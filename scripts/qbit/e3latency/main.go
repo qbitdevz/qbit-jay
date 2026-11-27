@@ -269,12 +269,12 @@ func main() {
 	if err != nil {
 		fatal(err)
 	}
-	defer os.RemoveAll(dataDir)
+	defer func() { _ = os.RemoveAll(dataDir) }()
 	workParent, err := os.MkdirTemp("", "e3latency-cwd-")
 	if err != nil {
 		fatal(err)
 	}
-	defer os.RemoveAll(workParent)
+	defer func() { _ = os.RemoveAll(workParent) }()
 
 	// The server rejects an explicit project it has no context for, so every
 	// call omits it and lets the server detect the project from the working
