@@ -24,9 +24,9 @@ Assumptions (not user specs):
 
 - [x] T1 Design system: `design/system.md` and `design/system.html` from qbitdev `tokens.css`/`tokens.json` plus qbit-jay additions — S2, S3, S5 — worker — commit: pending
 - [x] T2 Three identity directions in `design/qbit-jay-identity/` (mascot, logo and wordmark, README banner per direction) — S1, S2, S4, S5 — worker — commit: pending
-- [ ] T3 User chooses a direction — human. Shortlist: 01 and 03 (L6); 01 head marking to fix first (T2a)
+- [x] T3 User chooses a direction — human. Chosen: `03-hexagon-facets.html` (L9); 01 and 02 are alternatives
   - [x] T2a Fix the black head marking of `01-neon-outline.html` to match the photo — S1 — worker
-- [ ] T4 Final assets in `assets/branding/` from the chosen direction; README header comes with T0.4 — pending authorization after T3
+- [x] T4 Final assets in `assets/branding/` from `03-hexagon-facets.html` (standalone SVG mascot, isotype, lockups dark/light, README banner; PNG exports); `docs/BRAND.md` updated; Engram assets and README header stay until T0.4 — S1, S2, S5 — worker
 
 ## Log
 
@@ -39,4 +39,6 @@ Assumptions (not user specs):
 - L5 (evidence, 2026-11-27): T1 and T2 written by a worker: `design/system.md`, `design/system.html`, `design/qbit-jay-identity/` with `01-neon-outline.html`, `02-flat-sticker.html`, `03-hexagon-facets.html` and `design.json`; checked with Playwright at 1440 px. Banner copy "Hides thousands of acorns. Remembers where, months later." (figure left out until sourced). Generators live only in the temp dir.
 - L6 (user, 2026-11-27): "me gusta el tercer diseño o el primero, aunque el primero la linea negra de la cabeza esta mal"
 - L7 (user, 2026-11-27): "algo que no se si te dije es que aprovechemos que hoy engram esta maduro y bien diseñado. nos apalanquemos y lo mejoremos aun mas"
+- L9 (user, 2026-11-27): "me quedo con el 3." Chosen artboard: `design/qbit-jay-identity/03-hexagon-facets.html`; 01 and 02 are alternatives. The user accepted the hexagon echo of the qbitdev isotype.
 - L8 (evidence, 2026-11-27): T2a done by a worker: 01 now has a 4.5 px mask line from beak through eye to nape and an 11 px necklace across the upper breast below the white throat, shared by every mascot instance in 01. Parent screenshot at 1440 px confirms it. 02, 03 and system.* untouched.
+- L10 (evidence, 2026-11-27): T4 done by a worker: `assets/branding/qbit-jay-*` (mascot, isotype dark/light, horizontal logo dark/light, banner as SVG; mascot 512, isotype 256, banner 1x/2x as PNG), wordmark and tagline outlined from Outfit (OFL, qbitdev-brand), no external refs or rasters in the SVGs; `docs/BRAND.md` has a "Chosen identity" section. Parent viewed banner, mascot, both logos and both isotypes at 32 px. Engram assets and README untouched until T0.4.
