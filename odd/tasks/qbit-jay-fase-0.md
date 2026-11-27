@@ -29,7 +29,7 @@ Assumptions (not user specs):
 - [ ] T0.1 Environment and repository — S1, S2 — inline — commit: (upstream history; no own commit)
   - [x] T0.1a Go 1.26.11 in WSL
   - [x] T0.1b Import upstream with full history, remote `upstream`, `main` = starting commit
-  - [ ] T0.1c Create GitHub repository and get test CI green — blocked: owner decision + publishing consent
+  - [ ] T0.1c Create GitHub repository `qbitdevz/qbit-jay` (public) and get test CI green
 - [x] T0.2 Scaffolding — S3, S4, S5 — inline — commit: on branch `chore/fase-0-scaffolding-baseline`
 - [ ] T0.3 Upstream baseline (E3) — S6, S7, S8, S9, S10 — inline — commit: same branch. Partial: S9 open (race suite not run; 30 `plugin` tests fail without `jq`)
 - [ ] T0.4–T0.10 — not authorized yet (see spec section 11)
@@ -44,4 +44,5 @@ Assumptions (not user specs):
 - L6 (evidence, 2026-11-26): baseline measured on unchanged upstream, results in `docs/qbit/BASELINE.md`. Release binary 22,962,338 bytes; `go test ./...` exits 1 (34 packages ok, 30 failing tests, all in `plugin`, WSL lacks `jq`); race suite not run (no C compiler, sudo needs a password). MCP medians of three runs: `mem_save` p95 104.8 ms, `mem_search` p95 43.1 ms, `mem_context` p95 65.5 ms, startup p95 25.0 ms.
 - L7 (decision, 2026-11-26): run-to-run spread (up to 2x) exceeds the 5 % latency gates, so gates must be decided with alternating baseline/candidate runs in one session, not against the stored numbers. To review with the user, as section 2 asks.
 - L9 (state, 2026-11-26): session paused by the user ("guarda todo el estado continuamos mañana"). Native review of commit `b25af88` closed approved with 12 non-blocking findings, not applied. Open, all waiting on the user: (1) `sudo apt install -y jq gcc make` in WSL, then rerun `scripts/qbit/baseline.sh` to confirm the `plugin` failures and add the race suite to `docs/qbit/BASELINE.md`; (2) GitHub owner for `qbit-jay` and consent to create the public repository and push (T0.1c); (3) whether the specification under `docs/` is committed as is, trimmed, or kept out (it is untracked). Measurement artifacts live in WSL at `~/qbit-jay-baseline/upstream/out`. T0.4 is not authorized.
+- L10 (user, 2026-11-27): decisions on the L9 questions: (1) "Ya los instalo yo y te aviso" (jq, gcc, make in WSL); (2) owner "qbitdevz"; (3) "Público"; (4) specification "Commitearlo tal cual". Push branches only, never tags: `release.yml`, `cloud-image.yml` and `publish-pi.yml` trigger on tags.
 - L8 (discovery, 2026-11-26): MCP write and read tools reject an explicit `project` the server has no context for (`unknown_project`), even when the working directory has that name; the harness omits `project` and relies on detection.
