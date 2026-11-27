@@ -1,0 +1,10 @@
+{
+  "title": "qbit-jay visual identity",
+  "brief": "Three identity directions for qbit-jay, a persistent-memory tool for coding agents: a cartoon blue-jay mascot (large and small), a logo lockup with lowercase wordmark, and a 1280x320 README banner built on the acorn spatial-memory story. Built from qbitdev tokens plus qbit-jay additions; same genre as Engram (friendly cartoon, glow, one accent) with its own animal and palette.",
+  "feature": "odd/tasks/qbit-jay-identity.md",
+  "artboards": [
+    { "file": "01-neon-outline.html", "title": "Neon outline jay", "tradeoff": "Closest to the requested genre: dark ground, one cyan rim glow, saturated blue jay. Strong on README, TUI and dark web; the glow does not survive light backgrounds or print, so light lockups use a dark disc. Fonts at implementation: Outfit 600 (wordmark, -0.02em), Inter (body), JetBrains Mono (labels); artboard uses the system stack.", "width": 1440, "height": 1100 },
+    { "file": "02-flat-sticker.html", "title": "Flat sticker jay", "tradeoff": "Friendliest and most flexible: thick ink outline and white die-cut border hold on light, dark, photo and print, and at 32 px; gives up the glow genre of the request. Fonts at implementation: Outfit 700 (wordmark, -0.02em), Inter (body), JetBrains Mono (labels); artboard uses the system stack.", "width": 1440, "height": 1100 },
+    { "file": "03-hexagon-facets.html", "title": "Hexagon-facet jay with an acorn", "tradeoff": "Most ownable and closest to the qbitdev family (hexagon head, acorn as memory-cache metaphor, one glow on the hexagon behind); less cuddly than the others and risks reading as a qbitdev sub-logo. Fonts at implementation: Outfit 600 (wordmark, -0.02em), Inter (body), JetBrains Mono (labels); artboard uses the system stack.", "width": 1440, "height": 1100 }
+  ]
+}

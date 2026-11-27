@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1440">
+<title>qbit-jay identity · Flat sticker</title>
+<style>
+:root{
+  --qb-bg-deep:#04070D; --qb-panel:#0B121B; --qb-line-dark:#16222F;
+  --qb-blue:#2D7FFF; --qb-cyan:#35E0FF; --qb-green:#3DFF8B; --qb-ink:#E8F2FF; --qb-ink-muted:#8DA2B8; --qb-white:#FFFFFF;
+  --qb-light-bg:#F4F8FC; --qb-light-panel:#FFFFFF; --qb-light-line:#D6E0EA; --qb-light-blue:#1F6FEB; --qb-light-ink:#0B1521; --qb-light-ink-muted:#4F6275;
+  --qb-radius-field:12px; --qb-radius-card:20px; --qb-radius-pill:999px;
+  --jay-blue:#2F6FDB; --jay-blue-deep:#1B459E; --jay-blue-sky:#5B9BFF; --jay-mask:#070B12; --jay-beak:#1C2633; --jay-beak-hi:#3A4A5E;
+  --jay-face:#F2F7FD; --jay-belly:#B8C5D6;
+  --jay-acorn:#D9923A; --jay-acorn-cap:#8A5427; --jay-bark:#5B3A1E;
+  --jay-font-display:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --jay-font-body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --jay-font-mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{width:1440px;height:1100px;overflow:hidden;font-family:var(--jay-font-body);font-size:16px;line-height:1.5;background:var(--page-bg);color:var(--page-ink)}
+.board{padding:28px 40px 0;height:1100px;display:grid;grid-template-rows:auto 500px auto auto;gap:18px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:24px}
+h1{margin:0;font:600 28px/1.15 var(--jay-font-display);letter-spacing:-.02em}
+header p{margin:0;font:400 14px/1.4 var(--jay-font-mono);color:var(--page-muted)}
+h2{margin:0 0 10px;font:600 15px/1.2 var(--jay-font-display);letter-spacing:-.005em;color:var(--page-muted)}
+.row1{display:grid;grid-template-columns:700px 1fr;gap:24px;min-height:0}
+.panel{background:var(--panel-bg);border:1px solid var(--panel-line);border-radius:var(--qb-radius-card);position:relative;overflow:hidden}
+.col{display:grid;grid-template-rows:200px 1fr;gap:16px;min-height:0}
+.hero{display:flex;flex-direction:column;min-height:0}
+.hero .panel{flex:1;display:grid;place-items:center}
+.sizes .panel,.lockups .panel{height:100%}
+section{min-height:0}
+.sizes{display:flex;flex-direction:column}.sizes .panel{flex:1;display:flex;align-items:center;gap:0}
+.tile{flex:1;height:100%;display:flex;align-items:center;justify-content:center;gap:28px}
+.tile+.tile{border-left:1px solid var(--panel-line)}
+.tile.light{background:var(--qb-light-bg)}
+.tile.dark{background:var(--qb-bg-deep)}
+.tile small{display:block;font:400 12px/1.3 var(--jay-font-mono);margin-top:6px;text-align:center}
+.tile.light small{color:var(--qb-light-ink-muted)}.tile.dark small{color:var(--qb-ink-muted)}
+.lockups{display:flex;flex-direction:column;min-height:0}
+.lockups .panel{flex:1;display:grid;grid-template-rows:1fr 1fr}
+.lk{display:flex;align-items:center;gap:22px;padding:0 30px}
+.lk.dark{background:var(--qb-bg-deep);color:var(--qb-ink)}
+.lk.light{background:var(--qb-light-bg);color:var(--qb-light-ink)}
+.lk .wm{font:600 52px/1 var(--jay-font-display);letter-spacing:-.025em}
+.lk .by{font:500 15px/1.2 var(--jay-font-display);letter-spacing:-.005em;margin-top:8px}
+.lk.dark .by{color:var(--qb-ink-muted)}.lk.light .by{color:var(--qb-light-ink-muted)}
+.banner{display:flex;flex-direction:column;align-items:center}
+.banner h2{align-self:flex-start}
+.banner svg{display:block;border-radius:14px}
+.note{display:grid;grid-template-columns:150px 1fr;gap:20px;align-items:start}
+.note h2{margin:2px 0 0}
+.note p{margin:0;font-size:14.5px;line-height:1.5;max-width:1120px;color:var(--page-ink)}
+.note p+p{margin-top:4px;color:var(--page-muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+:focus-visible{outline:3px solid var(--qb-light-blue);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+body{--page-bg:var(--qb-light-bg);--page-ink:var(--qb-light-ink);--page-muted:var(--qb-light-ink-muted);--panel-bg:var(--qb-light-panel);--panel-line:var(--qb-light-line)}
+#jay-parts *,#jay-sil *{stroke-linejoin:round;stroke-linecap:round}
+.u1{fill:var(--qb-light-ink);stroke:var(--qb-light-ink);stroke-width:var(--sk1,40)}
+.u2{fill:var(--qb-white);stroke:var(--qb-white);stroke-width:var(--sk2,30)}
+.ink{stroke:var(--qb-light-ink)}
+.leg{fill:none;stroke:var(--qb-light-ink);stroke-width:8}
+.tail{fill:var(--jay-blue-deep)} .body{fill:var(--jay-blue)}
+.tail,.body,.wing,.crest,.head,.face,.beak{stroke:var(--qb-light-ink);stroke-width:var(--sw,7)}
+.ln{fill:none;stroke:var(--qb-light-ink);stroke-width:var(--sw,7)}
+.bar{fill:none;stroke:var(--qb-light-ink);stroke-width:5}
+.tip{fill:var(--jay-face)}
+.belly{fill:var(--jay-belly)} .belly-shade{fill:var(--qb-ink-muted)}
+.wing{fill:var(--jay-blue)} .feathers{fill:var(--jay-blue-deep)}
+.white{fill:var(--qb-white)} .crest{fill:var(--jay-blue)} .head{fill:var(--jay-blue)} .crown{fill:var(--jay-blue)}
+.face{fill:var(--qb-white)}
+.mask{fill:none;stroke:var(--qb-light-ink);stroke-width:12} .collar{stroke-width:13}
+.beak{fill:var(--jay-beak)} .beak-hi{fill:var(--jay-beak-hi)}
+.eye{fill:var(--qb-light-ink)} .smile{fill:none;stroke:var(--qb-light-ink);stroke-width:3.5}
+.detail{display:var(--d,inline)}
+.branch{fill:none;stroke:var(--qb-light-ink);stroke-width:26;stroke-linecap:round}
+.branch2{fill:none;stroke:var(--jay-bark);stroke-width:14;stroke-linecap:round}
+.ac-nut{fill:var(--jay-acorn);stroke:var(--qb-light-ink);stroke-width:3} .ac-cap{fill:var(--jay-acorn-cap);stroke:var(--qb-light-ink);stroke-width:3} .ac-hatch{fill:none;stroke:var(--qb-light-ink);stroke-width:2} .ac-stem{fill:none;stroke:var(--qb-light-ink);stroke-width:4}
+.iso-bg{fill:var(--qb-cyan)} .iso-ring{fill:none;stroke:var(--qb-light-ink);stroke-width:var(--ring,9)}
+.iso-sticker{fill:var(--qb-white);stroke:var(--qb-light-ink);stroke-width:6}
+.sm{--d:none;--sw:13;--sk1:56;--sk2:44;--ring:14}
+.hero-svg{transform:rotate(-3deg);filter:drop-shadow(0 8px 0 rgba(11,21,33,.12))}
+.tile.dark .sm,.lk.dark .iso{filter:none}
+
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<path id="p-tail" d="M283,319 L403,456 Q394,480 367,484 L257,341 Z"/>
+<path id="p-body" d="M112,205 C92,255 104,320 156,352 C206,384 286,372 322,326 C340,300 340,250 318,214 C296,176 240,166 200,176 Z"/>
+<path id="p-belly" d="M96,200 C80,262 100,330 156,358 C206,388 272,380 302,346 C262,336 214,300 204,232 C170,232 128,226 96,200 Z"/>
+<path id="p-wing" d="M204,212 C246,190 300,206 330,252 C352,288 374,330 398,370 L364,358 L368,380 L332,364 L330,382 L296,352 C236,330 196,290 204,212 Z"/>
+<path id="p-feathers" d="M200,246 C250,248 316,284 404,376 L330,392 L196,320 Z"/>
+<path id="p-head" d="M98,150 C98,100 130,82 168,82 C215,82 244,112 244,152 C244,200 210,226 168,226 C126,226 98,196 98,150 Z"/>
+<path id="p-crest" d="M118,116 C116,82 134,56 156,34 L168,62 L186,18 L200,58 L228,36 C242,64 240,98 228,124 Z"/>
+<path id="p-face" d="M100,150 C102,128 122,118 148,120 C172,118 192,126 198,146 C206,176 196,204 176,216 C160,226 142,226 128,212 C110,196 100,174 100,150 Z"/>
+<path id="p-beak" d="M110,136 L36,152 L110,168 Q118,152 110,136 Z"/>
+<path id="p-beak-top" d="M110,136 L36,152 L100,152 Q112,146 110,136 Z"/>
+<path id="p-legs" d="M196,362 L190,404 M170,408 L206,408 M238,366 L238,406 M220,410 L256,410"/>
+<clipPath id="c-body"><use href="#p-body"/></clipPath>
+<clipPath id="c-tail"><use href="#p-tail"/></clipPath>
+<clipPath id="c-wing"><use href="#p-wing"/></clipPath>
+<clipPath id="c-head"><use href="#p-head"/></clipPath>
+<g id="jay-sil"><use href="#p-tail"/><use href="#p-body"/><use href="#p-wing"/><use href="#p-crest"/><use href="#p-head"/><use href="#p-beak"/><use href="#p-legs"/></g>
+<g id="jay-parts">
+  <use href="#p-legs" class="leg"/>
+  <use href="#p-tail" class="tail"/>
+  <g clip-path="url(#c-tail)" class="detail">
+    <path class="bar" d="M278,394 L331,350 M297,416 L349,373 M315,438 L368,395 M332,459 L385,416"/>
+    <path class="tip" d="M400,425 L430,463 L368,514 L338,476 Z"/>
+  </g>
+  <use href="#p-tail" class="ln"/>
+  <use href="#p-body" class="body"/>
+  <g clip-path="url(#c-body)"><use href="#p-belly" class="belly"/>
+    <path class="belly-shade" d="M150,330 C190,372 250,378 300,346 C260,372 190,380 150,330 Z"/></g>
+  <use href="#p-body" class="ln"/>
+  <use href="#p-wing" class="wing"/>
+  <g clip-path="url(#c-wing)"><use href="#p-feathers" class="feathers"/>
+    <g class="detail">
+      <rect class="white" x="-17" y="-4.5" width="34" height="9" rx="4.5" transform="translate(236 252) rotate(18)"/>
+      <rect class="white" x="-17" y="-4.5" width="34" height="9" rx="4.5" transform="translate(268 266) rotate(28)"/>
+      <rect class="white" x="-17" y="-4.5" width="34" height="9" rx="4.5" transform="translate(298 288) rotate(40)"/>
+      <rect class="white" x="-17" y="-4.5" width="34" height="9" rx="4.5" transform="translate(324 318) rotate(50)"/>
+      <path class="bar" d="M268,292 l10,-12 M292,310 l12,-12 M314,334 l12,-12 M336,358 l12,-12 M356,376 l10,-8"/>
+    </g>
+  </g>
+  <use href="#p-wing" class="ln"/>
+  <use href="#p-crest" class="crest"/>
+  <use href="#p-head" class="head"/>
+  <g clip-path="url(#c-head)">
+    <path class="crown" d="M98,100 C140,96 190,110 250,96 L250,60 L98,60 Z"/>
+  </g>
+  <use href="#p-head" class="ln"/>
+  <use href="#p-face" class="face"/>
+  <path class="mask" d="M104,140 C128,137 160,132 208,140"/>
+  <path class="mask collar" d="M208,140 C240,172 228,224 178,238 C158,243 138,236 124,226"/>
+  <use href="#p-beak" class="beak"/>
+  <use href="#p-beak-top" class="beak-hi"/>
+  <circle class="eye" cx="146" cy="148" r="15"/>
+  <circle class="white" cx="151.5" cy="142" r="5.2"/>
+  <circle class="white" cx="141" cy="155" r="2.4"/>
+  <path class="smile" d="M114,170 Q128,182 142,172"/>
+</g>
+<g id="acorn">
+  <path class="ac-stem" d="M20,3 L21,-5"/>
+  <path class="ac-nut" d="M5,22 C5,40 15,48 20,50 C25,48 35,40 35,22 Z"/>
+  <path class="ac-cap" d="M2,22 C2,8 11,3 20,3 C29,3 38,8 38,22 Q20,27 2,22 Z"/>
+  <path class="ac-hatch" d="M8,14 L14,22 M16,8 L22,22 M26,8 L28,22 M33,14 L31,22"/>
+</g>
+<path id="p-branch" d="M20,424 C110,410 250,414 372,426"/>
+<clipPath id="c-iso"><circle cx="136" cy="126" r="131"/></clipPath></defs></svg>
+<main class="board">
+<header><h1>2. Flat sticker jay</h1><p>qbit-jay identity · direction 2 of 3 · 1440 × 1100</p></header>
+<div class="row1">
+  <section class="hero" aria-labelledby="h-hero"><h2 id="h-hero">Mascot, large</h2><div class="panel">
+<svg class="hero-svg" width="410" height="466" viewBox="-14 -14 468 528" role="img" aria-label="Sticker-style cartoon blue jay in profile, facing left, with a thick ink outline and a white die-cut border: pointed blue crest, white face with black eye line and necklace, blue wings with white bars, long blue tail, grey-white belly, dark beak. An acorn rests on the branch.">
+  <use href="#p-branch" class="branch"/><use href="#p-branch" class="branch2"/>
+  <use href="#jay-sil" class="u1"/><use href="#jay-sil" class="u2"/>
+  <use href="#jay-parts"/>
+  <use href="#acorn" class="ac" transform="translate(78 396) rotate(-12) scale(1.15) translate(-20 -26)"/>
+</svg></div></section>
+  <div class="col">
+    <section class="sizes" aria-labelledby="h-sizes"><h2 id="h-sizes">Mascot, small (32 px head, 96 px body)</h2><div class="panel"><div class="tile light"><div><svg class="sm" width="32" height="32" viewBox="4 -6 264 264" role="img" aria-label="32 px isotype"><circle class="iso-bg" cx="136" cy="126" r="131"/><g clip-path="url(#c-iso)"><use href="#jay-parts"/></g><circle class="iso-ring" cx="136" cy="126" r="124"/></svg><small>32 px</small></div>
+    <div><svg class="sm" style="--sw:10;--sk1:46;--sk2:36" width="90" height="102" viewBox="-12 -12 464 524" role="img" aria-label="96 px mascot"><use href="#jay-sil" class="u1"/><use href="#jay-sil" class="u2"/><use href="#jay-parts"/></svg><small>96 px</small></div></div>
+    <div class="tile dark"><div><svg class="sm" width="32" height="32" viewBox="4 -6 264 264" role="img" aria-label="32 px isotype on dark"><circle class="iso-bg" cx="136" cy="126" r="131"/><g clip-path="url(#c-iso)"><use href="#jay-parts"/></g><circle class="iso-ring" cx="136" cy="126" r="124"/></svg><small>32 px</small></div>
+    <div><svg class="sm" style="--sw:10;--sk1:46;--sk2:36" width="90" height="102" viewBox="-12 -12 464 524" role="img" aria-label="96 px mascot on dark"><use href="#jay-sil" class="u1"/><use href="#jay-sil" class="u2"/><use href="#jay-parts"/></svg><small>96 px</small></div></div></div></section>
+    <section class="lockups" aria-labelledby="h-lock"><h2 id="h-lock">Logo lockup on dark and on light</h2><div class="panel"><div class="lk dark"><svg class="iso " width="96" height="96" viewBox="4 -6 264 264" role="img" aria-label="qbit-jay isotype: the blue jay head"><circle class="iso-bg" cx="136" cy="126" r="131"/><g clip-path="url(#c-iso)"><use href="#jay-parts"/></g><circle class="iso-ring" cx="136" cy="126" r="124"/></svg><div><div class="wm">qbit-jay</div><div class="by">by qbitdev</div></div></div><div class="lk light"><svg class="iso " width="96" height="96" viewBox="4 -6 264 264" role="img" aria-label="qbit-jay isotype: the blue jay head"><circle class="iso-bg" cx="136" cy="126" r="131"/><g clip-path="url(#c-iso)"><use href="#jay-parts"/></g><circle class="iso-ring" cx="136" cy="126" r="124"/></svg><div><div class="wm">qbit-jay</div><div class="by">by qbitdev</div></div></div></div></section>
+  </div>
+</div>
+<section class="banner" aria-labelledby="h-banner"><h2 id="h-banner">README banner, 1280 × 320</h2><svg width="1280" height="320" viewBox="0 0 1280 320" role="img" aria-label="qbit-jay README banner in light mode: the sticker blue jay, the wordmark qbit-jay by qbitdev, the line Hides thousands of acorns. Remembers where, months later. and eight acorns joined by a dotted route.">
+  <rect width="1280" height="320" fill="#F4F8FC"/><rect x=".5" y=".5" width="1279" height="319" rx="14" fill="none" stroke="#D6E0EA"/>
+  <path d="M900,70 L1010,210 L1120,90 L1215,235 L960,275 L1180,160 L1070,40 L905,170" fill="none" stroke="#1F6FEB" stroke-width="3" stroke-dasharray="2 10" stroke-linecap="round"/><use href="#acorn" class="ac" transform="translate(900 70) rotate(-25) scale(1.25) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(1010 210) rotate(6) scale(1) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(1120 90) rotate(-13) scale(1.125) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(1215 235) rotate(18) scale(0.875) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(960 275) rotate(-1) scale(0.75) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(1180 160) rotate(-20) scale(0.6875) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(1070 40) rotate(11) scale(0.75) translate(-20 -26)"/><use href="#acorn" class="ac" transform="translate(905 170) rotate(-8) scale(0.6875) translate(-20 -26)"/>
+  <g transform="translate(40 10) scale(.585)"><use href="#jay-sil" class="u1"/><use href="#jay-sil" class="u2"/><use href="#jay-parts"/></g>
+  <g font-family="system-ui,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif">
+    <text x="372" y="138" font-size="92" font-weight="700" letter-spacing="-2.2" fill="#0B1521">qbit-jay</text>
+    <text x="378" y="172" font-size="18" font-weight="500" fill="#4F6275">by qbitdev</text>
+    <text x="378" y="236" font-size="29" font-weight="600" letter-spacing="-.3" fill="#0B1521">Hides thousands of acorns.</text>
+    <text x="378" y="272" font-size="29" font-weight="600" letter-spacing="-.3" fill="#0B1521">Remembers where, months later.</text>
+  </g>
+</svg></section>
+<section class="note" aria-labelledby="h-note"><h2 id="h-note">Tradeoff</h2><div><p>Friendliest and most flexible: thick ink outline and a white die-cut border make it a sticker that holds on light, dark or photo backgrounds, in print, and at 32 px. Gives up the glow genre of the request; the neon feeling survives only through the cyan isotype disc and qbitdev colour.</p><p>Type at implementation: Outfit 700 for the wordmark with −0.02em tracking (weight is heavier to match the outline), Inter for body, JetBrains Mono for labels. The artboard renders them with the system stack.</p></div></section>
+</main>
+</body>
+</html>

@@ -1,12 +1,12 @@
 # Brand plug-in points
 
-The visual identity of qbit-jay (jay logo, palette, typography, TUI and web
-style) is **not decided yet**. The user will define it in a separate design
-session. This document records where that identity plugs in, so it can be
-applied without searching the codebase.
+The visual identity of qbit-jay was chosen on 2026-11-27 (direction 03, see
+"Chosen identity"). The final assets exist in `assets/branding/`, but nothing
+uses them yet: wiring them into the README, docs, TUI and web, and removing
+Engram's assets, belongs to task T0.4. This document records where that
+identity plugs in, so it can be applied without searching the codebase.
 
-Status: inventory at upstream commit `11521f4`. Nothing has been renamed or
-replaced yet; that work belongs to task T0.4.
+Status: inventory at upstream commit `11521f4`, plus the new assets.
 
 ## Name and story
 
@@ -23,19 +23,43 @@ the story:
 The design session and the README in T0.4 should build on these. Before the
 acorn figure appears in public copy, cite a source for it.
 
+## Chosen identity
+
+Direction 03, **hexagon-facet jay with an acorn** (`design/qbit-jay-identity/03-hexagon-facets.html`):
+a blue jay built from triangle facets, holding an acorn, inside a flat-top
+hexagon. Tokens are in `design/system.md`; the other two directions (01, 02)
+stay as alternatives.
+
+| Asset (`assets/branding/`) | Intended use |
+| --- | --- |
+| `qbit-jay-mascot.svg`, `qbit-jay-mascot-512.png` | Full jay with acorn, transparent, no glow: docs, TUI splash source, web empty states |
+| `qbit-jay-isotype-dark.svg`, `qbit-jay-isotype-light.svg`, `qbit-jay-isotype-dark-256.png` | Hexagon tile with the jay head: favicon, avatar, small marks. Dark = for dark backgrounds, light = for light backgrounds |
+| `qbit-jay-logo-horizontal-dark.svg`, `qbit-jay-logo-horizontal-light.svg` | Isotype, wordmark `qbit-jay` and `by qbitdev`; transparent background |
+| `qbit-jay-banner.svg`, `qbit-jay-banner.png` (1280x320), `qbit-jay-banner@2x.png` (2560x640) | README header, with the tagline "Hides thousands of acorns. Remembers where, months later." |
+| `qbit-jay-banner.gif` | Animated README banner, 900x506, 20 fps, 7 s, 140 frames, looping, about 0.8 MB: the jay appears in its glowing hexagon, hides acorns in grid cells labelled `save`, `search`, `context`, `sync`, `recall`, `remember`, the wordmark is written on, then the tagline appears. Suggested alt text: "qbit-jay faceted blue jay hides acorns in a hexagon grid, the qbit-jay wordmark is written on, and the tagline Hides thousands of acorns. Remembers where, months later. appears" |
+
+All SVGs are self-contained, use only `design/system.md` colours and have the
+wordmark and banner text converted to paths (Outfit), so they need no font.
+
+- **Clear space** (qbit-jay decision): half the isotype height on every side.
+- **Minimum size** (qbit-jay decision): isotype 32 px.
+- **Fonts**: Outfit (wordmark and headlines), Inter (body), JetBrains Mono
+  (labels), all SIL OFL 1.1, taken from `qbitdev-brand/fonts`.
+- The Engram images in `assets/branding/` are removed in T0.4.
+
 ## Rules
 
 - A fork must use its own name and identity (`TRADEMARKS.md`). "Based on
   Engram" and "compatible with Engram" are allowed when true; Engram logos and
   confusingly similar names are not.
-- Until the design exists, use a neutral provisional theme and a logo
-  placeholder. Do not invent the final identity and do not imitate Engram's.
+- Until T0.4 lands, the TUI and web keep their provisional theme. Do not
+  imitate Engram's identity.
 
 ## Where identity lives today
 
 | Surface | Location | What it holds |
 | --- | --- | --- |
-| Images | `assets/branding/` | Engram banner, logo and Cloud elephant images: to be removed |
+| Images | `assets/branding/` | `qbit-jay-*` final assets (new, not wired in yet); Engram banner, logo and Cloud elephant images: to be removed in T0.4 |
 | Screenshots | `assets/*.png` | TUI and agent screenshots showing Engram branding: to be retaken |
 | TUI theme | `internal/tui/styles.go` | Lip Gloss colours (Catppuccin Mocha) |
 | Web theme | `internal/cloud/dashboard/static/styles.css` | Dashboard CSS on top of `pico.min.css` |
@@ -50,6 +74,6 @@ then means editing that one package.
 
 | Element | Plugs into | State |
 | --- | --- | --- |
-| Logo | `assets/branding/` and the README header | Pending design |
-| Palette | `internal/qbit/theme` | Pending design |
-| Typography | `internal/qbit/theme` | Pending design |
+| Logo | `assets/branding/` and the README header | Designed (direction 03); wiring pending in T0.4 |
+| Palette | `internal/qbit/theme` | Designed (`design/system.md`); theme package pending in T0.4 |
+| Typography | `internal/qbit/theme` | Chosen (Outfit, Inter, JetBrains Mono); theme package pending in T0.4 |
