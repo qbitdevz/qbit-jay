@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=1440"><title>qbit-jay design system</title>
+<style>
+:root{
+  --qb-bg-deep:#04070D;
+  --qb-panel:#0B121B;
+  --qb-line-dark:#16222F;
+  --qb-blue:#2D7FFF;
+  --qb-cyan:#35E0FF;
+  --qb-green:#3DFF8B;
+  --qb-teal:#1FB6C9;
+  --qb-ink:#E8F2FF;
+  --qb-ink-muted:#8DA2B8;
+  --qb-white:#FFFFFF;
+  --qb-light-bg:#F4F8FC;
+  --qb-light-panel:#FFFFFF;
+  --qb-light-line:#D6E0EA;
+  --qb-light-blue:#1F6FEB;
+  --qb-light-cyan:#0FA6C7;
+  --qb-light-green:#17B36A;
+  --qb-light-ink:#0B1521;
+  --qb-light-ink-muted:#4F6275;
+  --jay-blue:#2F6FDB;
+  --jay-blue-deep:#1B459E;
+  --jay-blue-sky:#5B9BFF;
+  --jay-mask:#070B12;
+  --jay-beak:#1C2633;
+  --jay-beak-hi:#3A4A5E;
+  --jay-face:#F2F7FD;
+  --jay-belly:#B8C5D6;
+  --jay-acorn:#D9923A;
+  --jay-acorn-cap:#8A5427;
+  --jay-bark:#5B3A1E;
+  --qb-gradient:linear-gradient(135deg,#2D7FFF 0%,#35E0FF 50%,#3DFF8B 100%);
+  --qb-glow-soft:0 0 24px rgba(53,224,255,.33);
+  --qb-glow-strong:0 0 18px #35E0FF,0 0 48px rgba(53,224,255,.4);
+  --qb-radius-field:12px;--qb-radius-card:20px;--qb-radius-pill:999px;
+  --jay-font-display:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --jay-font-body:system-ui,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --jay-font-mono:ui-monospace,"Cascadia Code",Consolas,monospace;
+}
+*{box-sizing:border-box}html,body{margin:0}
+body{width:1440px;background:var(--qb-bg-deep);color:var(--qb-ink);font:400 16px/1.5 var(--jay-font-body)}
+main{padding:40px 48px 56px;display:grid;gap:36px}
+h1{margin:0;font:600 34px/1.1 var(--jay-font-display);letter-spacing:-.02em}
+h2{margin:0 0 14px;font:600 20px/1.2 var(--jay-font-display);letter-spacing:-.01em}
+h3{margin:0 0 10px;font:600 15px/1.2 var(--jay-font-display);color:var(--qb-ink-muted)}
+p{margin:0;max-width:92ch}.muted{color:var(--qb-ink-muted)}
+code{font:500 13px/1.3 var(--jay-font-mono);color:var(--qb-ink)}
+.sw{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,1fr);gap:14px}
+.sw li{display:grid;gap:4px}
+.chip{height:64px;border-radius:var(--qb-radius-field);display:flex;align-items:flex-end;padding:8px 10px;font:500 13px/1 var(--jay-font-mono);border:1px solid var(--qb-line-dark)}
+.use{font-size:13px;color:var(--qb-ink-muted)}
+.sw.light{grid-template-columns:repeat(4,1fr)}
+.sw.jay{grid-template-columns:repeat(6,1fr)}
+.add{border:1px dashed var(--qb-cyan);border-radius:var(--qb-radius-card);padding:24px;background:var(--qb-panel)}
+.add .tag{display:inline-block;font:500 12px/1 var(--jay-font-mono);color:var(--qb-bg-deep);background:var(--qb-cyan);border-radius:var(--qb-radius-pill);padding:5px 10px;margin-bottom:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+.card{background:var(--qb-panel);border:1px solid var(--qb-line-dark);border-radius:var(--qb-radius-card);padding:24px}
+.type div{margin:0 0 10px}
+.t-wm{font:600 56px/1 var(--jay-font-display);letter-spacing:-.02em}
+.t-h{font:600 32px/1.15 var(--jay-font-display);letter-spacing:-.02em}
+.t-h2{font:600 22px/1.2 var(--jay-font-display);letter-spacing:-.01em}
+.t-b{font:400 16px/1.5 var(--jay-font-body)}
+.t-m{font:500 13px/1.4 var(--jay-font-mono);color:var(--qb-green)}
+.radii{display:flex;gap:20px;align-items:end}
+.rad{width:150px;height:96px;border:2px solid var(--qb-cyan);display:grid;place-items:center;font:500 13px/1 var(--jay-font-mono)}
+.glows{display:flex;gap:44px;padding:20px 8px}
+.gl{width:150px;height:76px;border-radius:var(--qb-radius-field);background:var(--qb-bg-deep);border:1px solid var(--qb-cyan);display:grid;place-items:center;font:500 13px/1 var(--jay-font-mono)}
+.gl.soft{box-shadow:var(--qb-glow-soft)}.gl.strong{box-shadow:var(--qb-glow-strong)}
+.comps{display:flex;flex-wrap:wrap;gap:18px;align-items:center}
+button{font:600 15px/1 var(--jay-font-body);border:0;cursor:pointer;border-radius:var(--qb-radius-pill);padding:14px 22px}
+.b1{background:var(--qb-gradient);color:var(--qb-bg-deep)}
+.b2{background:transparent;color:var(--qb-ink);border:1.5px solid var(--qb-cyan)}
+.b3{background:var(--qb-light-bg);color:var(--qb-light-ink)}
+button:focus-visible,input:focus-visible{outline:3px solid var(--qb-cyan);outline-offset:3px}
+input{font:400 15px/1 var(--jay-font-body);background:var(--qb-bg-deep);color:var(--qb-ink);border:1px solid var(--qb-ink-muted);border-radius:var(--qb-radius-field);padding:13px 14px;width:260px}
+label{display:grid;gap:6px;font-size:13px;color:var(--qb-ink-muted)}
+.pill{font:500 12px/1 var(--jay-font-mono);color:var(--qb-green);border:1px solid var(--qb-line-dark);background:var(--qb-bg-deep);border-radius:var(--qb-radius-pill);padding:7px 12px}
+.mem{width:340px;background:var(--qb-bg-deep);border:1px solid var(--qb-line-dark);border-radius:var(--qb-radius-card);padding:18px}
+.mem b{display:block;font:600 16px/1.3 var(--jay-font-display);margin-bottom:4px}
+.lightbox{background:var(--qb-light-bg);color:var(--qb-light-ink);border:1px solid var(--qb-light-line);border-radius:var(--qb-radius-card);padding:20px;width:340px}
+.lightbox a{color:var(--qb-light-blue);font-weight:600}
+.lightbox .p{background:var(--qb-light-panel);border:1px solid var(--qb-light-line);border-radius:var(--qb-radius-field);padding:12px;margin-top:10px;color:var(--qb-light-ink-muted);font-size:14px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style></head>
+<body><main>
+<header><h1>qbit-jay design system</h1>
+<p class="muted" style="margin-top:8px">qbitdev tokens, copied unchanged from <code>D:\Proyectos\Propios\qbitdev-brand\tokens.css</code> and <code>tokens.json</code>, plus a separate block of qbit-jay additions. Tokens and rules are written in <code>design/system.md</code>.</p></header>
+
+<section aria-labelledby="c1"><h2 id="c1">Colors, qbitdev</h2>
+<h3>Dark</h3><ul class="sw"><li><span class="chip" style="background:var(--qb-bg-deep);color:#FFFFFF">#04070D</span><code>--qb-bg-deep</code><span class="use">Page background</span></li><li><span class="chip" style="background:var(--qb-panel);color:#FFFFFF">#0B121B</span><code>--qb-panel</code><span class="use">Cards, disc, tile</span></li><li><span class="chip" style="background:var(--qb-line-dark);color:#FFFFFF">#16222F</span><code>--qb-line-dark</code><span class="use">Borders, grid</span></li><li><span class="chip" style="background:var(--qb-blue);color:#04070D">#2D7FFF</span><code>--qb-blue</code><span class="use">Gradient start</span></li><li><span class="chip" style="background:var(--qb-cyan);color:#04070D">#35E0FF</span><code>--qb-cyan</code><span class="use">Glow, rim</span></li><li><span class="chip" style="background:var(--qb-green);color:#04070D">#3DFF8B</span><code>--qb-green</code><span class="use">Gradient end</span></li><li><span class="chip" style="background:var(--qb-teal);color:#04070D">#1FB6C9</span><code>--qb-teal</code><span class="use">Secondary accent</span></li><li><span class="chip" style="background:var(--qb-ink);color:#04070D">#E8F2FF</span><code>--qb-ink</code><span class="use">Text</span></li><li><span class="chip" style="background:var(--qb-ink-muted);color:#04070D">#8DA2B8</span><code>--qb-ink-muted</code><span class="use">Secondary text</span></li><li><span class="chip" style="background:var(--qb-white);color:#04070D">#FFFFFF</span><code>--qb-white</code><span class="use">Sticker border</span></li></ul>
+<h3 style="margin-top:22px">Light</h3><ul class="sw light"><li><span class="chip" style="background:var(--qb-light-bg);color:#04070D">#F4F8FC</span><code>--qb-light-bg</code><span class="use">Page</span></li><li><span class="chip" style="background:var(--qb-light-panel);color:#04070D">#FFFFFF</span><code>--qb-light-panel</code><span class="use">Cards</span></li><li><span class="chip" style="background:var(--qb-light-line);color:#04070D">#D6E0EA</span><code>--qb-light-line</code><span class="use">Borders</span></li><li><span class="chip" style="background:var(--qb-light-blue);color:#FFFFFF">#1F6FEB</span><code>--qb-light-blue</code><span class="use">Emphasis</span></li><li><span class="chip" style="background:var(--qb-light-cyan);color:#04070D">#0FA6C7</span><code>--qb-light-cyan</code><span class="use">Lines only</span></li><li><span class="chip" style="background:var(--qb-light-green);color:#04070D">#17B36A</span><code>--qb-light-green</code><span class="use">Lines only</span></li><li><span class="chip" style="background:var(--qb-light-ink);color:#FFFFFF">#0B1521</span><code>--qb-light-ink</code><span class="use">Text, ink outline</span></li><li><span class="chip" style="background:var(--qb-light-ink-muted);color:#FFFFFF">#4F6275</span><code>--qb-light-ink-muted</code><span class="use">Secondary text</span></li></ul>
+<h3 style="margin-top:22px">Gradient</h3>
+<div style="height:48px;border-radius:var(--qb-radius-field);background:var(--qb-gradient)" role="img" aria-label="Brand gradient: blue, cyan, green at 135 degrees"></div></section>
+
+<section aria-labelledby="c2" class="add"><span class="tag">qbit-jay additions</span><h2 id="c2">Jay colors, acorn and artboard fonts</h2>
+<p class="muted" style="margin-bottom:16px">Not qbitdev values. They come from the reference photo and the acorn story; qbitdev tokens above are never altered.</p>
+<ul class="sw jay"><li><span class="chip" style="background:var(--jay-blue);color:#FFFFFF">#2F6FDB</span><code>--jay-blue</code><span class="use">Crest, back, coverts</span></li><li><span class="chip" style="background:var(--jay-blue-deep);color:#FFFFFF">#1B459E</span><code>--jay-blue-deep</code><span class="use">Flight feathers, tail</span></li><li><span class="chip" style="background:var(--jay-blue-sky);color:#04070D">#5B9BFF</span><code>--jay-blue-sky</code><span class="use">Highlight facets</span></li><li><span class="chip" style="background:var(--jay-mask);color:#FFFFFF">#070B12</span><code>--jay-mask</code><span class="use">Eye line, necklace</span></li><li><span class="chip" style="background:var(--jay-beak);color:#FFFFFF">#1C2633</span><code>--jay-beak</code><span class="use">Beak, legs</span></li><li><span class="chip" style="background:var(--jay-beak-hi);color:#FFFFFF">#3A4A5E</span><code>--jay-beak-hi</code><span class="use">Beak highlight</span></li><li><span class="chip" style="background:var(--jay-face);color:#04070D">#F2F7FD</span><code>--jay-face</code><span class="use">Face, wing bars</span></li><li><span class="chip" style="background:var(--jay-belly);color:#04070D">#B8C5D6</span><code>--jay-belly</code><span class="use">Belly, chest</span></li><li><span class="chip" style="background:var(--jay-acorn);color:#04070D">#D9923A</span><code>--jay-acorn</code><span class="use">Acorn nut</span></li><li><span class="chip" style="background:var(--jay-acorn-cap);color:#FFFFFF">#8A5427</span><code>--jay-acorn-cap</code><span class="use">Acorn cap</span></li><li><span class="chip" style="background:var(--jay-bark);color:#FFFFFF">#5B3A1E</span><code>--jay-bark</code><span class="use">Branch</span></li></ul>
+<p class="muted" style="margin-top:16px">Artboard font stacks (system only, per the gentle-design rule): <code>--jay-font-display</code>, <code>--jay-font-body</code> and <code>--jay-font-mono</code> stand in for Outfit, Inter and JetBrains Mono, which are named in each artboard's tradeoff note.</p></section>
+
+<div class="grid2">
+<section aria-labelledby="t1" class="card type"><h2 id="t1">Typography</h2>
+<div class="t-wm">qbit-jay</div>
+<div class="t-h">Hides thousands of acorns</div>
+<div class="t-h2">Remembers where, months later</div>
+<div class="t-b">Body text at 16 px, 1.5 line height, under 80 characters per line.</div>
+<div class="t-m">// mono label</div>
+<p class="muted" style="font-size:13px;margin-top:14px">Brand fonts: Outfit 500 to 700 (display, lowercase wordmark), Inter 400 to 600 (body), JetBrains Mono 400 to 500 (labels). Rendered here with the system stacks.</p></section>
+<section aria-labelledby="r1" class="card"><h2 id="r1">Radius and glow</h2>
+<div class="radii"><div class="rad" style="border-radius:var(--qb-radius-field)">12 field</div><div class="rad" style="border-radius:var(--qb-radius-card)">20 card</div><div class="rad" style="border-radius:var(--qb-radius-pill)">999 pill</div></div>
+<div class="glows"><div class="gl soft">glow soft</div><div class="gl strong">glow strong</div></div>
+<p class="muted" style="font-size:13px">One strong glow per piece. Spacing: the sources define none, so none is shown.</p></section>
+</div>
+
+<section aria-labelledby="k1" class="card"><h2 id="k1">Core components</h2>
+<div class="comps">
+<button class="b1" type="button">Save memory</button><button class="b2" type="button">Search</button><button class="b3" type="button">Light button</button>
+<label>Search memories<input type="text" value="where did I hide the auth fix?"></label>
+<span class="pill">decision</span><span class="pill">bugfix</span>
+</div>
+<div class="comps" style="margin-top:22px;align-items:flex-start">
+<div class="mem"><b>Chose JWT refresh rotation</b><span class="muted" style="font-size:14px">Stored 3 months ago, project billing-api</span></div>
+<div class="lightbox"><b>Light mode card</b><div class="p">Flat emphasis colour, no glow. <a href="#k1">Open memory</a></div></div>
+</div></section>
+</main></body></html>
