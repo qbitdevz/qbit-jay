@@ -61,7 +61,7 @@ func TestReleaseChecksModuleMetadataWithoutMutatingTaggedSources(t *testing.T) {
 
 // modulePath must carry the major-version suffix of the release line so that
 // `go install <modulePath>/cmd/engram@latest` resolves the tagged release.
-const modulePath = "github.com/Gentleman-Programming/engram/v3"
+const modulePath = "github.com/qbitdevz/qbit-jay"
 
 func TestModulePathMatchesReleaseMajorVersion(t *testing.T) {
 	root := releaseConfigRepoRoot(t)

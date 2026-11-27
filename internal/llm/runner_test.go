@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/llm"
 )
 
 // fakeRunner is a compile-time check that a concrete struct satisfying

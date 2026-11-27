@@ -6,8 +6,8 @@ import (
 	"math/big"
 	"strings"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // CallerBindingInput is host evidence, never authorization to resume or write.

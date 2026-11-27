@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/llm"
 )
 
 // ─── A.3 tests ────────────────────────────────────────────────────────────────

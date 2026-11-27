@@ -9,7 +9,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/command"
 )
 
 // ─── ClaudeRunner ─────────────────────────────────────────────────────────────

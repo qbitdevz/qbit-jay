@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
 )
 
 func TestDoctorBlankMCPConfig(t *testing.T) {

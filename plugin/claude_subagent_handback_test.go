@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/server"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func TestClaudeSubagentHandbackHookRegistration(t *testing.T) {

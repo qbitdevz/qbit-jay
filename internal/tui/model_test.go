@@ -4,9 +4,9 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	"github.com/Gentleman-Programming/engram/v3/internal/version"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/version"
 )
 
 type testFixture struct {

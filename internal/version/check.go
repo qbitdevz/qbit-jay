@@ -191,9 +191,9 @@ func updateInstructions() string {
 	case "darwin":
 		return "  brew update && brew upgrade engram"
 	case "linux":
-		return "  brew update && brew upgrade engram\n  or: go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest"
+		return "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/engram@latest"
 	default:
-		return "  go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
+		return "  go install github.com/qbitdevz/qbit-jay/cmd/engram@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
 	}
 }
 

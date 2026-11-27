@@ -7,7 +7,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
 )
 
 // stopDaemonProcess terminates the daemon on Windows. Graceful console

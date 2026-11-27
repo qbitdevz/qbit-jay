@@ -28,12 +28,12 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/agentops"
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
-	"github.com/Gentleman-Programming/engram/v3/internal/hostbind"
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	"github.com/Gentleman-Programming/engram/v3/internal/timeutil"
+	"github.com/qbitdevz/qbit-jay/internal/agentops"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
+	"github.com/qbitdevz/qbit-jay/internal/hostbind"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/timeutil"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

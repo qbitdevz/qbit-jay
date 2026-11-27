@@ -13,13 +13,13 @@ import (
 	"testing"
 	"time"
 
-	cloudauth "github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/dashboard"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/remote"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	cloudauth "github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/dashboard"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/remote"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 type fakeStore struct {

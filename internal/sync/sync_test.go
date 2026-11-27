@@ -15,8 +15,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	_ "modernc.org/sqlite"
 )
 

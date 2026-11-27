@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	httpserver "github.com/Gentleman-Programming/engram/v3/internal/server"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	httpserver "github.com/qbitdevz/qbit-jay/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Exercise registered MCP dispatch and the existing HTTP read/write interface.

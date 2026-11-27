@@ -8,7 +8,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
 )
 
 // stopDaemonProcess stops the daemon gracefully then forcibly (docker `stop`

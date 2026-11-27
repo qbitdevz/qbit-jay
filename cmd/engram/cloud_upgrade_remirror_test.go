@@ -8,9 +8,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloudconfig"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloudconfig"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func TestCmdCloudUpgradeRemirrorSuccessPrintsExportCounts(t *testing.T) {

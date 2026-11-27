@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 // TestSQLiteTempHTTPDeletedInheritedDirectory exercises the released runtime

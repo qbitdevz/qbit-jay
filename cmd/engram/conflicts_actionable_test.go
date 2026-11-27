@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	"strconv"
 	"strings"
 	"testing"

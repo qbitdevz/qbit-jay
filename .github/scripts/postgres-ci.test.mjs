@@ -5,7 +5,7 @@ import { spawnSync } from 'node:child_process';
 import test from 'node:test';
 
 const checker = '.github/scripts/postgres-ci-evidence.mjs';
-const prefix = 'github.com/Gentleman-Programming/engram/v3/';
+const prefix = 'github.com/qbitdevz/qbit-jay/';
 const selected = [
   ['internal/cloud/cloudstore', 'TestProjectSyncControlPersists'],
   ['internal/cloud/cloudserver', 'TestSessionAuthorityRegistrationPersistsOverHTTP'],

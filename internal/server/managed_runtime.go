@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/hostbind"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/hostbind"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func (s *Server) handleManagedRuntimeScopes(w http.ResponseWriter, r *http.Request) {

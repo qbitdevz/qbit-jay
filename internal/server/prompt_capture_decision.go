@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"strings"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 // handlePromptCaptureDecision classifies Claude input without persisting or notifying writes.

@@ -12,7 +12,7 @@ func validateArtifactCoreBuild(core []byte, revision string) error {
 	if err != nil {
 		return err
 	}
-	if info.Path != "github.com/Gentleman-Programming/engram/v3/cmd/engram" || info.Main.Path != "github.com/Gentleman-Programming/engram/v3" {
+	if info.Path != "github.com/qbitdevz/qbit-jay/cmd/engram" || info.Main.Path != "github.com/qbitdevz/qbit-jay" {
 		return fmt.Errorf("staging: Core module identity mismatch")
 	}
 	settings := map[string]string{}

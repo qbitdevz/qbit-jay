@@ -8,7 +8,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 // Unlike go run, the executable preserves exit 2 without adding stderr text.

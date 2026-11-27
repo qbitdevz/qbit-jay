@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 type promptPairClaimStore interface {

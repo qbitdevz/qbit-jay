@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/command"
 )
 
 // ErrAmbiguousProject is returned when the working directory is a parent of

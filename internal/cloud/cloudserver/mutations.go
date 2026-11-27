@@ -13,11 +13,11 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	cloudauth "github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
+	cloudauth "github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	"github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 // ─── Types ────────────────────────────────────────────────────────────────────

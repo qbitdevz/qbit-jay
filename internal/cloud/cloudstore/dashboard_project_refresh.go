@@ -5,7 +5,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
 )
 
 // Invalidation retains only an immutable, permission-neutral baseline. Readers

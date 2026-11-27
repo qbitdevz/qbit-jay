@@ -13,14 +13,14 @@ import (
 
 	"golang.org/x/mod/semver"
 
-	cloudauth "github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/dashboard"
-	engramproject "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	cloudauth "github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/dashboard"
+	engramproject "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 type Option func(*CloudServer)

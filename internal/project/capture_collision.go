@@ -9,7 +9,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/identityfile"
+	"github.com/qbitdevz/qbit-jay/internal/identityfile"
 )
 
 // HasImplicitGitProject reports whether the selection has a private Git binding.

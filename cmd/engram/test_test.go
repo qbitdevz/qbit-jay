@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/selftest"
-	versioncheck "github.com/Gentleman-Programming/engram/v3/internal/version"
+	"github.com/qbitdevz/qbit-jay/internal/selftest"
+	versioncheck "github.com/qbitdevz/qbit-jay/internal/version"
 )
 
 func TestParseTestArgs(t *testing.T) {

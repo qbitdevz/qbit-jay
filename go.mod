@@ -1,4 +1,4 @@
-module github.com/Gentleman-Programming/engram/v3
+module github.com/qbitdevz/qbit-jay
 
 go 1.26.11
 

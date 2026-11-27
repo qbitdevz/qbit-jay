@@ -8,7 +8,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 // ProjectHistory returns weak scope evidence for an exact directory. Session

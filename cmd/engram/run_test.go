@@ -13,8 +13,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // init() child emulation for `engram run -d` (issue #2228): when the parent

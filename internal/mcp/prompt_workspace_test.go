@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/hostbind"
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/hostbind"
+	"github.com/qbitdevz/qbit-jay/internal/project"
 	mcppkg "github.com/mark3labs/mcp-go/mcp"
 )
 

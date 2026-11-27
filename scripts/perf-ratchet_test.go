@@ -16,6 +16,13 @@ pkg: github.com/Gentleman-Programming/engram/internal/store
 cpu: test-cpu
 `
 
+// qbitStorePackage returns the package path the ratchet normalizes upstream
+// Engram package paths to (qbit-jay module path).
+func qbitStorePackage(s string) string {
+	s = strings.ReplaceAll(s, "github.com/qbitdevz/qbit-jay/", "github.com/qbitdevz/qbit-jay/")
+	return strings.ReplaceAll(s, "github.com/Gentleman-Programming/engram/", "github.com/qbitdevz/qbit-jay/")
+}
+
 func TestPerfRatchetCompare(t *testing.T) {
 	shell := perfRatchetShell()
 	if shell == "" {
@@ -336,7 +343,7 @@ func TestPerfRatchetAgainst(t *testing.T) {
 		{
 			name: "rejects different same-runner configurations", reference: one, candidate: strings.ReplaceAll(one, "test-cpu", "other-cpu"), bootstrap: true, code: 1,
 			diagnostic: "perf ratchet benchmark configurations do not match after package normalization; refusing separate benchstat tables\n",
-			diff:       "@@ -1,4 +1,4 @@\n-cpu: test-cpu\n+cpu: other-cpu\n goarch: amd64\n goos: linux\n pkg: github.com/Gentleman-Programming/engram/v3/internal/store\n",
+			diff:       "@@ -1,4 +1,4 @@\n-cpu: test-cpu\n+cpu: other-cpu\n goarch: amd64\n goos: linux\n pkg: github.com/qbitdevz/qbit-jay/internal/store\n",
 		},
 		{
 			name: "rejects bootstrap outside the versioned suite", reference: one, candidate: two, baseline: one, bootstrap: true, code: 1,
@@ -380,8 +387,8 @@ func TestPerfRatchetAgainst(t *testing.T) {
 			f.assertFile(t, "benchmark-calls", calls)
 			if tt.compared {
 				f.assertFile(t, "benchstat-calls", "benchstat\n")
-				f.assertFile(t, "compared-old", strings.ReplaceAll(tt.reference, "/engram/", "/engram/v3/"))
-				f.assertFile(t, "compared-new", strings.ReplaceAll(tt.candidate, "/engram/", "/engram/v3/"))
+				f.assertFile(t, "compared-old", qbitStorePackage(tt.reference))
+				f.assertFile(t, "compared-new", qbitStorePackage(tt.candidate))
 			} else if _, err := os.Stat(filepath.Join(f.root, "benchstat-calls")); !os.IsNotExist(err) {
 				t.Fatalf("unexpected benchstat execution: %v", err)
 			}
@@ -402,7 +409,7 @@ func TestPerfRatchetUpdate(t *testing.T) {
 			}
 			stdout, stderr, code := f.run(t, env, "--update")
 			wantStdout := "updated " + f.shellRoot + "/.perf-baseline.txt with 3 samples per benchmark\n"
-			wantStderr, wantCode, wantBaseline := "", 0, strings.ReplaceAll(candidate, "/engram/v2/", "/engram/v3/")
+			wantStderr, wantCode, wantBaseline := "", 0, strings.ReplaceAll(candidate, "github.com/Gentleman-Programming/engram/v2/", "github.com/qbitdevz/qbit-jay/")
 			if fail {
 				wantStdout, wantStderr, wantCode, wantBaseline = "", "fixture benchmark failed\n", 7, baseline
 			}

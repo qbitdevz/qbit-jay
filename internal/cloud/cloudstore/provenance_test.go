@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/chunkcodec"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/chunkcodec"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func TestMaterializedObservationProvenance(t *testing.T) {

@@ -19,8 +19,8 @@ import (
 	"testing"
 	"time"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const currentProjectGitFixture = "ENGRAM_TEST_CURRENT_PROJECT_GIT_ADDRESS"

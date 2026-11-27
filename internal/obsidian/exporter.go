@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/identityfile"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/identityfile"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // ExportConfig holds all CLI flags for the obsidian-export command.

@@ -11,8 +11,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const protectedReceiptVersion = 3

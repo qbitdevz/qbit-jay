@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/command"
 )
 
 // gitInspection belongs to one detection, never a cache across requests.

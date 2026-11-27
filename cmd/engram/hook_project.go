@@ -9,7 +9,7 @@ import (
 	"path/filepath"
 	"unicode/utf8"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 // cmdResolveHookProject is config-free like the other native hook actions. Its

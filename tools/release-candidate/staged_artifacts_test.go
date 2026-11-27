@@ -43,7 +43,7 @@ func stagedProgramFixture(t *testing.T, program string) ([]byte, string, string)
 			t.Fatal(err)
 		}
 	}
-	write("go.mod", "module github.com/Gentleman-Programming/engram/v3\n\ngo 1.23\n")
+	write("go.mod", "module github.com/qbitdevz/qbit-jay\n\ngo 1.23\n")
 	write("cmd/engram/main.go", program)
 	command := func(name string, args ...string) string {
 		t.Helper()
@@ -141,7 +141,7 @@ func TestStagedArtifacts(t *testing.T) {
 	// Change actual embedded build metadata, then recompute all enclosing hashes.
 	// Equal-length substitutions preserve the executable container framing.
 	for _, setting := range []struct{ name, old, new string }{
-		{"module", "github.com/Gentleman-Programming/engram/v3", "github.com/Gentleman-Programming/engram/v9"},
+		{"module", "github.com/qbitdevz/qbit-jay", "github.com/Gentleman-Programming/engram/v9"},
 		{"VCS", revision, strings.Repeat("b", 40)},
 		{"dirty", "vcs.modified=false", "vcs.modified=true "},
 		{"host OS", "GOOS=" + runtime.GOOS, "GOOS=" + strings.Repeat("x", len(runtime.GOOS))},

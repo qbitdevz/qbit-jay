@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	httpserver "github.com/Gentleman-Programming/engram/v3/internal/server"
+	httpserver "github.com/qbitdevz/qbit-jay/internal/server"
 )
 
 // Exercise current JSON-RPC mem_search dispatch and compact HTTP, both of which

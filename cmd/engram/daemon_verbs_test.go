@@ -14,8 +14,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // ─── Test helpers (seams and fixtures for the daemon control verbs) ─────────

@@ -15,8 +15,8 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/autosync"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/autosync"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	"github.com/mark3labs/mcp-go/mcp"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )

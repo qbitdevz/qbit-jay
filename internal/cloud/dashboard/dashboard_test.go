@@ -12,7 +12,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 	nethtml "golang.org/x/net/html"
 )
 

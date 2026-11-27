@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const migrateCopyUsage = "Usage: engram migrate-copy --data-dir <absolute-source> --output-dir <new-absolute-destination> --confirm-quiescent --json [--catalog-diagnostics=v3.4.0]\n"

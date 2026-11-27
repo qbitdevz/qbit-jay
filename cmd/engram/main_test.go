@@ -18,13 +18,13 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
-	"github.com/Gentleman-Programming/engram/v3/internal/obsidian"
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
-	versioncheck "github.com/Gentleman-Programming/engram/v3/internal/version"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/obsidian"
+	"github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
+	versioncheck "github.com/qbitdevz/qbit-jay/internal/version"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 

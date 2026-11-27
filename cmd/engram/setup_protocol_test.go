@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Token-classification coverage: one test per row.

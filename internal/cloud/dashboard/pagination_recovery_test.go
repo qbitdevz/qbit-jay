@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 )
 
 // recoveryStore sequences initial, retry and fallback calls without hiding their order.

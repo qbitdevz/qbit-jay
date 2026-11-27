@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
 )
 
 // claudeEngramWriteAndSessionTools is the complete set of Engram MCP tools
