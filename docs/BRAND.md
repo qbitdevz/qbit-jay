@@ -8,6 +8,21 @@ applied without searching the codebase.
 Status: inventory at upstream commit `11521f4`. Nothing has been renamed or
 replaced yet; that work belongs to task T0.4.
 
+## Name and story
+
+`jay` is the jay bird (Spanish *arrendajo*), chosen for its memory. Two facts carry
+the story:
+
+- Episodic memory: scrub jays were the first animals shown to remember **what**
+  they hid, **where** and **when** (Clayton and Dickinson, *Nature*, 1998). This
+  comes from the specification, section 1.
+- Spatial memory, the user's favourite (2026-11-27), quoted as given: "Capacidad
+  espacial: Un solo arrendajo esconde entre 3.000 y 5.000 bellotas por temporada
+  en miles de lugares distintos, y las recupera meses después."
+
+The design session and the README in T0.4 should build on these. Before the
+acorn figure appears in public copy, cite a source for it.
+
 ## Rules
 
 - A fork must use its own name and identity (`TRADEMARKS.md`). "Based on
