@@ -2,8 +2,10 @@
 //
 // Every variable has a qbit-jay name (QBIT_JAY_<NAME>) and an upstream Engram
 // name (ENGRAM_<NAME>) kept as a fallback for compatibility. When both are set
-// the qbit-jay name wins, even if its value is empty: the caller then applies
-// the same empty-value rule upstream applied to that variable.
+// the qbit-jay name wins. An empty qbit-jay value does not mask a set Engram
+// value (an empty templated QBIT_JAY_HTTP_TOKEN must not disable a configured
+// ENGRAM_HTTP_TOKEN); when only empty values are set, the variable still
+// counts as set and the caller applies its upstream empty-value rule.
 package env
 
 import (
@@ -31,10 +33,14 @@ func LegacyName(name string) string { return legacyPrefix + suffix(name) }
 // Lookup returns the value and whether either name is set (os.LookupEnv
 // semantics). QBIT_JAY_<NAME> is consulted first, then ENGRAM_<NAME>.
 func Lookup(name string) (string, bool) {
-	if v, ok := os.LookupEnv(NewName(name)); ok {
-		return v, true
+	newValue, newSet := os.LookupEnv(NewName(name))
+	if newSet && newValue != "" {
+		return newValue, true
 	}
-	return os.LookupEnv(LegacyName(name))
+	if legacyValue, legacySet := os.LookupEnv(LegacyName(name)); legacySet {
+		return legacyValue, true
+	}
+	return newValue, newSet
 }
 
 // Get returns the value of the variable, or "" when neither name is set

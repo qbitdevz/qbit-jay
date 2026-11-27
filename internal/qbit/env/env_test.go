@@ -23,7 +23,11 @@ func TestLookupPrecedence(t *testing.T) {
 		{name: "legacy only", legacySet: ptr("old"), want: "old", wantOK: true},
 		{name: "new only", newSet: ptr("new"), want: "new", wantOK: true},
 		{name: "both set new wins", newSet: ptr("new"), legacySet: ptr("old"), want: "new", wantOK: true},
-		{name: "new set but empty keeps upstream empty semantics", newSet: ptr(""), legacySet: ptr("old"), want: "", wantOK: true},
+		// An empty QBIT_JAY_ value (for example from a templated env file) must
+		// not mask a configured ENGRAM_ secret such as the HTTP token.
+		{name: "new set but empty falls back to legacy", newSet: ptr(""), legacySet: ptr("old"), want: "old", wantOK: true},
+		{name: "new set but empty and legacy unset stays set", newSet: ptr(""), want: "", wantOK: true},
+		{name: "both empty stays set", newSet: ptr(""), legacySet: ptr(""), want: "", wantOK: true},
 		{name: "legacy set but empty", legacySet: ptr(""), want: "", wantOK: true},
 	}
 	for _, tt := range tests {
