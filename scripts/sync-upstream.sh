@@ -29,7 +29,7 @@ BRANCH="${SYNC_BRANCH:-sync/upstream-$(date +%Y-%m-%d)}"
 
 cd "$(git rev-parse --show-toplevel)"
 
-if [ "${1:-}" = "rewrite" ]; then
+if [ "${1:-}" = "rewrite" ] && [ "$#" -eq 1 ]; then
   exec bash scripts/qbit/rewrite-module-path.sh
 fi
 if [ "$#" -gt 0 ]; then
