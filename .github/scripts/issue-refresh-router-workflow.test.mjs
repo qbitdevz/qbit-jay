@@ -81,12 +81,13 @@ test('workflow baselines retain readiness guards and pin original-event identity
   // #2355 adds only the two-line dependency/cancellation preamble to three full suites.
   // #2485 updates only the Lint action pin to the native Node.js 24 release.
   // qbit-jay T0.4 rewrites only the Go module path in ci.yml.
+  // qbit-jay T0.4 makes only Lint compare pull requests with the git merge base.
   // Normalize to LF for Windows and archives; retain strict full-file hash comparisons.
   const baseline = {
     '.github/workflows/pr-check.yml': '57fecdfa8eda8c3495c68068f8358da8bf74fe362ef569b50517e2a4dab9cd58',
     '.github/workflows/issue-validation.yml': 'd996ffae8e1341390b818e294a1a34a70f1b06f5eabda03cb96c0f065f7115b8',
     '.github/workflows/issue-policy.yml': '5f8bfbd9ab354f6b60d3ef35d30d5f4ee43a97eb83f61d8e0a955da37947adfd',
-    '.github/workflows/ci.yml': '1df6a58ba1ea0d48a08e4ea2bbbcf0739fb4806ff10f320985328eda3a9c930d',
+    '.github/workflows/ci.yml': '311a104e1f043744d9a16969d7bb867e9e3d508ee87adadd0f01418fb9f6bcab',
   };
   for (const [path, expected] of Object.entries(baseline)) {
     const source = path.endsWith('/pr-check.yml') ? read(path).replace(/^                  if \(!Array\.isArray\(issue\.labels\).+\n                    throw new Error\('issue labels are malformed'\);\n                  }\n/m, '').replace(/^                  if \(!Array\.isArray\(issue\.assignees\).+\n                    throw new Error\('issue assignees are malformed'\);\n                  }\n                  if \(issue\.assignees\.length === 0\) \{\n                    errors\.push\(.+\);\n                  }\n/m, '') : read(path);
