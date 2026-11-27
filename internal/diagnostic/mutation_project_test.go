@@ -186,7 +186,7 @@ func TestInvalidProjectScopeAndPayloadPriority(t *testing.T) {
 			t.Fatalf("payload error message lost priority: %+v", report.Checks[0].Findings[0])
 		}
 		next := report.Checks[0].Findings[0].SafeNextStep
-		if !strings.Contains(next, "engram doctor repair --check sync_mutation_required_fields --dry-run") || strings.Contains(next, "--project") {
+		if !strings.Contains(next, "qbit-jay doctor repair --check sync_mutation_required_fields --dry-run") || strings.Contains(next, "--project") {
 			t.Fatalf("unscoped repair hint: %q", next)
 		}
 	}

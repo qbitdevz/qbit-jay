@@ -1109,7 +1109,7 @@ func nullableJSON(metadata map[string]any) (any, error) {
 }
 
 // NormalizeProjectGrant exposes normalizeCloudProjectGrant's normalization
-// rules to callers outside this package (specifically, the cmd/engram
+// rules to callers outside this package (specifically, the cmd/qbit-jay
 // PrincipalProjectAuthorizer adapter wired into cloudserver at runtime) so a
 // caller-presented project name can be compared against stored
 // cloud_project_grants rows using the exact same normalization that

@@ -32,7 +32,7 @@ func newTestStoreWithLegacySchema(t *testing.T, fixtureRows []legacyObsRow) *Sto
 	t.Helper()
 
 	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 
 	// 1. Open raw DB and apply legacy DDL.
 	raw, err := sql.Open("sqlite", dbPath)
@@ -200,7 +200,7 @@ func newTestStoreWithLegacySchemaPostP1(t *testing.T, obsRows []legacyObsRow, re
 	t.Helper()
 
 	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 
 	// 1. Open raw DB and apply post-Phase-1 DDL.
 	raw, err := sql.Open("sqlite", dbPath)
@@ -824,7 +824,7 @@ func newTestStoreWithLegacySchemaPostP2(t *testing.T, relRows []legacyRelationRo
 	t.Helper()
 
 	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 
 	// 1. Open raw DB and apply post-Phase-2 DDL.
 	raw, err := sql.Open("sqlite", dbPath)
@@ -932,7 +932,7 @@ func TestMigrateAddsSessionsProjectIndex(t *testing.T) {
 
 func TestMigrate_LegacyDeferredRowsRemainAdministrativeOnly(t *testing.T) {
 	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 	raw, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)
@@ -983,7 +983,7 @@ func TestMigrate_LegacyDeferredRowsRemainAdministrativeOnly(t *testing.T) {
 
 func TestMigrateSyncDeleteTombstonesRepeatOpenSafe(t *testing.T) {
 	dir := t.TempDir()
-	raw, err := sql.Open("sqlite", filepath.Join(dir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(dir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)
 	}
@@ -1037,7 +1037,7 @@ func TestMigrateSyncDeleteTombstonesRepeatOpenSafe(t *testing.T) {
 
 func TestMigrate_AddsNullableLastSuccessAtWithoutBackfill(t *testing.T) {
 	dir := t.TempDir()
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 	raw, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)

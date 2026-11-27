@@ -1261,10 +1261,10 @@ func TestManagerRepairableFailureStoresUpgradeGuidance(t *testing.T) {
 	}
 	for _, want := range []string{
 		"Known repairable cloud sync failure detected.",
-		"engram cloud upgrade doctor --project proj-a",
-		"engram cloud upgrade repair --project proj-a --dry-run",
-		"engram cloud upgrade repair --project proj-a --apply",
-		"engram sync --cloud --project proj-a",
+		"qbit-jay cloud upgrade doctor --project proj-a",
+		"qbit-jay cloud upgrade repair --project proj-a --dry-run",
+		"qbit-jay cloud upgrade repair --project proj-a --apply",
+		"qbit-jay sync --cloud --project proj-a",
 	} {
 		if !strings.Contains(status.LastError, want) {
 			t.Fatalf("expected status.LastError to contain %q, got %q", want, status.LastError)
@@ -2446,7 +2446,7 @@ func TestManagerCyclePullsWhileNonEnrolledPendingMutationsRemain(t *testing.T) {
 	if st.ReasonCode != "non_enrolled_pending_mutations" {
 		t.Fatalf("expected non-enrolled reason code, got %q", st.ReasonCode)
 	}
-	for _, want := range []string{"alpha=2", "beta=1", "engram cloud enroll <project>"} {
+	for _, want := range []string{"alpha=2", "beta=1", "qbit-jay cloud enroll <project>"} {
 		if !strings.Contains(st.ReasonMessage, want) {
 			t.Fatalf("expected reason message to contain %q, got %q", want, st.ReasonMessage)
 		}

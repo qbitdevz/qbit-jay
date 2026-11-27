@@ -337,7 +337,7 @@ func assertNoCodexUnixRequest(t *testing.T, requests <-chan string) {
 
 func codexFixtureEndpoint(t *testing.T, port *string) string {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join(repoRoot(t), "cmd", "engram", "hook_codex.go"))
+	data, err := os.ReadFile(filepath.Join(repoRoot(t), "cmd", "qbit-jay", "hook_codex.go"))
 	if err != nil {
 		t.Fatal(err)
 	}

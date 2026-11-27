@@ -33,7 +33,7 @@ func TestReviewClearEventsLegacyMigration(t *testing.T) {
 	if err := s.Close(); err != nil {
 		t.Fatal(err)
 	}
-	fixture, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	fixture, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}

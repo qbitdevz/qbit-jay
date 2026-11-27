@@ -517,7 +517,7 @@ func (c SyncMutationRequiredFieldsCheck) Run(ctx context.Context, scope Scope) (
 			Message:              fmt.Sprintf("Pending cloud sync mutations for project %q are blocked because it is not enrolled.", project),
 			Why:                  "Cloud delivery cannot continue while pending mutations belong to a project that is not enrolled.",
 			Evidence:             mustJSON(map[string]any{"project": project, "pending_mutations": projectCount.Count}),
-			SafeNextStep:         "Run `engram cloud enroll <project>` for each intended project or review enrollment, then rerun `engram doctor`.",
+			SafeNextStep:         "Run `qbit-jay cloud enroll <project>` for each intended project or review enrollment, then rerun `qbit-jay doctor`.",
 			RequiresConfirmation: true,
 		})
 	}
@@ -535,9 +535,9 @@ func observationSourceRepairHint(project string, missingFields []string) string 
 }
 
 func syncMutationRequiredFieldsRepairHint(project string) string {
-	command := "engram doctor repair --check sync_mutation_required_fields --dry-run"
+	command := "qbit-jay doctor repair --check sync_mutation_required_fields --dry-run"
 	if project = strings.TrimSpace(project); project != "" {
-		command = "engram doctor repair --project " + project + " --check sync_mutation_required_fields --dry-run"
+		command = "qbit-jay doctor repair --project " + project + " --check sync_mutation_required_fields --dry-run"
 	}
 	return "Run `" + command + "` to inspect local repairs; cloud-upgrade tooling requires configured cloud sync."
 }
@@ -675,9 +675,9 @@ func (c SyncTargetClosedSpaceCheck) Run(ctx context.Context, scope Scope) (Check
 // explicit review decision before the row is discarded.
 func safeNextStepForForeignSyncTarget(state store.SyncTargetState) string {
 	if state.UnackedMutations == 0 {
-		return "If the target belongs to a project you want synced, run `engram cloud enroll <project>`. Otherwise no action is required: the row is inert drift left by the removed derivation fallback, it cannot advance and no data is at risk, and a later cloud-inbox slice removes these legacy rows automatically."
+		return "If the target belongs to a project you want synced, run `qbit-jay cloud enroll <project>`. Otherwise no action is required: the row is inert drift left by the removed derivation fallback, it cannot advance and no data is at risk, and a later cloud-inbox slice removes these legacy rows automatically."
 	}
-	return fmt.Sprintf("Review the %d unacknowledged mutation(s) recorded for this target before removing the row: they record writes that no configured pipeline will deliver. If the target belongs to a project you want synced, run `engram cloud enroll <project>` so delivery can resume; otherwise clear or re-ack the pending mutations through a supported repair workflow first.", state.UnackedMutations)
+	return fmt.Sprintf("Review the %d unacknowledged mutation(s) recorded for this target before removing the row: they record writes that no configured pipeline will deliver. If the target belongs to a project you want synced, run `qbit-jay cloud enroll <project>` so delivery can resume; otherwise clear or re-ack the pending mutations through a supported repair workflow first.", state.UnackedMutations)
 }
 
 func syncTargetKeyForClosedSpace(project string) string {
@@ -724,7 +724,7 @@ func (c InvalidSessionIdentityCheck) Run(ctx context.Context, scope Scope) (Chec
 			Message:              "A pulled session mutation was skipped because its identity is blank or does not match its payload; the pull cursor advanced past it.",
 			Why:                  "Halting the pull on a historical blank identity would pin the cursor forever, so the mutation is quarantined as evidence instead.",
 			Evidence:             mustJSON(item),
-			SafeNextStep:         "Inspect the quarantined mutation with `engram conflicts deferred`; it can only be applied once the remote side publishes a canonical session ID.",
+			SafeNextStep:         "Inspect the quarantined mutation with `qbit-jay conflicts deferred`; it can only be applied once the remote side publishes a canonical session ID.",
 			RequiresConfirmation: true,
 		})
 	}
@@ -790,7 +790,7 @@ func (c OrphanedObservationSessionCheck) Run(ctx context.Context, scope Scope) (
 			Message:              fmt.Sprintf("%d observation(s) reference missing session %q.", item.ObservationCount, item.SessionID),
 			Why:                  "Observations reference a missing session, so their canonical session cannot be reconstructed automatically.",
 			Evidence:             mustJSON(item),
-			SafeNextStep:         "Review the affected reference, then run `engram doctor repair --project <project> --check orphaned_observation_session --plan`; apply only after confirming the local placeholder session is appropriate.",
+			SafeNextStep:         "Review the affected reference, then run `qbit-jay doctor repair --project <project> --check orphaned_observation_session --plan`; apply only after confirming the local placeholder session is appropriate.",
 			RequiresConfirmation: true,
 		})
 	}
@@ -825,7 +825,7 @@ func (c OrphanedPendingRelationsCheck) Run(ctx context.Context, scope Scope) (Ch
 				"live_pending":         evidence.LivePending,
 				"sample":               evidence.Sample,
 			}),
-			SafeNextStep:         "Review the sample, then run `engram doctor repair --check orphaned_pending_relations --dry-run`; apply reclassifies only these rows into the audited `orphaned` disposition after creating a SQLite backup.",
+			SafeNextStep:         "Review the sample, then run `qbit-jay doctor repair --check orphaned_pending_relations --dry-run`; apply reclassifies only these rows into the audited `orphaned` disposition after creating a SQLite backup.",
 			RequiresConfirmation: true,
 		})
 	}
@@ -843,7 +843,7 @@ func (c SQLiteLockContentionCheck) Run(ctx context.Context, scope Scope) (CheckR
 	}
 	snapshot, err := readSnapshot(ctx)
 	if err != nil {
-		finding := Finding{CheckID: c.Code(), Severity: SeverityError, ReasonCode: "sqlite_lock_probe_failed", Message: err.Error(), Why: "Doctor could not read SQLite lock state, so contention cannot be ruled out.", Evidence: mustJSON(map[string]any{"error": err.Error()}), SafeNextStep: "Close other Engram processes and rerun `engram doctor --check sqlite_lock_contention`.", RequiresConfirmation: false}
+		finding := Finding{CheckID: c.Code(), Severity: SeverityError, ReasonCode: "sqlite_lock_probe_failed", Message: err.Error(), Why: "Doctor could not read SQLite lock state, so contention cannot be ruled out.", Evidence: mustJSON(map[string]any{"error": err.Error()}), SafeNextStep: "Close other Engram processes and rerun `qbit-jay doctor --check sqlite_lock_contention`.", RequiresConfirmation: false}
 		return resultFromFindings(c.Code(), map[string]any{"probe": "failed"}, []Finding{finding}), nil
 	}
 	findings := make([]Finding, 0)
@@ -855,7 +855,7 @@ func (c SQLiteLockContentionCheck) Run(ctx context.Context, scope Scope) (CheckR
 			Message:              "SQLite lock probe reported contention indicators.",
 			Why:                  "Lock contention can cause writes or sync enrollment to fail; doctor only reports the condition and does not repair it.",
 			Evidence:             mustJSON(snapshot),
-			SafeNextStep:         "Stop other Engram processes, wait for active operations to finish, then rerun `engram doctor --check sqlite_lock_contention`.",
+			SafeNextStep:         "Stop other Engram processes, wait for active operations to finish, then rerun `qbit-jay doctor --check sqlite_lock_contention`.",
 			RequiresConfirmation: false,
 		})
 	}

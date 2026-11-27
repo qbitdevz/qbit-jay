@@ -26,7 +26,7 @@ func TestRepairBackupPermissions(t *testing.T) {
 		for _, want := range []struct {
 			path string
 			mode os.FileMode
-		}{{backup, 0600}, {filepath.Join(data, "engram.db"), 0600}} {
+		}{{backup, 0600}, {filepath.Join(data, "qbit-jay.db"), 0600}} {
 			info, err := os.Stat(want.path)
 			if err != nil {
 				t.Fatal(err)

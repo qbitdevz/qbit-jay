@@ -302,7 +302,7 @@ func newTestStoreWithNullableLegacySessions(t *testing.T, sessions ...struct{ id
 	t.Helper()
 	cfg := mustDefaultConfig(t)
 	cfg.DataDir = t.TempDir()
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)
 	}
@@ -1829,7 +1829,7 @@ func TestPromptInboxIdentityStoreRetryReplaysCompetingWrite(t *testing.T) {
 		t.Fatal(err)
 	}
 	p := AddPromptParams{SessionID: "retry-inbox", Project: "engram", Content: "attempt", SourceInboxID: "inbox-1"}
-	competing, err := sql.Open("sqlite", storeDSN(filepath.Join(s.cfg.DataDir, "engram.db")))
+	competing, err := sql.Open("sqlite", storeDSN(filepath.Join(s.cfg.DataDir, "qbit-jay.db")))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1962,7 +1962,7 @@ func TestAddObservationRefusesAdoptionWhenSessionParentsForeignOwnedRecord(t *te
 	if !errors.Is(err, ErrProjectOwnershipAmbiguous) {
 		t.Fatalf("AddObservation error = %v, want ErrProjectOwnershipAmbiguous", err)
 	}
-	if !strings.Contains(err.Error(), "engram projects rescue-ownership") {
+	if !strings.Contains(err.Error(), "qbit-jay projects rescue-ownership") {
 		t.Fatalf("error %q must name the concrete repair command", err)
 	}
 	if got := sessionProjectOrNull(t, s, "null-session"); got != "<NULL>" {
@@ -1980,7 +1980,7 @@ func TestAddObservationUnownedSessionErrorNamesReachableRepair(t *testing.T) {
 	if !errors.Is(err, ErrProjectRequired) {
 		t.Fatalf("error = %v, want ErrProjectRequired", err)
 	}
-	for _, want := range []string{"null-session", "engram projects rescue-ownership"} {
+	for _, want := range []string{"null-session", "qbit-jay projects rescue-ownership"} {
 		if !strings.Contains(err.Error(), want) {
 			t.Fatalf("error %q must mention %q", err, want)
 		}
@@ -3818,7 +3818,7 @@ func TestDifferentTopicsDoNotReplaceEachOther(t *testing.T) {
 
 func TestNewMigratesLegacyObservationIDSchema(t *testing.T) {
 	dataDir := t.TempDir()
-	dbPath := filepath.Join(dataDir, "engram.db")
+	dbPath := filepath.Join(dataDir, "qbit-jay.db")
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -3948,7 +3948,7 @@ func TestNewMigratesPreOrgDatabaseIdempotently(t *testing.T) {
 	// Simulate a database created before #776: every other migration has
 	// already run (this store just applied them), but org and its index
 	// have not.
-	dbPath := filepath.Join(cfg.DataDir, "engram.db")
+	dbPath := filepath.Join(cfg.DataDir, "qbit-jay.db")
 	raw, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		t.Fatalf("reopen raw db: %v", err)
@@ -4021,7 +4021,7 @@ func TestNewMigratesPreOrgDatabaseIdempotently(t *testing.T) {
 
 func TestNewMigratesLegacyUserPromptsSyncIDSchema(t *testing.T) {
 	dataDir := t.TempDir()
-	dbPath := filepath.Join(dataDir, "engram.db")
+	dbPath := filepath.Join(dataDir, "qbit-jay.db")
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -5669,7 +5669,7 @@ func TestCloudUpgradeSnapshotMigrationRedactsAndPreservesOnlyTrustedCaptures(t *
 		{"malformed-enrolled", UpgradeStageBootstrapEnrolled, `{"captured":`, CloudUpgradeSnapshot{}},
 		{"malformed-pushed", UpgradeStageBootstrapPushed, `{"captured":`, CloudUpgradeSnapshot{}},
 	}
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open raw store: %v", err)
 	}
@@ -9275,7 +9275,7 @@ func TestNewErrorBranches(t *testing.T) {
 
 	t.Run("fails when db path is a directory", func(t *testing.T) {
 		dataDir := t.TempDir()
-		dbAsDir := filepath.Join(dataDir, "engram.db")
+		dbAsDir := filepath.Join(dataDir, "qbit-jay.db")
 		if err := os.Mkdir(dbAsDir, 0755); err != nil {
 			t.Fatalf("mkdir db path: %v", err)
 		}
@@ -9291,7 +9291,7 @@ func TestNewErrorBranches(t *testing.T) {
 
 	t.Run("fails when migration encounters conflicting object", func(t *testing.T) {
 		dataDir := t.TempDir()
-		dbPath := filepath.Join(dataDir, "engram.db")
+		dbPath := filepath.Join(dataDir, "qbit-jay.db")
 
 		db, err := sql.Open("sqlite", dbPath)
 		if err != nil {
@@ -11650,7 +11650,7 @@ func TestNewAllowsEnrolledInvalidSessionIdentityForDiagnostics(t *testing.T) {
 		t.Fatalf("close initialized store: %v", err)
 	}
 
-	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open raw database: %v", err)
 	}
@@ -12327,7 +12327,7 @@ func TestEnrollProjectBackfillsPromptDeleteTombstonesWithDerivedProject(t *testi
 
 func TestEnsureRepairsSoftDeletedObservationDeleteMutationsForEnrolledProjects(t *testing.T) {
 	dataDir := t.TempDir()
-	dbPath := filepath.Join(dataDir, "engram.db")
+	dbPath := filepath.Join(dataDir, "qbit-jay.db")
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -12443,7 +12443,7 @@ func TestEnsureRepairsSoftDeletedObservationDeleteMutationsForEnrolledProjects(t
 
 func TestStoreNewDefersRepairUntilSynchronization(t *testing.T) {
 	dataDir := t.TempDir()
-	dbPath := filepath.Join(dataDir, "engram.db")
+	dbPath := filepath.Join(dataDir, "qbit-jay.db")
 
 	db, err := sql.Open("sqlite", dbPath)
 	if err != nil {
@@ -19137,7 +19137,7 @@ func TestSearchCompositeLexicalReranking(t *testing.T) {
 
 func TestSearchReleasesTopicRowsAfterScanFailure(t *testing.T) {
 	cfg := FallbackConfig(t.TempDir())
-	if err := os.WriteFile(filepath.Join(cfg.DataDir, "engram.db"), nil, 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(cfg.DataDir, "qbit-jay.db"), nil, 0o600); err != nil {
 		t.Fatal(err)
 	}
 	s, err := New(cfg)

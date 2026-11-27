@@ -8,7 +8,7 @@
 //
 // Usage:
 //
-//	go run ./scripts/qbit/e3latency -bin /path/to/binary [-env-prefix ENGRAM]
+//	go run ./scripts/qbit/e3latency -bin /path/to/binary [-env-prefix QBIT_JAY]
 package main
 
 import (
@@ -251,7 +251,7 @@ func document(r *rand.Rand, targetChars int) string {
 
 func main() {
 	bin := flag.String("bin", "", "path to the binary under test (required)")
-	prefix := flag.String("env-prefix", "ENGRAM", "environment variable prefix of the binary")
+	prefix := flag.String("env-prefix", "QBIT_JAY", "environment variable prefix of the binary")
 	profile := flag.String("tools", "agent", "MCP tool profile")
 	memories := flag.Int("memories", 2300, "synthetic memories to save")
 	searches := flag.Int("searches", 300, "mem_search calls")

@@ -104,10 +104,10 @@ func Guidance(project string) string {
 	project = normalizeProject(project)
 	return fmt.Sprintf(`%s
 Run these commands, then retry sync:
-  engram cloud upgrade doctor --project %s
-  engram cloud upgrade repair --project %s --dry-run
-  engram cloud upgrade repair --project %s --apply
-  engram sync --cloud --project %s`, header, project, project, project, project)
+  qbit-jay cloud upgrade doctor --project %s
+  qbit-jay cloud upgrade repair --project %s --dry-run
+  qbit-jay cloud upgrade repair --project %s --apply
+  qbit-jay sync --cloud --project %s`, header, project, project, project, project)
 }
 
 // PolicyGuidance explains the server-side checks needed after a policy denial.

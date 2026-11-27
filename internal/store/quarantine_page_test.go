@@ -43,7 +43,7 @@ func TestQuarantinePagesBoundLegacyBacklogAndReleaseWriter(t *testing.T) {
 		}
 		return rows, err
 	}
-	other, err := sql.Open("sqlite", filepath.Join(s.cfg.DataDir, "engram.db"))
+	other, err := sql.Open("sqlite", filepath.Join(s.cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}

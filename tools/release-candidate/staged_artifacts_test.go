@@ -44,7 +44,7 @@ func stagedProgramFixture(t *testing.T, program string) ([]byte, string, string)
 		}
 	}
 	write("go.mod", "module github.com/qbitdevz/qbit-jay\n\ngo 1.23\n")
-	write("cmd/engram/main.go", program)
+	write("cmd/qbit-jay/main.go", program)
 	command := func(name string, args ...string) string {
 		t.Helper()
 		c := exec.Command(name, args...)
@@ -57,11 +57,11 @@ func stagedProgramFixture(t *testing.T, program string) ([]byte, string, string)
 		return strings.TrimSpace(string(b))
 	}
 	command("git", "init", "--quiet")
-	command("git", "add", "go.mod", "cmd/engram/main.go")
+	command("git", "add", "go.mod", "cmd/qbit-jay/main.go")
 	command("git", "-c", "user.name=Synthetic Fixture", "-c", "user.email=fixture@example.invalid", "-c", "core.hooksPath="+filepath.Join(root, "no-hooks"), "commit", "--quiet", "-m", "synthetic metadata fixture")
 	revision := command("git", "rev-parse", "HEAD")
 	output := filepath.Join(t.TempDir(), "core")
-	command("go", "build", "-buildvcs=true", "-o", output, "./cmd/engram")
+	command("go", "build", "-buildvcs=true", "-o", output, "./cmd/qbit-jay")
 	b, e := os.ReadFile(output)
 	if e != nil {
 		t.Fatal(e)

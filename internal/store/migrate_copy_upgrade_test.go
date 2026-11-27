@@ -37,7 +37,7 @@ func TestMigrateCopyUpgradedCatalog(t *testing.T) {
 	if err != nil || result == nil || !result.MigrationCompleted {
 		t.Fatalf("historical upgrade rejected: %+v %v", result, err)
 	}
-	migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+	migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -112,7 +112,7 @@ func TestMigrateCopyUpgradedRejectsNearMisses(t *testing.T) {
 				t.Fatal(err)
 			}
 			if name != "duplicate-name" {
-				copied, openErr := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+				copied, openErr := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 				if openErr != nil {
 					t.Fatal(openErr)
 				}

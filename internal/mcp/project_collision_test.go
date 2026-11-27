@@ -85,7 +85,7 @@ func TestMCPImplicitGitProjectCollisionAdvisory(t *testing.T) {
 					t.Fatal(err)
 				}
 				if response.Project != label || strings.Contains(response.Warning, "another Git checkout") != wantWarning ||
-					(wantWarning && !strings.Contains(response.Warning, "engram init <distinct-name>")) {
+					(wantWarning && !strings.Contains(response.Warning, "qbit-jay init <distinct-name>")) {
 					t.Fatalf("unexpected response %+v, want collision advisory=%v", response, wantWarning)
 				}
 				return response.Warning

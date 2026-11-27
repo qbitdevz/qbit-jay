@@ -31,7 +31,7 @@ type NetworkFilesystemError struct {
 }
 
 func (e *NetworkFilesystemError) Error() string {
-	return fmt.Sprintf("engram: data directory %q is on %s; persistent SQLite WAL is unsafe on network filesystems — set ENGRAM_DATA_DIR to a local directory", e.DataDir, e.Filesystem)
+	return fmt.Sprintf("qbit-jay: data directory %q is on %s; persistent SQLite WAL is unsafe on network filesystems — set QBIT_JAY_DATA_DIR to a local directory", e.DataDir, e.Filesystem)
 }
 
 // filesystemInspector is an OS-specific read-only adapter. Tests replace it

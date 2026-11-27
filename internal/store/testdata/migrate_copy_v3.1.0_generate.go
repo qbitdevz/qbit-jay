@@ -20,7 +20,7 @@ func main() {
 	if err := os.Mkdir(dir, 0700); err != nil {
 		panic(err)
 	}
-	f, err := os.OpenFile(filepath.Join(dir, "engram.db"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	f, err := os.OpenFile(filepath.Join(dir, "qbit-jay.db"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		panic(err)
 	}

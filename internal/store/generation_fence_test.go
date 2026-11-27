@@ -271,7 +271,7 @@ func TestStoreRejectsOperationsAfterDatabaseIdentityChange(t *testing.T) {
 		t.Fatalf("healthy sessions = %d, want 1", stats.TotalSessions)
 	}
 
-	dbPath := filepath.Join(s.DataDir(), "engram.db")
+	dbPath := filepath.Join(s.DataDir(), "qbit-jay.db")
 	replacementPath := filepath.Join(t.TempDir(), "different-file")
 	writeTestFile(t, replacementPath)
 	original := statFile
@@ -376,7 +376,7 @@ func TestGenerationRowsNextResultSetIsFenced(t *testing.T) {
 
 func newTestDatabaseGeneration(t *testing.T, wal, shm bool) (*databaseGeneration, string) {
 	t.Helper()
-	dbPath := filepath.Join(t.TempDir(), "engram.db")
+	dbPath := filepath.Join(t.TempDir(), "qbit-jay.db")
 	writeTestFile(t, dbPath)
 	if wal {
 		writeTestFile(t, dbPath+"-wal")

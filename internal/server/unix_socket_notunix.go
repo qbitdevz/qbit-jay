@@ -13,5 +13,5 @@ func listenSecureUnixSocket(string) (net.Listener, os.FileInfo, error) {
 }
 
 func secureUnixSocketPath(socketPath string) (string, error) {
-	return "", fmt.Errorf("engram server: Unix sockets are not supported on this platform")
+	return "", fmt.Errorf("qbit-jay server: Unix sockets are not supported on this platform")
 }

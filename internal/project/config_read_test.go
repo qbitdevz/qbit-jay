@@ -10,7 +10,7 @@ import (
 
 func TestConfigReadFailureDiagnostic(t *testing.T) {
 	dir := t.TempDir()
-	path := filepath.Join(dir, ".engram", "config.json")
+	path := filepath.Join(dir, ".qbit-jay", "config.json")
 	cause := &os.PathError{Op: "open", Path: path, Err: os.ErrPermission}
 	res, found := readConfigAtWithReader(dir, func(got string) ([]byte, error) {
 		if got != path {
@@ -21,7 +21,7 @@ func TestConfigReadFailureDiagnostic(t *testing.T) {
 	if !found || res.Project != "" || res.Source != SourceConfig || res.Path != dir || res.Error == nil {
 		t.Fatalf("read failure must remain authoritative and fail closed: found=%v result=%+v", found, res)
 	}
-	if !strings.HasPrefix(res.Error.Error(), "cannot read .engram/config.json: ") || !strings.Contains(res.Error.Error(), cause.Error()) {
+	if !strings.HasPrefix(res.Error.Error(), "cannot read .qbit-jay/config.json: ") || !strings.Contains(res.Error.Error(), cause.Error()) {
 		t.Errorf("read-specific diagnostic must retain cause: %v", res.Error)
 	}
 	if !errors.Is(res.Error, ErrInvalidConfig) || !errors.Is(res.Error, os.ErrPermission) {

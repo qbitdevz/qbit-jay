@@ -16,7 +16,7 @@
 //	│   ├── a3f8c1d2.jsonl.gz ← chunk 1 (compressed)
 //	│   ├── b7d2e4f1.jsonl.gz ← chunk 2
 //	│   └── ...
-//	└── engram.db              ← local working DB (gitignored)
+//	└── qbit-jay.db              ← local working DB (gitignored)
 package sync
 
 import (

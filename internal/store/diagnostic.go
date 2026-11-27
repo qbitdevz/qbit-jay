@@ -31,7 +31,7 @@ func ReadRuntimeSessionDiagnostic(ctx context.Context, dataDir, root string) (Ru
 	}
 	// Use an explicit file URI so SQLite recognizes the access mode on both
 	// POSIX and Windows. A drive letter belongs in the path, not the authority.
-	dbPath := filepath.ToSlash(filepath.Join(dataDir, "engram.db"))
+	dbPath := filepath.ToSlash(filepath.Join(dataDir, DatabaseFile))
 	if !strings.HasPrefix(dbPath, "/") {
 		dbPath = "/" + dbPath
 	}
@@ -1453,7 +1453,7 @@ func (s *Store) backupSQLiteUnderWriteLock() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	backupDB, err := openDB(filepath.Join(s.cfg.DataDir, "engram.db"), s.generation)
+	backupDB, err := openDB(filepath.Join(s.cfg.DataDir, DatabaseFile), s.generation)
 	if err != nil {
 		return "", fmt.Errorf("backup sqlite database: open snapshot connection: %w", err)
 	}

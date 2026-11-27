@@ -43,7 +43,7 @@ var loadServerStats = (*store.Store).StatsContext
 var ErrPortOwned = errors.New("an existing instance owns the port")
 
 // SyncStatusProvider returns the current sync status. This is implemented
-// by autosync.Manager and injected from cmd/engram/main.go.
+// by autosync.Manager and injected from cmd/qbit-jay/main.go.
 type SyncStatusProvider interface {
 	Status(project string) SyncStatus
 }
@@ -67,12 +67,12 @@ type SyncStatus struct {
 }
 
 // SemanticRunnerFactory is a function that resolves a store.SemanticRunner by name.
-// It is injected from cmd/engram/main.go so that internal/server does not depend on
+// It is injected from cmd/qbit-jay/main.go so that internal/server does not depend on
 // internal/llm directly (preserving the import-cycle boundary).
 type SemanticRunnerFactory func(name string) (store.SemanticRunner, error)
 
 // SemanticPromptBuilder constructs the LLM prompt for a given pair of observation
-// snippets. Injected from cmd/engram/main.go alongside SemanticRunnerFactory.
+// snippets. Injected from cmd/qbit-jay/main.go alongside SemanticRunnerFactory.
 type SemanticPromptBuilder func(a, b store.ObservationSnippet) string
 
 type Server struct {
@@ -318,9 +318,9 @@ func (s *Server) Start() error {
 	}
 	if err != nil {
 		if s.sessionOwnedToken == "" && socketPath == "" && isAddressInUse(err) {
-			return fmt.Errorf("engram server: listen %s: %w", addr, s.portConflict())
+			return fmt.Errorf("qbit-jay server: listen %s: %w", addr, s.portConflict())
 		}
-		return fmt.Errorf("engram server: listen %s: %w", addr, err)
+		return fmt.Errorf("qbit-jay server: listen %s: %w", addr, err)
 	}
 
 	s.closeMu.Lock()
@@ -417,7 +417,7 @@ func (s *Server) Close() error {
 
 func prepareUnixSocket(socketPath string) (string, error) {
 	if socketPath == "" || socketPath == "." {
-		return "", fmt.Errorf("engram server: socket path is required")
+		return "", fmt.Errorf("qbit-jay server: socket path is required")
 	}
 	canonicalPath, err := secureUnixSocketPath(socketPath)
 	if err != nil {
@@ -426,10 +426,10 @@ func prepareUnixSocket(socketPath string) (string, error) {
 	parent := filepath.Dir(canonicalPath)
 	parentInfo, err := os.Stat(parent)
 	if err != nil {
-		return "", fmt.Errorf("engram server: socket parent %q: %w", parent, err)
+		return "", fmt.Errorf("qbit-jay server: socket parent %q: %w", parent, err)
 	}
 	if !parentInfo.IsDir() {
-		return "", fmt.Errorf("engram server: socket parent %q is not a directory", parent)
+		return "", fmt.Errorf("qbit-jay server: socket parent %q is not a directory", parent)
 	}
 
 	info, err := os.Lstat(canonicalPath)
@@ -437,27 +437,27 @@ func prepareUnixSocket(socketPath string) (string, error) {
 		return canonicalPath, nil
 	}
 	if err != nil {
-		return "", fmt.Errorf("engram server: inspect socket %q: %w", canonicalPath, err)
+		return "", fmt.Errorf("qbit-jay server: inspect socket %q: %w", canonicalPath, err)
 	}
 	if info.Mode()&os.ModeSocket == 0 {
-		return "", fmt.Errorf("engram server: socket path %q exists and is not a Unix socket", canonicalPath)
+		return "", fmt.Errorf("qbit-jay server: socket path %q exists and is not a Unix socket", canonicalPath)
 	}
 
 	conn, err := net.DialTimeout("unix", canonicalPath, 250*time.Millisecond)
 	if err == nil {
 		_ = conn.Close()
-		return "", fmt.Errorf("engram server: socket %q is already in use", canonicalPath)
+		return "", fmt.Errorf("qbit-jay server: socket %q is already in use", canonicalPath)
 	}
 	if errors.Is(err, syscall.ECONNREFUSED) {
 		if err := removeOwnedUnixSocket(canonicalPath, info); err != nil {
-			return "", fmt.Errorf("engram server: remove stale socket %q: %w", canonicalPath, err)
+			return "", fmt.Errorf("qbit-jay server: remove stale socket %q: %w", canonicalPath, err)
 		}
 		return canonicalPath, nil
 	}
 	if errors.Is(err, os.ErrNotExist) {
 		return canonicalPath, nil
 	}
-	return "", fmt.Errorf("engram server: cannot verify socket %q is stale: %w", canonicalPath, err)
+	return "", fmt.Errorf("qbit-jay server: cannot verify socket %q is stale: %w", canonicalPath, err)
 }
 
 func removeOwnedUnixSocket(socketPath string, expected os.FileInfo) error {

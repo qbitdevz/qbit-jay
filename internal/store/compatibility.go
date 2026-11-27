@@ -57,10 +57,10 @@ func ProbeCompatibility(dir string) (Compatibility, error) {
 	hasDB := false
 	for _, e := range entries {
 		name := e.Name()
-		if strings.HasSuffix(name, "-wal") || strings.HasSuffix(name, "-shm") || strings.HasSuffix(name, "-journal") || (strings.HasSuffix(name, ".db") && name != "engram.db") {
+		if strings.HasSuffix(name, "-wal") || strings.HasSuffix(name, "-shm") || strings.HasSuffix(name, "-journal") || (strings.HasSuffix(name, ".db") && name != DatabaseFile) {
 			return fail()
 		}
-		if name == "engram.db" {
+		if name == DatabaseFile {
 			hasDB = true
 		}
 	}
@@ -70,7 +70,7 @@ func ProbeCompatibility(dir string) (Compatibility, error) {
 		}
 		r.Status = "fresh"
 	} else {
-		dbInfo, err := os.Lstat(filepath.Join(dir, "engram.db"))
+		dbInfo, err := os.Lstat(filepath.Join(dir, DatabaseFile))
 		if err != nil || !dbInfo.Mode().IsRegular() {
 			return fail()
 		}
@@ -83,7 +83,7 @@ func ProbeCompatibility(dir string) (Compatibility, error) {
 			return fail()
 		}
 		r.InstanceID = strings.TrimSpace(string(id))
-		f, err := os.Open(filepath.Join(dir, "engram.db"))
+		f, err := os.Open(filepath.Join(dir, DatabaseFile))
 		if err != nil {
 			return fail()
 		}

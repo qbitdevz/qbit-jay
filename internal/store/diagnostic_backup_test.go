@@ -101,7 +101,7 @@ func exerciseRepairBackup(t *testing.T, locked, existing bool) (string, string) 
 		t.Fatal(err)
 	}
 	restoredDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(restoredDir, "engram.db"), contents, 0600); err != nil {
+	if err := os.WriteFile(filepath.Join(restoredDir, "qbit-jay.db"), contents, 0600); err != nil {
 		t.Fatal(err)
 	}
 	restored, err := store.New(store.FallbackConfig(restoredDir))

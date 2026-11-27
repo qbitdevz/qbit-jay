@@ -22,7 +22,7 @@ func acquireMigrationLock(path string) (func(), error) {
 // contended lock throughout EOF and shutdown; releasing it cannot mask failure.
 func TestStartupCancellationOwnedLockEOF(t *testing.T) {
 	binary := filepath.Join(t.TempDir(), "engram.exe")
-	build := exec.Command("go", "build", "-o", binary, "../../cmd/engram")
+	build := exec.Command("go", "build", "-o", binary, "../../cmd/qbit-jay")
 	build.Env = startupCancellationEnvironment()
 	if out, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build public executable: %v\n%s", err, out)

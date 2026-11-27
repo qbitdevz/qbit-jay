@@ -1054,7 +1054,7 @@ func installClaudeCode() (*Result, error) {
 		// Non-fatal: the plugin installs, but MCP tools remain unavailable until
 		// Claude can register the user-scope server.
 		fmt.Fprintf(os.Stderr, "warning: could not register Claude Code user MCP server (%s): %v\n", ClaudeCodeUserMCPPath(), err)
-		fmt.Fprintf(os.Stderr, "  The plugin is installed, but rerun `engram setup claude-code` after resolving this error to register MCP tools.\n")
+		fmt.Fprintf(os.Stderr, "  The plugin is installed, but rerun `qbit-jay setup claude-code` after resolving this error to register MCP tools.\n")
 	} else {
 		mcpConfigured = true
 	}

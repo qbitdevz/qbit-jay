@@ -283,7 +283,7 @@ func TestClaudeCodeSessionEndHook(t *testing.T) {
 func TestClaudeSessionEndDoesNotCloseReplacementContinuation(t *testing.T) {
 	requireHookBinaries(t)
 	dataDir := t.TempDir()
-	if err := os.WriteFile(filepath.Join(dataDir, "engram.db"), nil, 0o600); err != nil {
+	if err := os.WriteFile(filepath.Join(dataDir, "qbit-jay.db"), nil, 0o600); err != nil {
 		t.Fatal(err)
 	}
 	db, err := store.New(store.FallbackConfig(dataDir))

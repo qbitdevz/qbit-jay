@@ -64,7 +64,7 @@ func TestCompatibilityOfflineNeverAuthorizes(t *testing.T) {
 				if name == "malformed" {
 					header = []byte("not sqlite")
 				}
-				write("engram.db", header)
+				write("qbit-jay.db", header)
 				if name != "missing_identity" {
 					id := "0123456789abcdef0123456789abcdef\n"
 					if name == "invalid_identity" {
@@ -74,15 +74,15 @@ func TestCompatibilityOfflineNeverAuthorizes(t *testing.T) {
 				}
 				switch name {
 				case "wal":
-					write("engram.db-wal", nil)
+					write("qbit-jay.db-wal", nil)
 				case "shm":
-					write("engram.db-shm", nil)
+					write("qbit-jay.db-shm", nil)
 				case "journal":
-					write("engram.db-journal", nil)
+					write("qbit-jay.db-journal", nil)
 				case "ambiguous":
 					write("other.db", nil)
 				case "symlink":
-					requireFixtureSymlink(t, "engram.db", filepath.Join(dir, "alias.db"))
+					requireFixtureSymlink(t, "qbit-jay.db", filepath.Join(dir, "alias.db"))
 				}
 			}
 			before := compatibilityHash(t, dir)
@@ -114,7 +114,7 @@ func TestCompatibilityActiveStartupFacts(t *testing.T) {
 		t.Run(map[bool]string{false: "current", true: "future"}[future], func(t *testing.T) {
 			cfg := FallbackConfig(t.TempDir())
 			if future {
-				db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+				db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -161,7 +161,7 @@ func TestCompatibilityProbeAcceptsRealWALStore(t *testing.T) {
 	}
 	// Checkpoint and close the last connection so SQLite removes the WAL and
 	// shared-memory sidecars, leaving a quiescent WAL-mode database.
-	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,13 +171,13 @@ func TestCompatibilityProbeAcceptsRealWALStore(t *testing.T) {
 	if err := db.Close(); err != nil {
 		t.Fatal(err)
 	}
-	for _, sidecar := range []string{"engram.db-wal", "engram.db-shm"} {
+	for _, sidecar := range []string{"qbit-jay.db-wal", "qbit-jay.db-shm"} {
 		if _, err := os.Stat(filepath.Join(cfg.DataDir, sidecar)); !os.IsNotExist(err) {
 			t.Fatalf("%s still present after the last connection closed", sidecar)
 		}
 	}
 	header := make([]byte, 100)
-	f, err := os.Open(filepath.Join(cfg.DataDir, "engram.db"))
+	f, err := os.Open(filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}

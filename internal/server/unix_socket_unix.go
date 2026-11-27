@@ -16,11 +16,11 @@ import (
 func secureUnixSocketPath(socketPath string) (string, error) {
 	parent, err := filepath.Abs(filepath.Dir(socketPath))
 	if err != nil {
-		return "", fmt.Errorf("engram server: resolve socket parent: %w", err)
+		return "", fmt.Errorf("qbit-jay server: resolve socket parent: %w", err)
 	}
 	parent, err = filepath.EvalSymlinks(parent)
 	if err != nil {
-		return "", fmt.Errorf("engram server: resolve socket parent: %w", err)
+		return "", fmt.Errorf("qbit-jay server: resolve socket parent: %w", err)
 	}
 	if err := validateUnixSocketParent(parent); err != nil {
 		return "", err
@@ -31,7 +31,7 @@ func secureUnixSocketPath(socketPath string) (string, error) {
 func validateUnixSocketParent(parent string) error {
 	relative, err := filepath.Rel(string(os.PathSeparator), parent)
 	if err != nil || relative == ".." || strings.HasPrefix(relative, ".."+string(os.PathSeparator)) {
-		return fmt.Errorf("engram server: socket parent is not an absolute Unix path")
+		return fmt.Errorf("qbit-jay server: socket parent is not an absolute Unix path")
 	}
 
 	component := string(os.PathSeparator)
@@ -41,14 +41,14 @@ func validateUnixSocketParent(parent string) error {
 		}
 		info, err := os.Lstat(component)
 		if err != nil {
-			return fmt.Errorf("engram server: cannot inspect socket parent directory: %w", err)
+			return fmt.Errorf("qbit-jay server: cannot inspect socket parent directory: %w", err)
 		}
 		if !info.IsDir() || info.Mode()&os.ModeSymlink != 0 {
-			return fmt.Errorf("engram server: socket parent hierarchy contains an unsafe directory")
+			return fmt.Errorf("qbit-jay server: socket parent hierarchy contains an unsafe directory")
 		}
 		stat, ok := info.Sys().(*syscall.Stat_t)
 		if !ok || !trustedUnixSocketDirectory(info.Mode(), int(stat.Uid), os.Geteuid()) {
-			return fmt.Errorf("engram server: socket parent hierarchy is writable by an untrusted user")
+			return fmt.Errorf("qbit-jay server: socket parent hierarchy is writable by an untrusted user")
 		}
 	}
 	return nil

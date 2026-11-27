@@ -1021,7 +1021,7 @@ func newServerTestStoreWithLegacyNullableSessions(t *testing.T, sessionIDs ...st
 		t.Fatalf("DefaultConfig: %v", err)
 	}
 	cfg.DataDir = t.TempDir()
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)
 	}
@@ -1106,7 +1106,7 @@ func TestHandleAddObservationUnresolvableOwnershipReturnsActionableConflict(t *t
 		t.Fatalf("code = %v, want project_ownership_required", response["code"])
 	}
 	remedy, _ := response["remedy"].(string)
-	if !strings.Contains(remedy, "engram projects rescue-ownership") {
+	if !strings.Contains(remedy, "qbit-jay projects rescue-ownership") {
 		t.Fatalf("remedy = %q, must name the reachable repair", remedy)
 	}
 }
@@ -3056,7 +3056,7 @@ func conflictsTestStore(t *testing.T) (*store.Store, *sql.DB) {
 	}
 	t.Cleanup(func() { _ = st.Close() })
 
-	rawDB, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	rawDB, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open raw db: %v", err)
 	}

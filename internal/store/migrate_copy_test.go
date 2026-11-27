@@ -214,7 +214,7 @@ func TestMigrateCopyLogicalWAL(t *testing.T) {
 			if _, err = s.db.Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
 				t.Fatal(err)
 			}
-			base, err := os.ReadFile(filepath.Join(src, "engram.db"))
+			base, err := os.ReadFile(filepath.Join(src, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -228,7 +228,7 @@ func TestMigrateCopyLogicalWAL(t *testing.T) {
 			if _, err = s.db.Exec(sql); err != nil {
 				t.Fatal(err)
 			}
-			walPath := filepath.Join(src, "engram.db-wal")
+			walPath := filepath.Join(src, "qbit-jay.db-wal")
 			wal, err := os.ReadFile(walPath)
 			if err != nil || len(wal) == 0 {
 				t.Fatalf("capture uncheckpointed WAL: %d bytes, %v", len(wal), err)
@@ -238,13 +238,13 @@ func TestMigrateCopyLogicalWAL(t *testing.T) {
 			}
 			// Restore the pre-close snapshot: closing the last connection can
 			// checkpoint and trim the persistent WAL.
-			if err = os.WriteFile(filepath.Join(src, "engram.db"), base, 0600); err != nil {
+			if err = os.WriteFile(filepath.Join(src, "qbit-jay.db"), base, 0600); err != nil {
 				t.Fatal(err)
 			}
 			if err = os.WriteFile(walPath, wal, 0600); err != nil {
 				t.Fatal(err)
 			}
-			if err = os.WriteFile(filepath.Join(src, "engram.db-shm"), []byte("source SHM must not be reused"), 0600); err != nil {
+			if err = os.WriteFile(filepath.Join(src, "qbit-jay.db-shm"), []byte("source SHM must not be reused"), 0600); err != nil {
 				t.Fatal(err)
 			}
 			before := copySnapshot(t, src)
@@ -311,7 +311,7 @@ func TestMigrateCopyRejects(t *testing.T) {
 					t.Fatal(e)
 				}
 			case "journal":
-				if e := os.WriteFile(filepath.Join(src, "engram.db-journal"), []byte("hot"), 0600); e != nil {
+				if e := os.WriteFile(filepath.Join(src, "qbit-jay.db-journal"), []byte("hot"), 0600); e != nil {
 					t.Fatal(e)
 				}
 			case "future", "unknown", "unknown-column", "unknown-trigger", "missing-table":
@@ -337,7 +337,7 @@ func TestMigrateCopyRejects(t *testing.T) {
 					t.Fatal(e)
 				}
 			case "corrupt":
-				if e := os.WriteFile(filepath.Join(src, "engram.db"), []byte("not sqlite"), 0600); e != nil {
+				if e := os.WriteFile(filepath.Join(src, "qbit-jay.db"), []byte("not sqlite"), 0600); e != nil {
 					t.Fatal(e)
 				}
 			}
@@ -378,12 +378,12 @@ func TestMigrateCopyRejects(t *testing.T) {
 }
 
 func TestMigrateCopyReadOnlyDSNUsesPlainPathsOnWindows(t *testing.T) {
-	if got, want := migrateCopyReadOnlyDSN("/data/out/engram.db", '/'), "file:///data/out/engram.db?mode=ro"; got != want {
+	if got, want := migrateCopyReadOnlyDSN("/data/out/qbit-jay.db", '/'), "file:///data/out/qbit-jay.db?mode=ro"; got != want {
 		t.Fatalf("POSIX DSN = %q, want %q", got, want)
 	}
 	// A file URI built from a drive path puts "C:" in the authority, which SQLite
 	// rejects; Windows paths must stay plain, as storeDSN already does.
-	if got, want := migrateCopyReadOnlyDSN(`C:\data\out\engram.db`, '\\'), `C:\data\out\engram.db?mode=ro`; got != want {
+	if got, want := migrateCopyReadOnlyDSN(`C:\data\out\qbit-jay.db`, '\\'), `C:\data\out\qbit-jay.db?mode=ro`; got != want {
 		t.Fatalf("Windows DSN = %q, want %q", got, want)
 	}
 }

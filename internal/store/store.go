@@ -32,6 +32,7 @@ import (
 	"unicode/utf8"
 
 	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/paths"
 	"github.com/qbitdevz/qbit-jay/internal/timeutil"
 	sqlite "modernc.org/sqlite"
 )
@@ -887,7 +888,7 @@ func DefaultConfig() (Config, error) {
 		return Config{}, fmt.Errorf("engram: determine home directory: %w", err)
 	}
 	return Config{
-		DataDir:              filepath.Join(home, ".engram"),
+		DataDir:              filepath.Join(home, paths.DataDirName),
 		MaxObservationLength: 50000,
 		MaxContextResults:    20,
 		MaxSearchResults:     20,
@@ -1149,7 +1150,7 @@ func newStoreWithStartupContext(ctx context.Context, cfg Config, ownedStartup bo
 	}
 
 	trace.Mark("database-file")
-	dbPath := filepath.Join(cfg.DataDir, "engram.db")
+	dbPath := filepath.Join(cfg.DataDir, DatabaseFile)
 	if err := ensureDatabaseFile(dbPath); err != nil {
 		return nil, fmt.Errorf("engram: create database file: %w", err)
 	}
@@ -12388,7 +12389,7 @@ func (s *Store) resolveSessionProjectTx(tx *sql.Tx, sessionID string) (string, e
 // server authorization configuration is: it reaches the local store directly and
 // never goes through the HTTP endpoint. Every ownership error names it, so the
 // failure carries its own remedy instead of pointing at a changelog.
-const RescueOwnershipCommand = "engram projects rescue-ownership"
+const RescueOwnershipCommand = "qbit-jay projects rescue-ownership"
 
 // rescueOwnershipHint renders the exact repair for one session.
 func rescueOwnershipHint(sessionID string) string {
@@ -15210,3 +15211,6 @@ func (s *Store) ListObservationSyncPayloads() ([]any, error) {
 	}
 	return payloads, nil
 }
+
+// DatabaseFile is the SQLite file name inside the data directory.
+const DatabaseFile = paths.DatabaseFile
