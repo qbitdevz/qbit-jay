@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -309,7 +310,7 @@ func cmdRestart(cfg store.Config, args []string) error {
 	// Reject the socket configuration before stopping anything, mirroring
 	// the `run -d` guard: a configuration error must never take a healthy
 	// daemon down.
-	if socket := strings.TrimSpace(os.Getenv("ENGRAM_SOCKET")); socket != "" {
+	if socket := strings.TrimSpace(env.Get("SOCKET")); socket != "" {
 		return fmt.Errorf("restart manages a TCP daemon; unset ENGRAM_SOCKET")
 	}
 	record, readErr := daemon.ReadPidfile(daemon.PidfilePath(cfg.DataDir))
@@ -374,7 +375,7 @@ func resolveRestartPort(args []string, record daemon.PidRecord) (int, error) {
 	if record.Port > 0 {
 		return record.Port, nil
 	}
-	if p := strings.TrimSpace(os.Getenv("ENGRAM_PORT")); p != "" {
+	if p := strings.TrimSpace(env.Get("PORT")); p != "" {
 		if n, err := strconv.ParseUint(p, 10, 16); err == nil && n > 0 {
 			return int(n), nil
 		}

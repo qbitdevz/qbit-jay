@@ -10,6 +10,8 @@ import (
 	"runtime"
 	"strings"
 	"time"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const claudeLifecycleContextBudget = 500 * time.Millisecond
@@ -65,7 +67,7 @@ func cmdClaudeRegistrationReceipt() {
 }
 
 func claudeReceiptEndpointConfirmed() bool {
-	if strings.TrimSpace(os.Getenv("ENGRAM_URL")) != "" {
+	if strings.TrimSpace(env.Get("URL")) != "" {
 		return true
 	}
 	base, client := hookEndpointClient("")

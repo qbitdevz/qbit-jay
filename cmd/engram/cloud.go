@@ -21,6 +21,7 @@ import (
 	"github.com/qbitdevz/qbit-jay/internal/cloud/dashboard"
 	"github.com/qbitdevz/qbit-jay/internal/cloud/remote"
 	"github.com/qbitdevz/qbit-jay/internal/cloudconfig"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
@@ -99,7 +100,7 @@ func newCloudRuntimeWithReceipt(ctx context.Context, cfg cloud.Config, verifier 
 			return nil, err
 		}
 	}
-	token := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_TOKEN"))
+	token := strings.TrimSpace(env.Get("CLOUD_TOKEN"))
 	cs.SetDashboardAllowedProjects(allowedProjects)
 	insecureNoAuth := token == "" && envBool("ENGRAM_CLOUD_INSECURE_NO_AUTH")
 	authenticator, managedHasher, err := buildRuntimeAuthenticator(cfg, cs, allowedProjects, token, insecureNoAuth)
@@ -344,7 +345,7 @@ func cmdCloudPrepareStartupReceipt(args []string) {
 		exitFunc(1)
 		return
 	}
-	if strings.TrimSpace(os.Getenv("ENGRAM_DATABASE_URL")) == "" {
+	if strings.TrimSpace(env.Get("DATABASE_URL")) == "" {
 		fatal(fmt.Errorf("cloud startup receipt requires ENGRAM_DATABASE_URL"))
 		return
 	}
@@ -748,7 +749,7 @@ func cmdCloudStatus(cfg store.Config) {
 	insecureNoAuth := envBool("ENGRAM_CLOUD_INSECURE_NO_AUTH")
 	fmt.Printf("Cloud status: configured (target=%s)\n", constants.TargetKeyCloud)
 	fmt.Printf("Server: %s\n", cc.ServerURL)
-	if strings.TrimSpace(os.Getenv(cloudconfig.EnvCloudServer)) != "" {
+	if strings.TrimSpace(env.Get(cloudconfig.EnvCloudServer)) != "" {
 		fmt.Printf("Server source: %s\n", cloudconfig.EnvCloudServer)
 	} else {
 		fmt.Println("Server source: cloud.json")
@@ -1022,10 +1023,10 @@ func cmdCloudConfig(cfg store.Config) {
 			return
 		}
 		fmt.Println("✓ Persisted cloud server URL and token cleared")
-		if strings.TrimSpace(os.Getenv(cloudconfig.EnvCloudServer)) != "" {
+		if strings.TrimSpace(env.Get(cloudconfig.EnvCloudServer)) != "" {
 			fmt.Printf("Note: %s remains active and overrides the cleared persisted server URL.\n", cloudconfig.EnvCloudServer)
 		}
-		if strings.TrimSpace(os.Getenv(cloudconfig.EnvCloudToken)) != "" {
+		if strings.TrimSpace(env.Get(cloudconfig.EnvCloudToken)) != "" {
 			fmt.Printf("Note: %s remains active and overrides the cleared persisted token.\n", cloudconfig.EnvCloudToken)
 		}
 		return
@@ -1092,11 +1093,11 @@ func runCloudServe(cfg cloud.Config) error {
 }
 
 func validateCloudServeAuthConfig() error {
-	token := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_TOKEN"))
-	adminToken := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_ADMIN"))
+	token := strings.TrimSpace(env.Get("CLOUD_TOKEN"))
+	adminToken := strings.TrimSpace(env.Get("CLOUD_ADMIN"))
 	insecureNoAuth := envBool("ENGRAM_CLOUD_INSECURE_NO_AUTH")
 	allowlist := normalizeAllowedProjects(cloud.ConfigFromEnv().AllowedProjects)
-	jwtSecretEnv := strings.TrimSpace(os.Getenv("ENGRAM_JWT_SECRET"))
+	jwtSecretEnv := strings.TrimSpace(env.Get("JWT_SECRET"))
 	if insecureNoAuth && token != "" {
 		return fmt.Errorf("conflicting cloud auth configuration: ENGRAM_CLOUD_INSECURE_NO_AUTH=1 cannot be used together with ENGRAM_CLOUD_TOKEN")
 	}

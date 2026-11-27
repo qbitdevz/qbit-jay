@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/qbitdevz/qbit-jay/internal/hostbind"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 // hostBindingDataDir resolves the directory where host bindings are kept. It
@@ -16,7 +17,7 @@ import (
 var hostBindingDataDir = hostBindingDataDirFromEnvOrConfig
 
 func hostBindingDataDirFromEnvOrConfig() string {
-	if dir := os.Getenv("ENGRAM_DATA_DIR"); strings.TrimSpace(dir) != "" {
+	if dir := env.Get("DATA_DIR"); strings.TrimSpace(dir) != "" {
 		return dir
 	}
 	cfg, err := storeDefaultConfig()

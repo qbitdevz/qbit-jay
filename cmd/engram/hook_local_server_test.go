@@ -201,7 +201,7 @@ func TestHookRecoveryDataDirectoryBytes(t *testing.T) {
 				}
 				found := false
 				for _, entry := range env {
-					if entry == "ENGRAM_DATA_DIR="+dir {
+					if entry == "QBIT_JAY_DATA_DIR="+dir {
 						found = true
 					}
 				}

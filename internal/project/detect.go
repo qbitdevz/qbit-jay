@@ -19,6 +19,7 @@ import (
 	"time"
 
 	"github.com/qbitdevz/qbit-jay/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 // ErrAmbiguousProject is returned when the working directory is a parent of
@@ -78,7 +79,7 @@ func ProcessOverride(explicit string) (string, bool) {
 	if trimmed := strings.TrimSpace(explicit); trimmed != "" {
 		return trimmed, true
 	}
-	if trimmed := strings.TrimSpace(os.Getenv(EnvProjectOverride)); trimmed != "" {
+	if trimmed := strings.TrimSpace(env.Get(EnvProjectOverride)); trimmed != "" {
 		return trimmed, true
 	}
 	return "", false

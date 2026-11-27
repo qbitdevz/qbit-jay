@@ -14,6 +14,7 @@ import (
 	"time"
 
 	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/setup"
 )
 
@@ -50,7 +51,7 @@ const hookSessionConfirmationTimeout = 4 * time.Second
 // hookSessionConfirmationBudget keeps all HTTP confirmation steps under one
 // deadline. Invalid or nonpositive overrides retain the fail-closed default.
 func hookSessionConfirmationBudget() time.Duration {
-	timeout, err := time.ParseDuration(strings.TrimSpace(os.Getenv("ENGRAM_HOOK_SESSION_CONFIRMATION_TIMEOUT")))
+	timeout, err := time.ParseDuration(strings.TrimSpace(env.Get("HOOK_SESSION_CONFIRMATION_TIMEOUT")))
 	if err != nil || timeout <= 0 {
 		return hookSessionConfirmationTimeout
 	}
@@ -70,7 +71,7 @@ func cmdHook(args []string) {
 		return
 	}
 	if len(args) == 2 && args[0] == "codex-resolve" && args[1] == "--local-compaction" {
-		if hookUsesClientProject() || strings.TrimSpace(os.Getenv("ENGRAM_SOCKET")) != "" {
+		if hookUsesClientProject() || strings.TrimSpace(env.Get("SOCKET")) != "" {
 			fmt.Fprintln(os.Stderr, "local compaction requires the implicit TCP endpoint")
 			exitFunc(2)
 			return
@@ -229,7 +230,7 @@ func confirmHookSessionWithin(id, cwd string, projectOwned bool, platform string
 		}
 		cancel()
 	}()
-	if strings.TrimSpace(os.Getenv("ENGRAM_URL")) == "" {
+	if strings.TrimSpace(env.Get("URL")) == "" {
 		identityErr := confirmHookLocalIdentity(ctx, client, base, platform)
 		if identityErr != nil && hookLocalRecoveryEligible(platform, base, base+"/health", identityErr) {
 			if recovered := recoverHookLocalServer(ctx, client, base); recovered != nil {
@@ -373,7 +374,7 @@ func hookSessionOwnerProject(ctx context.Context, client *http.Client, base, id 
 // hookUsesClientProject inspects the original environment, not the synthesized
 // transport URL: a loopback SSH tunnel is external, a port/socket default is not.
 func hookUsesClientProject() bool {
-	return strings.TrimSpace(os.Getenv("ENGRAM_URL")) != ""
+	return strings.TrimSpace(env.Get("URL")) != ""
 }
 
 type hookProjectSelection struct {

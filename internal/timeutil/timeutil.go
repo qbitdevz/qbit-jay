@@ -1,8 +1,9 @@
 package timeutil
 
 import (
-	"os"
 	"time"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 // defaultLayout is used by FormatLocal when callers do not care about display style.
@@ -44,7 +45,7 @@ func FormatTimeWithLayout(t time.Time, layout string) string {
 }
 
 func toConfiguredLocal(t time.Time) time.Time {
-	tz := os.Getenv("ENGRAM_TIMEZONE")
+	tz := env.Get("TIMEZONE")
 	if tz != "" {
 		if loc, err := time.LoadLocation(tz); err == nil {
 			return t.In(loc)

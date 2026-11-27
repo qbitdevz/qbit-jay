@@ -8,6 +8,8 @@ import (
 	"net"
 	"os"
 	"runtime"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const sessionOwnedProtocol = "engram-session-owned-v1"
@@ -24,11 +26,11 @@ func validateSessionOwned(args []string) (bool, error) {
 	if !owned {
 		return false, nil
 	}
-	if fd, present := os.LookupEnv(ownedListenerEnv); present && (runtime.GOOS != "linux" || fd != "3") {
+	if fd, present := env.Lookup(ownedListenerEnv); present && (runtime.GOOS != "linux" || fd != "3") {
 		return true, fmt.Errorf("session-owned listener inheritance requires Linux descriptor 3")
 	}
 	for _, key := range []string{"ENGRAM_URL", "ENGRAM_PORT", "ENGRAM_SOCKET"} {
-		if _, ok := os.LookupEnv(key); ok {
+		if _, ok := env.Lookup(key); ok {
 			return true, fmt.Errorf("session-owned serve conflicts with %s; unset it", key)
 		}
 	}
@@ -37,7 +39,7 @@ func validateSessionOwned(args []string) (bool, error) {
 			return true, fmt.Errorf("session-owned serve accepts no port or socket arguments")
 		}
 	}
-	token := os.Getenv("ENGRAM_TOKEN")
+	token := env.Get("TOKEN")
 	decoded, err := hex.DecodeString(token)
 	if err != nil || len(decoded) != 32 {
 		return true, fmt.Errorf("session-owned serve requires a private 256-bit hex ENGRAM_TOKEN")

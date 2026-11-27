@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const (
@@ -40,7 +40,7 @@ func defaultCloudDaemonProbe(ctx context.Context, port int) daemonProbeResult {
 // resolveDaemonProbePort mirrors the port resolution used by cmdServe so the
 // probe targets the same address the user's serve process is bound to.
 func resolveDaemonProbePort() int {
-	if p := strings.TrimSpace(os.Getenv("ENGRAM_PORT")); p != "" {
+	if p := strings.TrimSpace(env.Get("PORT")); p != "" {
 		if n, err := strconv.Atoi(p); err == nil && n > 0 && n < 65536 {
 			return n
 		}

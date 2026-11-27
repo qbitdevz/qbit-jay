@@ -3,9 +3,9 @@ package main
 import (
 	"context"
 	"errors"
-	"os"
 
 	"github.com/qbitdevz/qbit-jay/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -67,7 +67,7 @@ func llmBuildPrompt(a, b store.ObservationSnippet) string {
 // obtain a store.SemanticRunner. Returns a clear error if the env var is unset
 // or the factory rejects the value.
 func resolveAgentRunner() (store.SemanticRunner, error) {
-	name := os.Getenv("ENGRAM_AGENT_CLI")
+	name := env.Get("AGENT_CLI")
 	if name == "" {
 		return nil, errors.New("ENGRAM_AGENT_CLI is not set; required for --semantic scan (set to 'claude' or 'opencode')")
 	}

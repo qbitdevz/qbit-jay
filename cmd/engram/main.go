@@ -39,6 +39,7 @@ import (
 	"github.com/qbitdevz/qbit-jay/internal/mcp"
 	"github.com/qbitdevz/qbit-jay/internal/obsidian"
 	"github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/server"
 	"github.com/qbitdevz/qbit-jay/internal/setup"
 	"github.com/qbitdevz/qbit-jay/internal/store"
@@ -575,7 +576,7 @@ func derefString(ptr *string) string {
 }
 
 func envBool(key string) bool {
-	v := strings.TrimSpace(strings.ToLower(os.Getenv(key)))
+	v := strings.TrimSpace(strings.ToLower(env.Get(key)))
 	return v == "1" || v == "true" || v == "yes" || v == "on"
 }
 
@@ -804,7 +805,7 @@ func main() {
 	}
 
 	// Allow overriding data dir via env. Blank values retain the resolved default.
-	if dir := os.Getenv("ENGRAM_DATA_DIR"); strings.TrimSpace(dir) != "" {
+	if dir := env.Get("DATA_DIR"); strings.TrimSpace(dir) != "" {
 		cfg.DataDir = dir
 	}
 
@@ -989,12 +990,12 @@ func serveWith(cfg store.Config, options serveOptions) error {
 			defer func() { _ = ownedListener.Close() }()
 		}
 	}
-	readyFile, readyToken := os.Getenv("ENGRAM_RUN_READY_FILE"), os.Getenv("ENGRAM_RUN_READY_TOKEN")
+	readyFile, readyToken := env.Get("RUN_READY_FILE"), env.Get("RUN_READY_TOKEN")
 	detachedDaemon := readyFile != "" && readyToken != ""
 	var startup *server.LocalStartup
 	var trace *store.StartupTrace
 	if !options.sessionOwned && options.socketPath == "" && options.port > 0 && !detachedDaemon {
-		if os.Getenv("ENGRAM_STARTUP_PHASES") == "1" {
+		if env.Get("STARTUP_PHASES") == "1" {
 			trace = store.NewStartupTrace(os.Stderr, localServeTraceEpoch)
 		}
 		// An already occupied port still takes the normal bind path, which
@@ -1058,7 +1059,7 @@ func serveWith(cfg store.Config, options serveOptions) error {
 		srv.UseLocalStartup(startup)
 	}
 	if options.sessionOwned {
-		srv.SetSessionOwnedToken(os.Getenv("ENGRAM_TOKEN"))
+		srv.SetSessionOwnedToken(env.Get("TOKEN"))
 		if ownedListener != nil {
 			srv.UseSessionOwnedListener(ownedListener)
 		}
@@ -1176,9 +1177,9 @@ func resolveServeOptions(args []string) (serveOptions, error) {
 	if owned {
 		return serveOptions{sessionOwned: true, port: 0}, nil
 	}
-	options := serveOptions{port: 7437, socketPath: strings.TrimSpace(os.Getenv("ENGRAM_SOCKET"))}
+	options := serveOptions{port: 7437, socketPath: strings.TrimSpace(env.Get("SOCKET"))}
 	portExplicit := false
-	if p := strings.TrimSpace(os.Getenv("ENGRAM_PORT")); p != "" {
+	if p := strings.TrimSpace(env.Get("PORT")); p != "" {
 		if n, err := strconv.ParseUint(p, 10, 16); err == nil && n > 0 {
 			options.port = int(n)
 			portExplicit = true
@@ -1234,7 +1235,7 @@ func resolveServeSyncStatusProject() string {
 // before os.Exit to ensure the Manager releases its sync lease.
 func tryStartAutosync(ctx context.Context, s *store.Store, cfg store.Config) (autosyncStatusProvider, func()) {
 	// REQ-210: opt-in requires exact "1".
-	if strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_AUTOSYNC")) != "1" {
+	if strings.TrimSpace(env.Get("CLOUD_AUTOSYNC")) != "1" {
 		return nil, nil
 	}
 

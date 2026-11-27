@@ -27,6 +27,7 @@ import (
 
 	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
 	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -201,7 +202,7 @@ func requireAuth(h http.HandlerFunc) http.HandlerFunc {
 			h(w, r)
 			return
 		}
-		token := os.Getenv("ENGRAM_HTTP_TOKEN")
+		token := env.Get("HTTP_TOKEN")
 		if token == "" {
 			// No token configured → open access (zero-config default).
 			h(w, r)
@@ -266,7 +267,7 @@ func requireConfiguredAuth(h http.HandlerFunc) http.HandlerFunc {
 			h(w, r)
 			return
 		}
-		if os.Getenv("ENGRAM_HTTP_TOKEN") == "" {
+		if env.Get("HTTP_TOKEN") == "" {
 			jsonError(w, http.StatusServiceUnavailable, "server authorization is not configured")
 			return
 		}
@@ -2238,7 +2239,7 @@ func (s *Server) handleScanConflicts(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		name := os.Getenv("ENGRAM_AGENT_CLI")
+		name := env.Get("AGENT_CLI")
 		runner, err := s.runnerFactory(name)
 		if err != nil {
 			jsonError(w, http.StatusInternalServerError,

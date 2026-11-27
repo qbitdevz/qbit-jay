@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -45,7 +46,7 @@ type runOptions struct {
 // serve: -p beats ENGRAM_PORT beats the 7437 default.
 func parseRunArgs(args []string) (runOptions, error) {
 	options := runOptions{port: 7437}
-	if p := strings.TrimSpace(os.Getenv("ENGRAM_PORT")); p != "" {
+	if p := strings.TrimSpace(env.Get("PORT")); p != "" {
 		if n, err := strconv.ParseUint(p, 10, 16); err == nil && n > 0 {
 			options.port = int(n)
 		}
@@ -76,7 +77,7 @@ func parseRunArgs(args []string) (runOptions, error) {
 			return runOptions{}, fmt.Errorf("unknown run argument: %s", arg)
 		}
 	}
-	socket := strings.TrimSpace(os.Getenv("ENGRAM_SOCKET"))
+	socket := strings.TrimSpace(env.Get("SOCKET"))
 	if socket != "" {
 		if options.detach {
 			return runOptions{}, fmt.Errorf("run -d manages a TCP daemon; unset ENGRAM_SOCKET")
@@ -95,7 +96,7 @@ func cmdRun(cfg store.Config, args []string) error {
 	if err != nil {
 		return err
 	}
-	serve := serveOptions{port: options.port, socketPath: strings.TrimSpace(os.Getenv("ENGRAM_SOCKET"))}
+	serve := serveOptions{port: options.port, socketPath: strings.TrimSpace(env.Get("SOCKET"))}
 	if !options.detach {
 		return serveWith(cfg, serve)
 	}
@@ -232,8 +233,8 @@ var spawnDaemonArgs = func(port int) []string {
 // spawnDaemonEnv extends the environment with the readiness handshake markers.
 var spawnDaemonEnv = func(readyPath, token string) []string {
 	return append(os.Environ(),
-		"ENGRAM_RUN_READY_FILE="+readyPath,
-		"ENGRAM_RUN_READY_TOKEN="+token,
+		env.NewName("RUN_READY_FILE")+"="+readyPath,
+		env.NewName("RUN_READY_TOKEN")+"="+token,
 	)
 }
 

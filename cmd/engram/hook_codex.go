@@ -17,6 +17,8 @@ import (
 	"time"
 
 	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 // All prompt work shares this deadline; Codex kills hooks at 2s.
@@ -277,7 +279,7 @@ func cmdCodexLifecycle(action string, localCompaction bool) {
 		return
 	}
 	result := runCodexLifecycle(action, data, codexHookURL(), localCompaction)
-	if os.Getenv("ENGRAM_HOOK_OUTPUT") == "json" {
+	if env.Get("HOOK_OUTPUT") == "json" {
 		if result.SessionID != "" || result.Project != "" || result.ProjectLookupComplete || result.ErrorCode != "" {
 			_ = json.NewEncoder(os.Stdout).Encode(result)
 		}
@@ -290,7 +292,7 @@ func cmdCodexLifecycle(action string, localCompaction bool) {
 func runCodexLifecycle(action string, data []byte, base string, localCompaction bool) codexLifecycleResult {
 	// A process-scoped flag from the adapter allows older cores to continue
 	// handling codex-resolve with their existing budget.
-	compaction := action == "codex-resolve" && (localCompaction || os.Getenv("ENGRAM_HOOK_CODEX_COMPACTION") == "1")
+	compaction := action == "codex-resolve" && (localCompaction || env.Get("HOOK_CODEX_COMPACTION") == "1")
 	budget := codexUserPromptDeadline
 	if compaction {
 		budget = codexCompactionResolveDeadline
@@ -378,8 +380,8 @@ func hookEndpointClient(base string) (string, *http.Client) {
 	if base == "" {
 		base = configured
 	}
-	if strings.TrimSpace(os.Getenv("ENGRAM_URL")) == "" && base == "http://localhost" && base == configured {
-		if socket := strings.TrimSpace(os.Getenv("ENGRAM_SOCKET")); socket != "" {
+	if strings.TrimSpace(env.Get("URL")) == "" && base == "http://localhost" && base == configured {
+		if socket := strings.TrimSpace(env.Get("SOCKET")); socket != "" {
 			client.Transport = &http.Transport{DialContext: func(ctx context.Context, _, _ string) (net.Conn, error) {
 				return (&net.Dialer{}).DialContext(ctx, "unix", socket)
 			}}
@@ -389,13 +391,13 @@ func hookEndpointClient(base string) (string, *http.Client) {
 }
 
 func codexHookURL() string {
-	if base := strings.TrimSpace(os.Getenv("ENGRAM_URL")); base != "" {
+	if base := strings.TrimSpace(env.Get("URL")); base != "" {
 		return strings.TrimRight(base, "/")
 	}
-	if strings.TrimSpace(os.Getenv("ENGRAM_SOCKET")) != "" {
+	if strings.TrimSpace(env.Get("SOCKET")) != "" {
 		return "http://localhost"
 	}
-	port := strings.TrimSpace(os.Getenv("ENGRAM_PORT"))
+	port := strings.TrimSpace(env.Get("PORT"))
 	if port == "" {
 		port = "7437"
 	}
@@ -496,7 +498,7 @@ func codexJSON(ctx context.Context, c *http.Client, method, endpoint string, bod
 }
 func codexNudgeAllowed(path string, now time.Time) bool {
 	cooldown := 15 * time.Minute
-	if seconds, err := strconv.Atoi(os.Getenv("ENGRAM_NUDGE_COOLDOWN_SECS")); err == nil && seconds >= 0 {
+	if seconds, err := strconv.Atoi(env.Get("NUDGE_COOLDOWN_SECS")); err == nil && seconds >= 0 {
 		cooldown = time.Duration(seconds) * time.Second
 	}
 	if last, err := os.ReadFile(path); err == nil {

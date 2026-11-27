@@ -12,10 +12,12 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 func inheritedOwnedListener() (net.Listener, error) {
-	if _, present := os.LookupEnv(ownedListenerEnv); !present {
+	if _, present := env.Lookup(ownedListenerEnv); !present {
 		return nil, nil
 	}
 	// Do not take ownership of an unrelated runtime descriptor.

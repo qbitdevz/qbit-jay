@@ -15,11 +15,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func hookLocalWindowsPort(platform, base string) int {
-	if platform != "windows" || strings.TrimSpace(os.Getenv("ENGRAM_URL")) != "" || strings.TrimSpace(os.Getenv("ENGRAM_SOCKET")) != "" || base != codexHookURL() {
+	if platform != "windows" || strings.TrimSpace(env.Get("URL")) != "" || strings.TrimSpace(env.Get("SOCKET")) != "" || base != codexHookURL() {
 		return 0
 	}
 	u, parseErr := url.Parse(base)
@@ -137,9 +138,9 @@ func recoverHookLocalServer(ctx context.Context, client *http.Client, base strin
 	}
 	// SessionStart enables automatic sync for shared serve. Pass this intent to
 	// the child only; never mutate the hook's environment or cloud configuration.
-	env := os.Environ()
-	env = append(env, "ENGRAM_DATA_DIR="+dir, "ENGRAM_CLOUD_AUTOSYNC=1")
-	if err = hookLocalServerLaunch(ctx, executable, filepath.Join(dir, "serve.err.log"), env); err != nil {
+	// The qbit-jay names win over inherited ENGRAM_* ones, so set those.
+	childEnv := append(os.Environ(), env.NewName("DATA_DIR")+"="+dir, env.NewName("CLOUD_AUTOSYNC")+"=1")
+	if err = hookLocalServerLaunch(ctx, executable, filepath.Join(dir, "serve.err.log"), childEnv); err != nil {
 		return err
 	}
 	return hookLocalServerReady(ctx, client, base, expected)

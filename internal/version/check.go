@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const (
@@ -117,7 +119,7 @@ func CheckLatest(current string) CheckResult {
 }
 
 func updateCheckDisabled() bool {
-	v := strings.TrimSpace(strings.ToLower(os.Getenv(EnvNoUpdateCheck)))
+	v := strings.TrimSpace(strings.ToLower(env.Get(EnvNoUpdateCheck)))
 	return v == "1" || v == "true" || v == "yes" || v == "on"
 }
 

@@ -1,8 +1,9 @@
 package cloudconfig
 
 import (
-	"os"
 	"strings"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 // EnvCloudToken is the environment variable that overrides cloud.json.token.
@@ -43,7 +44,7 @@ func ApplyServerOverride(cfg *Config) *Config {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	if value := strings.TrimSpace(os.Getenv(EnvCloudServer)); value != "" {
+	if value := strings.TrimSpace(env.Get(EnvCloudServer)); value != "" {
 		cfg.ServerURL = value
 	}
 	return cfg
@@ -53,7 +54,7 @@ func ApplyServerOverride(cfg *Config) *Config {
 // A malformed configuration is treated as unavailable by this convenience API;
 // callers that must surface parse failures should call Load first.
 func EffectiveToken(dataDir string) (string, Source) {
-	if value := strings.TrimSpace(os.Getenv(EnvCloudToken)); value != "" {
+	if value := strings.TrimSpace(env.Get(EnvCloudToken)); value != "" {
 		return value, SourceEnv
 	}
 	cfg, err := Load(dataDir)

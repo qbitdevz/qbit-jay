@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -19,7 +20,7 @@ type saveTiming struct {
 }
 
 func beginSaveTiming() *saveTiming {
-	if os.Getenv("ENGRAM_MEM_SAVE_TIMING") != "1" {
+	if env.Get("MEM_SAVE_TIMING") != "1" {
 		return nil
 	}
 	return &saveTiming{started: time.Now()}
