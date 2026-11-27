@@ -36,6 +36,7 @@ stay as alternatives.
 | `qbit-jay-isotype-dark.svg`, `qbit-jay-isotype-light.svg`, `qbit-jay-isotype-dark-256.png` | Hexagon tile with the jay head: favicon, avatar, small marks. Dark = for dark backgrounds, light = for light backgrounds |
 | `qbit-jay-logo-horizontal-dark.svg`, `qbit-jay-logo-horizontal-light.svg` | Isotype, wordmark `qbit-jay` and `by qbitdev`; transparent background |
 | `qbit-jay-banner.svg`, `qbit-jay-banner.png` (1280x320), `qbit-jay-banner@2x.png` (2560x640) | README header, with the tagline "Hides thousands of acorns. Remembers where, months later." |
+| `qbit-jay-banner.gif` | Animated README banner, 900x506, 20 fps, 7 s, 140 frames, looping, about 0.8 MB: the jay appears in its glowing hexagon, hides acorns in grid cells labelled `save`, `search`, `context`, `sync`, `recall`, `remember`, the wordmark is written on, then the tagline appears. Suggested alt text: "qbit-jay faceted blue jay hides acorns in a hexagon grid, the qbit-jay wordmark is written on, and the tagline Hides thousands of acorns. Remembers where, months later. appears" |
 
 All SVGs are self-contained, use only `design/system.md` colours and have the
 wordmark and banner text converted to paths (Outfit), so they need no font.

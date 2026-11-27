@@ -10,6 +10,7 @@ Traceability: no business contract (`bcdd/contrato.md`) exists; this implements 
 - **S2** (user, L2) Deliverables: "Mascota cartoon del arrendajo", "Logo y wordmark", "Paleta y tipografía (design/system.md)", "Banner para el README".
 - **S3** (user, L2) qbitdev branding source: "Sí, leé qbitdev-brand" (`D:\Proyectos\Propios\qbitdev-brand`, read only).
 - **S4** (user, L3, brand story) "Capacidad espacial: Un solo arrendajo esconde entre 3.000 y 5.000 bellotas por temporada en miles de lugares distintos, y las recupera meses después."
+- **S6** (user, L11) "lo que no generaste es un gif asi como tiene engram"
 - **S5** (spec 6.2 and `TRADEMARKS.md` via `docs/BRAND.md`) A fork uses its own name and identity; Engram logos and confusingly similar identity are not allowed.
 
 Assumptions (not user specs):
@@ -27,6 +28,7 @@ Assumptions (not user specs):
 - [x] T3 User chooses a direction — human. Chosen: `03-hexagon-facets.html` (L9); 01 and 02 are alternatives
   - [x] T2a Fix the black head marking of `01-neon-outline.html` to match the photo — S1 — worker
 - [x] T4 Final assets in `assets/branding/` from `03-hexagon-facets.html` (standalone SVG mascot, isotype, lockups dark/light, README banner; PNG exports); `docs/BRAND.md` updated; Engram assets and README header stay until T0.4 — S1, S2, S5 — worker
+- [x] T5 Animated README banner `assets/branding/qbit-jay-banner.gif` like Engram's (`engram-banner.gif`: 900x506, 20 fps, 7 s, 140 frames, 2.4 MB) — S1, S6 — worker
 
 ## Log
 
@@ -42,3 +44,5 @@ Assumptions (not user specs):
 - L9 (user, 2026-11-27): "me quedo con el 3." Chosen artboard: `design/qbit-jay-identity/03-hexagon-facets.html`; 01 and 02 are alternatives. The user accepted the hexagon echo of the qbitdev isotype.
 - L8 (evidence, 2026-11-27): T2a done by a worker: 01 now has a 4.5 px mask line from beak through eye to nape and an 11 px necklace across the upper breast below the white throat, shared by every mascot instance in 01. Parent screenshot at 1440 px confirms it. 02, 03 and system.* untouched.
 - L10 (evidence, 2026-11-27): T4 done by a worker: `assets/branding/qbit-jay-*` (mascot, isotype dark/light, horizontal logo dark/light, banner as SVG; mascot 512, isotype 256, banner 1x/2x as PNG), wordmark and tagline outlined from Outfit (OFL, qbitdev-brand), no external refs or rasters in the SVGs; `docs/BRAND.md` has a "Chosen identity" section. Parent viewed banner, mascot, both logos and both isotypes at 32 px. Engram assets and README untouched until T0.4.
+- L11 (user, 2026-11-27): "si esta bien.. lo que no generaste es un gif asi como tiene engram" (light variants keep the dark tile; banner size accepted). Engram's README uses `assets/branding/engram-banner.gif`, 900x506, 20 fps, 7 s: the elephant exhales a memory stream (remember, sync, recall), the wordmark is written on, then the tagline appears.
+- L12 (evidence, 2026-11-27): T5 done by a worker: `assets/branding/qbit-jay-banner.gif`, 900x506, 20 fps, 140 frames, 7 s, infinite loop, 821,823 bytes. Story: jay appears in its glowing hexagon, hides six acorns in labelled cells (save, search, context, sync, recall, remember), wordmark written on, tagline, fade to empty grid. Parent extracted frames 35, 60, 90 and 115 from the final GIF and checked them. Unlike the static banner, the animated wordmark colours "jay" green.
