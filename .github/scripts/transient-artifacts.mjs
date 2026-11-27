@@ -10,6 +10,9 @@ const rootBinaryPaths = new Set([
   'cmd/engram/main',
   'cmd/engram/gentle-creation',
   'cmd/engram/engram',
+  'qbit-jay',
+  'cmd/qbit-jay/main',
+  'cmd/qbit-jay/qbit-jay',
 ]);
 
 const rootTransientDocumentNames = new Set([
