@@ -5,8 +5,10 @@ measures **upstream Engram unchanged**, before any rename.
 
 - Measured: 2026-11-26
 - Commit: `11521f4f3776db6d94dc17c11731bad35b71c7bc` (`v3.7.2-92-g11521f4`)
-- Status: **partial**. The race suite did not run and the test suite is not
-  green on this machine; see [Not measured or not passing](#not-measured-or-not-passing).
+- Status: **complete for E3 on Linux**. Test suite and race suite green on
+  2026-11-27 after installing `jq` and `build-essential` in WSL; see
+  [Test suite](#test-suite). Items outside E3 on Linux are listed in
+  [Not measured or not passing](#not-measured-or-not-passing).
 
 ## Environment
 
@@ -17,7 +19,7 @@ measures **upstream Engram unchanged**, before any rename.
 | Memory | 15.5 GiB visible to WSL |
 | Go | `go1.26.11 linux/amd64`, `GOTOOLCHAIN=local` |
 | File system | ext4 inside WSL (the clone and the data directory are not on a Windows mount) |
-| C compiler | none |
+| C compiler | none on 2026-11-26; GCC 15.2.0 (`build-essential`) from 2026-11-27 |
 
 Numbers from another machine are not comparable with these. Compare a change
 only against a baseline measured on the same machine in the same session.
@@ -35,21 +37,25 @@ The release binary is the reference for the size gate (growth of at most 10 %:
 
 ## Test suite
 
+Reference run, 2026-11-27 (`jq` 1.8.1, GCC 15.2.0, `make` 4.4.1 installed):
+
 | Measure | Value |
 | --- | --- |
-| `go test -count=1 ./...` | exit 1 after 112.7 s |
-| Packages passing | 34 |
-| Packages failing | 1 (`plugin`) |
-| Failing tests | 30 |
+| `go test -count=1 ./...` | exit 0 after 97.7 s |
+| Packages passing | 35 |
+| Packages failing | 0 |
+| Failing tests | 0 |
 | Packages without test files | 5 |
-| `go test -race ./...` | not run |
+| `go test -race -count=1 ./...` | exit 0 after 741.7 s, 35 packages passing, 0 failing |
 
-All 30 failures are in the `plugin` package, which runs the Claude Code and
-Codex hook scripts. This WSL has no `jq`, which those scripts need; most
-failures name the missing `/usr/bin/jq` directly. The remaining ones are
-Windows hook tests that find the host's `powershell.exe` through WSL interop
-and get empty output; their cause is not confirmed. No failure was observed in
-`store`, `mcp`, `cmd/engram`, `server` or `sync`.
+First run, 2026-11-26, without `jq` or a C compiler: `go test ./...` exited 1
+after 112.7 s with 30 failing tests, all in `plugin` (the Claude Code and Codex
+hook scripts need `jq`). With `jq` installed all of them pass, including the
+Windows hook tests whose cause was not confirmed then.
+
+GCC needs the C headers of `libc6-dev`: with `gcc` alone, cgo is enabled and
+`runtime/cgo` fails to compile (`stdint.h: No such file or directory`).
+Install `build-essential`, not just `gcc`.
 
 ## Store benchmarks
 
@@ -66,6 +72,13 @@ The benchmark expression of the upstream performance ratchet
 | `Search_TypeFilter` | 36.07 ms ± 5 % | 46.05 KiB | 481 |
 | `Search_Limit20` | 48.23 ms ± 8 % | 79.69 KiB | 829 |
 | `SearchContext_AllMode_Hit` | 47.77 ms ± 4 % | 45.47 KiB | 478 |
+
+The table is the 2026-11-26 run. The 2026-11-27 run, same commit and machine,
+gave `ScanProject_Page5000` 925.1 ms ± 5 %, `Search_AllMode_Hit` 53.06 ms,
+`Search_AnyMode_Hit` 42.32 ms, `Search_NoHit` 672.3 µs, `Search_TypeFilter`
+41.55 ms, `Search_Limit20` 55.57 ms and `SearchContext_AllMode_Hit` 52.72 ms,
+with identical memory per operation. Up to 17 % apart between days: another
+reason to compare candidate and baseline in the same session.
 
 ## Latency, startup and memory through MCP
 
@@ -118,9 +131,7 @@ alternately in the same session, several runs each, and compare the medians.
 
 | Item | State | What it needs |
 | --- | --- | --- |
-| `go test -race ./...` | Not run | A C compiler in WSL (`gcc`); installing it needs `sudo` |
-| Green test suite | 30 failures in `plugin` | `jq` in WSL, then a rerun to confirm the cause |
-| `make perf-check`, `make perf-baseline` | Not run through `make` | `make` in WSL; the same benchmarks were run directly |
+| `make perf-check`, `make perf-baseline` | Not run through `make` | Nothing; `make` is now installed. The same benchmarks were run directly |
 | Corpora of 10,000 and 100,000 memories | Not measured | Belongs to the evaluators of task T0.8 |
 | Real database of the user | Not measured | A copy at `QBIT_JAY_EVAL_DB`; never committed |
 | Windows and macOS | Not measured | CI |
