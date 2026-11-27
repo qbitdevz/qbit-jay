@@ -19,7 +19,7 @@
   "keywords": ["obsidian-plugin", "engram", "memory", "ai"],
   "license": "MIT",
   "devDependencies": {
-    "@types/node": "^20.0.0",
+    "@types/node": "^26.6.7",
     "builtin-modules": "^5.4.0",
     "esbuild": "^0.21.0",
     "lockfile-lint": "^4.14.1",
