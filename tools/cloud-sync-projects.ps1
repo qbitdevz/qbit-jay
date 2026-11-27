@@ -19,7 +19,7 @@ Usage: cloud-sync-projects.ps1 [-LogPath <path>] <project> [<project> ...]
 Run export then import for each explicitly named project.
 An export failure skips that project's import, matching native autosync.
 Exit 0 if all succeed, 1 if any project/log op fails, 2 on usage error.
-  -LogPath <path>  Overrides default and ENGRAM_CLOUD_SYNC_LOG.
+  -LogPath <path>  Overrides default and QBIT_JAY_CLOUD_SYNC_LOG (ENGRAM_CLOUD_SYNC_LOG is the fallback).
   -Help            Show this help.
 Requires PowerShell 7 (pwsh); 5.1 is not supported.
 '@ | Out-Host
@@ -35,9 +35,9 @@ if ($Projects.Count -eq 0) {
 }
 
 $resolvedLog = $LogPath
-if ([string]::IsNullOrEmpty($resolvedLog)) { $resolvedLog = $env:ENGRAM_CLOUD_SYNC_LOG }
+if ([string]::IsNullOrEmpty($resolvedLog)) { $resolvedLog = if ($env:QBIT_JAY_CLOUD_SYNC_LOG) { $env:QBIT_JAY_CLOUD_SYNC_LOG } else { $env:ENGRAM_CLOUD_SYNC_LOG } }
 if ([string]::IsNullOrEmpty($resolvedLog)) {
-  $dataDir = if ($env:ENGRAM_DATA_DIR) { $env:ENGRAM_DATA_DIR } else { (Join-Path $HOME '.engram') }
+  $dataDir = if ($env:QBIT_JAY_DATA_DIR) { $env:QBIT_JAY_DATA_DIR } elseif ($env:ENGRAM_DATA_DIR) { $env:ENGRAM_DATA_DIR } else { (Join-Path $HOME '.qbit-jay') }
   $resolvedLog = Join-Path $dataDir $defaultLogName
 }
 $resolvedLog = [System.IO.Path]::GetFullPath($resolvedLog)
@@ -57,9 +57,9 @@ function Write-LogLine {
 function Invoke-ProjectPhase {
   param([string]$Project, [string]$Phase)
   if (-not (Write-LogLine "phase=$Phase START project=$Project")) { return -1 }
-  $engram = Get-Command engram -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
+  $engram = Get-Command qbit-jay -CommandType Application -ErrorAction SilentlyContinue | Select-Object -First 1
   if ($null -eq $engram) {
-    [Console]::Error.WriteLine("cloud-sync-projects.ps1: error: $Phase failed for '$Project': engram executable not found")
+    [Console]::Error.WriteLine("cloud-sync-projects.ps1: error: $Phase failed for '$Project': qbit-jay executable not found")
     return -1
   }
   $exitCode = 0
@@ -74,7 +74,7 @@ function Invoke-ProjectPhase {
     }
     $exitCode = $LASTEXITCODE
     if ($null -eq $exitCode) {
-      [Console]::Error.WriteLine("cloud-sync-projects.ps1: error: $Phase launch failed for '$Project': engram returned no exit code")
+      [Console]::Error.WriteLine("cloud-sync-projects.ps1: error: $Phase launch failed for '$Project': qbit-jay returned no exit code")
       return -1
     }
   } catch {

@@ -67,7 +67,7 @@ jobs:
               name="engram_${os}_${arch}"
               if [[ "$os" == windows ]]; then name="$name.exe"; fi
               GOOS="$os" GOARCH="$arch" go build -mod=readonly -trimpath -buildvcs=true \
-                -ldflags "-s -w -X main.version=$CORE_VERSION" -o "$OUT/$name" ./cmd/engram
+                -ldflags "-s -w -X main.version=$CORE_VERSION" -o "$OUT/$name" ./cmd/qbit-jay
               go version -m "$OUT/$name" > "$OUT/$name.buildinfo.txt"
               grep -Fqx $'\tbuild\tvcs.revision='"$SOURCE_SHA" "$OUT/$name.buildinfo.txt"
               grep -Fqx $'\tbuild\tvcs.modified=false' "$OUT/$name.buildinfo.txt"

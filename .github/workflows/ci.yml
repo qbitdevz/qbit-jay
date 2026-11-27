@@ -786,7 +786,7 @@ jobs:
         run: go test ./...
 
       - name: Run binary quick self-test
-        run: go build -o engram-selftest ./cmd/engram && ./engram-selftest test --quick
+        run: go build -o engram-selftest ./cmd/qbit-jay && ./engram-selftest test --quick
 
   postgres-tests:
     name: PostgreSQL Integration Tests
@@ -841,7 +841,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          go test -json -count=1 -timeout=10m ./internal/cloud/cloudstore ./internal/cloud/cloudserver ./cmd/engram | tee "$RUNNER_TEMP/postgres-tests.json"
+          go test -json -count=1 -timeout=10m ./internal/cloud/cloudstore ./internal/cloud/cloudserver ./cmd/qbit-jay | tee "$RUNNER_TEMP/postgres-tests.json"
           node .github/scripts/postgres-ci-evidence.mjs "$RUNNER_TEMP/postgres-tests.json"
 
       - name: Run owned PostgreSQL measurement regressions
@@ -1005,7 +1005,7 @@ jobs:
           $ErrorActionPreference = 'Stop'
           $PSNativeCommandUseErrorActionPreference = $false
           $binary = Join-Path $env:RUNNER_TEMP 'windows-suite/recovery-engram.exe'
-          & go build -o $binary ./cmd/engram
+          & go build -o $binary ./cmd/qbit-jay
           $buildExit = $LASTEXITCODE
           if ($buildExit -ne 0) { exit $buildExit }
           Add-Content $env:GITHUB_ENV "ENGRAM_RECOVERY_PUBLIC_BINARY=$binary"
@@ -1059,7 +1059,7 @@ jobs:
         run: go test ./internal/setup/ -run 'TestClaudeCodeEngramCommandPreservesWindowsAbsolutePath|TestResolveEngramCommandMiseInstall|TestCanonicalEngramCommand|TestEnsurePiMCPConfigRepairsDeadEngramCommand' -count=1
 
       - name: Run Windows MCP parent-lifetime tests
-        run: go test ./cmd/engram/ -run '^TestMCPJobObject' -count=1
+        run: go test ./cmd/qbit-jay/ -run '^TestMCPJobObject' -count=1
 
   wrapper-tests-windows:
     name: Cloud Sync Wrapper Tests (Windows)

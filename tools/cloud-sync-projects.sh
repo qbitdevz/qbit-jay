@@ -10,9 +10,10 @@ Usage: cloud-sync-projects.sh [--log <path>] <project> [<project> ...]
 Run export then import for each explicitly named project.
 An export failure skips that project's import, matching native autosync.
 Exit 0 if all succeed, 1 if any project/log op fails, 2 on usage error.
-  --log <path>  Overrides default and ENGRAM_CLOUD_SYNC_LOG.
+  --log <path>  Overrides default and QBIT_JAY_CLOUD_SYNC_LOG.
   -h, --help    Show this help.
-Env: ENGRAM_DATA_DIR (defaults to ~/.engram); ENGRAM_CLOUD_SYNC_LOG (log override).
+Env: QBIT_JAY_DATA_DIR (defaults to ~/.qbit-jay); QBIT_JAY_CLOUD_SYNC_LOG (log override).
+The ENGRAM_DATA_DIR and ENGRAM_CLOUD_SYNC_LOG names are still read as a fallback.
 USAGE
 }
 
@@ -32,9 +33,9 @@ done
 
 [ "${#projects[@]}" -gt 0 ] || die_usage "at least one project is required"
 
-[ -z "$log_path" ] && log_path="${ENGRAM_CLOUD_SYNC_LOG:-}"
+[ -z "$log_path" ] && log_path="${QBIT_JAY_CLOUD_SYNC_LOG:-${ENGRAM_CLOUD_SYNC_LOG:-}}"
 if [ -z "$log_path" ]; then
-  log_path="${ENGRAM_DATA_DIR:-$HOME/.engram}/$DEFAULT_LOG_NAME"
+  log_path="${QBIT_JAY_DATA_DIR:-${ENGRAM_DATA_DIR:-$HOME/.qbit-jay}}/$DEFAULT_LOG_NAME"
 fi
 case "$log_path" in /*) ;; *) log_path="$PWD/$log_path" ;; esac  # absolute
 
@@ -52,9 +53,9 @@ run_phase() {
   local -a statuses
   logline "phase=$phase START project=$proj" || return 1
   if [ "$phase" = "export" ]; then
-    engram sync --cloud --project "$proj" 2>&1 | tee -a "$log_path"
+    qbit-jay sync --cloud --project "$proj" 2>&1 | tee -a "$log_path"
   else
-    engram sync --cloud --import --project "$proj" 2>&1 | tee -a "$log_path"
+    qbit-jay sync --cloud --import --project "$proj" 2>&1 | tee -a "$log_path"
   fi
   statuses=("${PIPESTATUS[@]}")  # snapshot before any other command mutates it
   rc=${statuses[0]:-1}; tee_rc=${statuses[1]:-1}

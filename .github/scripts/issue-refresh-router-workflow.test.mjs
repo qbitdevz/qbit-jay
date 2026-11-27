@@ -87,7 +87,7 @@ test('workflow baselines retain readiness guards and pin original-event identity
     '.github/workflows/pr-check.yml': '57fecdfa8eda8c3495c68068f8358da8bf74fe362ef569b50517e2a4dab9cd58',
     '.github/workflows/issue-validation.yml': 'd996ffae8e1341390b818e294a1a34a70f1b06f5eabda03cb96c0f065f7115b8',
     '.github/workflows/issue-policy.yml': '5f8bfbd9ab354f6b60d3ef35d30d5f4ee43a97eb83f61d8e0a955da37947adfd',
-    '.github/workflows/ci.yml': '311a104e1f043744d9a16969d7bb867e9e3d508ee87adadd0f01418fb9f6bcab',
+    '.github/workflows/ci.yml': '8b7f39c0945fd9b9cca26e0f1f87eafa66f6e8b716374d92c9c73ee624614bdb',
   };
   for (const [path, expected] of Object.entries(baseline)) {
     const source = path.endsWith('/pr-check.yml') ? read(path).replace(/^                  if \(!Array\.isArray\(issue\.labels\).+\n                    throw new Error\('issue labels are malformed'\);\n                  }\n/m, '').replace(/^                  if \(!Array\.isArray\(issue\.assignees\).+\n                    throw new Error\('issue assignees are malformed'\);\n                  }\n                  if \(issue\.assignees\.length === 0\) \{\n                    errors\.push\(.+\);\n                  }\n/m, '') : read(path);

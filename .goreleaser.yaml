@@ -6,8 +6,8 @@ release:
   prerelease: auto
 
 builds:
-  - main: ./cmd/engram
-    binary: engram
+  - main: ./cmd/qbit-jay
+    binary: qbit-jay
     env:
       - CGO_ENABLED=0
     goos:

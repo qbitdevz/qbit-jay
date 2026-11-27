@@ -41,7 +41,7 @@ func fakeEngram(t *testing.T, dir string, fail fakeFailure) {
 		if fail.project != "" {
 			body += "if \"%PROJ%\"==\"" + fail.project + "\" if \"%PHASE%\"==\"" + fail.phase + "\" (echo fake: forced " + fail.phase + " failure for %PROJ% 1>&2 & exit 1)\r\n"
 		}
-		if err := os.WriteFile(filepath.Join(dir, "engram.cmd"), []byte(body+"exit 0\r\n"), 0o755); err != nil {
+		if err := os.WriteFile(filepath.Join(dir, "qbit-jay.cmd"), []byte(body+"exit 0\r\n"), 0o755); err != nil {
 			t.Fatal(err)
 		}
 		return
@@ -50,7 +50,7 @@ func fakeEngram(t *testing.T, dir string, fail fakeFailure) {
 	if fail.project != "" {
 		s += fmt.Sprintf("if [ \"$proj\" = %q ] && [ \"$phase\" = %q ]; then echo \"fake: forced %s failure for $proj\" >&2; exit 1; fi\n", fail.project, fail.phase, fail.phase)
 	}
-	if err := os.WriteFile(filepath.Join(dir, "engram"), []byte(s+"exit 0\n"), 0o755); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "qbit-jay"), []byte(s+"exit 0\n"), 0o755); err != nil {
 		t.Fatal(err)
 	}
 }
@@ -64,7 +64,7 @@ func run(t *testing.T, interp, wrapper, fakeDir string, add, args []string) (int
 	env := []string{}
 	for _, e := range os.Environ() {
 		k, v, ok := strings.Cut(e, "=")
-		if !ok || strings.EqualFold(k, "ENGRAM_CLOUD_SYNC_LOG") || strings.EqualFold(k, "ENGRAM_DATA_DIR") {
+		if !ok || strings.EqualFold(k, "ENGRAM_CLOUD_SYNC_LOG") || strings.EqualFold(k, "ENGRAM_DATA_DIR") || strings.EqualFold(k, "QBIT_JAY_CLOUD_SYNC_LOG") || strings.EqualFold(k, "QBIT_JAY_DATA_DIR") {
 			continue
 		}
 		if pathOverride && strings.EqualFold(k, "PATH") {
@@ -144,7 +144,7 @@ func TestCloudSyncWrappers(t *testing.T) {
 			}
 			defLog := filepath.Join(dataDir, "cloud-sync-projects.log")
 			envLog, envLogUnused, explicitLog, pfLog := filepath.Join(tmp, "env.log"), filepath.Join(tmp, "env-unused.log"), filepath.Join(tmp, "explicit.log"), filepath.Join(tmp, "pf.log")
-			argvLog := filepath.Join(tmp, "engram-argv.log")
+			argvLog := filepath.Join(tmp, "qbit-jay-argv.log")
 			spaceArgs := []string{"sync --cloud --project my project", "sync --cloud --import --project my project"}
 			if runtime.GOOS == "windows" {
 				spaceArgs = []string{"sync --cloud --project \"my project\"", "sync --cloud --import --project \"my project\""}
@@ -242,7 +242,7 @@ func TestCloudSyncPowerShellMissingEngram(t *testing.T) {
 	if exit != 1 {
 		t.Fatalf("exit=%d want 1; output:\n%s", exit, out)
 	}
-	assertContains(t, "console", out, "engram executable not found", "project FAILURE project=alpha phase=export exit=-1", "wrapper END result=failure overall=1")
+	assertContains(t, "console", out, "qbit-jay executable not found", "project FAILURE project=alpha phase=export exit=-1", "wrapper END result=failure overall=1")
 	log, err := os.ReadFile(filepath.Join(data, "cloud-sync-projects.log"))
 	if err != nil {
 		t.Fatalf("read durable log: %v", err)

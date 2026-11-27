@@ -11,7 +11,7 @@ const profiles = {
   ],
   // Preserve the existing profile name; both native Windows boundaries are mandatory.
   'windows-recovery': [
-    ['cmd/engram', 'TestHookManagedLocalPublicRecovery'],
+    ['cmd/qbit-jay', 'TestHookManagedLocalPublicRecovery'],
     ...['handback', 'ascii', 'unicode', 'stdout-fallback'].map(name =>
       ['plugin', `TestSubagentStopPreservesUnicodeTransport/${name}`]),
   ],
