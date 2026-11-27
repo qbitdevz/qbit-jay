@@ -26,10 +26,10 @@ Assumptions (not user specs):
 
 ## Tasks
 
-- [ ] T0.1 Environment and repository — S1, S2 — inline — commit: (upstream history; no own commit)
+- [x] T0.1 Environment and repository — S1, S2 — inline — commit: (upstream history; no own commit)
   - [x] T0.1a Go 1.26.11 in WSL
   - [x] T0.1b Import upstream with full history, remote `upstream`, `main` = starting commit
-  - [ ] T0.1c Create GitHub repository `qbitdevz/qbit-jay` (public) and get test CI green
+  - [x] T0.1c Create GitHub repository `qbitdevz/qbit-jay` (public) and get test CI green
 - [x] T0.2 Scaffolding — S3, S4, S5 — inline — commit: on branch `chore/fase-0-scaffolding-baseline`
 - [x] T0.3 Upstream baseline (E3) — S6, S7, S8, S9, S10 — inline — commit: same branch (`b25af88`, results completed in the commit after `8278232`)
 - [ ] T0.4–T0.10 — not authorized yet (see spec section 11)
@@ -48,3 +48,4 @@ Assumptions (not user specs):
 - L11 (evidence, 2026-11-27): `qbitdevz/qbit-jay` created public; pushed `main` (= `11521f4`) and `chore/fase-0-scaffolding-baseline` (spec commit `cbb2664`), no tags. Actions enabled, 18 workflows active, but the initial push to `main` started no CI run after ~40 s; `ci.yml` has no `workflow_dispatch`, so a PR or a new push to `main` is needed to get the first run. Branch is 1,451 authored lines past `main`, mostly the specification document.
 - L12 (evidence, 2026-11-27): user installed `jq`, `gcc`, `make`, then `build-essential` (gcc alone lacked `libc6-dev` headers, so cgo builds failed). Rerun of `scripts/qbit/baseline.sh` on `11521f4` in `~/qbit-jay-baseline/upstream-r2`: `go test ./...` exit 0 (35 packages ok, 0 failing), `go test -race ./...` exit 0 in 741.7 s, benchmarks exit 0, release binary unchanged at 22,962,338 bytes. S9 met; `docs/qbit/BASELINE.md` updated. First CI run on PR #14 was cancelled by the next push (`cancel-in-progress`), 7 finished jobs green.
 - L8 (discovery, 2026-11-26): MCP write and read tools reject an explicit `project` the server has no context for (`unknown_project`), even when the working directory has that name; the harness omits `project` and relies on detection.
+- L13 (evidence, 2026-11-27): CI run 46071811255 on PR #14 (head `a6fed46`) concluded success: every job green, Performance Ratchet skipped (push-only). The previous run failed only Lint (`errcheck` on two `os.RemoveAll` in `scripts/qbit/e3latency/main.go`, fixed in `a6fed46`) and Windows Full Suite (Observational) on two Codex Windows adapter tests in `plugin`, which passed on this rerun without changes: treat them as flaky upstream tests. T0.1c met; T0.1-T0.3 complete. T0.4 not authorized.
