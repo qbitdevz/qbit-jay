@@ -78,6 +78,9 @@ func TestListenerConflictNamesEngram(t *testing.T) {
 
 func TestServeRefusesWhenEngramHoldsThePort(t *testing.T) {
 	port := fakeHealthServer(t, engramHealth)
+	oldServeCheck := serveEngramPortCheck
+	serveEngramPortCheck = engramPortError
+	t.Cleanup(func() { serveEngramPortCheck = oldServeCheck })
 	opened := false
 	old := storeNew
 	storeNew = func(store.Config) (*store.Store, error) { opened = true; return nil, os.ErrInvalid }
