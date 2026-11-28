@@ -49,10 +49,10 @@ export async function syncNow(plugin: EngramBrainPlugin): Promise<SyncResult> {
 	const { settings } = plugin;
 	const vault: Vault = plugin.app.vault;
 	if (!settings.engramUrl) {
-		new Notice("Engram URL is required");
-		throw new Error("Engram URL is required");
+		new Notice("qbit-jay URL is required");
+		throw new Error("qbit-jay URL is required");
 	}
-	const subfolder = settings.vaultSubfolder || "engram";
+	const subfolder = settings.vaultSubfolder || "qbit-jay";
 	if (!isSafeFolder(subfolder)) throw new Error("Invalid vault subfolder");
 
 	// Validate the entire response and derive every path before touching the vault.
@@ -108,7 +108,7 @@ async function fetchExport(baseUrl: string, project?: string): Promise<ExportDat
 	try {
 		res = await fetch(url.toString(), { signal: AbortSignal.timeout(30_000) });
 	} catch {
-		throw new Error("Sync failed: could not reach engram server");
+		throw new Error("Sync failed: could not reach qbit-jay server");
 	}
 	if (!res.ok) throw new Error(`Sync failed: server returned ${res.status} ${res.statusText}`);
 	let data: unknown;
