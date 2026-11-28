@@ -97,56 +97,23 @@ func TestPRValidationAndTransientArtifactWorkflowContracts(t *testing.T) {
 	for _, required := range []string{
 		"pull_request:",
 		"types: [opened, edited, labeled, unlabeled, synchronize, reopened]",
-		"check-issue-reference:",
-		"name: Check Issue Reference",
-		"check-issue-approved:",
-		"name: Check Issue Has status:approved",
-		"permissions:\n  contents: read\n  issues: read\n  pull-requests: read",
-		"issue.assignees.length === 0",
-		"has no assignee. Assign an owner before merge.",
+		"check-claude-plugin-version:",
+		"name: Check Claude Plugin Version",
+		"permissions:\n  contents: read\n  pull-requests: read",
 	} {
 		if !strings.Contains(prCheck, required) {
 			t.Errorf("%s does not contain %q", prCheckPath, required)
 		}
 	}
-	for _, forbidden := range []string{"pull_request_target:", "check-transient-artifacts:"} {
+	// Upstream issue and label policy jobs were removed (T0.9): they fail on every
+	// qbit-jay PR because no approved-issue workflow exists here.
+	for _, forbidden := range []string{"pull_request_target:", "check-transient-artifacts:", "check-issue-reference", "check-issue-approved", "issues: read"} {
 		if strings.Contains(prCheck, forbidden) {
 			t.Errorf("%s must not contain %q", prCheckPath, forbidden)
 		}
 	}
-	labelCheckPath := filepath.Join(workflowDirectory(t), "pr-label-check.yml")
-	labelCheckContent, err := os.ReadFile(labelCheckPath)
-	if err != nil {
-		t.Fatalf("read %s: %v", labelCheckPath, err)
-	}
-	labelCheck := strings.ReplaceAll(string(labelCheckContent), "\r\n", "\n")
-	for _, required := range []string{
-		"pull_request_target:",
-		"types: [opened, edited, labeled, unlabeled, synchronize, reopened]",
-		"permissions:\n  contents: read\n  pull-requests: read",
-		"check-label-policy:\n    name: Check PR Has type:* Label\n    runs-on: ubuntu-latest\n    concurrency:\n      group: ${{ github.workflow }}-type-label-${{ github.event.pull_request.number || github.run_id }}\n      cancel-in-progress: true",
-		"if (context.eventName === 'merge_group') {\n              const { aggregatePullRequestResults, resolveAssociatedPullRequests } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/merge-queue.mjs`);",
-		"resolveAssociatedPullRequests(github, {",
-		"aggregatePullRequestResults(pulls, validate)",
-		"failures = validate(pull).map((error) => `PR #${pull.number}: ${error}`)",
-		"validateLabels(policy, pull.labels.map((label) => label.name), 'pull-request')",
-		"github.event.merge_group.base_sha || github.event.pull_request.base.sha",
-		"persist-credentials: false",
-	} {
-		if !strings.Contains(labelCheck, required) {
-			t.Errorf("%s does not contain %q", labelCheckPath, required)
-		}
-	}
-	for _, forbidden := range []string{
-		"\n            const { aggregatePullRequestResults, resolveAssociatedPullRequests } = await import(`${process.env.GITHUB_WORKSPACE}/.github/scripts/merge-queue.mjs`);",
-		"github.event.pull_request.labels",
-		"context.payload.pull_request.labels",
-		"pull_request.head",
-		"head.sha",
-	} {
-		if strings.Contains(labelCheck, forbidden) {
-			t.Errorf("%s must not contain %q", labelCheckPath, forbidden)
-		}
+	if _, err := os.Stat(filepath.Join(workflowDirectory(t), "pr-label-check.yml")); err == nil {
+		t.Error("pr-label-check.yml must stay removed: it enforces upstream type:* labels")
 	}
 
 	artifactWorkflowPath := filepath.Join(workflowDirectory(t), "transient-artifacts.yml")

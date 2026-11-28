@@ -172,16 +172,34 @@ The screens above are the real TUI rendered with sample data. Navigate with `j`/
 
 ### Install
 
-qbit-jay has no published release yet. Install it from source with Go (1.26 or newer):
+Pick one channel; the scripts verify the release checksum before installing and need no administrator rights.
 
 ```bash
+# Linux, macOS, WSL
+curl -fsSL https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.sh | sh
+```
+
+```powershell
+# Windows PowerShell
+irm https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.ps1 | iex
+```
+
+```bash
+# Go 1.26 or newer, any platform
 go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
+
+# Homebrew
+brew install qbitdevz/tap/qbit-jay
+
+# Scoop
+scoop bucket add qbitdevz https://github.com/qbitdevz/scoop-bucket; scoop install qbit-jay
+```
+
+```bash
 qbit-jay version
 ```
 
-Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation](docs/INSTALLATION.md) for details.
-
-Coming later (none of these exists yet): GitHub Releases with prebuilt binaries, Homebrew, Scoop, npm and install scripts. See the [Release Policy](docs/RELEASE-POLICY.md) for how releases are meant to work.
+Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation](docs/INSTALLATION.md) and [Releasing](docs/qbit/RELEASING.md) for details.
 
 ### Existing Engram data
 
@@ -337,7 +355,7 @@ For parameters and the complete, current tool reference, see [the full documenta
 | Where to go | What you'll find |
 | :--- | :--- |
 | **[Intended Usage](docs/intended-usage.md)** | The human mental model for using qbit-jay |
-| **[Installation](docs/INSTALLATION.md)** · **[Release Policy](docs/RELEASE-POLICY.md)** · **[SignPath TEST pilot](docs/signpath-test.md)** | Platform support, release guidance, and the nonpublishing test-signing pilot |
+| **[Installation](docs/INSTALLATION.md)** · **[Release Policy](docs/RELEASE-POLICY.md)** · **[Releasing](docs/qbit/RELEASING.md)** | Platform support, release guidance, and the release pipeline |
 | **[Agent Setup](docs/AGENT-SETUP.md)** · **[Plugins](docs/PLUGINS.md)** | Per-agent configuration, compaction resilience, and OpenCode and Claude Code plugin details |
 | **[Architecture](docs/ARCHITECTURE.md)** · **[Codebase Guide](docs/CODEBASE-GUIDE.md)** | Memory model, tool behavior, project structure, flows, and implementation landmarks |
 | **[qbit-jay Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |
