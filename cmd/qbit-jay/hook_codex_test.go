@@ -50,7 +50,7 @@ func codexTestHookBinary(t *testing.T, root string) {
 	if port == "" {
 		t.Fatal("legacy native wrapper requires configured local port")
 	}
-	wrapper := "#!/bin/sh\nENGRAM_TEST_HOOK_PROCESS=1 ENGRAM_URL= ENGRAM_SOCKET= ENGRAM_PORT='" + port + "' exec '" + filepath.ToSlash(executable) + "' -test.run=^TestCodexHookProcess$ -- \"$2\"\n"
+	wrapper := "#!/bin/sh\nENGRAM_TEST_HOOK_PROCESS=1 QBIT_JAY_URL= ENGRAM_URL= QBIT_JAY_SOCKET= ENGRAM_SOCKET= QBIT_JAY_PORT='" + port + "' ENGRAM_PORT='" + port + "' exec '" + filepath.ToSlash(executable) + "' -test.run=^TestCodexHookProcess$ -- \"$2\"\n"
 	if err := os.WriteFile(filepath.Join(bin, "qbit-jay"), []byte(wrapper), 0o700); err != nil {
 		t.Fatal(err)
 	}
