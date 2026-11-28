@@ -31,8 +31,6 @@ func TestRenderPreviewScreens(t *testing.T) {
 		lipgloss.SetColorProfile(prevProfile)
 		lipgloss.SetHasDarkBackground(prevDark)
 	})
-	// termenv.TrueColor is Profile zero; subtracting avoids a direct termenv import.
-	lipgloss.SetColorProfile(prevProfile - prevProfile)
 
 	ptr := func(v string) *string { return &v }
 	obs := []store.Observation{
@@ -80,6 +78,12 @@ func TestRenderPreviewScreens(t *testing.T) {
 			return m
 		},
 	}
+
+	// termenv's TrueColor is the Profile zero value; reaching it by subtraction
+	// avoids importing termenv, which go.mod lists as an indirect dependency.
+	trueColor := prevProfile
+	trueColor -= prevProfile
+	lipgloss.SetColorProfile(trueColor)
 
 	for _, dark := range []bool{true, false} {
 		lipgloss.SetHasDarkBackground(dark)

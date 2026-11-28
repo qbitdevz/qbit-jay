@@ -15,7 +15,6 @@ import (
 
 var (
 	colorBase     = theme.Bg.Adaptive()         // App background
-	colorSurface  = theme.Panel.Adaptive()      // Panel background
 	colorOverlay  = borderColor                 // Borders and connectors
 	colorText     = theme.Ink.Adaptive()        // Primary text
 	colorSubtext  = theme.Muted.Adaptive()      // Secondary text
@@ -26,7 +25,6 @@ var (
 	colorBlue     = theme.Sky.Adaptive()        // Identifiers
 	colorMauve    = sectionColor                // Section titles
 	colorYellow   = theme.Warn.Adaptive()       // Acorn: warnings, projects, update banner
-	colorTeal     = theme.Warn.Adaptive()       // Acorn: search hits
 )
 
 var (
@@ -221,7 +219,7 @@ var (
 				MarginBottom(1)
 
 	searchHighlightStyle = lipgloss.NewStyle().
-				Foreground(colorTeal).
+				Foreground(colorPeach).
 				Bold(true)
 
 	noResultsStyle = lipgloss.NewStyle().
