@@ -493,7 +493,7 @@ func TestNewServerSessionIDDescriptions(t *testing.T) {
 	if start == nil {
 		t.Fatal("mem_session_start not registered")
 	}
-	const wantStartDescription = "Register a caller-provided session ID. Engram does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency."
+	const wantStartDescription = "Register a caller-provided session ID. qbit-jay does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency."
 	if got := start.Tool.Description; got != wantStartDescription {
 		t.Errorf("mem_session_start description = %q; want %q", got, wantStartDescription)
 	}
@@ -501,7 +501,7 @@ func TestNewServerSessionIDDescriptions(t *testing.T) {
 	if !ok {
 		t.Fatalf("mem_session_start id schema = %T; want object", start.Tool.InputSchema.Properties["id"])
 	}
-	const wantIDDescription = "Caller-provided unique session ID; Engram does not generate one."
+	const wantIDDescription = "Caller-provided unique session ID; qbit-jay does not generate one."
 	if got, _ := id["description"].(string); got != wantIDDescription {
 		t.Errorf("mem_session_start id description = %q; want %q", got, wantIDDescription)
 	}
@@ -3755,7 +3755,7 @@ func TestBuildServerInstructions_NilOrAll(t *testing.T) {
 	}
 
 	// Intro header
-	if !strings.Contains(instructions, "Engram provides persistent memory that survives across sessions and compactions.") {
+	if !strings.Contains(instructions, "qbit-jay provides persistent memory that survives across sessions and compactions.") {
 		t.Errorf("missing intro header in nil allowlist instructions")
 	}
 
@@ -3943,7 +3943,7 @@ func TestBuildServerInstructions_CustomAndConditional(t *testing.T) {
 
 	t.Run("empty allowlist", func(t *testing.T) {
 		instructions := buildServerInstructions(map[string]bool{})
-		expected := "Engram provides persistent memory that survives across sessions and compactions."
+		expected := "qbit-jay provides persistent memory that survives across sessions and compactions."
 		if instructions != expected {
 			t.Errorf("empty allowlist should only produce header, got %q", instructions)
 		}

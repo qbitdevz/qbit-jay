@@ -384,7 +384,7 @@ func hasRegisteredMemoryWriter(allowlist map[string]bool) bool {
 // based on which tools are allowed/registered.
 func buildServerInstructions(allowlist map[string]bool) string {
 	var b strings.Builder
-	b.WriteString("Engram provides persistent memory that survives across sessions and compactions.\n\n")
+	b.WriteString("qbit-jay provides persistent memory that survives across sessions and compactions.\n\n")
 
 	var activeCore []string
 	for _, ct := range coreTools {
@@ -438,7 +438,7 @@ func buildServerInstructions(allowlist map[string]bool) string {
 	return strings.TrimSpace(b.String())
 }
 
-// serverInstructions tells MCP clients when to use Engram's tools.
+// serverInstructions tells MCP clients when to use qbit-jay's tools.
 // Retained as package-level variable for backward compatibility.
 var serverInstructions = buildServerInstructions(nil)
 
@@ -613,7 +613,7 @@ Examples:
 					mcp.Description("Optional explicit project for this memory. Accepted only when backed by known context (existing project, matching session, repo config, or ambiguous-project recovery); invalid or unbacked names fail loudly."),
 				),
 				mcp.WithString("org",
-					mcp.Description("Optional org — a free-text grouping axis orthogonal to scope. Overrides the org inherited from .engram/config.json for the current directory, if any."),
+					mcp.Description("Optional org — a free-text grouping axis orthogonal to scope. Overrides the org inherited from .qbit-jay/config.json (or the legacy .engram/config.json) for the current directory, if any."),
 				),
 				mcp.WithString("project_choice_reason",
 					mcp.Description("Must be user_selected_after_ambiguous_project, and only after the user explicitly chose one of available_projects from an ambiguous_project error."),
@@ -990,7 +990,7 @@ GUIDELINES:
 	if shouldRegister("mem_session_start", allowlist) {
 		srv.AddTool(
 			mcp.NewTool("mem_session_start",
-				mcp.WithDescription("Register a caller-provided session ID. Engram does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency."),
+				mcp.WithDescription("Register a caller-provided session ID. qbit-jay does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency."),
 				mcp.WithDeferLoading(true),
 				mcp.WithTitleAnnotation("Start Session"),
 				mcp.WithReadOnlyHintAnnotation(false),
@@ -999,7 +999,7 @@ GUIDELINES:
 				mcp.WithOpenWorldHintAnnotation(false),
 				mcp.WithString("id",
 					mcp.Required(),
-					mcp.Description("Caller-provided unique session ID; Engram does not generate one."),
+					mcp.Description("Caller-provided unique session ID; qbit-jay does not generate one."),
 				),
 				mcp.WithString("directory",
 					mcp.Description("Working directory"),
@@ -1075,11 +1075,11 @@ Duplicates are automatically detected and skipped — safe to call multiple time
 				mcp.WithOpenWorldHintAnnotation(false),
 				mcp.WithString("from",
 					mcp.Required(),
-					mcp.Description("Comma-separated list of project names to merge FROM (e.g. 'Engram,engram-memory,ENGRAM')"),
+					mcp.Description("Comma-separated list of project names to merge FROM (e.g. 'qbit-jay,qbit-jay-memory,QBIT-JAY')"),
 				),
 				mcp.WithString("to",
 					mcp.Required(),
-					mcp.Description("The canonical project name to merge INTO (e.g. 'engram')"),
+					mcp.Description("The canonical project name to merge INTO (e.g. 'qbit-jay')"),
 				),
 			),
 			queuedWriteHandler(writeQueue, handleMergeProjects(s)),
@@ -1111,7 +1111,7 @@ Duplicates are automatically detected and skipped — safe to call multiple time
 	if shouldRegister("mem_list_projects", allowlist) {
 		srv.AddTool(
 			mcp.NewTool("mem_list_projects",
-				mcp.WithDescription("List every project known to Engram, with per-project observation/session/prompt counts, ordered by observation count (same view as `engram projects list`). Use for cross-project discovery when the working directory matches no known project: pick the right project, then scope mem_search/mem_context to it. Returns a successful empty list when nothing is stored yet; a store failure returns a tool error."),
+				mcp.WithDescription("List every project known to qbit-jay, with per-project observation/session/prompt counts, ordered by observation count (same view as `qbit-jay projects list`). Use for cross-project discovery when the working directory matches no known project: pick the right project, then scope mem_search/mem_context to it. Returns a successful empty list when nothing is stored yet; a store failure returns a tool error."),
 				mcp.WithTitleAnnotation("List Known Projects"),
 				mcp.WithReadOnlyHintAnnotation(true),
 				mcp.WithDestructiveHintAnnotation(false),
@@ -1129,9 +1129,9 @@ Duplicates are automatically detected and skipped — safe to call multiple time
 	if shouldRegister("mem_doctor", allowlist) {
 		srv.AddTool(
 			mcp.NewTool("mem_doctor",
-				mcp.WithDescription("Run read-only operational diagnostics. Returns the same structured envelope as `engram doctor --json`."),
+				mcp.WithDescription("Run read-only operational diagnostics. Returns the same structured envelope as `qbit-jay doctor --json`."),
 				mcp.WithDeferLoading(true),
-				mcp.WithTitleAnnotation("Run Engram Doctor"),
+				mcp.WithTitleAnnotation("Run qbit-jay Doctor"),
 				mcp.WithReadOnlyHintAnnotation(true),
 				mcp.WithDestructiveHintAnnotation(false),
 				mcp.WithIdempotentHintAnnotation(true),
@@ -1218,7 +1218,7 @@ Re-judging an already-judged ID overwrites the verdict (deliberate revision).`),
 	if shouldRegister("mem_compare", allowlist) {
 		srv.AddTool(
 			mcp.NewTool("mem_compare",
-				mcp.WithDescription(`Persist a semantic verdict you have already judged externally (with your LLM) into Engram.
+				mcp.WithDescription(`Persist a semantic verdict you have already judged externally (with your LLM) into qbit-jay.
 
 WHEN TO CALL: After you have evaluated two memories and reached a verdict, call mem_compare to PERSIST that verdict into the relation store. You do the judgment; mem_compare records it.
 
