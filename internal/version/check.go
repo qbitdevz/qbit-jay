@@ -1,4 +1,4 @@
-// Package version checks for newer engram releases on GitHub.
+// Package version checks for newer qbit-jay releases on GitHub.
 package version
 
 import (
@@ -8,7 +8,6 @@ import (
 	"fmt"
 	"net/http"
 	"os"
-	"runtime"
 	"strconv"
 	"strings"
 	"time"
@@ -17,8 +16,8 @@ import (
 )
 
 const (
-	repoOwner        = "Gentleman-Programming"
-	repoName         = "engram"
+	repoOwner        = "qbitdevz"
+	repoName         = "qbit-jay"
 	EnvNoUpdateCheck = "ENGRAM_NO_UPDATE_CHECK"
 )
 
@@ -187,16 +186,11 @@ func splitVersion(v string) [3]int {
 	return parts
 }
 
-// updateInstructions returns platform-appropriate update commands.
+// updateInstructions returns the update commands. There is no package-manager
+// channel yet (T0.9), so every platform gets the go install hint and the
+// releases page.
 func updateInstructions() string {
-	switch runtime.GOOS {
-	case "darwin":
-		return "  brew update && brew upgrade engram"
-	case "linux":
-		return "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest"
-	default:
-		return "  go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
-	}
+	return "  go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest\n  or: https://github.com/" + repoOwner + "/" + repoName + "/releases/latest"
 }
 
 func githubToken() string {
