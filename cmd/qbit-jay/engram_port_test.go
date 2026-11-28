@@ -93,6 +93,9 @@ func TestServeRefusesWhenEngramHoldsThePort(t *testing.T) {
 }
 
 func TestDoctorReportsEngramOnThePort(t *testing.T) {
+	oldCheck := doctorEngramPortCheck
+	doctorEngramPortCheck = engramPortFinding
+	t.Cleanup(func() { doctorEngramPortCheck = oldCheck })
 	port := fakeHealthServer(t, engramHealth)
 	t.Setenv("QBIT_JAY_PORT", strconv.Itoa(port))
 	t.Setenv("ENGRAM_PORT", "")

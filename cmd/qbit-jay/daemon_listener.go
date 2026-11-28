@@ -32,6 +32,11 @@ func engramPortError(port int) error {
 	return nil
 }
 
+// doctorEngramPortCheck is the seam doctor calls; tests that compare whole
+// doctor reports stub it so a real Engram on the machine's port 7437 cannot
+// change their output.
+var doctorEngramPortCheck = engramPortFinding
+
 // engramPortFinding is the doctor check for the same condition.
 func engramPortFinding(port int) *diagnostic.CheckResult {
 	probe := daemonStatusProbe(port)

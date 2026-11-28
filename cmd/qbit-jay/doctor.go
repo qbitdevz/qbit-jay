@@ -116,7 +116,7 @@ func cmdDoctor(cfg store.Config) {
 	}
 	if strings.TrimSpace(project) == "" && strings.TrimSpace(check) == "" {
 		if options, optErr := resolveServeOptions(nil); optErr == nil && options.socketPath == "" && options.port > 0 {
-			if finding := engramPortFinding(options.port); finding != nil {
+			if finding := doctorEngramPortCheck(options.port); finding != nil {
 				report.Checks = append(report.Checks, *finding)
 				report.Summary.Total++
 				report.Summary.Warnings++

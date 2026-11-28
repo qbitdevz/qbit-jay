@@ -5,6 +5,8 @@ import (
 	"os"
 	"sync"
 	"testing"
+
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
 )
 
 // Pi exports PI_CODING_AGENT to every process it starts, and the Claude hook
@@ -23,6 +25,9 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "set QBIT_JAY_NO_IMPORT: %v\n", err)
 		os.Exit(1)
 	}
+	// Doctor reports must not depend on what listens on this machine's port
+	// 7437 (a developer may run Engram there); the port tests opt back in.
+	doctorEngramPortCheck = func(int) *diagnostic.CheckResult { return nil }
 	// Test subprocesses must never recover a developer's drive-root database.
 	// Migration dispatch assertions install their own seam.
 	migrateOrphanedDatabase = func(string) {}
