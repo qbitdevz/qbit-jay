@@ -22,6 +22,7 @@ This is the complete technical reference for qbit-jay. For getting started, see 
 | [Memory Protocol](#memory-protocol)                       | When/how agents should use the tools                         |
 | [Project Name Normalization](#project-name-normalization) | Auto-detection, normalization, similar-project warnings      |
 | [Features](#features)                                     | FTS5 search, timeline, privacy, git sync, compression        |
+| [Local telemetry](#local-telemetry)                         | What is recorded locally, where, retention, how to turn it off and clear it |
 | [TUI](#terminal-ui-tui)                                   | Screens, navigation, architecture                            |
 | [Running as a Service](#running-as-a-service)             | systemd setup                                                |
 | [Design Decisions](#design-decisions)                     | Why Go, why SQLite, why no raw auto-capture                  |
@@ -200,6 +201,8 @@ qbit-jay delete project <name> [--hard]
 qbit-jay timeline <obs_id>      Chronological context [--project P|--all]
 qbit-jay context [project]      Recent context [--project P|--all] [--older-history]
 qbit-jay stats                  Memory statistics [--project P|--all]
+qbit-jay stats --telemetry      Local usage telemetry summary (see Local telemetry)
+qbit-jay telemetry clear        Delete the local telemetry file [--yes]
 qbit-jay export [file]          Export memories to JSON [--project P|--all]
 qbit-jay import <file>          Import memories from JSON
 qbit-jay sync                   Export new memories to .qbit-jay/, excluding prompts [--all: every project]
@@ -2023,6 +2026,24 @@ qbit-jay does not record a firehose of raw tool calls. Raw tool calls (`edit: {f
 `mem_save` can also best-effort store the current user prompt when its runtime supplies context for the same project/session and `capture_prompt` is not disabled. MCP uses process-local context (typically fed by `mem_save_prompt`); native Pi supplies its eligible current turn's redacted/truncated content. Go dedupes independent prompt rows by session/project/content; there is no explicit observation-ID link. The save still succeeds if context is missing or capture fails, and opting out does not disable Pi's independent lifecycle capture.
 
 ---
+
+## Local telemetry
+
+qbit-jay measures how it is used so improvements can be judged with numbers. This is **local only**: it never leaves your machine, is not sent to any server, and is not part of Git Sync or Cloud.
+
+- **Where:** `<data dir>/telemetry.db` (default `~/.qbit-jay/telemetry.db`), a SQLite file separate from the main database. The main database schema is untouched.
+- **What is stored**, per MCP session of the `qbit-jay mcp` process:
+  - *search:* query text, project, match mode, result count, the top 10 result ids, latency.
+  - *open:* a `mem_get_observation` of an id that a search of the same session returned in the last 10 minutes.
+  - *reformulation:* another search in the same session within 60 seconds of the previous one (with the previous query).
+  - *context:* bytes and estimated tokens (bytes / 4) of a `mem_context` result, the titles of the injected memories with the section they came from (`pinned` or `recent`), and whether the session later read (`mem_get_observation`) or updated (`mem_update`) a memory with the same title. `mem_context` does not render ids, so injected memories are matched by title.
+  - *save:* content size, latency, and the error text (truncated) with `error` or `limit` classification when a save fails.
+  Memory contents are never stored, only the sizes, titles shown in context, and the search queries.
+- **Retention:** rows older than 90 days are removed, and the file is capped at 50 MB (the oldest quarter is dropped and the file compacted when it grows past the cap). Both are checked when the MCP process starts and every 500 writes.
+- **Never in the way:** events are written by a background goroutine through a bounded queue. A full queue or a write error drops the event and is counted; it never changes or delays a tool response.
+- **Turn it off:** `QBIT_JAY_TELEMETRY=off` (also `0` or `false`; `ENGRAM_TELEMETRY` is the fallback name). Nothing is created or written while it is off.
+- **Read it:** `qbit-jay stats --telemetry` prints searches, zero-result rate, reformulation rate, opens after search, the most opened ids, injected tokens per session and save errors. The web "Telemetría" view arrives with the local web interface (not built yet).
+- **Delete it:** `qbit-jay telemetry clear` asks first; `qbit-jay telemetry clear --yes` deletes `telemetry.db` without a prompt. Deleting the file by hand is equally safe.
 
 ## Terminal UI (TUI)
 
