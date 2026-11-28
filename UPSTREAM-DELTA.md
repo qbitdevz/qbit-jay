@@ -13,6 +13,7 @@ test that covers it. Update it in every pull request that touches upstream code.
 | File | Change | Reason | Covering test |
 | --- | --- | --- | --- |
 | `go.mod` and every `.go`, `.templ`, `*_templ.go` file that imports the module | Module path `github.com/Gentleman-Programming/engram/v3` → `github.com/qbitdevz/qbit-jay` (spec S10) | The fork is its own module, so `go install` and imports resolve to qbit-jay. Go identifiers, `mem_*` and the DB schema are unchanged (S11). | `go build ./...` and the full `go test ./...` suite; `internal/cloud/dashboard` `TestTemplGeneratedFilesAreCheckedIn` (regenerated templ) |
+| `Makefile` | Two targets appended: `eval` (`go test -tags eval ... -run TestEval`) and `eval-bench`; `.PHONY` lists them | Spec S10, S11: the evaluators run on demand | `make eval` (CI does not run it) |
 | `.perf-baseline.txt`, `scripts/perf-ratchet.sh` | Package path normalizes to `github.com/qbitdevz/qbit-jay/internal/store` | Keeps benchstat tables comparable across the path change | `scripts/perf-ratchet_test.go` (`qbitStorePackage` helper) |
 | `.github/workflows/ci.yml`, `.github/scripts/*` | Go package path only; `github.repository == 'Gentleman-Programming/engram'` guards stay until a later task | Contract tests pin the package path | `.github/scripts/*.test.mjs` (`issue-refresh-router-workflow.test.mjs` hash updated) |
 | `release_config_test.go`, `tools/release-candidate/*`, `internal/version/check.go` + test, `internal/setup/setup.go`, `docs/INSTALLATION.md` | Go package path only (including the `go install` hint) | Fixtures and hints must name the real module | `release_config_test.go`, `tools/release-candidate` tests, `internal/version/check_test.go` |
@@ -65,6 +66,7 @@ fork's footprint stays visible.
 | `scripts/qbit/rewrite-module-path.sh` | Idempotent module path rewrite used by the sync script (`scripts/sync-upstream.sh rewrite`) |
 | `scripts/qbit/baseline.sh` | E3 baseline: build size, test suite, store benchmarks |
 | `scripts/qbit/e3latency/` | E3 baseline: black-box latency, startup and memory through MCP |
+| `internal/qbit/eval/` | Evaluators E1 (context), E2 (search, with the synthetic query fixture in `testdata/`) and E3 (store benchmarks) over a deterministic synthetic corpus; built only with `-tags eval`, never in the release binary. `make eval`, `make eval-bench` |
 | `internal/qbit/env/` | One lookup for production environment variables: `QBIT_JAY_*` first, `ENGRAM_*` fallback, plus the guard test against direct `ENGRAM_*` reads |
 | `internal/qbit/theme/` | Single source of visual tokens (S14): dark and light colours, font stacks, radius, spacing, motion, the Lip Gloss adapter and the generated `--qj-*` CSS block; tests parse `design/system.md` and check AA contrast |
 | `internal/qbit/paths/` | On-disk names: data directory `.qbit-jay`, database file `qbit-jay.db`, and the project folder resolver (`.qbit-jay/`, or `.engram/` when it is the only one) |
