@@ -25,14 +25,6 @@ func (p Pair) Adaptive() lipgloss.AdaptiveColor {
 	return lipgloss.AdaptiveColor{Light: p.Light, Dark: p.Dark}
 }
 
-// Color returns the Lip Gloss colour for one theme, ignoring the terminal.
-func (p Pair) Color(dark bool) lipgloss.Color {
-	if dark {
-		return lipgloss.Color(p.Dark)
-	}
-	return lipgloss.Color(p.Light)
-}
-
 // same builds a Pair whose value is identical in both themes.
 func same(value, source string) Pair {
 	return Pair{Dark: value, Light: value, DarkSource: source, LightSource: source}

@@ -1,3 +1,6 @@
+//go:build qbitpreview
+
+// Opt-in preview renderer: go test -tags qbitpreview -run TestRenderPreview ./...
 package tui
 
 import (
