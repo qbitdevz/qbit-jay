@@ -121,3 +121,48 @@ func releaseConfigFile(t *testing.T, path string) string {
 	}
 	return string(content)
 }
+
+// TestNoUpstreamBrandAssetsAreShipped pins spec S6 and S12: Engram's logos and
+// screenshots are gone from the tree (TRADEMARKS.md), and the README header is
+// the qbit-jay banner with the attribution line and no Engram logo.
+func TestNoUpstreamBrandAssetsAreShipped(t *testing.T) {
+	root := releaseConfigRepoRoot(t)
+
+	for _, glob := range []string{
+		"assets/branding/engram-*",
+		"plugin/pi/assets/engram-*",
+		"assets/agent-save.png",
+		"assets/tui-*.png",
+	} {
+		matches, err := filepath.Glob(filepath.Join(root, filepath.FromSlash(glob)))
+		if err != nil {
+			t.Fatal(err)
+		}
+		if len(matches) != 0 {
+			t.Errorf("upstream brand asset(s) still shipped for %s: %v", glob, matches)
+		}
+	}
+
+	readme := releaseConfigFile(t, filepath.Join(root, "README.md"))
+	for _, forbidden := range []string{"engram-banner", "engram-logo", "engram-cloud-", "<h1>Engram"} {
+		if strings.Contains(readme, forbidden) {
+			t.Errorf("README.md still contains %q", forbidden)
+		}
+	}
+	for _, want := range []string{
+		"assets/branding/qbit-jay-banner.gif",
+		"[Engram](https://github.com/Gentleman-Programming/engram) by Gentleman Programming",
+		"go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest",
+	} {
+		if !strings.Contains(readme, want) {
+			t.Errorf("README.md must contain %q", want)
+		}
+	}
+
+	license := releaseConfigFile(t, filepath.Join(root, "LICENSE"))
+	for _, want := range []string{"Copyright (c) 2026 Alan Buscaglia", "Copyright (c) 2026 qbitdev (Leandro Alvarez)"} {
+		if !strings.Contains(license, want) {
+			t.Errorf("LICENSE must contain %q", want)
+		}
+	}
+}
