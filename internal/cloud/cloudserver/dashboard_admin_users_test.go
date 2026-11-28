@@ -438,7 +438,7 @@ func TestDashboardCreateManagedTokenRejectsDisabledUserWithStyledErrorWithoutMin
 		t.Fatalf("expected disabled-user rejection to render a dashboard HTML page, got Content-Type=%q body=%q", contentType, rec.Body.String())
 	}
 	body := rec.Body.String()
-	for _, marker := range []string{"<!doctype html>", "Engram Cloud", "Cannot Create Token", "Enable this managed user before creating a managed token.", "disabled-user"} {
+	for _, marker := range []string{"<!doctype html>", "qbit-jay Cloud", "Cannot Create Token", "Enable this managed user before creating a managed token.", "disabled-user"} {
 		if !strings.Contains(body, marker) {
 			t.Fatalf("expected styled disabled-user error page marker %q, body=%q", marker, body)
 		}
@@ -497,7 +497,7 @@ func TestDashboardCreateManagedTokenStoreDisabledRaceReturns409WithoutPersisting
 		t.Fatalf("expected store-level disabled rejection to render a dashboard HTML page, got Content-Type=%q body=%q", contentType, rec.Body.String())
 	}
 	body := rec.Body.String()
-	for _, marker := range []string{"<!doctype html>", "Engram Cloud", "Cannot Create Token", "Enable this managed user before creating a managed token.", "race"} {
+	for _, marker := range []string{"<!doctype html>", "qbit-jay Cloud", "Cannot Create Token", "Enable this managed user before creating a managed token.", "race"} {
 		if !strings.Contains(body, marker) {
 			t.Fatalf("expected styled store-level disabled error page marker %q, body=%q", marker, body)
 		}
@@ -765,7 +765,7 @@ func TestDashboardLegacyAdminCanViewButNotMutateManagedUsers(t *testing.T) {
 		t.Fatalf("expected legacy admin dashboard session to view the managed users shell, got %d body=%q", shellRec.Code, shellRec.Body.String())
 	}
 	shellBody := shellRec.Body.String()
-	for _, marker := range []string{"Managed-user administration requires a managed admin token.", "engram cloud bootstrap admin --issue-token", "engram cloud bootstrap recover-token"} {
+	for _, marker := range []string{"Managed-user administration requires a managed admin token.", "qbit-jay cloud bootstrap admin --issue-token", "qbit-jay cloud bootstrap recover-token"} {
 		if !strings.Contains(shellBody, marker) {
 			t.Fatalf("expected actionable legacy-admin guidance %q, body=%q", marker, shellBody)
 		}

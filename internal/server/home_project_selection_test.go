@@ -80,7 +80,7 @@ func TestHomeProjectSelectionHTTPRejectsContext(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			want := map[string]any{"code": "explicit_project_required", "error": "project resolution failed: explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name"}
+			want := map[string]any{"code": "explicit_project_required", "error": "project resolution failed: explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name"}
 			for _, request := range []struct{ method, path, body string }{
 				{"GET", "/project/current?cwd=" + url.QueryEscape(cwd), ""},
 				{"POST", "/prompts/capture-decision", `{"source":"claude-code","cwd":` + quoteCapture(cwd) + `,"content":"human input"}`},
