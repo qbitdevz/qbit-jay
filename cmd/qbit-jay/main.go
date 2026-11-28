@@ -829,7 +829,7 @@ func main() {
 	if usesLocalSQLite(os.Args[1:]) {
 		// First start: bring the Engram database over before the store opens
 		// qbit-jay's. `import --from-engram` does its own, explicit copy.
-		if !(os.Args[1] == "import" && len(os.Args) > 2 && os.Args[2] == "--from-engram") {
+		if os.Args[1] != "import" || len(os.Args) <= 2 || os.Args[2] != "--from-engram" {
 			autoImportFromEngram(cfg.DataDir, os.Stderr)
 		}
 		release, err := prepareSQLiteTemp(cfg.DataDir)
@@ -3856,6 +3856,10 @@ func cmdSetup(cfg store.Config) {
 			fatal(err)
 			return
 		}
+		if result.GentleAIMode {
+			fmt.Println(result.Notice)
+			return
+		}
 		if allowMemoryWrites {
 			if !result.MCPConfigured {
 				fatal(fmt.Errorf("--allow-memory-writes requires successful Claude Code MCP registration; no permissions added"))
@@ -3918,6 +3922,10 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 	result, err := setupInstallAgent(selected.Name)
 	if err != nil {
 		fatal(err)
+	}
+	if result.GentleAIMode {
+		fmt.Println(result.Notice)
+		return
 	}
 	if mode != "" {
 		applyProtocolMode(cfg, selected.Name, mode)

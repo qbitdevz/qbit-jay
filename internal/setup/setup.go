@@ -105,6 +105,12 @@ type Result struct {
 	Replaced     []string
 	BackupDir    string
 	BackupReused bool
+
+	// GentleAIMode is set when an existing "engram" entry already runs the
+	// qbit-jay binary (gentle-ai compatibility mode). Nothing was installed or
+	// changed; Notice is the one line to print.
+	GentleAIMode bool
+	Notice       string
 }
 
 const claudeCodeMarketplace = "qbitdevz/qbit-jay"

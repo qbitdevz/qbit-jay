@@ -9,6 +9,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -41,6 +42,9 @@ type replaceTarget struct {
 	// used for files another program owns (Claude Code's ~/.claude.json is
 	// edited through `claude mcp remove`).
 	apply func() error
+	// commands lists the command of every "engram" server entry in the file,
+	// used to tell an entry that runs qbit-jay from one that runs Engram.
+	commands func(data []byte) []string
 }
 
 // BackupEntry is one saved file in a backup manifest.
@@ -80,6 +84,27 @@ func InstallReplacingEngram(agentName string) (*Result, error) {
 		return Install(agentName)
 	}
 	targets := replaceTargets(agentName)
+
+	// gentle-ai compatibility mode: an "engram" entry that already runs
+	// qbit-jay is the intended registration. Touch nothing, add nothing.
+	for _, t := range targets {
+		if t.commands == nil {
+			continue
+		}
+		data, err := os.ReadFile(t.path)
+		if err != nil {
+			continue
+		}
+		for _, command := range t.commands(data) {
+			if runsQbitJay(command) {
+				return &Result{
+					Agent:        agentName,
+					GentleAIMode: true,
+					Notice:       fmt.Sprintf("The %q MCP entry in %s already runs qbit-jay (gentle-ai mode); nothing was changed.", engramServerKey, t.path),
+				}, nil
+			}
+		}
+	}
 
 	var found []int
 	for i, t := range targets {
@@ -384,12 +409,13 @@ const engramServerKey = legacyMCPServerName
 
 func replaceTargets(slug string) []replaceTarget {
 	jsonServer := func(path string, f mcpFormat) replaceTarget {
-		return replaceTarget{path: path, strip: stripJSONServers(f == opencodeObject, mcpTopKey(f))}
+		jsonc := f == opencodeObject
+		return replaceTarget{path: path, strip: stripJSONServers(jsonc, mcpTopKey(f)), commands: jsonServerCommands(jsonc, mcpTopKey(f))}
 	}
 	switch slug {
 	case "opencode":
 		return []replaceTarget{
-			{path: openCodeConfigPath(), strip: stripJSONServers(true, "mcp")},
+			{path: openCodeConfigPath(), strip: stripJSONServers(true, "mcp"), commands: jsonServerCommands(true, "mcp")},
 			{path: openCodeTUIConfigPath()},
 			{path: filepath.Join(openCodePluginDir(), "engram.ts"), deleteWhat: "removed the Engram OpenCode plugin file"},
 			{path: filepath.Join(openCodePluginDir(), "qbit-jay.ts")},
@@ -401,7 +427,7 @@ func replaceTargets(slug string) []replaceTarget {
 		}
 	case "claude-code":
 		return []replaceTarget{
-			{path: ClaudeCodeUserMCPPath(), strip: stripJSONServers(false, "mcpServers"), apply: removeClaudeUserEngramServer},
+			{path: ClaudeCodeUserMCPPath(), strip: stripJSONServers(false, "mcpServers"), apply: removeClaudeUserEngramServer, commands: jsonServerCommands(false, "mcpServers")},
 			{path: ClaudeCodeSettingsPath(), strip: stripClaudeEngramSettings},
 		}
 	case "gemini-cli":
@@ -416,7 +442,7 @@ func replaceTargets(slug string) []replaceTarget {
 			return nil
 		}
 		return []replaceTarget{
-			{path: cfg, strip: stripCodexEngram},
+			{path: cfg, strip: stripCodexEngram, commands: codexEngramCommands},
 			{path: codexInstructionsPath()},
 			{path: codexCompactPromptPath()},
 		}
@@ -649,4 +675,117 @@ func removeClaudeUserEngramServer() error {
 		return fmt.Errorf("claude mcp remove %s: %v: %s", engramServerKey, err, strings.TrimSpace(string(out)))
 	}
 	return nil
+}
+
+// ─── gentle-ai mode ──────────────────────────────────────────────────────────
+
+// runsQbitJay reports whether command names the qbit-jay binary: the file name
+// is qbit-jay (or qbit-jay.exe, any case, either path separator), or it is the
+// very executable running this setup.
+func runsQbitJay(command string) bool {
+	command = strings.TrimSpace(command)
+	if command == "" {
+		return false
+	}
+	base := command
+	if i := strings.LastIndexAny(base, `/\`); i >= 0 {
+		base = base[i+1:]
+	}
+	base = strings.ToLower(base)
+	if base == "qbit-jay" || base == "qbit-jay.exe" {
+		return true
+	}
+	exe, err := osExecutable()
+	if err != nil || exe == "" {
+		return false
+	}
+	if filepath.Clean(command) == filepath.Clean(exe) {
+		return true
+	}
+	a, errA := os.Stat(command)
+	b, errB := os.Stat(exe)
+	return errA == nil && errB == nil && os.SameFile(a, b)
+}
+
+// jsonServerCommands returns the commands of the "engram" entries under topKey
+// (and topKey.servers for OpenCode's V2 layout).
+func jsonServerCommands(jsonc bool, topKey string) func([]byte) []string {
+	return func(data []byte) []string {
+		cfg, err := parseObject(data, jsonc)
+		if err != nil {
+			return nil
+		}
+		var out []string
+		collect := func(servers map[string]json.RawMessage) {
+			if entry, ok := servers[engramServerKey]; ok {
+				out = append(out, entryCommand(entry)...)
+			}
+		}
+		var servers map[string]json.RawMessage
+		if json.Unmarshal(cfg[topKey], &servers) == nil {
+			collect(servers)
+			if jsonc {
+				var v2 map[string]json.RawMessage
+				if json.Unmarshal(servers["servers"], &v2) == nil {
+					collect(v2)
+				}
+			}
+		}
+		return out
+	}
+}
+
+// entryCommand reads the executable of an MCP entry whose "command" is a string
+// or an array whose first element is the executable.
+func entryCommand(entry json.RawMessage) []string {
+	var obj struct {
+		Command json.RawMessage `json:"command"`
+	}
+	if json.Unmarshal(entry, &obj) != nil || len(obj.Command) == 0 {
+		return nil
+	}
+	var s string
+	if json.Unmarshal(obj.Command, &s) == nil {
+		return []string{s}
+	}
+	var list []string
+	if json.Unmarshal(obj.Command, &list) == nil && len(list) > 0 {
+		return []string{list[0]}
+	}
+	return nil
+}
+
+// codexEngramCommands returns the command of [mcp_servers.engram].
+func codexEngramCommands(data []byte) []string {
+	content := string(data)
+	spans, err := scanCodexTOML(content)
+	if err != nil {
+		return nil
+	}
+	var out []string
+	inEngram := false
+	for _, span := range spans {
+		code := strings.TrimSpace(content[span.start:span.codeEnd])
+		if strings.HasPrefix(code, "[") {
+			keys, err := codexTOMLHeader(code)
+			inEngram = err == nil && !strings.HasPrefix(code, "[[") && len(keys) == 2 && keys[0] == "mcp_servers" && keys[1] == engramServerKey
+			continue
+		}
+		if !inEngram || span.equal < 0 {
+			continue
+		}
+		keys, err := codexTOMLKey(content[span.start:span.equal])
+		if err != nil || len(keys) != 1 || keys[0] != "command" {
+			continue
+		}
+		value := strings.TrimSpace(content[span.equal+1 : span.codeEnd])
+		if len(value) >= 2 && value[0] == '"' {
+			if unquoted, err := strconv.Unquote(value); err == nil {
+				out = append(out, unquoted)
+			}
+		} else if len(value) >= 2 && value[0] == '\'' && value[len(value)-1] == '\'' {
+			out = append(out, value[1:len(value)-1])
+		}
+	}
+	return out
 }
