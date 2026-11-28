@@ -1,8 +1,16 @@
 version: 2
 
-project_name: engram
+project_name: qbit-jay
 
+# Releases go to qbitdevz/qbit-jay with the workflow GITHUB_TOKEN only. No
+# personal access token exists, so the Homebrew formula and the Scoop manifest
+# are generated into dist/ (skip_upload) and attached to the release by
+# .github/workflows/release.yml. The maintainer commits them to the tap and
+# bucket repositories (docs/qbit/RELEASING.md).
 release:
+  github:
+    owner: qbitdevz
+    name: qbit-jay
   prerelease: auto
 
 builds:
@@ -48,13 +56,21 @@ changelog:
 
 brews:
   - repository:
-      owner: Gentleman-Programming
+      owner: qbitdevz
       name: homebrew-tap
-      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    skip_upload: auto
+    skip_upload: true
     directory: Formula
-    name: engram
-    homepage: "https://github.com/Gentleman-Programming/engram"
+    name: qbit-jay
+    homepage: "https://github.com/qbitdevz/qbit-jay"
     description: "Persistent memory for AI coding agents. Agent-agnostic, single binary, zero dependencies."
     license: "MIT"
-    commit_msg_template: "chore: update engram formula to {{ .Tag }}"
+
+scoops:
+  - repository:
+      owner: qbitdevz
+      name: scoop-bucket
+    skip_upload: true
+    name: qbit-jay
+    homepage: "https://github.com/qbitdevz/qbit-jay"
+    description: "Persistent memory for AI coding agents. Agent-agnostic, single binary, zero dependencies."
+    license: "MIT"
