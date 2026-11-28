@@ -62,7 +62,13 @@ Install qbit-jay's Pi-native package:
 qbit-jay setup pi
 ```
 
-`qbit-jay setup pi` currently fails without reading or changing Pi settings: the qbit-jay Pi plugin is not distributed through npm (an unregistered npm name could be claimed by anyone), so setup never installs or pins an `npm:` source for it, and existing `npm:gentle-engram` entries are left untouched (the Engram replacement with backup and `--restore` skips Pi; see [INTEGRATION.md](INTEGRATION.md)). Install the plugin from a local checkout with `pi install <repo>/plugin/pi`. T0.9 replaces this with a plugin embedded in the binary.
+The Pi plugin is embedded in the qbit-jay binary; nothing is installed from npm. `qbit-jay setup pi`:
+
+1. writes the package to `<data dir>/pi-plugin/<version>/` (`~/.qbit-jay/pi-plugin/<version>/`, or under `QBIT_JAY_DATA_DIR`), staged and swapped in atomically, owner-only;
+2. adds that absolute path to `packages` in Pi's `settings.json` (`~/.pi/agent/`, or `PI_CODING_AGENT_DIR`), so Pi loads it as a local package, after saving the original `settings.json` under `~/.qbit-jay/backups/pi/`;
+3. leaves every other entry as it is. An existing `npm:gentle-engram` entry stays and setup warns about it: Pi tool names are exclusive, so keep only one of the two if Pi reports a conflict. When an `engram` MCP entry in Pi's `mcp.json` already runs qbit-jay (gentle-ai mode), setup changes nothing.
+
+Running it again changes nothing; a newer binary writes its own version directory, removes the old one and replaces the settings entry. `qbit-jay setup --restore pi` puts back the saved `settings.json` (refused if you edited it since, unless `--force`); the plugin directory stays on disk and is inert once nothing lists it. Check with `pi list`, then restart Pi.
 
 Pi agent writes use native `mem_*` tools. If Pi already has a qbit-jay MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.qbit-jay` key from that file and restart Pi. Keep the entries for your other MCP servers.
 
@@ -71,7 +77,7 @@ Pi 0.99.0 and later ship built-in MCP (`mcp.json`, `/mcp`, `pi mcp add`); an ins
 For versioned mise installations, setup selects the shim directory from an absolute `MISE_SHIMS_DIR`, the effective absolute `shims_dir` reported by `mise settings get shims_dir` (including global config), or the mise data directory's default `shims` folder, in that order. Invalid settings output or an unavailable mise CLI leaves the default directory as the fallback. If the shim is missing from the selected directory, the caller uses its existing executable/PATH fallback policy; setup never writes mise warnings as the qbit-jay MCP command.
 
 
-To update the plugin, run `pi install <repo>/plugin/pi` again from an updated checkout. A pin for the plugin in a trusted project's `.pi/settings.json` can override the personal package. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
+To update the plugin, install the newer qbit-jay binary and run `qbit-jay setup pi` again. A pin for the plugin in a trusted project's `.pi/settings.json` can override the personal package. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
 
 Restart Pi and check that the native `mem_update` tool exposes `expected_project`. Set it to the observation's existing project when updating.
 

@@ -58,9 +58,14 @@ import (
 var version = "dev"
 
 func init() {
-	if version != "dev" {
-		return
+	if version == "dev" {
+		resolveModuleVersion()
 	}
+	// The embedded Pi plugin is written to a directory named after the version.
+	setup.BinaryVersion = version
+}
+
+func resolveModuleVersion() {
 	if info, ok := debug.ReadBuildInfo(); ok && info.Main.Version != "" && info.Main.Version != "(devel)" {
 		version = strings.TrimPrefix(info.Main.Version, "v")
 	}
@@ -3905,6 +3910,7 @@ func cmdSetup(cfg store.Config) {
 		fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 		fmt.Printf("  → %s\n", result.Destination)
 		printEngramReplacement(result)
+		printSetupNotes(result)
 		printPostInstallWithMemoryWrites(result, allowMemoryWrites)
 	default:
 		// No slug: interactive menu. Mode (if any) applies to whichever
@@ -3962,7 +3968,27 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 	fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 	fmt.Printf("  → %s\n", result.Destination)
 	printEngramReplacement(result)
+	printSetupNotes(result)
 	printPostInstall(result)
+}
+
+// printSetupNotes prints what setup noticed and left alone, and for Pi where the
+// settings backup is (Pi has no Engram entry to replace, but its settings change).
+func printSetupNotes(result *setup.Result) {
+	if result == nil {
+		return
+	}
+	if result.Agent == "pi" && result.BackupDir != "" {
+		if result.BackupReused {
+			fmt.Printf("  Backup of Pi settings (identical, reused): %s\n", result.BackupDir)
+		} else {
+			fmt.Printf("  Backup of Pi settings: %s\n", result.BackupDir)
+		}
+		fmt.Println("  Undo with: qbit-jay setup --restore pi")
+	}
+	for _, w := range result.Warnings {
+		fmt.Fprintf(os.Stderr, "warning: %s\n", w)
+	}
 }
 
 // printEngramReplacement says what setup replaced and where the backup is
@@ -4170,8 +4196,8 @@ func printPostInstallWithMemoryWrites(result *setup.Result, memoryWritesAllowed 
 		}
 	case "pi":
 		fmt.Println("\nNext steps:")
-		fmt.Println("  1. Restart Pi so packages and MCP config are reloaded")
-		fmt.Println("  2. Verify with: pi list")
+		fmt.Println("  1. Restart Pi so the local package is loaded")
+		fmt.Println("  2. Verify with: pi list (the qbit-jay plugin appears as a local path)")
 	case "claude-code":
 		if memoryWritesAllowed {
 			fmt.Println("  Claude Code memory-write permissions added for both qbit-jay MCP prefixes.")

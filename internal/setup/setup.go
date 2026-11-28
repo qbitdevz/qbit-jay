@@ -10,7 +10,8 @@
 //     the resolved absolute binary path.
 //   - Gemini CLI: injects MCP registration in ~/.gemini/settings.json
 //   - Codex: injects MCP registration in ~/.codex/config.toml
-//   - Pi: not installed from npm (embedded plugin planned, T0.9); setup pi fails without touching settings
+//   - Pi: writes the embedded plugin to <data dir>/pi-plugin/<version>/ and lists
+//     that local path in ~/.pi/agent/settings.json packages (never an npm source)
 package setup
 
 import (
@@ -111,7 +112,15 @@ type Result struct {
 	// changed; Notice is the one line to print.
 	GentleAIMode bool
 	Notice       string
+
+	// Warnings are things setup noticed but deliberately left alone, for the
+	// caller to print (for example another Pi memory package).
+	Warnings []string
 }
+
+// BinaryVersion names the directory the embedded Pi plugin is written to
+// (<data dir>/pi-plugin/<version>/). The binary sets it at start-up.
+var BinaryVersion = "dev"
 
 const claudeCodeMarketplace = "qbitdevz/qbit-jay"
 
@@ -308,17 +317,6 @@ func piAgentDir() string {
 		return filepath.Join(".pi", "agent")
 	}
 	return filepath.Join(home, ".pi", "agent")
-}
-
-// errPiNotOnNpm explains why setup pi installs nothing. The qbit-jay Pi plugin
-// is not published to npm and never will be: an unregistered package name could
-// be claimed by anyone, so setup must not write or install any npm source for
-// it. T0.9 replaces this with the plugin embedded in the binary.
-var errPiNotOnNpm = errors.New("the qbit-jay Pi plugin is not distributed through npm; install it from a local checkout with `pi install <repo>/plugin/pi`")
-
-// installPi fails before reading or writing any Pi setting.
-func installPi() (*Result, error) {
-	return nil, errPiNotOnNpm
 }
 
 // resolveMiseNodeVersion returns the active Node version managed by mise as a

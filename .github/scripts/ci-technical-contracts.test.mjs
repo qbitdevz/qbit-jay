@@ -758,15 +758,13 @@ test('native isolation resolves the real temporary root before deriving fixture 
   assert.throws(() => check(source.replace('state=$(cd "$state" && pwd -P)', 'state="$state"')));
 });
 
-test('native summary classifies only the Windows published-Core execution exclusion', () => {
+test('native summary never classifies a published-Core skip as an exclusion', () => {
   const reason = 'published observation supports Windows amd64 only\n';
   for (const name of ['TestPublishedCoreAdmission', 'TestPublishedCoreContextMutation', 'TestUnexpectedSkip']) {
-    for (const pkg of ['tools/release-candidate', 'internal/store']) {
-      const events = [...passed, ...[event('output', name, reason), event('skip', name)]
-        .map(e => ({ ...e, Package: `github.com/qbitdevz/qbit-jay/${pkg}` }))];
-      const result = summarize(events);
-      assert.equal(result.status, pkg === 'tools/release-candidate' && name === 'TestPublishedCoreContextMutation' ? 0 : 1, result.stdout);
-    }
+    const events = [...passed, ...[event('output', name, reason), event('skip', name)]
+      .map(e => ({ ...e, Package: 'github.com/qbitdevz/qbit-jay/internal/store' }))];
+    const result = summarize(events);
+    assert.equal(result.status, 1, result.stdout);
   }
 });
 

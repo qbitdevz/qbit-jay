@@ -20,7 +20,7 @@
 | OpenCode | TypeScript plugin plus MCP registration via `qbit-jay setup opencode`. |
 | Claude Code | Marketplace/bundled plugin for hooks, scripts, and skills; `qbit-jay setup claude-code` solely registers MCP. |
 | Codex | Codex plugin assets under `plugin/codex/`; `qbit-jay setup codex` best-effort installs the marketplace plugin and writes MCP/instruction config. |
-| Pi | Pi package under `plugin/pi/` exposes Pi-native HTTP memory tools; Pi 0.99.0+ built-in MCP handles other servers, and an installed `pi-mcp-adapter` replaces it, so setup does not add it. |
+| Pi | Pi package under `plugin/pi/` (embedded in the binary, installed by `qbit-jay setup pi`) exposes Pi-native HTTP memory tools; Pi 0.99.0+ built-in MCP handles other servers, and an installed `pi-mcp-adapter` replaces it, so setup does not add it. |
 
 ### Client-local project inspection
 

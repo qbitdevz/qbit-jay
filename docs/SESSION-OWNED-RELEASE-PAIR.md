@@ -61,7 +61,7 @@ Pi publication uses `candidate`; promotion to `latest` remains manual and rights
 Core's existing Homebrew behavior remains non-atomic. These guards do not transfer earlier
 artifact/runtime evidence to a new source tree or prove official release bytes or bundle upgrades.
 
-The [candidate checker](./RELEASE-CANDIDATE.md) remains **rejection-only**. Passing its tests,
+The candidate checker (removed in qbit-jay: the Pi plugin is embedded in the binary and nothing is published to npm) was **rejection-only**. Passing its tests,
 metadata checks or package-content inspection cannot certify runtime compatibility or release readiness.
 No published-binary handshake, supported Windows bundle upgrade or publisher-permission evidence
 is claimed by this preparation. Actual validation results must accompany the eventual release decision.

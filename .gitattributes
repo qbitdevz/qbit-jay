@@ -13,3 +13,4 @@ internal/store/testdata/migrate_copy_downgraded_340_catalog.json text eol=lf
 internal/store/testdata/migrate_copy_v3.1.0_generate.go text eol=lf
 internal/store/testdata/migrate_copy_upgraded_catalog.json text eol=lf
 internal/store/testdata/migrate_copy_upgraded_provenance.json text eol=lf
+internal/setup/plugins/pi/runtime-contract.json text eol=lf

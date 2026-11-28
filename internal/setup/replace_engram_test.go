@@ -289,32 +289,6 @@ func TestRestoreRefusesCorruptBackupAndUnknownAgent(t *testing.T) {
 	}
 }
 
-func TestInstallReplacingEngramPiRefusesAndTouchesNothing(t *testing.T) {
-	resetSetupSeams(t)
-	useTestHome(t)
-	dir := t.TempDir()
-	t.Setenv("PI_CODING_AGENT_DIR", dir)
-	seed := map[string]string{
-		filepath.Join(dir, "mcp.json"):      `{"mcpServers":{"engram":{"command":"engram"}}}`,
-		filepath.Join(dir, "settings.json"): `{"packages":["npm:gentle-engram@0.7.1"]}`,
-	}
-	seedFiles(t, seed)
-	if _, err := InstallReplacingEngram("pi"); err == nil {
-		t.Fatal("setup pi must refuse")
-	}
-	for p, want := range seed {
-		got, err := os.ReadFile(p)
-		if err != nil || string(got) != want {
-			t.Fatalf("%s changed: %q %v", p, got, err)
-		}
-	}
-	if root, err := BackupRoot(); err == nil {
-		if _, err := os.Stat(root); err == nil {
-			t.Fatalf("no backup expected for Pi, found %s", root)
-		}
-	}
-}
-
 func claudeReplaceCase(t *testing.T) (map[string]string, replaceCase) {
 	t.Helper()
 	for _, tc := range replaceCases() {
