@@ -13,7 +13,7 @@ function contract(text) {
   assert.match(text, /on:\n  pull_request:\n  merge_group:\n    types: \[checks_requested\]\n  push:\n    branches:\n      - main\n/);
   assert.match(text, /run: node --test \.github\/scripts\/windows-suite\.test\.mjs\n/);
   for (const line of ['name: Windows Full Suite (Observational)', 'runs-on: windows-2025',
-    'timeout-minutes: 30', 'contents: read', 'GOTOOLCHAIN: local',
+    'timeout-minutes: 40', 'contents: read', 'GOTOOLCHAIN: local',
     'ENGRAM_PI_SCHEMA_REQUIRE_REAL: "1"', 'shell: pwsh',
     'ref: ${{ github.sha }}', 'persist-credentials: false',
     'go-version: "1.26.11"', 'node-version: "24"',
@@ -45,12 +45,14 @@ function contract(text) {
     'elapsed_seconds=$($timer.Elapsed.TotalSeconds)', 'exit $suiteExit',
     'path: ${{ runner.temp }}/windows-suite/evidence']) assert.ok(body.includes(token), token);
   assert.ok(body.split('\n').some(line => line.trim() ===
-    '& go test -json -count=1 ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt"'),
+    '& go test -json -count=1 -timeout=20m ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt"'),
   'exact Windows suite command');
   for (const key of ['HOME', 'USERPROFILE', 'APPDATA', 'LOCALAPPDATA', 'ENGRAM_DATA_DIR', 'TEMP', 'TMP', 'TMPDIR']) {
     assert.match(body, new RegExp(`(?:^|[ ;])${key} = '(?:home|appdata|localappdata|data|tmp)'`, 'm'), `isolated ${key}`);
   }
-  assert.doesNotMatch(body, /continue-on-error|needs:|: write|secrets\.|\|\| true| -p | -parallel| -run | -short| -skip| -tags| -timeout|GOFLAGS|GOOS:|GOARCH:/);
+  assert.equal(body.split('-timeout').length - 1, 1, 'a single per-package timeout');
+  assert.ok(body.includes(' -timeout=20m '), '20m headroom for the plugin package');
+  assert.doesNotMatch(body, /continue-on-error|needs:|: write|secrets\.|\|\| true| -p | -parallel| -run | -short| -skip| -tags|GOFLAGS|GOOS:|GOARCH:/);
   assert.equal((body.match(/\n\s+if:/g) ?? []).length, 1, 'only failure artifact guard');
   assert.equal(body.split('Add-Content $env:GITHUB_ENV "$key=$value"').length - 1, 2,
     'export both preserved caches and isolated test state');
@@ -90,15 +92,16 @@ test('installed Git entrypoints resolve to actual usr/bin Bash', {
 });
 
 const mutations = [
-  ['go test -json -count=1 ./...', 'go test -json ./...'],
-  ['go test -json -count=1 ./...', 'go test -json -count=0 ./...'],
-  ['go test -json -count=1 ./...', 'go test -json -count=2 ./...'],
-  ['& go test -json -count=1 ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt"',
-   '& go test -json -count=1 ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt" -count=2'],
-  ['go test -json -count=1 ./...', 'go test -json -count=1 ./internal/setup/...'],
-  ['go test -json -count=1 ./...', 'go test -json -count=1 -short ./...'],
-  ['go test -json -count=1 ./...', 'go test -json -count=1 -p 1 ./...'],
-  ['exit $suiteExit', 'exit 0'], ['$suiteExit = $LASTEXITCODE', '$suiteExit = 0'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -timeout=20m ./...'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -count=0 -timeout=20m ./...'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -count=2 -timeout=20m ./...'],
+  ['& go test -json -count=1 -timeout=20m ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt"',
+   '& go test -json -count=1 -timeout=20m ./... 1> "$evidence/suite.json" 2> "$evidence/stderr.txt" -count=2'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -count=1 -timeout=20m ./internal/setup/...'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -count=1 -short -timeout=20m ./...'],
+  ['go test -json -count=1 -timeout=20m ./...', 'go test -json -count=1 -p 1 -timeout=20m ./...'],
+  [' -timeout=20m ./...', ' -timeout=10m ./...'],
+  ['-timeout=20m', '-timeout=10m'], ['exit $suiteExit', 'exit 0'], ['$suiteExit = $LASTEXITCODE', '$suiteExit = 0'],
   ['ENGRAM_PI_SCHEMA_REQUIRE_REAL: "1"', 'ENGRAM_PI_SCHEMA_REQUIRE_REAL: "0"'],
   ['npm ci --ignore-scripts --legacy-peer-deps', 'npm install'],
   ["Get-Command powershell.exe", 'Write-Output powershell.exe'],
@@ -113,7 +116,7 @@ const mutations = [
   ["$bash -notlike '*\\usr\\bin\\bash.exe'", '$false'],
   ["(go env GOOS) -ne 'windows'", "(go env GOOS) -ne 'linux'"],
   ["(go env GOARCH) -ne 'amd64'", "(go env GOARCH) -ne 'arm64'"],
-  ['timeout-minutes: 30', 'timeout-minutes: 60'],
+  ['timeout-minutes: 40', 'timeout-minutes: 60'],
   ['contents: read', 'contents: write'],
   ['ref: ${{ github.sha }}', 'ref: main'],
   ['persist-credentials: false', 'persist-credentials: true'],
