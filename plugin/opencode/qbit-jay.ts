@@ -1,11 +1,11 @@
 /**
- * Engram — OpenCode plugin adapter
+ * qbit-jay — OpenCode plugin adapter (based on Engram)
  *
- * Thin layer that connects OpenCode's event system to the Engram Go binary.
+ * Thin layer that connects OpenCode's event system to the qbit-jay Go binary.
  * The Go binary runs as a local HTTP server and handles all persistence.
  *
  * Flow:
- *   OpenCode events → this plugin → HTTP calls → engram serve → SQLite
+ *   OpenCode events → this plugin → HTTP calls → qbit-jay serve → SQLite
  *
  * Session resilience:
  *   Resolves OpenCode's persisted session hierarchy before attributed writes,
@@ -23,12 +23,20 @@ function optionalEnvironmentValue(value: string | undefined): string | undefined
   return value?.trim() ? value : undefined
 }
 
-const ENGRAM_PORT = parseInt(optionalEnvironmentValue(process.env.ENGRAM_PORT) ?? "7437")
-const CONFIGURED_ENGRAM_URL = optionalEnvironmentValue(process.env.ENGRAM_URL)
+// qbit-jay variables: QBIT_JAY_<NAME> wins, ENGRAM_<NAME> is the compatibility
+// fallback (gentle-ai and existing setups). A blank qbit-jay value does not mask a set one.
+function envValue(name: string): string | undefined {
+  return optionalEnvironmentValue(process.env[`QBIT_JAY_${name}`]) ?? optionalEnvironmentValue(process.env[`ENGRAM_${name}`])
+}
+
+const ENGRAM_PORT = parseInt(envValue("PORT") ?? "7437")
+const CONFIGURED_ENGRAM_URL = envValue("URL")
 const ENGRAM_URL = CONFIGURED_ENGRAM_URL ?? `http://127.0.0.1:${ENGRAM_PORT}`
-const ENGRAM_BIN_OVERRIDE = optionalEnvironmentValue(process.env.ENGRAM_BIN)
+const ENGRAM_BIN_OVERRIDE = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN)
+// Name of the variable that supplied the override, for diagnostics.
+const ENGRAM_BIN_OVERRIDE_NAME = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) !== undefined ? "QBIT_JAY_BIN" : "ENGRAM_BIN"
 // Keep this declaration compatible with setup's literal fallback-path patch.
-const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram"
+const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"
 
 // Engram's own MCP tools — don't count these as "tool calls" for session stats
 const ENGRAM_TOOLS = new Set([
@@ -55,10 +63,13 @@ const SESSION_ATTRIBUTED_WRITE_TOOLS = new Set([
   "mem_capture_passive",
 ])
 
-// OpenCode qualifies MCP tool IDs as <server>_<tool>; only normalize Engram's.
+// OpenCode qualifies MCP tool IDs as <server>_<tool>; only normalize ours (server qbit-jay, or the upstream engram).
 function canonicalEngramToolName(tool: string): string {
   const canonical = tool.toLowerCase()
-  return canonical.startsWith("engram_") ? canonical.slice("engram_".length) : canonical
+  for (const prefix of ["qbit-jay_", "engram_"]) {
+    if (canonical.startsWith(prefix)) return canonical.slice(prefix.length)
+  }
+  return canonical
 }
 
 // ─── Memory Instructions ─────────────────────────────────────────────────────
@@ -72,7 +83,7 @@ The agent MUST follow this protocol without waiting for activation.
 ## AVAILABLE TOOLS
 
 Use the Engram tools actually exposed by OpenCode. The names below are logical
-names; OpenCode qualifies registered MCP names, for example \`engram_mem_save\`.
+names; OpenCode qualifies registered MCP names, for example \`qbit-jay_mem_save\`.
 Use those actual names for calls. Availability and discovery follow OpenCode's
 host interface, not a universal bootstrap or deferred-tool split.
 
@@ -163,9 +174,9 @@ For attributed Engram writes (\`mem_save\`, \`mem_save_prompt\`,
 session before the tool runs. Do not invent or override this value. The adapter
 owns session registration and lifecycle closure; read-only tools are unchanged.
 
-**Fallback**: If tools are unexpectedly unavailable, run \`engram setup opencode\`
+**Fallback**: If tools are unexpectedly unavailable, run \`qbit-jay setup opencode\`
 and restart OpenCode. Setup repairs OpenCode's authoritative Engram MCP
-registration; use its actual \`engram_mem_*\` tool names.
+registration; use its actual \`qbit-jay_mem_*\` tool names.
 `
 
 // ─── HTTP Client ─────────────────────────────────────────────────────────────
@@ -229,11 +240,11 @@ function localInstanceID(): string {
   if (reason) {
     const overridden = ENGRAM_BIN_OVERRIDE !== undefined
     const recovery = reason === "binary-not-found"
-      ? overridden ? "Correct or unset ENGRAM_BIN, then restart OpenCode."
-        : "Run engram setup opencode from the current Engram installation, then restart OpenCode."
+      ? overridden ? `Correct or unset ${ENGRAM_BIN_OVERRIDE_NAME}, then restart OpenCode.`
+        : "Run qbit-jay setup opencode from the current qbit-jay installation, then restart OpenCode."
       : "Verify that the selected binary can run instance-id successfully and returns only 32 lowercase hexadecimal characters."
-    readinessDiagnostic = `${reason} (binary source: ${overridden ? "ENGRAM_BIN override" : "setup-default"}). ${recovery}`
-    throw new Error("gentle-engram could not resolve its local server identity")
+    readinessDiagnostic = `${reason} (binary source: ${overridden ? `${ENGRAM_BIN_OVERRIDE_NAME} override` : "setup-default"}). ${recovery}`
+    throw new Error("qbit-jay could not resolve its local server identity")
   }
   readinessDiagnostic = ""
   return id
@@ -285,7 +296,7 @@ async function resolveProjectName(directory: string): Promise<{ project: string;
   return {
     project: "unknown",
     ambiguous: data?.project_source === "ambiguous" && Array.isArray(data?.available_projects) && data.available_projects.length > 1,
-    error: `gentle-engram could not resolve a safe project identity.${reason}${choices} Retry when project resolution is available.`,
+    error: `qbit-jay could not resolve a safe project identity.${reason}${choices} Retry when project resolution is available.`,
   }
 }
 
@@ -301,7 +312,7 @@ function startManagedDaemon(): Promise<"started" | "unsupported" | "failed"> {
   return new Promise((resolve) => {
     const launcher = spawn(ENGRAM_BIN, ["run", "-d"], {
       // Older cores can print an update diagnostic before rejecting run.
-      env: { ...process.env, ENGRAM_NO_UPDATE_CHECK: "1" },
+      env: { ...process.env, QBIT_JAY_NO_UPDATE_CHECK: "1", ENGRAM_NO_UPDATE_CHECK: "1" },
       stdio: ["ignore", "pipe", "pipe"],
       windowsHide: true,
     })
@@ -335,7 +346,7 @@ function startManagedDaemon(): Promise<"started" | "unsupported" | "failed"> {
       // Older cores print usage to stdout and reject the command at the end
       // of stderr, after any startup notices. Daemon failures can quote logs.
       const rejectedRun = /(?:^|\n)unknown command: run(?:\r?\n)*$/.test(stderrTail)
-      const printedUsage = /^engram v[^\r\n]+\r?\n\r?\nUsage:\r?\n  engram <command> \[arguments\]\r?\n/.test(stdoutPrefix)
+      const printedUsage = /^(?:qbit-jay|engram) v[^\r\n]+\r?\n\r?\nUsage:\r?\n  (?:qbit-jay|engram) <command> \[arguments\]\r?\n/.test(stdoutPrefix)
       resolve(code === 1 && rejectedRun && printedUsage ? "unsupported" : "failed")
     })
   })
@@ -488,7 +499,7 @@ export const Engram: Plugin = async (ctx) => {
     registrationErrors.set(sessionId, cause)
     if (!warnedSessions.has(sessionId)) {
       warnedSessions.add(sessionId)
-      console.warn(`gentle-engram session ${sessionId}: ${cause}; verify Engram project ownership and server availability, or start a new OpenCode session and retry`)
+      console.warn(`qbit-jay session ${sessionId}: ${cause}; verify Engram project ownership and server availability, or start a new OpenCode session and retry`)
     }
     return false
   }
@@ -953,12 +964,12 @@ export const Engram: Plugin = async (ctx) => {
       const failure = { reason: "session-unavailable-or-invalid-chain" }
       const authoritativeSessionID = await resolveAuthoritativeSessionID(input.sessionID, failure)
       if (!authoritativeSessionID) {
-        throw new Error(`gentle-engram could not resolve an authoritative OpenCode runtime session for ${canonicalEngramToolName(input.tool)} [${failure.reason}]. Reopen the session in the current project and retry; if it persists, check OpenCode runtime session metadata.`)
+        throw new Error(`qbit-jay could not resolve an authoritative OpenCode runtime session for ${canonicalEngramToolName(input.tool)} [${failure.reason}]. Reopen the session in the current project and retry; if it persists, check OpenCode runtime session metadata.`)
       }
       const registered = await ensureSession(authoritativeSessionID, true)
       const confirmedSessionID = await resolveAuthoritativeSessionID(input.sessionID, failure)
       if (confirmedSessionID !== authoritativeSessionID) {
-        throw new Error(`gentle-engram could not resolve an authoritative OpenCode runtime session for ${canonicalEngramToolName(input.tool)} [${failure.reason}]. Reopen the session in the current project and retry; if it persists, check OpenCode runtime session metadata.`)
+        throw new Error(`qbit-jay could not resolve an authoritative OpenCode runtime session for ${canonicalEngramToolName(input.tool)} [${failure.reason}]. Reopen the session in the current project and retry; if it persists, check OpenCode runtime session metadata.`)
       }
       if (!registered) {
         const tool = canonicalEngramToolName(input.tool)
@@ -969,7 +980,7 @@ export const Engram: Plugin = async (ctx) => {
           return
         }
 			if (projectResolutionError) throw new Error(projectResolutionError)
-        throw new Error(`gentle-engram could not confirm Engram session registration for ${input.tool}${!client.localReady && client.readinessDiagnostic ? `: ${client.readinessDiagnostic}` : registrationErrors.has(authoritativeSessionID) ? `: ${registrationErrors.get(authoritativeSessionID)}` : ""}; verify that the Engram server is available and retry`)
+        throw new Error(`qbit-jay could not confirm Engram session registration for ${input.tool}${!client.localReady && client.readinessDiagnostic ? `: ${client.readinessDiagnostic}` : registrationErrors.has(authoritativeSessionID) ? `: ${registrationErrors.get(authoritativeSessionID)}` : ""}; verify that the Engram server is available and retry`)
       }
       output.args.session_id = effectiveSessions.get(authoritativeSessionID)!.id
     },
@@ -1050,7 +1061,7 @@ export const Engram: Plugin = async (ctx) => {
         // effective session its writes already use.
         const sessionID = effectiveSessions.get(rootID)?.id ?? rootID
 
-        const cooldownSecs = parseInt(process.env.ENGRAM_NUDGE_COOLDOWN_SECS ?? "900", 10)
+        const cooldownSecs = parseInt(envValue("NUDGE_COOLDOWN_SECS") ?? "900", 10)
         const nowSecs = Math.floor(Date.now() / 1000)
 
         // Debounce: skip if we nudged recently this session
@@ -1361,4 +1372,4 @@ async function setupEngramV2(ctx: V2Context): Promise<() => Promise<void>> {
 }
 
 // V1 (1.18.29+) calls server(); V2 calls setup().
-export default { id: "engram", server: Engram, setup: setupEngramV2 }
+export default { id: "qbit-jay", server: Engram, setup: setupEngramV2 }

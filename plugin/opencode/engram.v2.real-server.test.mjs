@@ -143,7 +143,7 @@ test("V2 inbox prompts stay idempotent and deleted across real server restarts",
   process.env.ENGRAM_URL = PLUGIN_URL
 
   let events = eventStream()
-  const module = await import(new URL("./engram.ts?v2-real-server", import.meta.url).href)
+  const module = await import(new URL("./qbit-jay.ts?v2-real-server", import.meta.url).href)
   const setup = () => module.default.setup({
     location: { directory: dir, project: { id: PROJECT_ID } },
     event: { subscribe: (options) => events.subscribe(options) },

@@ -5,7 +5,7 @@ const require = createRequire(import.meta.url)
 const childProcess = require("node:child_process")
 const fs = require("node:fs")
 
-import { shouldNudgeForObservations } from "./engram.ts"
+import { shouldNudgeForObservations } from "./qbit-jay.ts"
 
 const nowSecs = 1_735_689_600
 
@@ -133,7 +133,7 @@ async function createRuntime(t: any, { sessionGet, sessionRegistration, sessionE
   })
 
   runtimeImport += 1
-  const moduleURL = new URL(`./engram.ts?lifecycle=${runtimeImport}`, import.meta.url)
+  const moduleURL = new URL(`./qbit-jay.ts?lifecycle=${runtimeImport}`, import.meta.url)
   const { Engram } = await import(moduleURL.href)
   const plugin: any = await Engram({
     directory: "/work/engram",

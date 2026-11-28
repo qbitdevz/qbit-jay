@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url)
 const childProcess = require("node:child_process")
 const fs = require("node:fs")
 
-const source = readFileSync(new URL("./engram.ts", import.meta.url), "utf8")
+const source = readFileSync(new URL("./qbit-jay.ts", import.meta.url), "utf8")
 
 const DIRECTORY = "/work/engram"
 const PROJECT_ID = "project-1"
@@ -195,7 +195,7 @@ async function setupV2(t, { sessions = new Map(), promptResponse, registrationRe
   }
 
   runtimeImport += 1
-  const module = await import(new URL(`./engram.ts?v2-runtime=${runtimeImport}`, import.meta.url).href)
+  const module = await import(new URL(`./qbit-jay.ts?v2-runtime=${runtimeImport}`, import.meta.url).href)
   const cleanup = await module.default.setup(ctx)
   return {
     module,
@@ -356,8 +356,8 @@ test("V2 resumed inbox capture retains durable source identity", async (t) => {
 })
 
 test("default export serves V1 through server and V2 through setup", async () => {
-  const module = await import(new URL("./engram.ts?v2-shape", import.meta.url).href)
-  assert.equal(module.default.id, "engram")
+  const module = await import(new URL("./qbit-jay.ts?v2-shape", import.meta.url).href)
+  assert.equal(module.default.id, "qbit-jay")
   assert.strictEqual(module.default.server, module.Engram)
   assert.equal(typeof module.default.setup, "function")
   assert.doesNotMatch(source, /^import\s+(?!type\b)[^\n]*from\s+"@opencode(-ai)?\/plugin"/m, "V1 hosts may lack the V2 SDK")
