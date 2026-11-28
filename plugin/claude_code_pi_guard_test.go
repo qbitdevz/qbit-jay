@@ -16,7 +16,7 @@ import (
 )
 
 // Pi runs Claude models through pi-claude-bridge, which loads the user's Claude
-// Code settings. Pi already owns its Engram session through gentle-engram, so
+// Code settings. Pi already owns its Engram session through qbit-jay-pi, so
 // every Claude Code plugin hook must be a silent no-op when Pi marks its child
 // processes with PI_CODING_AGENT.
 

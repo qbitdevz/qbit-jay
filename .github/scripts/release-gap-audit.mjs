@@ -4,7 +4,7 @@ import { pathToFileURL } from 'node:url';
 
 const exec = promisify(execFile);
 const channels = [
-  { name: 'Pi npm latest', url: 'https://registry.npmjs.org/gentle-engram/latest', tag: data => `pi-v${data.version}`, kind: 'pi' },
+  { name: 'Pi npm latest', url: 'https://registry.npmjs.org/qbit-jay-pi/latest', tag: data => `pi-v${data.version}`, kind: 'pi' },
   { name: 'Go latest stable GitHub Release', url: 'https://api.github.com/repos/Gentleman-Programming/engram/releases/latest', tag: data => data.tag_name, kind: 'go' },
 ];
 

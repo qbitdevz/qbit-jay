@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/gentle-engram"><img alt="npm" src="https://img.shields.io/npm/v/gentle-engram?color=blue" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay"><img alt="GitHub stars" src="https://img.shields.io/github/stars/qbitdevz/qbit-jay?style=flat&color=yellow" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/qbitdevz/qbit-jay?color=brightgreen" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/qbitdevz/qbit-jay/ci.yml?label=CI" /></a>
@@ -17,7 +16,7 @@
 
 Pi is great at doing the work in front of it. The problem is everything around the work: what the agent learned yesterday, which architecture decision was accepted, why a bug was fixed a certain way, what the user prefers, and what should survive when the context window compacts.
 
-qbit-jay is persistent memory for AI coding agents. `gentle-engram` connects Pi to that memory so your agent can save the useful parts of a session and retrieve them later — without stuffing raw tool output back into the prompt.
+qbit-jay is persistent memory for AI coding agents. `qbit-jay-pi` connects Pi to that memory so your agent can save the useful parts of a session and retrieve them later — without stuffing raw tool output back into the prompt.
 
 ## Shared daemon lifecycle
 
@@ -200,7 +199,7 @@ qbit-jay includes a terminal UI for browsing sessions, observations, prompts, pr
 
 ## Core resume compatibility
 
-Since 0.5.1, `gentle-engram` negotiates root session resume through `GET /health`:
+Since 0.5.1, `gentle-engram` (now `qbit-jay-pi`) negotiates root session resume through `GET /health`:
 `capabilities.root_session_resume: true` enables it; explicit false or malformed
 capability data disables it. When the capability is absent, a stable core version
 of **3.0.0 or newer** (optionally prefixed with `v`) is accepted. The tagged
@@ -251,11 +250,11 @@ it does not resolve either incident or weaken session guards.
 ## Opt-in Pi session registration trace
 
 For an affected quit/resume cycle, set `QBIT_JAY_PI_SESSION_TRACE=1` before launching
-Pi with `gentle-engram` 0.4.0 or a local source checkout. The older `0.2.0` package
+Pi with `gentle-engram` 0.4.0 (the former package name) or a local source checkout. The older `0.2.0` package
 does not include this instrumentation. When using a local extension, do not load
 an installed npm copy at the same time.
 
-If your Pi `settings.json` lists an installed `npm:gentle-engram` version under `packages`,
+If your Pi `settings.json` lists an installed copy of this package (for example a former `npm:gentle-engram` entry) under `packages`,
 temporarily remove only that entry before launching the local extension, then
 restore it after collecting the trace. Keep other packages enabled: `-e` adds
 an extension; it does not replace the installed package.
@@ -305,36 +304,21 @@ it. No trace file is created automatically.
 
 ## Quick start
 
-**Unreleased release preparation:** this source prepares companion `0.8.0`
-from the current reviewed Pi source.
-The commands below apply only after that candidate and its matching core artifacts
-are published and validated. The [release policy](../../docs/RELEASE-POLICY.md)
-describes the publication guards; the [earlier pair plan](../../docs/SESSION-OWNED-RELEASE-PAIR.md)
-retains the session-owned validation requirements and historical preparation versions.
+The qbit-jay Pi plugin is not distributed through npm: nothing named `qbit-jay-pi` is published, and neither `qbit-jay setup pi` nor `pi-qbit-jay init` installs or pins an `npm:` source for it (an unregistered name could be claimed by anyone). Both exit with an error without reading or changing Pi settings, and existing user entries, including `npm:gentle-engram` ones, are left untouched. Install it from a local checkout:
 
 ```bash
-pi install npm:gentle-engram@0.8.0
-pi-qbit-jay init
+pi install <repo>/plugin/pi
 ```
 
-This source version of Go's `qbit-jay setup pi` pins `0.8.0` and migrates the known `0.7.1`, `0.7.0` and `0.6.0` pins along with older managed pins. Already-published core binaries retain their original installer pins; installing a newer companion does not change them. Use the validated core/companion pair rather than changing installed metadata. Earlier `0.1.16` still registers qbit-jay MCP during `pi-qbit-jay init`, so do not use it for native-only setup.
-
-Go's `qbit-jay setup pi` preserves a custom same-name npm entry across `pi install` only when Pi's
-change matches its known source replacement. Unexpected settings changes stop
-setup and retain an `.engram-pi-settings-*` recovery copy at the reported path;
-inspect it before retrying. This does not lock settings against concurrent edits.
-
-The direct `pi install` command above does not provide this protection. Pi 0.99.0
-can replace the first custom same-name npm source before `pi-qbit-jay init` runs.
-To preserve that source, use the matching core's `qbit-jay setup pi` instead.
+T0.9 replaces this with a plugin embedded in the qbit-jay binary.
 
 Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
 
-`gentle-engram` does not need an MCP extension. Pi 0.99.0 and later ship built-in MCP support that reads `mcp.json` in the Pi agent directory and is managed with `/mcp` or `pi mcp add`. An installed `pi-mcp-adapter` replaces that built-in support, so `pi-qbit-jay init` does not add it; an existing adapter entry in `settings.json` is left for you to keep or remove.
+`qbit-jay-pi` does not need an MCP extension. Pi 0.99.0 and later ship built-in MCP support that reads `mcp.json` in the Pi agent directory and is managed with `/mcp` or `pi mcp add`. An installed `pi-mcp-adapter` replaces that built-in support, so `pi-qbit-jay init` does not add it; an existing adapter entry in `settings.json` is left for you to keep or remove.
 
 ## What gets installed
 
-`gentle-engram` connects Pi to qbit-jay through Pi-native tools. Direct MCP is separate and opt-in:
+`qbit-jay-pi` connects Pi to qbit-jay through Pi-native tools. Direct MCP is separate and opt-in:
 
 | Path         | Purpose                                                                                                                                |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
@@ -344,13 +328,13 @@ Restart Pi after installation, then ask Pi what it remembers about the current p
 Pi-native `mem_session_end` accepts only the current Pi host session ID; a different, missing, or empty ID is refused before an end request. If a resumed conversation has a distinct persisted session ID, the matching host request ends that effective ID through the same coordination as session shutdown. A raw host-ID end requires locally confirmed registration; an uncertain registration cannot authorize it. A pending resumed ID whose end acknowledgement was lost can be reconciled without another end request only when qbit-jay confirms that exact ID is already ended under the resolved local project. To end an independent/manual session, use a separate direct client rather than supplying its ID to the Pi-native tool.
 
 ```text
-Pi events/tools -> gentle-engram extension -> QBIT_JAY_URL / qbit-jay serve -> SQLite
+Pi events/tools -> qbit-jay-pi extension -> QBIT_JAY_URL / qbit-jay serve -> SQLite
 Standalone MCP client -> qbit-jay mcp -> SQLite (deliberate, separate setup)
 ```
 
 Pi-native compact tools use the same HTTP server path as event capture, including project detection, diagnostics, passive capture, lifecycle review, conflict-judgment tools such as `mem_current_project`, `mem_doctor`, `mem_capture_passive`, `mem_review`, `mem_judge`, and `mem_compare`, cross-project discovery through `mem_list_projects`, and local pin curation through `mem_pin`/`mem_unpin`. MCP tools remain a separate stdio path, so direct MCP usage still needs an qbit-jay binary even when `QBIT_JAY_URL` points at a remote HTTP server. qbit-jay MCP is not registered by Pi setup. An existing Pi MCP entry remains active until you manually remove it and restart/reload Pi; native-only agent writes are not guaranteed while it remains.
 
-To keep per-turn prompts small, tools the Memory Protocol never names (`mem_search_prompts`, `mem_consolidate`, `mem_session_finalize`, `mem_session_start`, `mem_judge_many`, `mem_compare`, `mem_list_projects`, `mem_pin`, `mem_unpin`) are registered with `exposure: "deferred"`: Pi does not declare them on every turn, and the model reaches them through `tool_search` or codemode scripts. A session without either (Pi turns `tool_search` off by default) gets them back as direct tools before its first request: at the start of each prompt, when the active tools include a `mem_*` tool but neither `codemode` nor `tool_search`, or when Pi does not report its active tools, gentle-engram re-registers them as direct, and they stay direct for the rest of the session. Pi versions without tool exposure ignore the field and keep them direct. When Pi reports the active tools (`systemPromptOptions.selectedTools`) and none of them is a `mem_*` tool, as in a subagent launched with `--tools read,bash`, the Memory Protocol is not injected; prompt capture is unchanged.
+To keep per-turn prompts small, tools the Memory Protocol never names (`mem_search_prompts`, `mem_consolidate`, `mem_session_finalize`, `mem_session_start`, `mem_judge_many`, `mem_compare`, `mem_list_projects`, `mem_pin`, `mem_unpin`) are registered with `exposure: "deferred"`: Pi does not declare them on every turn, and the model reaches them through `tool_search` or codemode scripts. A session without either (Pi turns `tool_search` off by default) gets them back as direct tools before its first request: at the start of each prompt, when the active tools include a `mem_*` tool but neither `codemode` nor `tool_search`, or when Pi does not report its active tools, qbit-jay-pi re-registers them as direct, and they stay direct for the rest of the session. Pi versions without tool exposure ignore the field and keep them direct. When Pi reports the active tools (`systemPromptOptions.selectedTools`) and none of them is a `mem_*` tool, as in a subagent launched with `--tools read,bash`, the Memory Protocol is not injected; prompt capture is unchanged.
 
 ## Runtime contract assets
 
@@ -512,7 +496,7 @@ With a supporting running Go server, `older_history: true` adds a bounded **Olde
 
 Run `node --test plugin/pi/test/context-older-history.test.mjs plugin/pi/test/context-older-history-package.test.mjs` from the repository root. Use Node.js 24 and the checkout's Go toolchain/dependencies, or `QBIT_JAY_PI_TEST_SERVER_BINARY` for the existing real-server fixture. Without either fixture resource, the real context test skips before sandbox creation/build; mocks remain runnable in the package. Invalid configured binaries and checkout build failures remain failures, not skips. No npm install is needed.
 
-`gentle-engram` owns the Pi chrome for qbit-jay memory tools by registering compact Pi-native `mem_*` tools in the companion package. When tools such as `mem_search`, `mem_context`, `mem_save`, `mem_session_summary`, `mem_get_observation`, `mem_review`, `mem_judge`, and `mem_doctor` run in Pi, the default collapsed view stays compact:
+`qbit-jay-pi` owns the Pi chrome for qbit-jay memory tools by registering compact Pi-native `mem_*` tools in the companion package. When tools such as `mem_search`, `mem_context`, `mem_save`, `mem_session_summary`, `mem_get_observation`, `mem_review`, `mem_judge`, and `mem_doctor` run in Pi, the default collapsed view stays compact:
 
 ```text
 🧠 search “auth model” …
@@ -542,7 +526,7 @@ When a tool call fails because qbit-jay cannot determine which project to use, t
 | `🧠 repos · ambiguous project` | Pi was started from a directory that contains multiple git repos. Run Pi from inside a single repo, or add `.qbit-jay/config.json` with `project_name` to the parent directory. |
 | `🧠 repos · error`         | A different tool or network error occurred. Expand the tool output in Pi for the full error message.  |
 
-Full tool details remain available by expanding the tool output in Pi. If `gentle-engram` or the qbit-jay server is not installed/running, the compact tool reports an error instead of implying memory is available.
+Full tool details remain available by expanding the tool output in Pi. If `qbit-jay-pi` or the qbit-jay server is not installed/running, the compact tool reports an error instead of implying memory is available.
 
 ## What Pi can remember
 
@@ -624,7 +608,7 @@ A memory is an evolving topic, not a log entry. Before writing, search the inten
 
 ## Private blocks
 
-`gentle-engram` redacts explicit private blocks before sending captured prompts, passive observations, or compaction summaries to qbit-jay:
+`qbit-jay-pi` redacts explicit private blocks before sending captured prompts, passive observations, or compaction summaries to qbit-jay:
 
 ```text
 <private>
@@ -638,7 +622,7 @@ This is a lightweight convenience convention, not a full secret-scanning system.
 
 ## Compaction recovery
 
-When Pi emits a compaction lifecycle event, `gentle-engram` reads the current payload field `compactionEntry.summary` first, then falls back to supported legacy fields when that value is absent or blank. It uses the opaque Pi runtime session identity captured from a fresh lifecycle event; it never accepts a model-supplied session ID for compaction recovery.
+When Pi emits a compaction lifecycle event, `qbit-jay-pi` reads the current payload field `compactionEntry.summary` first, then falls back to supported legacy fields when that value is absent or blank. It uses the opaque Pi runtime session identity captured from a fresh lifecycle event; it never accepts a model-supplied session ID for compaction recovery.
 
 Before archiving, the extension requires qbit-jay to acknowledge registration for the effective session identity. Pi registers its runtime ID with `resume: true`; the Go core reuses a live continuation or creates the next `<runtimeID>:resume:N` identity when the root has ended. The extension validates and adopts the acknowledged ID rather than choosing a suffix; every ended row remains closed. Pi session entries retain the mapping for extension reloads, without appending duplicates on each renewal. If the host cannot append and read mapping entries, root registration does not request resume: an ended root is refused instead of creating an untrackable continuation. A valid existing continuation mapping can still be renewed without append support, but adopting any changed ID requires append support—even when fallback returns the runtime root. Root fallback supersedes the old mapping so writes and cleanup use the same identity. For read-only mappings, confirmed shutdown delivery is remembered in-process to avoid repeated `/end`; uncertain delivery remains retryable. Existing `:resume:<uuid>` mappings are registered as-is; when a mapped session has ended, Pi registers the runtime root with `resume: true` again. A fork uses its own runtime conversation ID and cannot inherit the parent's mapping. Unknown registration failures, invalid acknowledgements, and project ownership conflicts prevent attributed writes. An older server's `409 session_already_ended` is reported with that specific cause, without client-side guessing. It checks runtime-identity ambiguity against Pi's host ID, saves a `session_summary` observation with topic key `session/compaction-recovery` under the acknowledged effective ID (including resumed continuations), then requests `/context/compaction?session_id=...` for recovery guidance scoped to that same effective session.
 After a second distinct or blank/missing runtime identity, compaction recovery permanently fails closed until the plugin process restarts.
@@ -779,8 +763,8 @@ production CLI startup, model quality, external providers or other integrations.
 
 - Pi coding agent with npm package support.
 - qbit-jay installed as `qbit-jay` on `PATH`, or `QBIT_JAY_BIN` pointing at the binary (`QBIT_JAY_BIN` is still accepted).
-- For Pi-native `mem_list_projects`, a running qbit-jay core server v2.1.0 or later, which provides HTTP `GET /projects`. If `/health` returns 200 but this tool gets a 404, upgrade and restart the server; updating `gentle-engram` alone does not add the route. The optional `org` input is forwarded as `GET /projects?org=...`; a server that predates org filtering ignores it and returns the unfiltered list. Pi-native `mem_save` sends a nonblank explicit `org` in the `POST /observations` body; when omitted or blank, it inherits the nearest applicable `.qbit-jay/config.json` org from core's existing project detection for the caller cwd (or an explicitly supplied `cwd`), independently of an explicit project override. The default label follows the session's project-detection snapshot; restart Pi after changing that configuration, or pass `org`/`cwd` explicitly. The resolved org is frozen with the existing save/recovery payload. This inheritance requires a core that exposes the optional `org` metadata; an older core omits it. `mem_current_project` exposes that same optional label. Pi-native `mem_search` forwards a nonblank, trimmed `org` as `GET /search?org=...`; a server that predates the `/search` org filter ignores it and returns unfiltered results.
-- No MCP extension: Pi-native `mem_*` tools come from `gentle-engram`. Pi 0.99.0 and later provide built-in MCP for other servers.
+- For Pi-native `mem_list_projects`, a running qbit-jay core server v2.1.0 or later, which provides HTTP `GET /projects`. If `/health` returns 200 but this tool gets a 404, upgrade and restart the server; updating `qbit-jay-pi` alone does not add the route. The optional `org` input is forwarded as `GET /projects?org=...`; a server that predates org filtering ignores it and returns the unfiltered list. Pi-native `mem_save` sends a nonblank explicit `org` in the `POST /observations` body; when omitted or blank, it inherits the nearest applicable `.qbit-jay/config.json` org from core's existing project detection for the caller cwd (or an explicitly supplied `cwd`), independently of an explicit project override. The default label follows the session's project-detection snapshot; restart Pi after changing that configuration, or pass `org`/`cwd` explicitly. The resolved org is frozen with the existing save/recovery payload. This inheritance requires a core that exposes the optional `org` metadata; an older core omits it. `mem_current_project` exposes that same optional label. Pi-native `mem_search` forwards a nonblank, trimmed `org` as `GET /search?org=...`; a server that predates the `/search` org filter ignores it and returns unfiltered results.
+- No MCP extension: Pi-native `mem_*` tools come from `qbit-jay-pi`. Pi 0.99.0 and later provide built-in MCP for other servers.
 
 For HTTP session capture against a separately managed qbit-jay server, set `QBIT_JAY_URL`. The extension will not auto-start a local `qbit-jay serve` process; initial connection refusal waits within the bounded startup policy above.
 
@@ -873,12 +857,9 @@ The Pi extension treats absent, empty, and whitespace-only `QBIT_JAY_URL`, `QBIT
 
 ## Install command details
 
-With this Pi package version, `pi-qbit-jay init` updates Pi-owned config in the Pi agent directory:
+`pi-qbit-jay init` does not update any Pi-owned config: it prints the local install instruction and exits non-zero without touching `settings.json` or `mcp.json`.
 
-- `settings.json`: with the prepared matching core, ensures `npm:gentle-engram@0.8.0` is declared, replacing affected `npm:gentle-engram@0.1.5`, `npm:gentle-engram@0.1.6`, `npm:gentle-engram@0.1.7`, `npm:gentle-engram@0.1.8`, `npm:gentle-engram@0.1.11`, `npm:gentle-engram@0.1.12`, `npm:gentle-engram@0.1.13`, `npm:gentle-engram@0.1.14`, `npm:gentle-engram@0.1.15`, `npm:gentle-engram@0.1.16`, `npm:gentle-engram@0.2.0`, `npm:gentle-engram@0.3.0`, `npm:gentle-engram@0.4.0`, `npm:gentle-engram@0.4.1`, `npm:gentle-engram@0.4.2`, `npm:gentle-engram@0.5.0`, `npm:gentle-engram@0.5.1`, `npm:gentle-engram@0.6.0`, `npm:gentle-engram@0.7.0`, and `npm:gentle-engram@0.7.1` pins when present. It does not add `npm:pi-mcp-adapter` and leaves an existing adapter entry untouched.
-- `mcp.json`: never created or changed by init. Existing `mcpServers.qbit-jay` (or the upstream `mcpServers.qbit-jay`) triggers a warning with its exact config path. Manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
-
-`qbit-jay setup pi` also auto-pins `npmCommand` in Pi's `settings.json` when [mise](https://mise.jdx.dev/) is detected in `PATH`. It sets `npmCommand` to `["mise", "exec", "node@<version>", "--", "npm"]` so Pi always uses the mise-managed Node version. Existing `npmCommand` values are never overwritten; if mise is not found, this step is a no-op.
+- `mcp.json`: never created or changed. If it has `mcpServers.qbit-jay` (or the upstream `mcpServers.engram`), manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
 
 Existing `mcpServers.qbit-jay` entries are preserved even with `--force`; the flag does not bypass native-only safety guidance. The published `mcp-template.json` is a legacy **Pi MCP configuration shape** for explicit, optional Pi MCP clients; it is not a generic standalone MCP template and neither `pi-qbit-jay init` nor `qbit-jay setup pi` uses it.
 
@@ -940,7 +921,7 @@ There is no automatic inference: editing files in another repository never chang
 
 | Symptom                                                      | Fix                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mem_*` tools are missing                                    | After the candidate pair is published and validated, install/verify `npm:gentle-engram@0.8.0` with its matching core, run `pi-qbit-jay init`, then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
+| `mem_*` tools are missing                                    | Install the plugin from a local checkout with `pi install <repo>/plugin/pi` (it is not distributed through npm), then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
 | Pi cannot find `qbit-jay`                                      | Set `QBIT_JAY_BIN=/absolute/path/to/qbit-jay`.                                                                                                                                                                                                                              |
 | Session capture should use another server                    | Set `QBIT_JAY_URL=http://host:7437`.                                                                                                                                                                                                                                      |
 | Pi shows `error MCP: 0/N servers` but `mem_*` works          | That status covers Pi's MCP servers, not qbit-jay's Pi-native HTTP tools. Check `~/.pi/agent/mcp.json` for stale/unreachable servers such as remote OAuth services. |

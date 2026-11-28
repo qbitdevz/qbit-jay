@@ -46,7 +46,7 @@ function argumentsFor(args) {
 function goFailure(stderr) {
   if (/invalid core-ref/.test(stderr)) return "Invalid core-ref: expected a full strict SemVer ref.";
   if (/invalid pi-ref/.test(stderr)) return "Invalid pi-ref: expected a full strict SemVer ref.";
-  if (/package name must be gentle-engram/.test(stderr)) return "Package name must be gentle-engram.";
+  if (/package name must be qbit-jay-pi/.test(stderr)) return "Package name must be qbit-jay-pi.";
   if (/package version must match candidate version/.test(stderr)) return "Package version must match candidate version.";
   if (/installer pin must match candidate version exactly/.test(stderr)) return "Installer pin must match candidate version exactly.";
   return "Go validator/exporter failed or is unavailable; candidate rejected.";

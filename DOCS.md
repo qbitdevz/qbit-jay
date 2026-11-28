@@ -1489,7 +1489,7 @@ MCP `mem_save` runs conflict candidate detection after saving the observation. I
 
 Update an observation by ID, with mandatory `expected_project` supplied by the caller (for example, `{ "id": 42, "expected_project": "qbit-jay", "title": "Corrected" }`). Public schema supports partial updates for `title`, `content`, `find`, `replace`, `type`, `scope`, and `topic_key`. `find` and `replace` are paired literal, case-sensitive global replacement inputs and cannot be combined with `content`; empty finds and replacements with no effective normalized change preserve content.
 
-This intentionally breaks mutation clients that omit the owner assertion. Native MCP and the in-repository Pi adapter require it; an external gentle-engram relay must be adapted separately and is not fixed by this repository change. Never read the target observation to manufacture a missing expectation. CLI/internal maintenance store APIs retain their unguarded entry points.
+This intentionally breaks mutation clients that omit the owner assertion. Native MCP and the in-repository Pi adapter require it; an external qbit-jay-pi relay must be adapted separately and is not fixed by this repository change. Never read the target observation to manufacture a missing expectation. CLI/internal maintenance store APIs retain their unguarded entry points.
 
 ### mem_review
 

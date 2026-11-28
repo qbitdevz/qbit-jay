@@ -22,7 +22,7 @@ func TestPackageMaterialization(t *testing.T) {
 				t.Fatal(err)
 			}
 			names := append(append([]string{}, packageRuntimeFiles...), "assets/nested.txt")
-			manifest, err := json.Marshal(map[string]any{"name": "gentle-engram", "version": "1.2.3", "files": names})
+			manifest, err := json.Marshal(map[string]any{"name": "qbit-jay-pi", "version": "1.2.3", "files": names})
 			if err != nil {
 				t.Fatal(err)
 			}

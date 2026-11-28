@@ -129,7 +129,7 @@ func cmdHook(args []string) {
 		return
 	}
 
-	// Pi owns its Engram session natively (gentle-engram); when pi-claude-bridge
+	// Pi owns its Engram session natively (qbit-jay-pi); when pi-claude-bridge
 	// runs Claude Code inside a Pi turn, this hook must stay a silent no-op.
 	if args[0] == "claude-pre-tool-use" && runningUnderPi() {
 		return

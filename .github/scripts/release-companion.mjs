@@ -3,20 +3,15 @@ import { readFileSync } from "node:fs";
 try {
 	if (process.argv.length !== 2) throw new Error("No arguments accepted");
 	const pkg = JSON.parse(readFileSync("plugin/pi/package.json", "utf8"));
-	const setup = readFileSync("internal/setup/setup.go", "utf8");
-	const pins = [...setup.matchAll(/\bconst\s+piGentleEngramPackage\s*=\s*"([^"]+)"|^\s*piGentleEngramPackage\s*=\s*"([^"]+)"/gm)];
 	const version = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?(?:\+[0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*)?$/;
-	if (pkg.name !== "gentle-engram" || typeof pkg.version !== "string" || !version.test(pkg.version)) {
+	if (pkg.name !== "qbit-jay-pi" || typeof pkg.version !== "string" || !version.test(pkg.version)) {
 		throw new Error("Invalid companion package name/version");
-	}
-	if (pins.length !== 1 || (pins[0][1] ?? pins[0][2]) !== `npm:${pkg.name}@${pkg.version}`) {
-		throw new Error("Actual installer companion pin must match package name/version");
 	}
 	if (pkg.engram?.startupPolicy !== 1 ||
 		(Object.hasOwn(pkg.engram, "sessionOwned") && pkg.engram.sessionOwned !== 1)) {
 		throw new Error("Invalid declared companion metadata");
 	}
-	const response = await fetch(`https://registry.npmjs.org/gentle-engram/${encodeURIComponent(pkg.version)}`, {
+	const response = await fetch(`https://registry.npmjs.org/qbit-jay-pi/${encodeURIComponent(pkg.version)}`, {
 		method: "GET",
 		redirect: "error",
 		credentials: "omit",
