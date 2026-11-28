@@ -122,14 +122,21 @@ func TestMemoryProtocolSessionStartSh(t *testing.T) {
 
 func assertCodexBindingContract(t *testing.T, text string) {
 	t.Helper()
+	// "a|b" accepts the qbit-jay name or the upstream Engram name: DOCS.md still
+	// carries the upstream names until the documentation task (T7) renames them.
 	for _, required := range []string{
-		"PreToolUse", "engram hook codex-pre-tool-use",
-		"mcp__engram__mem_*", "mcp__plugin_engram_engram__mem_*",
+		"PreToolUse", "qbit-jay hook codex-pre-tool-use|engram hook codex-pre-tool-use",
+		"mcp__qbit-jay__mem_*|mcp__engram__mem_*",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_*|mcp__plugin_engram_engram__mem_*",
 		"authoritative Codex host", "server-confirmed", "Read-only tools",
 		"direct/nonintercepted clients", "reuse this exact",
 		"`mem_session_end` uses `id`, not `session_id`",
 	} {
-		if !strings.Contains(text, required) {
+		found := false
+		for _, alternative := range strings.Split(required, "|") {
+			found = found || strings.Contains(text, alternative)
+		}
+		if !found {
 			t.Errorf("Codex binding contract missing %q", required)
 		}
 	}
@@ -154,8 +161,8 @@ func TestMemoryProtocolSourceInventory(t *testing.T) {
 		claude           bool
 	}{
 		{"internal/setup/setup.go", "const memoryProtocolMarkdown = `", "`", false},
-		{"plugin/opencode/engram.ts", "const MEMORY_INSTRUCTIONS = `", "\n`", false},
-		{"internal/setup/plugins/opencode/engram.ts", "const MEMORY_INSTRUCTIONS = `", "\n`", false},
+		{"plugin/opencode/qbit-jay.ts", "const MEMORY_INSTRUCTIONS = `", "\n`", false},
+		{"internal/setup/plugins/opencode/qbit-jay.ts", "const MEMORY_INSTRUCTIONS = `", "\n`", false},
 		{"plugin/pi/index.ts", "const MEMORY_INSTRUCTIONS = `", "\n`", false},
 		{"plugin/pi/README.md", "### Injected memory contract", "### Automatic user-prompt capture", false},
 		{"skills/memory-protocol/SKILL.md", "## When to Use", "", false},
@@ -188,11 +195,11 @@ func TestMemoryProtocolSourceInventory(t *testing.T) {
 			}
 		})
 	}
-	source, err := os.ReadFile("../../plugin/opencode/engram.ts")
+	source, err := os.ReadFile("../../plugin/opencode/qbit-jay.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
-	embedded, err := os.ReadFile("plugins/opencode/engram.ts")
+	embedded, err := os.ReadFile("plugins/opencode/qbit-jay.ts")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -355,7 +362,7 @@ func TestMemoryProtocolHookRecoveryAndLifecyclePreserved(t *testing.T) {
 
 func TestMemoryProtocolCanonicalOwnership(t *testing.T) {
 	text := readMemoryContract(t, "../../DOCS.md")
-	for _, path := range []string{"internal/setup/setup.go", "plugin/opencode/engram.ts", "internal/setup/plugins/opencode/engram.ts", "skills/memory-protocol/SKILL.md"} {
+	for _, path := range []string{"internal/setup/setup.go", "plugin/opencode/qbit-jay.ts", "internal/setup/plugins/opencode/qbit-jay.ts", "skills/memory-protocol/SKILL.md"} {
 		if !strings.Contains(text, path) {
 			t.Errorf("canonical ownership omits source %q", path)
 		}
