@@ -156,7 +156,7 @@ var (
 
 	// Project name
 	projectStyle = lipgloss.NewStyle().
-			Foreground(colorYellow)
+			Foreground(colorMauve)
 
 	// Content preview
 	contentPreviewStyle = lipgloss.NewStyle().
