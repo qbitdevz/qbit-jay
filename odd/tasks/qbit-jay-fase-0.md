@@ -33,7 +33,7 @@ Assumptions (not user specs):
 - [x] T0.2 Scaffolding — S3, S4, S5 — inline — commit: on branch `chore/fase-0-scaffolding-baseline`
 - [x] T0.3 Upstream baseline (E3) — S6, S7, S8, S9, S10 — inline — commit: same branch (`b25af88`, results completed in the commit after `8278232`)
 - [x] T0.4 — `odd/tasks/qbit-jay-t04-rename.md`
-- [ ] T0.5–T0.10 — authorized 2026-11-28, tracked in `odd/tasks/qbit-jay-fase-0-rest.md`
+- [x] T0.5–T0.10 — `odd/tasks/qbit-jay-fase-0-rest.md`; release v0.1.0 published 2026-11-28
 
 ## Log
 
