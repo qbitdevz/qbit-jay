@@ -63,10 +63,10 @@ func (r *Report) Print(w io.Writer) {
 	_ = tw.Flush()
 
 	_, _ = fmt.Fprintln(w, "\nE2 Search (real SearchPreviewsContext, project filter, limit 10)")
-	fmt.Fprintln(tw, "size\tmode\tgroup\tqueries\trecall@5\trecall@10\tMRR\tzero-result")
+	_, _ = fmt.Fprintln(tw, "size\tmode\tgroup\tqueries\trecall@5\trecall@10\tMRR\tzero-result")
 	for _, e := range r.E2 {
 		row := func(group string, x E2Metrics) {
-			fmt.Fprintf(tw, "%d\t%s\t%s\t%d\t%s\t%s\t%.3f\t%s\n", e.Size, e.MatchMode, group, x.Queries, pct(x.RecallAt5), pct(x.RecallAt10), x.MRR, pct(x.ZeroResult))
+			_, _ = fmt.Fprintf(tw, "%d\t%s\t%s\t%d\t%s\t%s\t%.3f\t%s\n", e.Size, e.MatchMode, group, x.Queries, pct(x.RecallAt5), pct(x.RecallAt10), x.MRR, pct(x.ZeroResult))
 		}
 		row("overall", e.Overall)
 		for _, k := range SortedKeys(e.ByKind) {
@@ -78,10 +78,10 @@ func (r *Report) Print(w io.Writer) {
 	}
 	_ = tw.Flush()
 
-	fmt.Fprintln(w, "\nE3 Performance (store level; MCP latency, startup and RSS: scripts/qbit/e3latency)")
-	fmt.Fprintln(tw, "size\tload s\tdb MiB\tsearch p50 ms\tsearch p95 ms\tcontext p50 ms\tcontext p95 ms")
+	_, _ = fmt.Fprintln(w, "\nE3 Performance (store level; MCP latency, startup and RSS: scripts/qbit/e3latency)")
+	_, _ = fmt.Fprintln(tw, "size\tload s\tdb MiB\tsearch p50 ms\tsearch p95 ms\tcontext p50 ms\tcontext p95 ms")
 	for _, e := range r.E3 {
-		fmt.Fprintf(tw, "%d\t%.1f\t%.1f\t%.2f\t%.2f\t%.2f\t%.2f\n", e.Size, e.LoadSeconds, float64(e.DBBytes)/(1<<20), e.SearchP50ms, e.SearchP95ms, e.ContextP50ms, e.ContextP95ms)
+		_, _ = fmt.Fprintf(tw, "%d\t%.1f\t%.1f\t%.2f\t%.2f\t%.2f\t%.2f\n", e.Size, e.LoadSeconds, float64(e.DBBytes)/(1<<20), e.SearchP50ms, e.SearchP95ms, e.ContextP50ms, e.ContextP95ms)
 	}
 	_ = tw.Flush()
 }
