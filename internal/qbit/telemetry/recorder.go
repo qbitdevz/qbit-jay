@@ -186,7 +186,7 @@ func (r *Recorder) run() {
 		r.errs.Add(1)
 	}
 	if db != nil {
-		defer db.Close()
+		defer func() { _ = db.Close() }()
 	}
 	r.loop(db, path)
 }
