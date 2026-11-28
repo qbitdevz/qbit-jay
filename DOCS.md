@@ -33,6 +33,7 @@ For other docs:
 | [Installation](docs/INSTALLATION.md)        | All install methods + platform support                                                        |
 | [qbit-jay Cloud](docs/engram-cloud/README.md) | Cloud landing page, quickstart path, branding, and reference links                            |
 | [Agent Setup](docs/AGENT-SETUP.md)          | Per-agent configuration + compaction survival                                                 |
+| [Integration](docs/INTEGRATION.md)          | Contract for configurators (qbit-ai, gentle-ai): command line, output formats, paths, env, plugins, ODD mirrors |
 | [Codebase Guide](docs/CODEBASE-GUIDE.md)    | Definitive guide to repository structure, package ownership, flows, and maintainer guardrails |
 | [Capture Project Provenance](docs/CAPTURE-PROJECT-PROVENANCE.md) | Optional local capture evidence, compatibility and limits |
 | [Local Project Aliases](docs/PROJECT-ALIASES.md) | Local key/cwd alias administration and read-only future-derivation preview |

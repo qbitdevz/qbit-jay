@@ -111,6 +111,7 @@ qbit-jay keeps memory local by default. The local SQLite database is authoritati
 | Need | Start here |
 | --- | --- |
 | Local memory and the runtime model | [Architecture](docs/ARCHITECTURE.md) |
+| Integrate qbit-jay with a configurator (qbit-ai, gentle-ai) | [Integration contract](docs/INTEGRATION.md) |
 | Share memory with Git | [Git Sync reference](DOCS.md#git-sync-chunked) |
 | Use optional Cloud replication | [qbit-jay Cloud](docs/engram-cloud/README.md) |
 | Diagnose or recover Cloud operations | [Cloud troubleshooting](docs/engram-cloud/troubleshooting.md) |

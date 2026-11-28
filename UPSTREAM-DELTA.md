@@ -55,5 +55,7 @@ fork's footprint stays visible.
 | `internal/qbit/env/` | One lookup for production environment variables: `QBIT_JAY_*` first, `ENGRAM_*` fallback, plus the guard test against direct `ENGRAM_*` reads |
 | `internal/qbit/theme/` | Single source of visual tokens (S14): dark and light colours, font stacks, radius, spacing, motion, the Lip Gloss adapter and the generated `--qj-*` CSS block; tests parse `design/system.md` and check AA contrast |
 | `internal/qbit/paths/` | On-disk names: data directory `.qbit-jay`, database file `qbit-jay.db`, and the project folder resolver (`.qbit-jay/`, or `.engram/` when it is the only one) |
+| `internal/qbit/compat/` | Test-only package: builds `cmd/qbit-jay` and runs every invocation gentle-ai makes against the Engram binary (version, `setup --help`, `instance-id`, stdio `initialize` probe, HTTP health, `mcp --tools=agent`), plus the ODD mirror contract (upsert, `mem_update`, read back, `capture_prompt`, search by topic, the 50,000-byte limit as a pinned finding). Parsers copied from gentle-ai (MIT) with attribution. No upstream code changes |
+| `docs/INTEGRATION.md` | Contract for configurators (qbit-ai, gentle-ai) with the gentle-ai inventory and the G1 to G7 verdicts |
 | `assets/screenshots/` | TUI screens for the README, rendered from the qbit-jay TUI |
 | `internal/mcp/brand_descriptions_test.go` | Guard: no tool title, description or instruction names the upstream product |
