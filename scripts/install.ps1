@@ -4,7 +4,8 @@
 #
 # Downloads checksums.txt and the windows zip for this architecture from a
 # GitHub Release of qbitdevz/qbit-jay, verifies the zip's sha256 with
-# Get-FileHash, and only then installs qbit-jay.exe into
+# .NET SHA256 (Get-FileHash is missing when a host's PSModulePath points at
+# another PowerShell edition), and only then installs qbit-jay.exe into
 # %LOCALAPPDATA%\Programs\qbit-jay and adds that folder to the user PATH.
 # Nothing is installed when the checksum does not match.
 #
@@ -79,7 +80,12 @@ function Install-QbitJay {
         $zip = Join-Path $tmp $archive
         try { Get-Resource "$base/$archive" $zip } catch { throw "cannot download $base/$archive ($($_.Exception.Message))" }
 
-        $got = (Get-FileHash -LiteralPath $zip -Algorithm SHA256).Hash.ToLowerInvariant()
+        $stream = [System.IO.File]::OpenRead($zip)
+        try {
+            $sha = [System.Security.Cryptography.SHA256]::Create()
+            try { $got = ([System.BitConverter]::ToString($sha.ComputeHash($stream)) -replace '-', '').ToLowerInvariant() }
+            finally { $sha.Dispose() }
+        } finally { $stream.Dispose() }
         if ($got -ne $want) { throw "checksum mismatch for $archive (expected $want, got $got); nothing was installed" }
         Write-Host "Checksum verified (sha256 $got)"
 

@@ -46,7 +46,8 @@ if git show-ref --verify --quiet "refs/heads/${BRANCH}"; then
   exit 1
 fi
 
-git fetch "$REMOTE"
+# --no-tags: upstream Engram tags (v0.1.0 ... v3.x) collide with qbit-jay release tags.
+git fetch --no-tags "$REMOTE"
 git switch -c "$BRANCH" "$BASE"
 
 if ! git merge --no-ff -m "chore(sync): merge ${REMOTE}/main" "${REMOTE}/main"; then
