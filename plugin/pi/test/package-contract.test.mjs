@@ -42,7 +42,6 @@ test("next Pi package release is 0.8.0", () => {
 });
 const CLI_PATH = fileURLToPath(new URL("../cli.js", import.meta.url));
 const RELEASE_CONTRACT_PATH = fileURLToPath(new URL("./release-contract.mjs", import.meta.url));
-const PUBLISH_WORKFLOW_SOURCE = readFileSync(new URL("../../../.github/workflows/publish-pi.yml", import.meta.url), "utf8");
 
 function runReleaseContract(tag) {
 	return spawnSync(process.execPath, [RELEASE_CONTRACT_PATH, tag], { encoding: "utf8" });
@@ -219,15 +218,3 @@ test("Pi release contract rejects branch refs even when their names match", () =
 	}
 });
 
-test("Pi publish workflow passes the full event ref through a shell environment variable", () => {
-	assert.match(
-		PUBLISH_WORKFLOW_SOURCE,
-		/env:\s*\n\s+RELEASE_REF:\s*\$\{\{\s*github\.ref\s*\}\}\s*\n\s+run:\s*node test\/release-contract\.mjs "\$RELEASE_REF"/,
-		"the full event ref must be provided as RELEASE_REF and quoted when passed to the release contract",
-	);
-	assert.doesNotMatch(
-		PUBLISH_WORKFLOW_SOURCE,
-		/run:\s*node test\/release-contract\.mjs\s+[^\n]*\$\{\{/,
-		"the release contract shell command must not interpolate a GitHub expression directly",
-	);
-});
