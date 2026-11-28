@@ -25,7 +25,7 @@ func TestRetentionPrunesOldRowsAndCapsSize(t *testing.T) {
 	fresh := telemetry.New(telemetry.Options{DataDir: dir, Now: func() time.Time { return now }})
 	fresh.ObserveTool("mem_save", map[string]any{"content": "new"}, "ok", false, time.Millisecond)
 	fresh.Close()
-	sum, err := telemetry.Load(dir)
+	sum, err := telemetry.LoadProject(dir, "")
 	if err != nil || sum.Saves != 1 {
 		t.Fatalf("90-day retention should keep only the fresh save: %+v err=%v", sum, err)
 	}
@@ -149,7 +149,7 @@ func TestStatsSummaryAndClear(t *testing.T) {
 	r.call("mem_get_observation", map[string]any{"id": float64(ids[0])})
 	r.rec.Flush()
 
-	sum, err := telemetry.Load(r.dataDir)
+	sum, err := telemetry.LoadProject(r.dataDir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -172,14 +172,14 @@ func TestStatsSummaryAndClear(t *testing.T) {
 	if err != nil || !cleared {
 		t.Fatalf("clear: cleared=%v err=%v", cleared, err)
 	}
-	after, err := telemetry.Load(r.dataDir)
+	after, err := telemetry.LoadProject(r.dataDir, "")
 	if err != nil || after.Searches != 0 || after.Saves != 0 {
 		t.Fatalf("load after clear: %+v err=%v", after, err)
 	}
 	// The running writer still has a valid database.
 	r.save("Another", "after the clear")
 	r.rec.Flush()
-	again, err := telemetry.Load(r.dataDir)
+	again, err := telemetry.LoadProject(r.dataDir, "")
 	if err != nil || again.Saves != 1 {
 		t.Fatalf("writer must keep working after clear: %+v err=%v", again, err)
 	}
@@ -212,7 +212,7 @@ func TestSaveLimitAndErrorClassification(t *testing.T) {
 	if ev[2]["error"] != "timeout" || ev[2]["query"] != "find me" {
 		t.Fatalf("search error keeps the query and a class only: %v", ev[2])
 	}
-	sum, _ := telemetry.Load(r.dataDir)
+	sum, _ := telemetry.LoadProject(r.dataDir, "")
 	if sum.SaveLimit != 1 || sum.SaveErrors != 2 {
 		t.Fatalf("summary: %+v", sum)
 	}
@@ -266,7 +266,7 @@ func TestDroppedAndErrorCountersPersistAndRender(t *testing.T) {
 		t.Fatal(err)
 	}
 	_ = db.Close()
-	sum, err := telemetry.Load(dir)
+	sum, err := telemetry.LoadProject(dir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -288,7 +288,7 @@ func TestPersistedCountersFromRecorder(t *testing.T) {
 	if rec.Dropped() == 0 {
 		t.Skip("writer kept up with the producer; nothing was dropped")
 	}
-	sum, err := telemetry.Load(dir)
+	sum, err := telemetry.LoadProject(dir, "")
 	if err != nil || sum.Dropped != rec.Dropped() {
 		t.Fatalf("persisted dropped %d != recorder %d (err=%v)", sum.Dropped, rec.Dropped(), err)
 	}
@@ -301,7 +301,7 @@ func TestLoadProjectFilters(t *testing.T) {
 	rec.ObserveTool("mem_search", map[string]any{"query": "b"}, `{"project":"beta"}`, false, 0)
 	rec.ObserveTool("mem_save", map[string]any{"content": "x", "project": "Alpha"}, "ok", false, 0)
 	rec.Close()
-	all, _ := telemetry.Load(dir)
+	all, _ := telemetry.LoadProject(dir, "")
 	one, err := telemetry.LoadProject(dir, "alpha")
 	if err != nil || all.Searches != 2 || one.Searches != 1 || one.Saves != 1 || one.ZeroResult != 0 {
 		t.Fatalf("all=%+v one=%+v err=%v", all, one, err)

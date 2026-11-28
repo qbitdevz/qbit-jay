@@ -71,7 +71,7 @@ func TestTelemetryClear(t *testing.T) {
 
 	withArgs(t, "qbit-jay", "telemetry", "clear", "--yes")
 	out, _ = captureOutput(t, func() { cmdTelemetry(cfg) })
-	sum, err := telemetry.Load(cfg.DataDir)
+	sum, err := telemetry.LoadProject(cfg.DataDir, "")
 	if err != nil || sum.Searches != 0 || sum.Saves != 0 {
 		t.Fatalf("--yes must delete every row: %+v err=%v", sum, err)
 	}

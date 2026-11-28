@@ -58,15 +58,12 @@ func ratio(a, b int) float64 {
 	return float64(a) / float64(b)
 }
 
-// Load summarizes the telemetry database of dataDir. A missing file is not an
-// error: it yields an empty summary with Exists=false. Load never creates the
-// file.
-func Load(dataDir string) (Summary, error) { return LoadProject(dataDir, "") }
-
-// LoadProject is Load restricted to the events of one project (matched
-// case-insensitively). Events recorded without a project (for example a save
-// that relied on the server default) are not counted for a filtered view. The
-// dropped/error counters are global and not filtered.
+// LoadProject summarizes the telemetry database of dataDir, restricted to one
+// project when project is non-empty (matched case-insensitively; events
+// recorded without a project, such as a save that relied on the server
+// default, are not counted for a filtered view). The dropped/error counters
+// are global and never filtered. A missing file is not an error: it yields an
+// empty summary with Exists=false. It never creates the file.
 func LoadProject(dataDir, project string) (Summary, error) {
 	path := Path(dataDir)
 	sum := Summary{Path: path, Project: project}
