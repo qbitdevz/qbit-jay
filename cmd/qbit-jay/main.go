@@ -827,6 +827,11 @@ func main() {
 
 	if usesLocalSQLite(os.Args[1:]) {
 		release, err := prepareSQLiteTemp(cfg.DataDir)
+		// First start: bring the Engram database over before the store opens
+		// qbit-jay's. `import --from-engram` does its own, explicit copy.
+		if !(os.Args[1] == "import" && len(os.Args) > 2 && os.Args[2] == "--from-engram") {
+			autoImportFromEngram(cfg.DataDir, os.Stderr)
+		}
 		if err != nil {
 			fatal(err)
 			return
@@ -2304,8 +2309,15 @@ func cmdImport(cfg store.Config) {
 	inFile := os.Args[2]
 	raw, err := os.ReadFile(inFile)
 	if err != nil {
+	if len(os.Args) >= 3 && os.Args[2] == "--from-engram" {
+		if code := runImportFromEngram(os.Args[3:], cfg.DataDir, os.Stdout, os.Stderr); code != 0 {
+			exitFunc(code)
+		}
+		return
+	}
 		fatal(fmt.Errorf("read %s: %w", inFile, err))
 	}
+		fmt.Fprintln(os.Stderr, "       qbit-jay import --from-engram [path] [--force]")
 
 	var data store.ExportData
 	if err := json.Unmarshal(raw, &data); err != nil {

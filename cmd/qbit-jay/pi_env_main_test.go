@@ -17,6 +17,12 @@ func TestMain(m *testing.M) {
 		fmt.Fprintf(os.Stderr, "clear PI_CODING_AGENT: %v\n", err)
 		os.Exit(1)
 	}
+	// Commands that open the store would import the developer's real
+	// ~/.engram database on first start. Tests of that import opt back in.
+	if err := os.Setenv("QBIT_JAY_NO_IMPORT", "1"); err != nil {
+		fmt.Fprintf(os.Stderr, "set QBIT_JAY_NO_IMPORT: %v\n", err)
+		os.Exit(1)
+	}
 	// Test subprocesses must never recover a developer's drive-root database.
 	// Migration dispatch assertions install their own seam.
 	migrateOrphanedDatabase = func(string) {}
