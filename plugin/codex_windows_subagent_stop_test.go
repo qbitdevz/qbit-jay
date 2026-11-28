@@ -289,7 +289,7 @@ func TestCodexWindowsSubagentStopAdapter(t *testing.T) {
 			fixture := newCodexSubagentCaptureFixture(t, root)
 			stdout, stderr, code := runCodexWindowsSubagentStop(t, adapterPath, input, &tc.port)
 			assertCodexSubagentStopHookEnvelope(t, stdout, stderr, code)
-			if strings.Count(stderr, "engram:") != 1 || !strings.Contains(stderr, "invalid ENGRAM_PORT") {
+			if strings.Count(stderr, "qbit-jay:") != 1 || !strings.Contains(stderr, "invalid ENGRAM_PORT") {
 				t.Fatalf("stderr=%q, want one invalid port diagnostic", stderr)
 			}
 			select {

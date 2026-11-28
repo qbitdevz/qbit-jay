@@ -74,14 +74,17 @@ try {
         }
 
         if (-not [string]::IsNullOrEmpty($output)) {
-            $portText = $(if ([Environment]::GetEnvironmentVariable('QBIT_JAY_PORT')) { [Environment]::GetEnvironmentVariable('QBIT_JAY_PORT') } else { [Environment]::GetEnvironmentVariable('ENGRAM_PORT') })
+            if (-not [string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable('QBIT_JAY_PORT'))) {
+                [Environment]::SetEnvironmentVariable('ENGRAM_PORT', [Environment]::GetEnvironmentVariable('QBIT_JAY_PORT'))
+            }
+            $portText = [Environment]::GetEnvironmentVariable('ENGRAM_PORT')
             if ([string]::IsNullOrWhiteSpace($portText)) {
                 $portText = '7437'
             }
 
             $port = 0
             if ($portText -notmatch '^[0-9]+$' -or -not [int]::TryParse($portText, [ref]$port) -or $port -lt 1 -or $port -gt 65535) {
-                Write-HookDiagnostic 'invalid QBIT_JAY_PORT/ENGRAM_PORT; skipping passive capture'
+                Write-HookDiagnostic 'invalid ENGRAM_PORT; skipping passive capture'
             } else {
                 $engramUrl = "http://127.0.0.1:$port"
                 $networkBudgetSec = 7
