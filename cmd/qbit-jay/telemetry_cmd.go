@@ -17,8 +17,14 @@ func newTelemetryRecorder(cfg store.Config) *telemetry.Recorder {
 
 // cmdStatsTelemetry implements `qbit-jay stats --telemetry`. It only reads
 // telemetry.db and never creates it.
-func cmdStatsTelemetry(cfg store.Config) {
-	sum, err := telemetry.Load(cfg.DataDir)
+// With --project it only counts that project's events; --all (the default)
+// counts everything; both together is an error.
+func cmdStatsTelemetry(cfg store.Config, project string, all bool) {
+	if project != "" && all {
+		fatal(fmt.Errorf("stats --telemetry: --project and --all cannot be combined"))
+		return
+	}
+	sum, err := telemetry.LoadProject(cfg.DataDir, project)
 	if err != nil {
 		fatal(fmt.Errorf("read telemetry: %w", err))
 		return

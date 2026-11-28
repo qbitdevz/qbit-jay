@@ -71,16 +71,47 @@ func TestTelemetryClear(t *testing.T) {
 
 	withArgs(t, "qbit-jay", "telemetry", "clear", "--yes")
 	out, _ = captureOutput(t, func() { cmdTelemetry(cfg) })
-	if _, err := os.Stat(telemetry.Path(cfg.DataDir)); !os.IsNotExist(err) {
-		t.Fatalf("--yes must delete the file: %v", err)
+	sum, err := telemetry.Load(cfg.DataDir)
+	if err != nil || sum.Searches != 0 || sum.Saves != 0 {
+		t.Fatalf("--yes must delete every row: %+v err=%v", sum, err)
 	}
 	if !strings.Contains(out, "deleted") {
 		t.Fatalf("expected a confirmation, got:\n%s", out)
 	}
-	// A second clear is a no-op, not an error.
-	out, _ = captureOutput(t, func() { cmdTelemetry(cfg) })
-	if !strings.Contains(out, "nothing to delete") {
-		t.Fatalf("expected nothing-to-delete, got:\n%s", out)
+}
+
+func TestStatsTelemetryProjectFilter(t *testing.T) {
+	cfg := testConfig(t)
+	t.Setenv("QBIT_JAY_TELEMETRY", "")
+	seedTelemetry(t, cfg.DataDir) // searches are project "p"
+
+	withArgs(t, "qbit-jay", "stats", "--telemetry", "--project", "other")
+	out, _ := captureOutput(t, func() { cmdStats(cfg) })
+	if !strings.Contains(out, "Project: other") || !strings.Contains(out, "Searches: 0") {
+		t.Fatalf("filter by another project must show no searches:\n%s", out)
+	}
+	withArgs(t, "qbit-jay", "stats", "--telemetry", "--project", "p")
+	out, _ = captureOutput(t, func() { cmdStats(cfg) })
+	if !strings.Contains(out, "Searches: 2") {
+		t.Fatalf("filter by p:\n%s", out)
+	}
+	withArgs(t, "qbit-jay", "stats", "--telemetry", "--all")
+	out, _ = captureOutput(t, func() { cmdStats(cfg) })
+	if !strings.Contains(out, "Searches: 2") || !strings.Contains(out, "dropped events: 0, write errors: 0") {
+		t.Fatalf("--all:\n%s", out)
+	}
+}
+
+func TestStatsTelemetryProjectAndAllConflict(t *testing.T) {
+	cfg := testConfig(t)
+	var codes []int
+	old := exitFunc
+	t.Cleanup(func() { exitFunc = old })
+	exitFunc = func(code int) { codes = append(codes, code) }
+	withArgs(t, "qbit-jay", "stats", "--telemetry", "--project", "p", "--all")
+	_, errOut := captureOutput(t, func() { cmdStats(cfg) })
+	if len(codes) == 0 || !strings.Contains(errOut, "cannot be combined") {
+		t.Fatalf("expected a clear error, codes=%v stderr=%q", codes, errOut)
 	}
 }
 

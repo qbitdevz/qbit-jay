@@ -41,6 +41,9 @@ type Summary struct {
 	SaveErrors      int
 	SaveLimit       int
 	AvgSaveMS       float64
+	Project         string // non-empty: events were filtered to this project
+	Dropped         int64  // events lost (queue full), all processes, all time
+	WriteErrors     int64
 }
 
 // ZeroRate, ReformulationRate and OpenRate are fractions of searches.
@@ -58,9 +61,15 @@ func ratio(a, b int) float64 {
 // Load summarizes the telemetry database of dataDir. A missing file is not an
 // error: it yields an empty summary with Exists=false. Load never creates the
 // file.
-func Load(dataDir string) (Summary, error) {
+func Load(dataDir string) (Summary, error) { return LoadProject(dataDir, "") }
+
+// LoadProject is Load restricted to the events of one project (matched
+// case-insensitively). Events recorded without a project (for example a save
+// that relied on the server default) are not counted for a filtered view. The
+// dropped/error counters are global and not filtered.
+func LoadProject(dataDir, project string) (Summary, error) {
 	path := Path(dataDir)
-	sum := Summary{Path: path}
+	sum := Summary{Path: path, Project: project}
 	db, err := openDB(path, false)
 	if errors.Is(err, os.ErrNotExist) {
 		return sum, nil
@@ -71,6 +80,11 @@ func Load(dataDir string) (Summary, error) {
 	defer func() { _ = db.Close() }()
 	sum.Exists = true
 
+	where, wargs := "", []any(nil)
+	andKind := ""
+	if project != "" {
+		where, andKind, wargs = " WHERE project = ? COLLATE NOCASE", " AND project = ? COLLATE NOCASE", []any{project}
+	}
 	one := func(dst any, q string, args ...any) error { return db.QueryRow(q, args...).Scan(dst) }
 	if err := db.QueryRow(`SELECT
 		COALESCE(SUM(kind='search'),0), COALESCE(SUM(kind='search' AND results=0 AND error=''),0),
@@ -80,18 +94,18 @@ func Load(dataDir string) (Summary, error) {
 		COALESCE(SUM(kind='injected_read'),0), COALESCE(SUM(kind='injected_update'),0),
 		COALESCE(SUM(kind='save'),0), COALESCE(SUM(kind='save' AND error<>''),0),
 		COALESCE(SUM(kind='save' AND extra='limit'),0)
-		FROM events`).Scan(&sum.Searches, &sum.ZeroResult, &sum.Reformulations, &sum.Opens,
+		FROM events`+where, wargs...).Scan(&sum.Searches, &sum.ZeroResult, &sum.Reformulations, &sum.Opens,
 		&sum.ContextEvents, &sum.InjectedTokens, &sum.InjectedItems, &sum.InjectedRead, &sum.InjectedUpdated,
 		&sum.Saves, &sum.SaveErrors, &sum.SaveLimit); err != nil {
 		return sum, err
 	}
-	if err := one(&sum.AvgSearchMS, `SELECT COALESCE(AVG(latency_ms),0) FROM events WHERE kind='search'`); err != nil {
+	if err := one(&sum.AvgSearchMS, `SELECT COALESCE(AVG(latency_ms),0) FROM events WHERE kind='search'`+andKind, wargs...); err != nil {
 		return sum, err
 	}
-	if err := one(&sum.AvgSaveMS, `SELECT COALESCE(AVG(latency_ms),0) FROM events WHERE kind='save'`); err != nil {
+	if err := one(&sum.AvgSaveMS, `SELECT COALESCE(AVG(latency_ms),0) FROM events WHERE kind='save'`+andKind, wargs...); err != nil {
 		return sum, err
 	}
-	rows, err := db.Query(`SELECT ids, COUNT(*) c FROM events WHERE kind='open' GROUP BY ids ORDER BY c DESC, ids LIMIT 5`)
+	rows, err := db.Query(`SELECT ids, COUNT(*) c FROM events WHERE kind='open'`+andKind+` GROUP BY ids ORDER BY c DESC, ids LIMIT 5`, wargs...)
 	if err != nil {
 		return sum, err
 	}
@@ -106,7 +120,7 @@ func Load(dataDir string) (Summary, error) {
 	if err := rows.Close(); err != nil {
 		return sum, err
 	}
-	rows, err = db.Query(`SELECT session, SUM(tokens), SUM(results) FROM events WHERE kind='context' GROUP BY session ORDER BY MAX(ts) DESC LIMIT 10`)
+	rows, err = db.Query(`SELECT session, SUM(tokens), SUM(results) FROM events WHERE kind='context'`+andKind+` GROUP BY session ORDER BY MAX(ts) DESC LIMIT 10`, wargs...)
 	if err != nil {
 		return sum, err
 	}
@@ -118,13 +132,20 @@ func Load(dataDir string) (Summary, error) {
 		}
 		sum.PerSession = append(sum.PerSession, st)
 	}
-	return sum, rows.Err()
+	if err := rows.Err(); err != nil {
+		return sum, err
+	}
+	_ = db.QueryRow(`SELECT COALESCE((SELECT value FROM meta WHERE key='dropped'),0), COALESCE((SELECT value FROM meta WHERE key='write_errors'),0)`).Scan(&sum.Dropped, &sum.WriteErrors)
+	return sum, nil
 }
 
 // Render writes the human-readable summary.
 func (s Summary) Render(w io.Writer) {
 	pf := func(format string, a ...any) { _, _ = fmt.Fprintf(w, format, a...) }
 	pf("qbit-jay local telemetry (%s)\n", s.Path)
+	if s.Project != "" {
+		pf("Project: %s (events recorded without a project are not counted)\n", s.Project)
+	}
 	if !s.Exists {
 		pf("No telemetry recorded yet.\n")
 		if !Enabled() {
@@ -149,20 +170,54 @@ func (s Summary) Render(w io.Writer) {
 		pf("  session %s: ~%d tokens, %d items\n", st.Session, st.Tokens, st.Items)
 	}
 	pf("Saves: %d (avg %.1f ms), errors: %d, limit rejections: %d\n", s.Saves, s.AvgSaveMS, s.SaveErrors, s.SaveLimit)
+	pf("Telemetry health: dropped events: %d, write errors: %d\n", s.Dropped, s.WriteErrors)
 }
 
-// Clear deletes the telemetry database and returns whether a file was removed.
+// Clear deletes every telemetry row (and the persisted counters) through
+// SQLite and compacts the file, so a running MCP process that holds the file
+// keeps a valid database. Only when the file is not a usable database (nothing
+// can hold it open meaningfully) is it removed instead. It reports whether
+// the telemetry file existed and was cleared.
 func Clear(dataDir string) (bool, error) {
-	removed := false
-	for _, suffix := range []string{"", "-journal", "-wal", "-shm"} {
-		err := os.Remove(Path(dataDir) + suffix)
-		if err == nil {
-			removed = removed || suffix == ""
-			continue
+	path := Path(dataDir)
+	if _, err := os.Stat(path); err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return false, nil
 		}
-		if !errors.Is(err, os.ErrNotExist) {
-			return removed, err
+		return false, err
+	}
+	if err := clearRows(path); err != nil {
+		if isBusy(err) {
+			return false, fmt.Errorf("telemetry file is busy, try again: %w", err)
+		}
+		// Not a usable database: remove it and any leftovers.
+		for _, suffix := range []string{"", "-journal", "-wal", "-shm"} {
+			if rerr := os.Remove(path + suffix); rerr != nil && !errors.Is(rerr, os.ErrNotExist) {
+				return false, rerr
+			}
 		}
 	}
-	return removed, nil
+	return true, nil
+}
+
+func isBusy(err error) bool {
+	m := strings.ToLower(err.Error())
+	return strings.Contains(m, "locked") || strings.Contains(m, "busy")
+}
+
+func clearRows(path string) error {
+	db, err := openDB(path, false)
+	if err != nil {
+		return err
+	}
+	defer func() { _ = db.Close() }()
+	for _, q := range []string{`DELETE FROM injected`, `DELETE FROM events`, `DELETE FROM meta`, `DELETE FROM sqlite_sequence WHERE name='events'`} {
+		if _, err := db.Exec(q); err != nil {
+			return err
+		}
+	}
+	// Compaction is best effort: the rows are already gone, and another
+	// process may briefly hold the file.
+	_, _ = db.Exec(`VACUUM`)
+	return nil
 }

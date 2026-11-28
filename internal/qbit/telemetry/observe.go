@@ -8,11 +8,39 @@ import (
 	"time"
 )
 
+// errorClass reduces a tool error message to a class. Error text can echo user
+// content, so only the class is ever stored.
+func errorClass(text string) string {
+	lower := strings.ToLower(text)
+	switch {
+	case strings.Contains(lower, "timeout"), strings.Contains(lower, "timed out"), strings.Contains(lower, "deadline"):
+		return "timeout"
+	case strings.Contains(lower, "limit"), strings.Contains(lower, "too large"), strings.Contains(lower, "too long"), strings.Contains(lower, "exceed"):
+		return "limit"
+	}
+	return "error"
+}
+
 // loop is the writer goroutine body after the database is open (or failed).
 func (r *Recorder) loop(db *sql.DB, path string) {
 	writes := 0
+	var savedDropped, savedErrs int64
+	persist := func() {
+		if db == nil {
+			return
+		}
+		d, w := r.dropped.Load(), r.errs.Load()
+		if bumpMeta(db, "dropped", d-savedDropped) == nil {
+			savedDropped = d
+		}
+		if bumpMeta(db, "write_errors", w-savedErrs) == nil {
+			savedErrs = w
+		}
+	}
+	defer persist()
 	for e := range r.ch {
 		if e.flush != nil {
+			persist()
 			close(e.flush)
 			continue
 		}
@@ -29,6 +57,7 @@ func (r *Recorder) loop(db *sql.DB, path string) {
 			if err := prune(db, path, r.opts.Now(), r.opts.MaxAge, r.opts.MaxBytes); err != nil {
 				r.errs.Add(1)
 			}
+			persist()
 		}
 	}
 }
@@ -128,7 +157,7 @@ func (r *Recorder) observeSearch(now time.Time, args map[string]any, text string
 	e := event{ts: now, kind: "search", project: project, query: clip(query), mode: mode,
 		results: len(env.Results), ids: strings.Join(ids, ","), latency: latency}
 	if isError {
-		e.errText = clip(text)
+		e.errText = errorClass(text)
 	}
 
 	r.mu.Lock()
@@ -194,6 +223,7 @@ func (r *Recorder) observeRead(now time.Time, args map[string]any, text string, 
 	for title, reason := range r.pending {
 		if strings.Contains(text, title) {
 			out = append(out, event{ts: now, kind: injectedKind, ids: strconv.FormatInt(id, 10), extra: clip(title), mode: reason})
+			delete(r.pending, title) // consumed: one event per injected title
 		}
 	}
 	r.mu.Unlock()
@@ -236,7 +266,7 @@ func parseContext(text string) []injectedItem {
 
 func (r *Recorder) observeContext(now time.Time, args map[string]any, text string, isError bool, latency time.Duration) {
 	if isError {
-		r.enqueue(event{ts: now, kind: "context", latency: latency, errText: clip(text)})
+		r.enqueue(event{ts: now, kind: "context", latency: latency, errText: errorClass(text)})
 		return
 	}
 	items := parseContext(text)
@@ -264,12 +294,10 @@ func (r *Recorder) observeSave(now time.Time, args map[string]any, text string, 
 	e := event{ts: now, kind: "save", bytes: len(content), latency: latency}
 	e.project, _ = args["project"].(string)
 	if isError {
-		e.errText = clip(text)
-		lower := strings.ToLower(text)
-		switch {
-		case strings.Contains(lower, "limit"), strings.Contains(lower, "too large"), strings.Contains(lower, "too long"), strings.Contains(lower, "exceed"):
+		e.errText = errorClass(text)
+		if e.errText == "limit" {
 			e.extra = "limit"
-		default:
+		} else {
 			e.extra = "error"
 		}
 	}

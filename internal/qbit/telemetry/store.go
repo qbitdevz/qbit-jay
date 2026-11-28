@@ -2,9 +2,11 @@ package telemetry
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	_ "modernc.org/sqlite"
@@ -36,6 +38,10 @@ CREATE TABLE IF NOT EXISTS injected (
 	reason   TEXT    NOT NULL DEFAULT ''
 );
 CREATE INDEX IF NOT EXISTS injected_event ON injected(event_id);
+CREATE TABLE IF NOT EXISTS meta (
+	key   TEXT PRIMARY KEY,
+	value INTEGER NOT NULL DEFAULT 0
+);
 `
 
 // FileName is the telemetry database inside the data directory.
@@ -55,7 +61,10 @@ func openDB(path string, create bool) (*sql.DB, error) {
 	if err := os.MkdirAll(filepath.Dir(path), 0o700); err != nil {
 		return nil, err
 	}
-	db, err := sql.Open("sqlite", path+"?_pragma=busy_timeout(250)&_pragma=journal_mode(DELETE)&_pragma=synchronous(OFF)")
+	if err := securePermissions(path); err != nil {
+		return nil, err
+	}
+	db, err := sql.Open("sqlite", path+"?_pragma=busy_timeout(2000)&_pragma=journal_mode(DELETE)&_pragma=synchronous(OFF)")
 	if err != nil {
 		return nil, err
 	}
@@ -65,6 +74,42 @@ func openDB(path string, create bool) (*sql.DB, error) {
 		return nil, err
 	}
 	return db, nil
+}
+
+// securePermissions makes sure the database file exists owner-only before
+// SQLite touches it (SQLite gives its journal the mode of the database file),
+// and strips group/other bits from files left by an earlier run. Windows keeps
+// the default ACLs. A read-only file is never made writable.
+func securePermissions(path string) error {
+	if runtime.GOOS == "windows" {
+		return nil
+	}
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_RDWR, 0o600)
+	if err != nil {
+		if errors.Is(err, os.ErrPermission) { // exists but not writable
+			f = nil
+		} else {
+			return err
+		}
+	}
+	if f != nil {
+		_ = f.Close()
+	}
+	for _, suffix := range []string{"", "-journal", "-wal", "-shm"} {
+		if fi, err := os.Stat(path + suffix); err == nil && fi.Mode().Perm()&0o077 != 0 {
+			_ = os.Chmod(path+suffix, fi.Mode().Perm()&^0o077)
+		}
+	}
+	return nil
+}
+
+// bumpMeta adds delta to a persisted counter.
+func bumpMeta(db *sql.DB, key string, delta int64) error {
+	if delta == 0 {
+		return nil
+	}
+	_, err := db.Exec(`INSERT INTO meta(key, value) VALUES(?, ?) ON CONFLICT(key) DO UPDATE SET value = value + excluded.value`, key, delta)
+	return err
 }
 
 // prune enforces the retention window and the size cap. It is cheap when
@@ -80,13 +125,21 @@ func prune(db *sql.DB, path string, now time.Time, maxAge time.Duration, maxByte
 	if maxBytes <= 0 {
 		return nil
 	}
-	for i := 0; i < 8; i++ {
+	// Loop until under the cap. Each pass drops the oldest quarter (at least
+	// one row), so the loop is bounded by the row count.
+	for {
 		fi, err := os.Stat(path)
 		if err != nil || fi.Size() <= maxBytes {
 			return nil
 		}
-		// Drop the oldest quarter, then give the space back to the file system.
-		if _, err := db.Exec(`DELETE FROM events WHERE id IN (SELECT id FROM events ORDER BY ts, id LIMIT max(1, (SELECT count(*)/4 FROM events)))`); err != nil {
+		var n int64
+		if err := db.QueryRow(`SELECT count(*) FROM events`).Scan(&n); err != nil {
+			return err
+		}
+		if n == 0 {
+			return nil // nothing left to drop; the empty schema is the floor
+		}
+		if _, err := db.Exec(`DELETE FROM events WHERE id IN (SELECT id FROM events ORDER BY ts, id LIMIT max(1, ?/4))`, n); err != nil {
 			return err
 		}
 		if _, err := db.Exec(`DELETE FROM injected WHERE event_id NOT IN (SELECT id FROM events)`); err != nil {
@@ -96,5 +149,4 @@ func prune(db *sql.DB, path string, now time.Time, maxAge time.Duration, maxByte
 			return fmt.Errorf("vacuum: %w", err)
 		}
 	}
-	return nil
 }

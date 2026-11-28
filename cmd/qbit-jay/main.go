@@ -2195,11 +2195,11 @@ func cmdContext(cfg store.Config) {
 func cmdStats(cfg store.Config) {
 	projectName := ""
 	allProjects := false
+	wantTelemetry := false
 	for i := 2; i < len(os.Args); i++ {
 		switch os.Args[i] {
 		case "--telemetry":
-			cmdStatsTelemetry(cfg)
-			return
+			wantTelemetry = true
 		case "--project":
 			value, err := requiredProjectValue(os.Args, i)
 			if err != nil {
@@ -2211,6 +2211,10 @@ func cmdStats(cfg store.Config) {
 		case "--all":
 			allProjects = true
 		}
+	}
+	if wantTelemetry {
+		cmdStatsTelemetry(cfg, projectName, allProjects)
+		return
 	}
 	s, err := storeNew(cfg)
 	if err != nil {
