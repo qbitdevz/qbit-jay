@@ -361,6 +361,7 @@ For parameters and the complete, current tool reference, see [the full documenta
 | **[qbit-jay Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |
 | **[Doctor](docs/DOCTOR.md)** · **[Binary self-testing](docs/SELF-TESTING.md)** | Operational diagnosis and repair workflows, and isolated reliability and performance checks for released binaries |
 | **[Obsidian Brain](docs/beta/obsidian-brain.md)** · **[Upstream beta guide](docs/BETA_TESTING.md)** | Exporting memories as an Obsidian knowledge graph, and Engram's historical beta testing guide (kept as a record) |
+| **[Local telemetry](DOCS.md#local-telemetry)** | What qbit-jay records locally (never sent anywhere), retention, `QBIT_JAY_TELEMETRY=off`, `qbit-jay stats --telemetry` and `qbit-jay telemetry clear` |
 | **[Comparison](docs/COMPARISON.md)** | qbit-jay compared with claude-mem |
 | **[Full Docs](DOCS.md)** · **[Contributing](CONTRIBUTING.md)** | Complete CLI, environment, API, and operational reference, and the contributor workflow |
 
