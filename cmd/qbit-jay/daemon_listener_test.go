@@ -30,7 +30,7 @@ func TestUnmanagedListenerDiagnostics(t *testing.T) {
 							t.Errorf("unexpected probe %s %s", r.Method, r.URL.Path)
 						}
 						probes.Add(1)
-						_, _ = fmt.Fprintf(w, `{"status":"ok","service":%q,"version":"0.1.0"}`, service)
+						_, _ = fmt.Fprintf(w, `{"status":"ok","service":%q,"product":"qbit-jay","version":"0.1.0"}`, service)
 					}))
 					defer server.Close()
 					port := server.Listener.Addr().(*net.TCPAddr).Port
@@ -106,7 +106,7 @@ func TestUnmanagedListenerDiagnostics(t *testing.T) {
 func TestPsOmitsInvalidUnmanagedListenerVersion(t *testing.T) {
 	for _, reported := range []string{"dev", "private\nmetadata", "0.1.0-" + strings.Repeat("a", 64)} {
 		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			_, _ = fmt.Fprintf(w, `{"status":"ok","service":"engram","version":%q}`, reported)
+			_, _ = fmt.Fprintf(w, `{"status":"ok","service":"engram","product":"qbit-jay","version":%q}`, reported)
 		}))
 		t.Setenv("ENGRAM_PORT", strconv.Itoa(server.Listener.Addr().(*net.TCPAddr).Port))
 		err := cmdPs(store.Config{DataDir: t.TempDir()}, nil)

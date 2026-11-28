@@ -163,7 +163,7 @@ func TestHookLocalIdentityReleaseGuidance(t *testing.T) {
 				switch r.URL.Path {
 				case "/health":
 					w.WriteHeader(tc.httpStatus)
-					body := map[string]any{"status": "ok", "service": tc.service, "version": tc.reported}
+					body := map[string]any{"status": "ok", "service": tc.service, "product": "qbit-jay", "version": tc.reported}
 					if tc.identity != "" {
 						body["instance_id"] = tc.identity
 					}

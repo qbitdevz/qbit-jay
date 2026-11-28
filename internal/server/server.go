@@ -28,6 +28,7 @@ import (
 	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
 	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
 	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/product"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -594,6 +595,7 @@ func (s *Server) handleHealth(w http.ResponseWriter, r *http.Request) {
 	body := map[string]any{
 		"status":      "ok",
 		"service":     "engram",
+		"product":     product.ID,
 		"version":     s.version,
 		"instance_id": s.instanceID,
 		"capabilities": map[string]bool{

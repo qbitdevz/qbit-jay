@@ -999,6 +999,13 @@ func serveWith(cfg store.Config, options serveOptions) error {
 	}
 	readyFile, readyToken := env.Get("RUN_READY_FILE"), env.Get("RUN_READY_TOKEN")
 	detachedDaemon := readyFile != "" && readyToken != ""
+	// Engram uses the same default port and health protocol. Say so before
+	// opening the store instead of failing later or serving next to it.
+	if !options.sessionOwned && ownedListener == nil && options.socketPath == "" && options.port > 0 {
+		if err := engramPortError(options.port); err != nil {
+			return err
+		}
+	}
 	var startup *server.LocalStartup
 	var trace *store.StartupTrace
 	if !options.sessionOwned && options.socketPath == "" && options.port > 0 && !detachedDaemon {
