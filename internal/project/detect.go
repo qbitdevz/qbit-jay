@@ -29,10 +29,10 @@ var ErrAmbiguousProject = errors.New("ambiguous project: multiple git repos foun
 
 // ErrInvalidConfig is returned when .engram/config.json exists but cannot be
 // used as a project write lock.
-var ErrInvalidConfig = errors.New("invalid .engram/config.json")
+var ErrInvalidConfig = errors.New("invalid .qbit-jay/config.json")
 
 // ErrExplicitProjectRequired reports a HOME repository descendant needing designation.
-var ErrExplicitProjectRequired = errors.New("explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name")
+var ErrExplicitProjectRequired = errors.New("explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name")
 
 // Source constants describe how the project name was resolved.
 const (

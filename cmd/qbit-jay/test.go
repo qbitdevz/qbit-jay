@@ -94,7 +94,7 @@ func printTestReport(report selftest.Report) {
 	if report.Quick {
 		mode = "quick"
 	}
-	fmt.Printf("Engram self-test (%s suite, %s mode)\n", report.Suite, mode)
+	fmt.Printf("qbit-jay self-test (%s suite, %s mode)\n", report.Suite, mode)
 	for _, scenario := range report.Scenarios {
 		status := "PASS"
 		if !scenario.Passed {

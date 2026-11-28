@@ -14,7 +14,7 @@ import (
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 
-const homeSelectionGuidance = "explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name"
+const homeSelectionGuidance = "explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name"
 
 func mcpHomeSelectionFixture(t *testing.T) (string, string) {
 	t.Helper()

@@ -1156,7 +1156,7 @@ func serveWith(cfg store.Config, options serveOptions) error {
 		}
 	}
 	if terminal != nil {
-		log.Println("[qbit-jay] database generation changed; stopping server; restart Engram")
+		log.Println("[qbit-jay] database generation changed; stopping server; restart qbit-jay")
 	}
 	if terminal != nil {
 		return terminal
@@ -2229,7 +2229,7 @@ func cmdStats(cfg store.Config) {
 		projects = strings.Join(stats.Projects, ", ")
 	}
 
-	fmt.Printf("Engram Memory Stats\n")
+	fmt.Printf("qbit-jay Memory Stats\n")
 	fmt.Printf("  Sessions:     %d\n", stats.TotalSessions)
 	fmt.Printf("  Observations: %d\n", stats.TotalObservations)
 	fmt.Printf("  Prompts:      %d\n", stats.TotalPrompts)
@@ -3905,7 +3905,7 @@ func printSetupUsage() {
 	fmt.Println("                          missing values fall back to full with a warning.")
 	fmt.Println("                          slim currently only takes effect for claude-code,")
 	fmt.Println("                          and only with a clean tagged engram release >= 1.4.0.")
-	fmt.Println("                          Claude Code slim also requires Engram plugin >= 0.1.1;")
+	fmt.Println("                          Claude Code slim also requires qbit-jay plugin >= 0.1.1;")
 	fmt.Println("                          setup warns, but continues, when it cannot verify it.")
 	fmt.Println("  --allow-memory-writes  Claude Code only: explicitly allow the finite memory-write")
 	fmt.Println("                          tool set for both MCP prefixes, without reading stdin.")
@@ -3917,7 +3917,7 @@ func printSetupUsage() {
 	fmt.Println("                          or return to Bash in the managed user plugin.")
 	fmt.Println("  --windows-pretooluse=extended")
 	fmt.Println("                          With --native-windows-prompt=enable, allow 10 seconds")
-	fmt.Println("                          for Claude and 7 seconds for Engram session confirmation.")
+	fmt.Println("                          for Claude and 7 seconds for qbit-jay session confirmation.")
 	fmt.Println("  --help, -h              Show this help and exit.")
 }
 
@@ -3963,7 +3963,7 @@ func warnIfClaudeCodeSlimUnverified(slug, mode string) {
 		return
 	}
 	if err := setupVerifyClaudeCodeSlim(); err != nil {
-		fmt.Fprintf(os.Stderr, "warning: unable to verify the Claude Code Engram plugin supports --protocol=slim (requires plugin 0.1.1+): %v\n", err)
+		fmt.Fprintf(os.Stderr, "warning: unable to verify the Claude Code qbit-jay plugin supports --protocol=slim (requires plugin 0.1.1+): %v\n", err)
 		fmt.Fprintln(os.Stderr, "  Update the plugin through your normal Claude Code plugin update path, then restart Claude Code.")
 		fmt.Fprintln(os.Stderr, "  Session-only plugins loaded with `claude --plugin-dir ...` cannot be detected by this check.")
 	}
@@ -4056,14 +4056,14 @@ func printPostInstallWithMemoryWrites(result *setup.Result, memoryWritesAllowed 
 	case "opencode":
 		fmt.Println("\nNext steps:")
 		if result.MCPConfigured {
-			fmt.Println("  1. Configuration written: the OpenCode plugin and Engram MCP registration.")
+			fmt.Println("  1. Configuration written: the OpenCode plugin and qbit-jay MCP registration.")
 		} else {
-			fmt.Println("  1. Plugin written, but Engram MCP registration needs the manual configuration shown above.")
+			fmt.Println("  1. Plugin written, but qbit-jay MCP registration needs the manual configuration shown above.")
 		}
-		fmt.Println("  2. Restart OpenCode, then run `opencode mcp list` to confirm that OpenCode reports Engram connected.")
-		fmt.Println("  3. Start a new OpenCode agent session and confirm it can use an `engram_mem_*` tool before relying on Engram.")
+		fmt.Println("  2. Restart OpenCode, then run `opencode mcp list` to confirm that OpenCode reports qbit-jay connected.")
+		fmt.Println("  3. Start a new OpenCode agent session and confirm it can use a `qbit-jay_mem_*` tool before relying on qbit-jay.")
 		fmt.Println("     Setup and server connectivity checks cannot verify tool exposure in the active agent session.")
-		fmt.Println("  4. The plugin auto-starts the Engram HTTP server when needed.")
+		fmt.Println("  4. The plugin auto-starts the qbit-jay HTTP server when needed.")
 		if result.TUIPluginEnabled {
 			fmt.Println("\nAlso enabled: opencode-subagent-statusline in tui.json — sub-agent activity in the sidebar/footer.")
 		}
@@ -4073,12 +4073,12 @@ func printPostInstallWithMemoryWrites(result *setup.Result, memoryWritesAllowed 
 		fmt.Println("  2. Verify with: pi list")
 	case "claude-code":
 		if memoryWritesAllowed {
-			fmt.Println("  Claude Code memory-write permissions added for both Engram MCP prefixes.")
+			fmt.Println("  Claude Code memory-write permissions added for both qbit-jay MCP prefixes.")
 			fmt.Println("  These tools bypass permission prompts and the auto-mode classifier; session checks still apply.")
 			fmt.Println("  mem_delete and mem_merge_projects were not added; existing permissions remain unchanged.")
 		} else {
 			// Offer to add engram tools to the permissions allowlist
-			fmt.Printf("\nAdd engram tools to %s allowlist?\n", setup.ClaudeCodeSettingsPath())
+			fmt.Printf("\nAdd qbit-jay tools to %s allowlist?\n", setup.ClaudeCodeSettingsPath())
 			fmt.Print("This prevents Claude Code from asking permission on every tool call.\n")
 			fmt.Print("Add to allowlist? (y/N): ")
 			var answer string
@@ -4090,7 +4090,7 @@ func printPostInstallWithMemoryWrites(result *setup.Result, memoryWritesAllowed 
 					fmt.Fprintf(os.Stderr, "  warning: could not update allowlist: %v\n", err)
 					fmt.Fprintf(os.Stderr, "  You can add them manually to permissions.allow in %s\n", setup.ClaudeCodeSettingsPath())
 				} else {
-					fmt.Println("  ✓ Engram tools added to allowlist")
+					fmt.Println("  ✓ qbit-jay tools added to allowlist")
 				}
 			} else {
 				fmt.Printf("  Skipped. You can add them later to permissions.allow in %s\n", setup.ClaudeCodeSettingsPath())

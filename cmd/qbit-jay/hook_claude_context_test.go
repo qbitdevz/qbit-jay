@@ -129,7 +129,7 @@ func TestClaudeSessionContextConfirmedBinding(t *testing.T) {
 				before := registrations.Load()
 				context := runClaudeSessionContext(t, string(input))
 				encoded, _ := json.Marshal(effective)
-				if !strings.Contains(context, "Confirmed Engram session ID (JSON): "+string(encoded)) {
+				if !strings.Contains(context, "Confirmed qbit-jay session ID (JSON): "+string(encoded)) {
 					t.Fatalf("context does not expose confirmed effective identity: %q", context)
 				}
 				if registrations.Load() != before+1 {
@@ -239,7 +239,7 @@ func TestClaudeSessionContextEscapesIdentityAndSkipsPi(t *testing.T) {
 	}
 	input, _ := json.Marshal(map[string]string{"session_id": id, "cwd": root})
 	output := runClaudeSessionContext(t, string(input))
-	line := strings.Split(strings.Split(output, "Confirmed Engram session ID (JSON): ")[1], "\n")[0]
+	line := strings.Split(strings.Split(output, "Confirmed qbit-jay session ID (JSON): ")[1], "\n")[0]
 	var decoded string
 	if err := json.Unmarshal([]byte(line), &decoded); err != nil || decoded != id {
 		t.Fatalf("identity did not round trip as one JSON string: %q %v", line, err)

@@ -63,7 +63,7 @@ func TestUnmanagedListenerDiagnostics(t *testing.T) {
 						t.Fatal("occupied listener must not be represented as a managed/stopped/startable daemon")
 					}
 					diagnostic := out.String() + err.Error()
-					want := "unmanaged Engram listener"
+					want := "unmanaged qbit-jay listener"
 					if service != "engram" {
 						want = "unknown listener"
 					}
@@ -111,7 +111,7 @@ func TestPsOmitsInvalidUnmanagedListenerVersion(t *testing.T) {
 		t.Setenv("ENGRAM_PORT", strconv.Itoa(server.Listener.Addr().(*net.TCPAddr).Port))
 		err := cmdPs(store.Config{DataDir: t.TempDir()}, nil)
 		server.Close()
-		if err == nil || !strings.Contains(err.Error(), "unmanaged Engram listener") || strings.Contains(err.Error(), "Versions:") {
+		if err == nil || !strings.Contains(err.Error(), "unmanaged qbit-jay listener") || strings.Contains(err.Error(), "Versions:") {
 			t.Errorf("invalid observed release produced a version diagnostic: %v", err)
 		}
 	}

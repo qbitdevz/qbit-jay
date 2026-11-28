@@ -1088,7 +1088,7 @@ func runCloudServe(cfg cloud.Config) error {
 		}
 		return err
 	}
-	fmt.Printf("Starting Engram cloud server on port %d\n", cfg.Port)
+	fmt.Printf("Starting qbit-jay cloud server on port %d\n", cfg.Port)
 	return runtime.Start(startup)
 }
 
