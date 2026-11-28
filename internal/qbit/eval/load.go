@@ -23,6 +23,7 @@ const tsFormat = "2006-01-02 15:04:05"
 // that, and only on databases it created itself.
 type Loaded struct {
 	Dir   string
+	cfg   store.Config
 	Store *store.Store
 	// IDs maps Memory.Index to the observation id the store assigned.
 	IDs []int64
@@ -48,7 +49,36 @@ func Open(dir string) (*Loaded, error) {
 		return nil, fmt.Errorf("open patch connection: %w", err)
 	}
 	raw.SetMaxOpenConns(1)
-	return &Loaded{Dir: dir, Store: s, raw: raw}, nil
+	return &Loaded{Dir: dir, cfg: cfg, Store: s, raw: raw}, nil
+}
+
+// The store's save path looks up the topic_key and the duplicate hash with
+// predicates the SQLite planner answers by scanning every row of the scope
+// (idx_obs_scope) when the database has no statistics, so loading N memories
+// through the store costs O(N^2) (2k rows: 16 s, 8k rows: 97 s). ANALYZE while
+// loading lets the planner use the selective indexes; the statistics are
+// dropped again at the end (dropStats), because a real database has none and
+// search and context must be measured against that.
+func (l *Loaded) analyze() error {
+	_, err := l.raw.Exec("ANALYZE")
+	return err
+}
+
+// dropStats removes the planner statistics and reopens both connections so
+// neither keeps them cached.
+func (l *Loaded) dropStats() error {
+	if _, err := l.raw.Exec("DELETE FROM sqlite_stat1"); err != nil {
+		return err
+	}
+	if err := l.Close(); err != nil {
+		return err
+	}
+	fresh, err := Open(l.Dir)
+	if err != nil {
+		return err
+	}
+	l.Store, l.raw = fresh.Store, fresh.raw
+	return nil
 }
 
 // Close releases both connections.
@@ -101,8 +131,16 @@ func (l *Loaded) LoadFlat(c *Corpus) error {
 			return fmt.Errorf("add %s: %w", m.Key, err)
 		}
 		l.IDs[m.Index] = id
+		if m.Index == 500 || (m.Index > 0 && m.Index%20000 == 0) {
+			if err := l.analyze(); err != nil {
+				return err
+			}
+		}
 	}
-	return l.patchCreated(c)
+	if err := l.patchCreated(c); err != nil {
+		return err
+	}
+	return l.dropStats()
 }
 
 func (l *Loaded) patchCreated(c *Corpus) error {
@@ -172,13 +210,18 @@ func (l *Loaded) Replay(c *Corpus, plans []SessionPlan, before func(SessionPlan)
 		return evs[i].kind < evs[j].kind
 	})
 	l.IDs = make([]int64, len(c.Memories))
-	for _, e := range evs {
+	for i, e := range evs {
+		if i == 500 || (i > 0 && i%10000 == 0) {
+			if err := l.analyze(); err != nil {
+				return err
+			}
+		}
 		p := plans[e.plan]
 		if err := l.apply(c, p, e, before); err != nil {
 			return fmt.Errorf("session %s: %w", p.ID, err)
 		}
 	}
-	return nil
+	return l.dropStats()
 }
 
 func (l *Loaded) apply(c *Corpus, p SessionPlan, e event, before func(SessionPlan) error) error {
