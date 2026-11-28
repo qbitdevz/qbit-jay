@@ -50,7 +50,7 @@ func TestDoctorReportsStaleGenericMCP(t *testing.T) {
 		t.Fatal(err)
 	}
 	missing := filepath.Join(home, "missing-engram")
-	raw, _ := json.Marshal(map[string]any{"mcpServers": map[string]any{"engram": map[string]any{"command": missing, "args": []string{"mcp", "--tools=agent"}}, "other": map[string]any{"command": "other"}}})
+	raw, _ := json.Marshal(map[string]any{"mcpServers": map[string]any{"qbit-jay": map[string]any{"command": missing, "args": []string{"mcp", "--tools=agent"}}, "other": map[string]any{"command": "other"}}})
 	if err := os.WriteFile(path, raw, 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -84,7 +84,7 @@ func TestDoctorMultiClientTextAndJSON(t *testing.T) {
 		if err := os.MkdirAll(filepath.Dir(client.path), 0755); err != nil {
 			t.Fatal(err)
 		}
-		raw, _ := json.Marshal(map[string]any{"mcpServers": map[string]any{"engram": map[string]any{"command": missing, "args": []string{"mcp", "--tools=agent"}}, "other": map[string]any{"command": "other"}}})
+		raw, _ := json.Marshal(map[string]any{"mcpServers": map[string]any{"qbit-jay": map[string]any{"command": missing, "args": []string{"mcp", "--tools=agent"}}, "other": map[string]any{"command": "other"}}})
 		if err := os.WriteFile(client.path, raw, 0644); err != nil {
 			t.Fatal(err)
 		}

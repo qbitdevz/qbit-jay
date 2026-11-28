@@ -107,8 +107,8 @@ still confirms every mutation and corrects or denies a stale binding. This hint
 does not grant permission or authorize retries; necessary rewrites can still be
 denied in auto mode.
 
-**Fallback**: If tools are unexpectedly unavailable, run `engram setup claude-code`
+**Fallback**: If tools are unexpectedly unavailable, run `qbit-jay setup claude-code`
 again and restart Claude Code. Setup repairs a regular durable MCP config and
-the permissions allowlist for both current (`mcp__engram__...`) and older
-plugin-scoped (`mcp__plugin_engram_engram__...`) server ids. If the MCP config
+the permissions allowlist for both current (`mcp__qbit-jay__...`) and older
+plugin-scoped (`mcp__plugin_qbit-jay_qbit-jay__...`) server ids. If the MCP config
 is a symlink or another non-regular path, replace it manually before rerunning setup.

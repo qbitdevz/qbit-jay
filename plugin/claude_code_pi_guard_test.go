@@ -72,7 +72,7 @@ func piGuardHookInput(t *testing.T, payload map[string]any) string {
 
 func buildEngramBinary(t *testing.T) string {
 	t.Helper()
-	name := "engram"
+	name := "qbit-jay"
 	if runtime.GOOS == "windows" {
 		name += ".exe"
 	}
@@ -80,7 +80,7 @@ func buildEngramBinary(t *testing.T) string {
 	cmd := exec.Command("go", "build", "-o", bin, "./cmd/qbit-jay")
 	cmd.Dir = repoRoot(t)
 	if out, err := cmd.CombinedOutput(); err != nil {
-		t.Fatalf("build engram: %v\n%s", err, out)
+		t.Fatalf("build qbit-jay: %v\n%s", err, out)
 	}
 	return bin
 }
@@ -94,7 +94,7 @@ func TestClaudeCodeHooksAreNoOpUnderPi(t *testing.T) {
 		"cwd":        t.TempDir(),
 		"prompt":     "hello from pi",
 		"source":     "startup",
-		"tool_name":  "mcp__engram__mem_save",
+		"tool_name":  "mcp__qbit-jay__mem_save",
 		"tool_input": map[string]string{"title": "x"},
 	})
 
@@ -164,7 +164,7 @@ func TestClaudeCodeHooksAreNoOpUnderPi(t *testing.T) {
 					cmd.Stdin = strings.NewReader(piGuardHookInput(t, map[string]any{
 						"session_id": "pi-guard-session",
 						"cwd":        cwd,
-						"tool_name":  "mcp__engram__mem_save",
+						"tool_name":  "mcp__qbit-jay__mem_save",
 						"tool_input": map[string]string{"title": "x"},
 					}))
 					cmd.Env = []string{"PATH=" + os.Getenv("PATH"), "HOME=" + t.TempDir(), "ENGRAM_URL=" + srv.URL, "ENGRAM_DATA_DIR=" + t.TempDir(), "GIT_CEILING_DIRECTORIES=" + ceiling}
@@ -177,7 +177,7 @@ func TestClaudeCodeHooksAreNoOpUnderPi(t *testing.T) {
 					var stdout, stderr bytes.Buffer
 					cmd.Stdout, cmd.Stderr = &stdout, &stderr
 					if err := cmd.Run(); err != nil {
-						t.Fatalf("engram hook claude-pre-tool-use must exit 0: %v\nstderr: %s", err, stderr.String())
+						t.Fatalf("qbit-jay hook claude-pre-tool-use must exit 0: %v\nstderr: %s", err, stderr.String())
 					}
 					if stderr.Len() != 0 {
 						t.Errorf("stderr = %q, want empty", stderr.String())

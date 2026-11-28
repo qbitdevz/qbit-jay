@@ -81,7 +81,7 @@ func powerShellToolSearchFixture(lines ...string) string {
 func assertExactPowerShellToolSearchNames(t *testing.T, listed map[string]bool) {
 	t.Helper()
 	want := make(map[string]bool, len(powerShellBootstrapTools)*2)
-	for _, prefix := range []string{"mcp__engram__", "mcp__plugin_engram_engram__"} {
+	for _, prefix := range []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__"} {
 		for _, tool := range powerShellBootstrapTools {
 			want[prefix+tool] = true
 		}
@@ -123,7 +123,7 @@ func TestClaudePreToolUseManifestUsesPortableCoreHook(t *testing.T) {
 
 	for _, group := range manifest.Hooks["PreToolUse"] {
 		for _, hook := range group.Hooks {
-			if hook.Command != "engram" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
+			if hook.Command != "qbit-jay" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
 				continue
 			}
 			// This matcher uses only anchors, groups and literal alternatives: Go's
@@ -136,7 +136,7 @@ func TestClaudePreToolUseManifestUsesPortableCoreHook(t *testing.T) {
 				t.Fatalf("invalid PreToolUse matcher %q: %v", group.Matcher, err)
 			}
 			tools := []string{"mem_save", "mem_update", "mem_review", "mem_delete", "mem_save_prompt", "mem_pin", "mem_unpin", "mem_session_summary", "mem_session_start", "mem_session_end", "mem_capture_passive", "mem_merge_projects", "mem_judge", "mem_compare"}
-			for _, prefix := range []string{"mcp__engram__", "mcp__plugin_engram_engram__"} {
+			for _, prefix := range []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__", "mcp__engram__", "mcp__plugin_engram_engram__"} {
 				for _, tool := range tools {
 					if !matcher.MatchString(prefix + tool) {
 						t.Errorf("PreToolUse matcher %q misses %s%s", group.Matcher, prefix, tool)
@@ -153,7 +153,7 @@ func TestClaudePreToolUseManifestUsesPortableCoreHook(t *testing.T) {
 					}
 				}
 			}
-			for _, name := range []string{"mcp__other__mem_save", "mcp__engram_extra__mem_save", "other_mcp__engram__mem_save", "mem_save"} {
+			for _, name := range []string{"mcp__other__mem_save", "mcp__engram_extra__mem_save", "mcp__qbit-jay_extra__mem_save", "other_mcp__qbit-jay__mem_save", "other_mcp__engram__mem_save", "mem_save"} {
 				if matcher.MatchString(name) {
 					t.Errorf("PreToolUse matcher %q accepts unrelated name %q", group.Matcher, name)
 				}
@@ -161,7 +161,7 @@ func TestClaudePreToolUseManifestUsesPortableCoreHook(t *testing.T) {
 			return
 		}
 	}
-	t.Fatal("no exec-form PreToolUse hook invokes engram with hook and claude-pre-tool-use arguments")
+	t.Fatal("no exec-form PreToolUse hook invokes qbit-jay with hook and claude-pre-tool-use arguments")
 }
 
 // Configuration contract only: Claude Code >= 2.1.295 owns enforcement of
@@ -187,7 +187,7 @@ func TestClaudePreToolUseMutatingHooksBlockOnFailure(t *testing.T) {
 	found := 0
 	for groupIndex, group := range manifest.Hooks["PreToolUse"] {
 		for hookIndex, hook := range group.Hooks {
-			if hook.Command != "engram" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
+			if hook.Command != "qbit-jay" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
 				continue
 			}
 			found++
@@ -287,8 +287,8 @@ func TestSessionStartBindSessionHookIsExecForm(t *testing.T) {
 			if group.Matcher != "startup|resume|clear|fork" {
 				t.Errorf("bind hook matcher = %q, want startup|resume|clear|fork", group.Matcher)
 			}
-			if hook.Type != "command" || hook.Command != "engram" || strings.Join(hook.Args, " ") != "hook claude-bind-session" {
-				t.Errorf("bind hook = %+v, want exec form command=engram args=[hook claude-bind-session]", hook)
+			if hook.Type != "command" || hook.Command != "qbit-jay" || strings.Join(hook.Args, " ") != "hook claude-bind-session" {
+				t.Errorf("bind hook = %+v, want exec form command=qbit-jay args=[hook claude-bind-session]", hook)
 			}
 			if hook.Timeout != 5 {
 				t.Errorf("bind hook timeout = %d, want 5", hook.Timeout)

@@ -69,7 +69,7 @@ func TestClaudeSessionLookupFailureDoesNotGuessOwner(t *testing.T) {
 				}))
 				defer endpoint.Close()
 				stubDir := t.TempDir()
-				if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
+				if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
 					t.Fatal(err)
 				}
 				_, stderr := runHookWithStderr(t, script, `{"session_id":"`+host+`","cwd":`+strconv.Quote(t.TempDir())+`}`, map[string]string{"ENGRAM_URL": endpoint.URL, "PATH": stubDir + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME": t.TempDir()})
@@ -130,7 +130,7 @@ func TestClaudeResumeRetainsPersistedProject(t *testing.T) {
 				}))
 				defer endpoint.Close()
 				stubDir := t.TempDir()
-				if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
+				if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
 					t.Fatal(err)
 				}
 				env := map[string]string{"ENGRAM_URL": endpoint.URL, "PATH": stubDir + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME": t.TempDir()}
@@ -182,7 +182,7 @@ func TestClaudeRegistrationFailureIsVisible(t *testing.T) {
 				}))
 				defer endpoint.Close()
 				stubDir := t.TempDir()
-				if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
+				if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte("#!/bin/bash\nexit 0\n"), 0755); err != nil {
 					t.Fatal(err)
 				}
 				out, stderr := runHookWithStderr(t, script, `{"session_id":"private-host-do-not-log","cwd":`+strconv.Quote(t.TempDir())+`}`, map[string]string{"ENGRAM_URL": endpoint.URL, "PATH": stubDir + string(os.PathListSeparator) + os.Getenv("PATH"), "HOME": t.TempDir()})

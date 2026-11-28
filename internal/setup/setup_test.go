@@ -225,20 +225,20 @@ func TestInstallGeminiCLIInjectsMCPConfig(t *testing.T) {
 		t.Fatalf("expected mcpServers object")
 	}
 
-	engram, ok := mcpServers["engram"].(map[string]any)
+	engram, ok := mcpServers["qbit-jay"].(map[string]any)
 	if !ok {
-		t.Fatalf("expected mcpServers.engram object")
+		t.Fatalf("expected mcpServers.qbit-jay object")
 	}
 
 	// Since resolveEngramCommand() uses os.Executable() on all platforms, the
 	// command will be the real test binary path in integration tests (not bare
-	// "engram"). Verify it is a non-empty absolute path.
+	// "qbit-jay"). Verify it is a non-empty absolute path.
 	cmd, ok := engram["command"].(string)
 	if !ok || cmd == "" {
 		t.Fatalf("expected non-empty command string, got %#v", engram["command"])
 	}
-	if cmd == "engram" {
-		t.Fatalf("expected absolute path from os.Executable(), got bare 'engram'")
+	if cmd == "qbit-jay" {
+		t.Fatalf("expected absolute path from os.Executable(), got bare 'qbit-jay'")
 	}
 
 	args, ok := engram["args"].([]any)
@@ -290,7 +290,7 @@ func TestInstallCodexFailsClosedForWindowsRuntimeWhenExecutableCannotResolve(t *
 		err  error
 	}{
 		{name: "executable lookup error", err: errors.New("unavailable")},
-		{name: "bare command fallback", exe: "engram"},
+		{name: "bare command fallback", exe: "qbit-jay"},
 	}
 
 	for _, tt := range tests {
@@ -402,7 +402,7 @@ func TestInstallCodexWindowsWritesOneCanonicalHookMarker(t *testing.T) {
 		duplicateMarker,
 		opaqueTOML,
 		"",
-		"[mcp_servers.engram]",
+		"[mcp_servers.qbit-jay]",
 		`command = "wrong"`,
 		`args = ["wrong"]`,
 		"",
@@ -434,9 +434,9 @@ func TestInstallCodexWindowsWritesOneCanonicalHookMarker(t *testing.T) {
 		if markerCommand != want {
 			t.Fatalf("marker command = %q, want %q", markerCommand, want)
 		}
-		section := strings.SplitN(text, "[mcp_servers.engram]\n", 2)
+		section := strings.SplitN(text, "[mcp_servers.qbit-jay]\n", 2)
 		if len(section) != 2 {
-			t.Fatalf("missing Engram MCP section:\n%s", text)
+			t.Fatalf("missing qbit-jay MCP section:\n%s", text)
 		}
 		var mcpCommand string
 		for _, line := range strings.Split(section[1], "\n") {
@@ -505,7 +505,7 @@ func TestInstallCodexInjectsTOMLAndIsIdempotent(t *testing.T) {
 		"command = \"existing\"",
 		"args = [\"x\"]",
 		"",
-		"[mcp_servers.engram]",
+		"[mcp_servers.qbit-jay]",
 		"command = \"wrong\"",
 		"args = [\"wrong\"]",
 	}, "\n")
@@ -540,20 +540,20 @@ func TestInstallCodexInjectsTOMLAndIsIdempotent(t *testing.T) {
 		if !strings.Contains(text, "[mcp_servers.existing]") {
 			t.Fatalf("expected existing mcp server section to be preserved")
 		}
-		if strings.Count(text, "[mcp_servers.engram]") != 1 {
-			t.Fatalf("expected exactly one engram section, got:\n%s", text)
+		if strings.Count(text, "[mcp_servers.qbit-jay]") != 1 {
+			t.Fatalf("expected exactly one qbit-jay section, got:\n%s", text)
 		}
 		lines := strings.Split(text, "\n")
 		if len(lines) > 0 && strings.HasPrefix(lines[0], windowsHookCommandMarkerPrefix) {
 			t.Fatalf("non-Windows Codex config must not retain a setup-owned first-line marker:\n%s", text)
 		}
 		// resolveEngramCommand() uses os.Executable() on all platforms — command
-		// will be the real absolute path in tests, not bare "engram".
-		if !strings.Contains(text, "command = ") || !strings.Contains(text, "engram") {
-			t.Fatalf("expected engram command in config, got:\n%s", text)
+		// will be the real absolute path in tests, not bare "qbit-jay".
+		if !strings.Contains(text, "command = ") || !strings.Contains(text, "qbit-jay") {
+			t.Fatalf("expected qbit-jay command in config, got:\n%s", text)
 		}
 		if !strings.Contains(text, `args = ["mcp", "--tools=agent"]`) {
-			t.Fatalf("expected engram args in config, got:\n%s", text)
+			t.Fatalf("expected qbit-jay args in config, got:\n%s", text)
 		}
 		if strings.Contains(text, "model_instructions_file") {
 			t.Fatalf("did not expect model_instructions_file (it replaces Codex's built-in prompt), got:\n%s", text)
@@ -747,8 +747,8 @@ func TestInstallCodexPluginCLIAbsent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected config.toml to be written: %v", err)
 	}
-	if !strings.Contains(string(raw), "[mcp_servers.engram]") {
-		t.Fatalf("expected [mcp_servers.engram] in config, got:\n%s", raw)
+	if !strings.Contains(string(raw), "[mcp_servers.qbit-jay]") {
+		t.Fatalf("expected [mcp_servers.qbit-jay] in config, got:\n%s", raw)
 	}
 }
 
@@ -796,11 +796,11 @@ func TestInstallPiInstallsPackagesAndWritesConfig(t *testing.T) {
 	agentDir := t.TempDir()
 	t.Setenv("PI_CODING_AGENT_DIR", agentDir)
 	prefix := t.TempDir()
-	exe := filepath.Join(prefix, "Cellar", "engram", "1.16.1", "bin", "engram")
+	exe := filepath.Join(prefix, "Cellar", "qbit-jay", "1.16.1", "bin", "qbit-jay")
 	if err := os.MkdirAll(filepath.Dir(exe), 0755); err != nil {
 		t.Fatalf("create Cellar executable directory: %v", err)
 	}
-	if err := os.WriteFile(exe, []byte("engram"), 0755); err != nil {
+	if err := os.WriteFile(exe, []byte("qbit-jay"), 0755); err != nil {
 		t.Fatalf("write Cellar executable: %v", err)
 	}
 	if !filepath.IsAbs(exe) {
@@ -1313,8 +1313,8 @@ func TestInstallOpenCodeSuccessAndMCPRegistered(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected mcp object in opencode.json")
 	}
-	if _, ok := mcp["engram"]; !ok {
-		t.Fatalf("expected mcp.engram registration")
+	if _, ok := mcp["qbit-jay"]; !ok {
+		t.Fatalf("expected mcp.qbit-jay registration")
 	}
 
 	tuiRaw, err := os.ReadFile(filepath.Join(xdg, "opencode", "tui.json"))
@@ -1448,7 +1448,7 @@ func TestOpenCodeJSONCCharacterization(t *testing.T) {
 		name, file, section, noop string
 		inject                    func() error
 	}{
-		{"MCP", "opencode.jsonc", "mcp", `{"mcp":{"engram":{"command":["custom"],"enabled":false}}}`, injectOpenCodeMCP},
+		{"MCP", "opencode.jsonc", "mcp", `{"mcp":{"qbit-jay":{"command":["custom"],"enabled":false}}}`, injectOpenCodeMCP},
 		{"TUI", "tui.jsonc", "plugin", `{"plugin":["existing","opencode-subagent-statusline"]}`, injectOpenCodeTUIPlugin},
 	} {
 		t.Run(agent.name, func(t *testing.T) {
@@ -1553,7 +1553,7 @@ func TestOpenCodeJSONCCharacterization(t *testing.T) {
 					case "section":
 						prefix = "parse " + agent.section + " block: "
 					case "entry":
-						prefix = "marshal engram entry: "
+						prefix = "marshal qbit-jay entry: "
 					case "block":
 						prefix = "marshal " + agent.section + " block: "
 					}
@@ -1611,11 +1611,11 @@ func TestOpenCodeJSONCCharacterization(t *testing.T) {
 								t.Fatal(err)
 							}
 							var compact bytes.Buffer
-							if err := json.Compact(&compact, servers["engram"]); err != nil {
+							if err := json.Compact(&compact, servers["qbit-jay"]); err != nil {
 								t.Fatal(err)
 							}
-							if compact.String() != `{"command":["engram","mcp","--tools=agent"],"enabled":true,"type":"local"}` || resolutions != 1 {
-								t.Fatalf("builder payload/resolution changed: %s calls=%d", servers["engram"], resolutions)
+							if compact.String() != `{"command":["qbit-jay","mcp","--tools=agent"],"enabled":true,"type":"local"}` || resolutions != 1 {
+								t.Fatalf("builder payload/resolution changed: %s calls=%d", servers["qbit-jay"], resolutions)
 							}
 						}
 					}
@@ -1663,12 +1663,12 @@ func TestInjectOpenCodeMCPPreservesExistingAndIsIdempotent(t *testing.T) {
 	if _, ok := mcp["other"]; !ok {
 		t.Fatalf("expected existing mcp entry to be preserved")
 	}
-	engram, ok := mcp["engram"].(map[string]any)
+	engram, ok := mcp["qbit-jay"].(map[string]any)
 	if !ok {
-		t.Fatalf("expected engram object")
+		t.Fatalf("expected qbit-jay object")
 	}
 	if engram["enabled"] != true {
-		t.Fatalf("expected engram.enabled=true")
+		t.Fatalf("expected qbit-jay.enabled=true")
 	}
 }
 
@@ -1823,7 +1823,7 @@ func TestInjectOpenCodeMCPConfigErrors(t *testing.T) {
 		}
 	})
 
-	t.Run("marshal engram entry error", func(t *testing.T) {
+	t.Run("marshal qbit-jay entry error", func(t *testing.T) {
 		resetSetupSeams(t)
 		home := useTestHome(t)
 		runtimeGOOS = "linux"
@@ -1835,8 +1835,8 @@ func TestInjectOpenCodeMCPConfigErrors(t *testing.T) {
 		}
 
 		err := injectOpenCodeMCP()
-		if err == nil || !strings.Contains(err.Error(), "marshal engram entry") {
-			t.Fatalf("expected marshal engram entry error, got %v", err)
+		if err == nil || !strings.Contains(err.Error(), "marshal qbit-jay entry") {
+			t.Fatalf("expected marshal qbit-jay entry error, got %v", err)
 		}
 	})
 
@@ -1966,7 +1966,7 @@ func TestInstallClaudeCodeBranches(t *testing.T) {
 				}
 				return []byte("already added"), errors.New("exit 1")
 			}
-			if strings.Join(args, " ") != "plugin install engram" {
+			if strings.Join(args, " ") != "plugin install qbit-jay" {
 				t.Fatalf("unexpected second command args: %q", strings.Join(args, " "))
 			}
 			return []byte("installed"), nil
@@ -2032,7 +2032,7 @@ func TestInstallClaudeCodeBranches(t *testing.T) {
 			if err != nil || result == nil || !result.MCPConfigured {
 				t.Fatalf("expected configured success, got %#v, %v", result, err)
 			}
-			want := []string{"plugin marketplace add " + claudeCodeMarketplace, "plugin install engram", "plugin marketplace update engram", "plugin update engram@engram --scope user"}
+			want := []string{"plugin marketplace add " + claudeCodeMarketplace, "plugin install qbit-jay", "plugin marketplace update qbit-jay", "plugin update qbit-jay@qbit-jay --scope user"}
 			if !reflect.DeepEqual(commands, want) || mcpCalls != 1 {
 				t.Fatalf("commands=%v MCP calls=%d, want %v and 1", commands, mcpCalls, want)
 			}
@@ -2067,7 +2067,7 @@ func TestInstallClaudeCodeBranches(t *testing.T) {
 			if result != nil || err == nil || err.Error() != wantError {
 				t.Fatalf("result=%#v error=%v, want nil and %q", result, err, wantError)
 			}
-			want := []string{"plugin marketplace add " + claudeCodeMarketplace, "plugin install engram", "plugin marketplace update engram", "plugin update engram@engram --scope user"}
+			want := []string{"plugin marketplace add " + claudeCodeMarketplace, "plugin install qbit-jay", "plugin marketplace update qbit-jay", "plugin update qbit-jay@qbit-jay --scope user"}
 			if !reflect.DeepEqual(commands, want[:failAt]) {
 				t.Fatalf("commands=%v, want %v", commands, want[:failAt])
 			}
@@ -2096,8 +2096,8 @@ func TestInstallClaudeCodeBranches(t *testing.T) {
 }
 
 func TestVerifyClaudeCodeSlimCapability(t *testing.T) {
-	verified := `{"plugins":[{"name":"engram","version":"0.1.1","enabled":true,"marketplace":"engram"}]}`
-	current := `[{"name":"engram@engram","version":"0.1.2","enabled":true,"marketplace":"Gentleman-Programming/engram"}]`
+	verified := `{"plugins":[{"name":"qbit-jay","version":"0.1.1","enabled":true,"marketplace":"qbit-jay"}]}`
+	current := `[{"name":"qbit-jay@qbit-jay","version":"0.1.2","enabled":true,"marketplace":"qbitdevz/qbit-jay"}]`
 
 	tests := []struct {
 		name    string
@@ -2107,19 +2107,19 @@ func TestVerifyClaudeCodeSlimCapability(t *testing.T) {
 	}{
 		{name: "supported floor", output: verified},
 		{name: "supported current array", output: current},
-		{name: "old version", output: `{"plugins":[{"name":"engram","version":"0.1.0","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
+		{name: "old version", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.0","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
 		{name: "command failure", runErr: errors.New("unknown flag: --json"), wantErr: true},
 		{name: "malformed JSON", output: `{`, wantErr: true},
 		{name: "missing plugin", output: `{"plugins":[]}`, wantErr: true},
-		{name: "unrelated plugin name", output: `{"plugins":[{"name":"other","version":"0.1.2","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "wrong marketplace", output: `{"plugins":[{"name":"engram","version":"0.1.2","enabled":true,"marketplace":"other"}]}`, wantErr: true},
-		{name: "disabled plugin", output: `{"plugins":[{"name":"engram","version":"0.1.2","enabled":false,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "missing enabled", output: `{"plugins":[{"name":"engram","version":"0.1.2","marketplace":"engram"}]}`, wantErr: true},
-		{name: "ambiguous plugins", output: `{"plugins":[{"name":"engram","version":"0.1.2","enabled":true,"marketplace":"engram"},{"name":"engram","version":"0.1.2","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "invalid version", output: `{"plugins":[{"name":"engram","version":"current","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "floor prerelease", output: `{"plugins":[{"name":"engram","version":"0.1.1-beta.1","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "malformed suffix", output: `{"plugins":[{"name":"engram","version":"0.1.1+","enabled":true,"marketplace":"engram"}]}`, wantErr: true},
-		{name: "missing marketplace", output: `{"plugins":[{"name":"engram","version":"0.1.2","enabled":true}]}`, wantErr: true},
+		{name: "unrelated plugin name", output: `{"plugins":[{"name":"other","version":"0.1.2","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "wrong marketplace", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.2","enabled":true,"marketplace":"other"}]}`, wantErr: true},
+		{name: "disabled plugin", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.2","enabled":false,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "missing enabled", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.2","marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "ambiguous plugins", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.2","enabled":true,"marketplace":"qbit-jay"},{"name":"qbit-jay","version":"0.1.2","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "invalid version", output: `{"plugins":[{"name":"qbit-jay","version":"current","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "floor prerelease", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.1-beta.1","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "malformed suffix", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.1+","enabled":true,"marketplace":"qbit-jay"}]}`, wantErr: true},
+		{name: "missing marketplace", output: `{"plugins":[{"name":"qbit-jay","version":"0.1.2","enabled":true}]}`, wantErr: true},
 	}
 
 	for _, tt := range tests {
@@ -2201,46 +2201,46 @@ func TestResolveEngramCommand(t *testing.T) {
 	t.Run("unix returns absolute path from os.Executable", func(t *testing.T) {
 		resetSetupSeams(t)
 		runtimeGOOS = "linux"
-		osExecutable = func() (string, error) { return "/usr/local/bin/engram", nil }
+		osExecutable = func() (string, error) { return "/usr/local/bin/qbit-jay", nil }
 
 		got := resolveEngramCommand()
 		// EvalSymlinks on a non-existent path returns an error, so the result
 		// is the raw os.Executable() value.
-		if got == "engram" {
-			t.Fatalf("expected absolute path on unix, got bare 'engram'")
+		if got == "qbit-jay" {
+			t.Fatalf("expected absolute path on unix, got bare 'qbit-jay'")
 		}
-		if !strings.Contains(got, "engram") {
-			t.Fatalf("expected engram in path, got %q", got)
+		if !strings.Contains(got, "qbit-jay") {
+			t.Fatalf("expected qbit-jay in path, got %q", got)
 		}
 	})
 
 	t.Run("darwin returns absolute path from os.Executable", func(t *testing.T) {
 		resetSetupSeams(t)
 		runtimeGOOS = "darwin"
-		osExecutable = func() (string, error) { return "/opt/homebrew/bin/engram", nil }
+		osExecutable = func() (string, error) { return "/opt/homebrew/bin/qbit-jay", nil }
 
 		got := resolveEngramCommand()
-		if got == "engram" {
-			t.Fatalf("expected absolute path on darwin, got bare 'engram'")
+		if got == "qbit-jay" {
+			t.Fatalf("expected absolute path on darwin, got bare 'qbit-jay'")
 		}
-		if !strings.Contains(got, "engram") {
-			t.Fatalf("expected engram in path, got %q", got)
+		if !strings.Contains(got, "qbit-jay") {
+			t.Fatalf("expected qbit-jay in path, got %q", got)
 		}
 	})
 
 	t.Run("windows returns absolute path", func(t *testing.T) {
 		resetSetupSeams(t)
 		runtimeGOOS = "windows"
-		osExecutable = func() (string, error) { return `C:\Users\user\bin\engram.exe`, nil }
+		osExecutable = func() (string, error) { return `C:\Users\user\bin\qbit-jay.exe`, nil }
 
 		got := resolveEngramCommand()
 		// EvalSymlinks may change the path on real OS but in tests it should
-		// either equal the input or the resolved form — either way not bare "engram"
-		if got == "engram" {
-			t.Fatalf("expected absolute path on windows, got bare 'engram'")
+		// either equal the input or the resolved form — either way not bare "qbit-jay"
+		if got == "qbit-jay" {
+			t.Fatalf("expected absolute path on windows, got bare 'qbit-jay'")
 		}
-		if !strings.Contains(got, "engram") {
-			t.Fatalf("expected engram in path, got %q", got)
+		if !strings.Contains(got, "qbit-jay") {
+			t.Fatalf("expected qbit-jay in path, got %q", got)
 		}
 	})
 
@@ -2251,8 +2251,8 @@ func TestResolveEngramCommand(t *testing.T) {
 				runtimeGOOS = goos
 				osExecutable = func() (string, error) { return "", errors.New("no executable") }
 
-				if got := resolveEngramCommand(); got != "engram" {
-					t.Fatalf("expected fallback to bare 'engram', got %q", got)
+				if got := resolveEngramCommand(); got != "qbit-jay" {
+					t.Fatalf("expected fallback to bare 'qbit-jay', got %q", got)
 				}
 			})
 		}
@@ -2261,12 +2261,12 @@ func TestResolveEngramCommand(t *testing.T) {
 
 // TestResolveEngramCommandHomebrewCellar guards against baking a versioned
 // Homebrew/Linuxbrew Cellar path into MCP client configs. Such paths (e.g.
-// .../Cellar/engram/1.16.1/bin/engram) are removed on `brew upgrade`, leaving
+// .../Cellar/qbit-jay/1.16.1/bin/qbit-jay) are removed on `brew upgrade`, leaving
 // OpenCode/Codex with a stale command that fails to spawn (ENOENT). The command
-// must resolve to the stable <brew-prefix>/bin/engram symlink when present. When
+// must resolve to the stable <brew-prefix>/bin/qbit-jay symlink when present. When
 // that launcher is absent but os.Executable() supplied an absolute executable,
 // resolveEngramCommand preserves that original path to avoid a PATH-dependent
-// command. canonicalEngramCommand retains its bare "engram" fallback; the shared
+// command. canonicalEngramCommand retains its bare "qbit-jay" fallback; the shared
 // resolver applies the absolute-path preservation policy.
 func TestResolveEngramCommandHomebrewCellar(t *testing.T) {
 	cases := []struct {
@@ -2277,27 +2277,27 @@ func TestResolveEngramCommandHomebrewCellar(t *testing.T) {
 	}{
 		{
 			name:         "linuxbrew cellar maps to stable bin symlink",
-			exe:          "/home/linuxbrew/.linuxbrew/Cellar/engram/1.16.1/bin/engram",
-			stableOnDisk: "/home/linuxbrew/.linuxbrew/bin/engram",
-			want:         "/home/linuxbrew/.linuxbrew/bin/engram",
+			exe:          "/home/linuxbrew/.linuxbrew/Cellar/qbit-jay/1.16.1/bin/qbit-jay",
+			stableOnDisk: "/home/linuxbrew/.linuxbrew/bin/qbit-jay",
+			want:         "/home/linuxbrew/.linuxbrew/bin/qbit-jay",
 		},
 		{
 			name:         "macos arm cellar maps to stable bin symlink",
-			exe:          "/opt/homebrew/Cellar/engram/1.16.1/bin/engram",
-			stableOnDisk: "/opt/homebrew/bin/engram",
-			want:         "/opt/homebrew/bin/engram",
+			exe:          "/opt/homebrew/Cellar/qbit-jay/1.16.1/bin/qbit-jay",
+			stableOnDisk: "/opt/homebrew/bin/qbit-jay",
+			want:         "/opt/homebrew/bin/qbit-jay",
 		},
 		{
 			name:         "macos intel cellar maps to stable bin symlink",
-			exe:          "/usr/local/Cellar/engram/1.16.1/bin/engram",
-			stableOnDisk: "/usr/local/bin/engram",
-			want:         "/usr/local/bin/engram",
+			exe:          "/usr/local/Cellar/qbit-jay/1.16.1/bin/qbit-jay",
+			stableOnDisk: "/usr/local/bin/qbit-jay",
+			want:         "/usr/local/bin/qbit-jay",
 		},
 		{
 			name:         "non-cellar absolute path is preserved",
-			exe:          "/opt/engram/bin/engram",
+			exe:          "/opt/qbit-jay/bin/qbit-jay",
 			stableOnDisk: "",
-			want:         "/opt/engram/bin/engram",
+			want:         "/opt/qbit-jay/bin/qbit-jay",
 		},
 	}
 
@@ -2325,11 +2325,11 @@ func TestResolveEngramCommandHomebrewCellar(t *testing.T) {
 		resetSetupSeams(t)
 
 		prefix := t.TempDir()
-		exe := filepath.Join(prefix, "Cellar", "engram", "1.16.1", "bin", "engram")
+		exe := filepath.Join(prefix, "Cellar", "qbit-jay", "1.16.1", "bin", "qbit-jay")
 		if err := os.MkdirAll(filepath.Dir(exe), 0755); err != nil {
 			t.Fatalf("create Cellar executable directory: %v", err)
 		}
-		if err := os.WriteFile(exe, []byte("engram"), 0755); err != nil {
+		if err := os.WriteFile(exe, []byte("qbit-jay"), 0755); err != nil {
 			t.Fatalf("write Cellar executable: %v", err)
 		}
 		if !filepath.IsAbs(exe) {
@@ -2344,14 +2344,14 @@ func TestResolveEngramCommandHomebrewCellar(t *testing.T) {
 }
 
 // TestResolveEngramCommandMiseInstall guards against baking a versioned mise
-// install path (<mise-data-dir>/installs/engram/<version>/engram) into MCP
+// install path (<mise-data-dir>/installs/qbit-jay/<version>/qbit-jay) into MCP
 // client configs. `mise up` plus `mise prune` removes superseded version
 // directories, leaving a stale command that fails to spawn (ENOENT). The
-// command must resolve to the stable <mise-data-dir>/shims/engram shim when
+// command must resolve to the stable <mise-data-dir>/shims/qbit-jay shim when
 // present. When that launcher is absent but os.Executable() supplied an
 // absolute executable, resolveEngramCommand preserves that original path to
 // avoid a PATH-dependent command; canonicalEngramCommand retains its bare
-// "engram" fallback, asserted in TestCanonicalEngramCommand.
+// "qbit-jay" fallback, asserted in TestCanonicalEngramCommand.
 func TestResolveEngramCommandMiseInstall(t *testing.T) {
 	t.Setenv("MISE_SHIMS_DIR", "")
 	cases := []struct {
@@ -2362,27 +2362,27 @@ func TestResolveEngramCommandMiseInstall(t *testing.T) {
 	}{
 		{
 			name:       "default mise data dir maps to stable shim",
-			exe:        "/home/u/.local/share/mise/installs/engram/2.1.0/engram",
-			shimOnDisk: "/home/u/.local/share/mise/shims/engram",
-			want:       "/home/u/.local/share/mise/shims/engram",
+			exe:        "/home/u/.local/share/mise/installs/qbit-jay/2.1.0/qbit-jay",
+			shimOnDisk: "/home/u/.local/share/mise/shims/qbit-jay",
+			want:       "/home/u/.local/share/mise/shims/qbit-jay",
 		},
 		{
 			name:       "custom mise data dir maps to stable shim",
-			exe:        "/opt/mise-data/installs/engram/2.1.0/engram",
-			shimOnDisk: "/opt/mise-data/shims/engram",
-			want:       "/opt/mise-data/shims/engram",
+			exe:        "/opt/mise-data/installs/qbit-jay/2.1.0/qbit-jay",
+			shimOnDisk: "/opt/mise-data/shims/qbit-jay",
+			want:       "/opt/mise-data/shims/qbit-jay",
 		},
 		{
 			name:       "legacy home mise dir maps to stable shim",
-			exe:        "/home/u/.mise/installs/engram/2.1.0/engram",
-			shimOnDisk: "/home/u/.mise/shims/engram",
-			want:       "/home/u/.mise/shims/engram",
+			exe:        "/home/u/.mise/installs/qbit-jay/2.1.0/qbit-jay",
+			shimOnDisk: "/home/u/.mise/shims/qbit-jay",
+			want:       "/home/u/.mise/shims/qbit-jay",
 		},
 		{
 			name:       "non-mise absolute path is preserved",
-			exe:        "/opt/engram/bin/engram",
+			exe:        "/opt/qbit-jay/bin/qbit-jay",
 			shimOnDisk: "",
-			want:       "/opt/engram/bin/engram",
+			want:       "/opt/qbit-jay/bin/qbit-jay",
 		},
 	}
 
@@ -2425,9 +2425,9 @@ func TestResolveEngramCommandMiseInstall(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				resetSetupSeams(t)
 				root := t.TempDir()
-				exe := filepath.Join(root, "installs", "engram", "2.1.0", "engram")
+				exe := filepath.Join(root, "installs", "qbit-jay", "2.1.0", "qbit-jay")
 				custom := filepath.Join(t.TempDir(), "shims")
-				fallback := filepath.Join(root, "shims", "engram")
+				fallback := filepath.Join(root, "shims", "qbit-jay")
 				if tc.override {
 					t.Setenv("MISE_SHIMS_DIR", filepath.Join(t.TempDir(), "override"))
 				}
@@ -2444,17 +2444,17 @@ func TestResolveEngramCommandMiseInstall(t *testing.T) {
 					return []byte(tc.output), tc.err
 				}
 				statFn = func(name string) (os.FileInfo, error) {
-					if name == fallback || name == filepath.Join(custom, "engram") || name == filepath.Join(os.Getenv("MISE_SHIMS_DIR"), "engram") {
+					if name == fallback || name == filepath.Join(custom, "qbit-jay") || name == filepath.Join(os.Getenv("MISE_SHIMS_DIR"), "qbit-jay") {
 						return nil, nil
 					}
 					return nil, os.ErrNotExist
 				}
 				want := fallback
 				if tc.wantCustom {
-					want = filepath.Join(custom, "engram")
+					want = filepath.Join(custom, "qbit-jay")
 				}
 				if tc.override {
-					want = filepath.Join(os.Getenv("MISE_SHIMS_DIR"), "engram")
+					want = filepath.Join(os.Getenv("MISE_SHIMS_DIR"), "qbit-jay")
 					runCommand = func(string, ...string) ([]byte, error) {
 						t.Fatal("environment must bypass mise query")
 						return nil, nil
@@ -2470,8 +2470,8 @@ func TestResolveEngramCommandMiseInstall(t *testing.T) {
 	t.Run("absolute override selects relocated shim", func(t *testing.T) {
 		resetSetupSeams(t)
 		root := t.TempDir()
-		exe := filepath.Join(root, "installs", "engram", "2.1.0", "engram")
-		shim := filepath.Join(t.TempDir(), "engram")
+		exe := filepath.Join(root, "installs", "qbit-jay", "2.1.0", "qbit-jay")
+		shim := filepath.Join(t.TempDir(), "qbit-jay")
 		t.Setenv("MISE_SHIMS_DIR", filepath.Dir(shim))
 		osExecutable = func() (string, error) { return exe, nil }
 		statFn = func(name string) (os.FileInfo, error) {
@@ -2489,11 +2489,11 @@ func TestResolveEngramCommandMiseInstall(t *testing.T) {
 		resetSetupSeams(t)
 
 		prefix := t.TempDir()
-		exe := filepath.Join(prefix, "installs", "engram", "2.1.0", "engram")
+		exe := filepath.Join(prefix, "installs", "qbit-jay", "2.1.0", "qbit-jay")
 		if err := os.MkdirAll(filepath.Dir(exe), 0755); err != nil {
 			t.Fatalf("create mise install directory: %v", err)
 		}
-		if err := os.WriteFile(exe, []byte("engram"), 0755); err != nil {
+		if err := os.WriteFile(exe, []byte("qbit-jay"), 0755); err != nil {
 			t.Fatalf("write mise install executable: %v", err)
 		}
 		osExecutable = func() (string, error) { return exe, nil }
@@ -2517,8 +2517,8 @@ func TestCanonicalEngramCommand(t *testing.T) {
 		}
 		resetSetupSeams(t)
 		root := filepath.Join(t.TempDir(), "mise")
-		exe := filepath.Join(root, "installs", "engram", "2.1.0", "engram.exe")
-		shim := filepath.Join(root, "shims", "engram.exe")
+		exe := filepath.Join(root, "installs", "qbit-jay", "2.1.0", "qbit-jay.exe")
+		shim := filepath.Join(root, "shims", "qbit-jay.exe")
 		statFn = func(name string) (os.FileInfo, error) {
 			if name == shim {
 				return nil, nil
@@ -2534,7 +2534,7 @@ func TestCanonicalEngramCommand(t *testing.T) {
 		}
 		override := filepath.Join(t.TempDir(), "relocated")
 		t.Setenv("MISE_SHIMS_DIR", override)
-		custom := filepath.Join(override, "engram.exe")
+		custom := filepath.Join(override, "qbit-jay.exe")
 		statFn = func(name string) (os.FileInfo, error) {
 			if name == custom {
 				return nil, nil
@@ -2554,45 +2554,45 @@ func TestCanonicalEngramCommand(t *testing.T) {
 	}{
 		{
 			name:         "linuxbrew cellar maps to stable bin symlink",
-			exe:          "/home/linuxbrew/.linuxbrew/Cellar/engram/1.20.0/bin/engram",
-			stableOnDisk: "/home/linuxbrew/.linuxbrew/bin/engram",
-			want:         "/home/linuxbrew/.linuxbrew/bin/engram",
+			exe:          "/home/linuxbrew/.linuxbrew/Cellar/qbit-jay/1.20.0/bin/qbit-jay",
+			stableOnDisk: "/home/linuxbrew/.linuxbrew/bin/qbit-jay",
+			want:         "/home/linuxbrew/.linuxbrew/bin/qbit-jay",
 		},
 		{
 			name:         "macos arm cellar maps to stable bin symlink",
-			exe:          "/opt/homebrew/Cellar/engram/1.20.0/bin/engram",
-			stableOnDisk: "/opt/homebrew/bin/engram",
-			want:         "/opt/homebrew/bin/engram",
+			exe:          "/opt/homebrew/Cellar/qbit-jay/1.20.0/bin/qbit-jay",
+			stableOnDisk: "/opt/homebrew/bin/qbit-jay",
+			want:         "/opt/homebrew/bin/qbit-jay",
 		},
 		{
 			name:         "mise install maps to stable shim",
-			exe:          "/home/u/.local/share/mise/installs/engram/2.1.0/engram",
-			stableOnDisk: "/home/u/.local/share/mise/shims/engram",
-			want:         "/home/u/.local/share/mise/shims/engram",
+			exe:          "/home/u/.local/share/mise/installs/qbit-jay/2.1.0/qbit-jay",
+			stableOnDisk: "/home/u/.local/share/mise/shims/qbit-jay",
+			want:         "/home/u/.local/share/mise/shims/qbit-jay",
 		},
 		{
 			name:         "custom mise data dir maps to stable shim",
-			exe:          "/opt/mise-data/installs/engram/2.1.0/engram",
-			stableOnDisk: "/opt/mise-data/shims/engram",
-			want:         "/opt/mise-data/shims/engram",
+			exe:          "/opt/mise-data/installs/qbit-jay/2.1.0/qbit-jay",
+			stableOnDisk: "/opt/mise-data/shims/qbit-jay",
+			want:         "/opt/mise-data/shims/qbit-jay",
 		},
 		{
 			name:         "mise install with missing shim falls back to bare name",
-			exe:          "/home/u/.local/share/mise/installs/engram/2.1.0/engram",
+			exe:          "/home/u/.local/share/mise/installs/qbit-jay/2.1.0/qbit-jay",
 			stableOnDisk: "",
-			want:         "engram",
+			want:         "qbit-jay",
 		},
 		{
 			name:         "cellar with missing stable symlink falls back to bare name",
-			exe:          "/opt/homebrew/Cellar/engram/1.20.0/bin/engram",
+			exe:          "/opt/homebrew/Cellar/qbit-jay/1.20.0/bin/qbit-jay",
 			stableOnDisk: "",
-			want:         "engram",
+			want:         "qbit-jay",
 		},
 		{
 			name:         "non-cellar absolute path is preserved",
-			exe:          "/opt/engram/bin/engram",
+			exe:          "/opt/qbit-jay/bin/qbit-jay",
 			stableOnDisk: "",
-			want:         "/opt/engram/bin/engram",
+			want:         "/opt/qbit-jay/bin/qbit-jay",
 		},
 	}
 
@@ -2719,9 +2719,9 @@ func TestGeminiInjectUsesAbsolutePath(t *testing.T) {
 		goos string
 		exe  string
 	}{
-		{"windows", `C:\Users\user\bin\engram.exe`},
-		{"linux", "/usr/local/bin/engram"},
-		{"darwin", "/opt/homebrew/bin/engram"},
+		{"windows", `C:\Users\user\bin\qbit-jay.exe`},
+		{"linux", "/usr/local/bin/qbit-jay"},
+		{"darwin", "/opt/homebrew/bin/qbit-jay"},
 	} {
 		t.Run(tc.goos+" uses absolute path", func(t *testing.T) {
 			resetSetupSeams(t)
@@ -2742,18 +2742,18 @@ func TestGeminiInjectUsesAbsolutePath(t *testing.T) {
 				t.Fatalf("parse config: %v", err)
 			}
 			mcpServers := cfg["mcpServers"].(map[string]any)
-			engram := mcpServers["engram"].(map[string]any)
-			cmd := engram["command"].(string)
-			if cmd == "engram" {
-				t.Fatalf("expected absolute path on %s, got bare 'engram'", tc.goos)
+			server := mcpServers["qbit-jay"].(map[string]any)
+			cmd := server["command"].(string)
+			if cmd == "qbit-jay" {
+				t.Fatalf("expected absolute path on %s, got bare 'qbit-jay'", tc.goos)
 			}
-			if !strings.Contains(cmd, "engram") {
-				t.Fatalf("expected engram in command path, got %q", cmd)
+			if !strings.Contains(cmd, "qbit-jay") {
+				t.Fatalf("expected qbit-jay in command path, got %q", cmd)
 			}
 		})
 	}
 
-	t.Run("fallback to bare engram when os.Executable fails", func(t *testing.T) {
+	t.Run("fallback to bare qbit-jay when os.Executable fails", func(t *testing.T) {
 		resetSetupSeams(t)
 		runtimeGOOS = "linux"
 		osExecutable = func() (string, error) { return "", errors.New("no executable") }
@@ -2772,9 +2772,9 @@ func TestGeminiInjectUsesAbsolutePath(t *testing.T) {
 			t.Fatalf("parse config: %v", err)
 		}
 		mcpServers := cfg["mcpServers"].(map[string]any)
-		engram := mcpServers["engram"].(map[string]any)
-		if got := engram["command"]; got != "engram" {
-			t.Fatalf("expected bare 'engram' fallback, got %#v", got)
+		server := mcpServers["qbit-jay"].(map[string]any)
+		if got := server["command"]; got != "qbit-jay" {
+			t.Fatalf("expected bare 'qbit-jay' fallback, got %#v", got)
 		}
 	})
 }
@@ -2787,9 +2787,9 @@ func TestCodexBlockUsesAbsolutePath(t *testing.T) {
 		exe  string
 		want string
 	}{
-		{"windows", `C:\Users\user\bin\engram.exe`, `C:\Users\user\bin\engram.exe`},
-		{"linux", "/usr/local/bin/engram", "/usr/local/bin/engram"},
-		{"darwin", "/opt/homebrew/bin/engram", "/opt/homebrew/bin/engram"},
+		{"windows", `C:\Users\user\bin\qbit-jay.exe`, `C:\Users\user\bin\qbit-jay.exe`},
+		{"linux", "/usr/local/bin/qbit-jay", "/usr/local/bin/qbit-jay"},
+		{"darwin", "/opt/homebrew/bin/qbit-jay", "/opt/homebrew/bin/qbit-jay"},
 	} {
 		t.Run(tc.goos+" uses absolute path in codex block", func(t *testing.T) {
 			resetSetupSeams(t)
@@ -2801,19 +2801,19 @@ func TestCodexBlockUsesAbsolutePath(t *testing.T) {
 				t.Fatalf("resolve Codex command: %v", err)
 			}
 			block := codexEngramBlockStr(command)
-			if !strings.Contains(block, "[mcp_servers.engram]") {
-				t.Fatalf("expected mcp_servers.engram header, got:\n%s", block)
+			if !strings.Contains(block, "[mcp_servers.qbit-jay]") {
+				t.Fatalf("expected mcp_servers.qbit-jay header, got:\n%s", block)
 			}
 			if !strings.Contains(block, `args = ["mcp", "--tools=agent"]`) {
 				t.Fatalf("expected args in codex block, got:\n%s", block)
 			}
 			if block == codexEngramBlock {
-				t.Fatalf("expected absolute path, got bare-engram fallback block:\n%s", block)
+				t.Fatalf("expected absolute path, got bare-qbit-jay fallback block:\n%s", block)
 			}
 		})
 	}
 
-	t.Run("falls back to bare engram when os.Executable fails", func(t *testing.T) {
+	t.Run("falls back to bare qbit-jay when os.Executable fails", func(t *testing.T) {
 		resetSetupSeams(t)
 		runtimeGOOS = "linux"
 		osExecutable = func() (string, error) { return "", errors.New("no executable") }
@@ -2823,8 +2823,8 @@ func TestCodexBlockUsesAbsolutePath(t *testing.T) {
 			t.Fatalf("resolve non-Windows Codex fallback: %v", err)
 		}
 		block := codexEngramBlockStr(command)
-		if !strings.Contains(block, `command = "engram"`) {
-			t.Fatalf("expected bare engram fallback in codex block, got:\n%s", block)
+		if !strings.Contains(block, `command = "qbit-jay"`) {
+			t.Fatalf("expected bare qbit-jay fallback in codex block, got:\n%s", block)
 		}
 	})
 }
@@ -3024,7 +3024,7 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 	t.Run("injectGeminiMCP creates file from missing config", func(t *testing.T) {
 		resetSetupSeams(t)
 		// Force a known absolute path so the test is deterministic.
-		osExecutable = func() (string, error) { return "/usr/local/bin/engram", nil }
+		osExecutable = func() (string, error) { return "/usr/local/bin/qbit-jay", nil }
 		configPath := filepath.Join(t.TempDir(), "settings.json")
 
 		if err := injectGeminiMCP(configPath); err != nil {
@@ -3045,14 +3045,14 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 		if !ok {
 			t.Fatalf("expected mcpServers object")
 		}
-		engram, ok := mcpServers["engram"].(map[string]any)
+		engram, ok := mcpServers["qbit-jay"].(map[string]any)
 		if !ok {
-			t.Fatalf("expected engram server object")
+			t.Fatalf("expected qbit-jay server object")
 		}
 		// resolveEngramCommand() now returns absolute path on all platforms.
 		cmd, ok := engram["command"].(string)
-		if !ok || !strings.Contains(cmd, "engram") {
-			t.Fatalf("expected command containing 'engram', got %#v", engram["command"])
+		if !ok || !strings.Contains(cmd, "qbit-jay") {
+			t.Fatalf("expected command containing 'qbit-jay', got %#v", engram["command"])
 		}
 	})
 
@@ -3064,8 +3064,8 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 		}
 
 		err := injectGeminiMCP(configPath)
-		if err == nil || !strings.Contains(err.Error(), "marshal engram entry") {
-			t.Fatalf("expected marshal engram entry error, got %v", err)
+		if err == nil || !strings.Contains(err.Error(), "marshal qbit-jay entry") {
+			t.Fatalf("expected marshal qbit-jay entry error, got %v", err)
 		}
 	})
 
@@ -3309,7 +3309,7 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 
 	t.Run("upsertCodexEngramBlock replaces section before another section", func(t *testing.T) {
 		input := strings.Join([]string{
-			"[mcp_servers.engram]",
+			"[mcp_servers.qbit-jay]",
 			"command = \"wrong\"",
 			"args = [\"wrong\"]",
 			"",
@@ -3317,12 +3317,12 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 			"command = \"other\"",
 		}, "\n")
 
-		output, err := upsertCodexEngramBlock(input, "/usr/local/bin/engram")
+		output, err := upsertCodexEngramBlock(input, "/usr/local/bin/qbit-jay")
 		if err != nil {
 			t.Fatal(err)
 		}
-		if strings.Count(output, "[mcp_servers.engram]") != 1 {
-			t.Fatalf("expected one engram block, got:\n%s", output)
+		if strings.Count(output, "[mcp_servers.qbit-jay]") != 1 {
+			t.Fatalf("expected one qbit-jay block, got:\n%s", output)
 		}
 		if !strings.Contains(output, "[mcp_servers.other]") {
 			t.Fatalf("expected other section preserved, got:\n%s", output)
@@ -3331,7 +3331,7 @@ func TestGeminiAndCodexHelpersErrorPaths(t *testing.T) {
 
 	t.Run("upsertCodexEngramBlock from empty content", func(t *testing.T) {
 		resetSetupSeams(t)
-		output, err := upsertCodexEngramBlock("\n\n", "engram")
+		output, err := upsertCodexEngramBlock("\n\n", "qbit-jay")
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -3515,20 +3515,20 @@ func TestClaudeCodePermissionTools(t *testing.T) {
 	})
 
 	want := []string{
-		"mcp__engram__mem_current_project",
-		"mcp__engram__mem_search",
-		"mcp__plugin_engram_engram__mem_current_project",
-		"mcp__plugin_engram_engram__mem_search",
+		"mcp__qbit-jay__mem_current_project",
+		"mcp__qbit-jay__mem_search",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_current_project",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_search",
 	}
 	if !reflect.DeepEqual(tools, want) {
 		t.Fatalf("unexpected permissions:\nwant %#v\n got %#v", want, tools)
 	}
 
 	for _, tool := range []string{
-		"mcp__engram__mem_current_project",
-		"mcp__engram__mem_judge",
-		"mcp__plugin_engram_engram__mem_current_project",
-		"mcp__plugin_engram_engram__mem_judge",
+		"mcp__qbit-jay__mem_current_project",
+		"mcp__qbit-jay__mem_judge",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_current_project",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_judge",
 	} {
 		if !slices.Contains(claudeCodeMCPTools, tool) {
 			t.Fatalf("claudeCodeMCPTools missing current agent permission %q", tool)
@@ -3542,10 +3542,10 @@ func TestClaudeCodeMemorySkillDoesNotHardcodePluginScopedToolSearch(t *testing.T
 		t.Fatalf("read memory skill: %v", err)
 	}
 	text := string(data)
-	if strings.Contains(text, "select:mcp__plugin_engram_engram__") {
+	if strings.Contains(text, "select:mcp__plugin_qbit-jay_qbit-jay__") {
 		t.Fatalf("memory skill must not hardcode plugin-scoped ToolSearch names")
 	}
-	if !strings.Contains(text, "engram setup claude-code") {
+	if !strings.Contains(text, "qbit-jay setup claude-code") {
 		t.Fatalf("memory skill fallback should direct users to repair Claude Code setup")
 	}
 }
@@ -4368,7 +4368,7 @@ func TestClaudeCodeUserPromptHookIncludesPowerShellFallback(t *testing.T) {
 	for _, want := range []string{
 		"[Console]::In.ReadToEnd()",
 		"ConvertFrom-Json",
-		"mcp__engram__mem_context",
+		"mcp__qbit-jay__mem_context",
 		"Write-EmptyHookResponse",
 	} {
 		if !strings.Contains(text, want) {
@@ -4398,7 +4398,7 @@ func TestClaudePreToolUseHookUsesWindowsPortableCommand(t *testing.T) {
 
 	for _, entry := range cfg.Hooks["PreToolUse"] {
 		for _, hook := range entry.Hooks {
-			if hook.Command != "engram" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
+			if hook.Command != "qbit-jay" || !slices.Equal(hook.Args, []string{"hook", "claude-pre-tool-use"}) {
 				continue
 			}
 			// Current manifest uses only JS-compatible literal alternatives and groups.
@@ -4409,7 +4409,7 @@ func TestClaudePreToolUseHookUsesWindowsPortableCommand(t *testing.T) {
 			if err != nil {
 				t.Fatalf("invalid PreToolUse matcher %q: %v", entry.Matcher, err)
 			}
-			for _, prefix := range []string{"mcp__engram__", "mcp__plugin_engram_engram__"} {
+			for _, prefix := range []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__", "mcp__engram__", "mcp__plugin_engram_engram__"} {
 				if !matcher.MatchString(prefix+"mem_session_end") || !matcher.MatchString(prefix+"mem_save") {
 					t.Errorf("PreToolUse matcher %q misses representative writes for %s", entry.Matcher, prefix)
 				}
@@ -4975,8 +4975,8 @@ func TestInjectOpenCodeMCPHandlesJSONC(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected mcp object in result")
 	}
-	if _, ok := mcp["engram"]; !ok {
-		t.Fatalf("expected engram to be registered")
+	if _, ok := mcp["qbit-jay"]; !ok {
+		t.Fatalf("expected qbit-jay to be registered")
 	}
 	if _, ok := mcp["other"]; !ok {
 		t.Fatalf("expected existing 'other' entry to be preserved")
@@ -5042,9 +5042,9 @@ func TestInjectOpenCodeMCPUsesResolvedCommand(t *testing.T) {
 		goos string
 		exe  string
 	}{
-		{"windows", `C:\Users\user\bin\engram.exe`},
-		{"linux", "/usr/local/bin/engram"},
-		{"darwin", "/opt/homebrew/bin/engram"},
+		{"windows", `C:\Users\user\bin\qbit-jay.exe`},
+		{"linux", "/usr/local/bin/qbit-jay"},
+		{"darwin", "/opt/homebrew/bin/qbit-jay"},
 	} {
 		t.Run(tc.goos+" writes absolute path in command array", func(t *testing.T) {
 			resetSetupSeams(t)
@@ -5071,17 +5071,17 @@ func TestInjectOpenCodeMCPUsesResolvedCommand(t *testing.T) {
 				t.Fatalf("parse config: %v", err)
 			}
 			mcp := cfg["mcp"].(map[string]any)
-			engram := mcp["engram"].(map[string]any)
+			engram := mcp["qbit-jay"].(map[string]any)
 			cmd := engram["command"].([]any)
 			if len(cmd) == 0 {
 				t.Fatalf("expected non-empty command array")
 			}
 			first := cmd[0].(string)
-			if first == "engram" {
-				t.Fatalf("expected absolute path on %s, got bare 'engram'", tc.goos)
+			if first == "qbit-jay" {
+				t.Fatalf("expected absolute path on %s, got bare 'qbit-jay'", tc.goos)
 			}
-			if !strings.Contains(first, "engram") {
-				t.Fatalf("expected engram in command path, got %q", first)
+			if !strings.Contains(first, "qbit-jay") {
+				t.Fatalf("expected qbit-jay in command path, got %q", first)
 			}
 			// Remaining args should be the MCP flags
 			if len(cmd) != 3 || cmd[1] != "mcp" || cmd[2] != "--tools=agent" {
@@ -5090,7 +5090,7 @@ func TestInjectOpenCodeMCPUsesResolvedCommand(t *testing.T) {
 		})
 	}
 
-	t.Run("executable error falls back to bare engram on all platforms", func(t *testing.T) {
+	t.Run("executable error falls back to bare qbit-jay on all platforms", func(t *testing.T) {
 		for _, goos := range []string{"linux", "darwin", "windows"} {
 			t.Run(goos, func(t *testing.T) {
 				resetSetupSeams(t)
@@ -5117,13 +5117,13 @@ func TestInjectOpenCodeMCPUsesResolvedCommand(t *testing.T) {
 					t.Fatalf("parse config: %v", err)
 				}
 				mcp := cfg["mcp"].(map[string]any)
-				engram := mcp["engram"].(map[string]any)
-				cmd := engram["command"].([]any)
+				server := mcp["qbit-jay"].(map[string]any)
+				cmd := server["command"].([]any)
 				if len(cmd) == 0 {
 					t.Fatalf("expected non-empty command array")
 				}
-				if got := cmd[0].(string); got != "engram" {
-					t.Fatalf("expected fallback to bare 'engram' when os.Executable fails, got %q", got)
+				if got := cmd[0].(string); got != "qbit-jay" {
+					t.Fatalf("expected fallback to bare 'qbit-jay' when os.Executable fails, got %q", got)
 				}
 			})
 		}
@@ -5340,7 +5340,7 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 		}
 		content := string(raw)
 
-		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram"`) {
+		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"`) {
 			t.Fatalf("must preserve the normalized bare fallback when os.Executable fails, got:\n%s", content)
 		}
 		if strings.Contains(content, `Bun.which`) {
@@ -5368,7 +5368,7 @@ func TestEnsureClaudeCodeUserMCPUsesClaudeManagedUserConfig(t *testing.T) {
 	var calls [][]string
 	runCommand = func(name string, args ...string) ([]byte, error) {
 		calls = append(calls, append([]string{name}, args...))
-		if err := os.WriteFile(path, []byte(fmt.Sprintf(`{"mcpServers":{"engram":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)), 0644); err != nil {
+		if err := os.WriteFile(path, []byte(fmt.Sprintf(`{"mcpServers":{"qbit-jay":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)), 0644); err != nil {
 			t.Fatalf("simulate Claude config write: %v", err)
 		}
 		return nil, nil
@@ -5376,7 +5376,7 @@ func TestEnsureClaudeCodeUserMCPUsesClaudeManagedUserConfig(t *testing.T) {
 	if err := EnsureClaudeCodeUserMCP(); err != nil {
 		t.Fatalf("ensure absent registration: %v", err)
 	}
-	want := [][]string{{claude, "mcp", "add", "--transport", "stdio", "--scope", "user", "engram", "--", command, "mcp", "--tools=agent"}}
+	want := [][]string{{claude, "mcp", "add", "--transport", "stdio", "--scope", "user", "qbit-jay", "--", command, "mcp", "--tools=agent"}}
 	if !reflect.DeepEqual(calls, want) {
 		t.Fatalf("commands = %#v, want %#v (Claude must own the config write)", calls, want)
 	}
@@ -5389,7 +5389,7 @@ func TestEnsureClaudeCodeUserMCPConflictAndRecovery(t *testing.T) {
 	command := filepath.Join(t.TempDir(), "engram")
 	claude := filepath.Join(t.TempDir(), "claude")
 	config := func(command string) string {
-		return fmt.Sprintf(`{"mcpServers":{"engram":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)
+		return fmt.Sprintf(`{"mcpServers":{"qbit-jay":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)
 	}
 	prepare := func(t *testing.T, contents string) (string, *[][]string) {
 		t.Helper()
@@ -5448,7 +5448,7 @@ func TestEnsureClaudeCodeUserMCPConflictAndRecovery(t *testing.T) {
 			if tc.name == "relative command" {
 				entryCommand = "engram"
 			}
-			contents := fmt.Sprintf(`{"mcpServers":{"engram":{%s%s}}}`, tc.typeJSON, fmt.Sprintf(entry, entryCommand))
+			contents := fmt.Sprintf(`{"mcpServers":{"qbit-jay":{%s%s}}}`, tc.typeJSON, fmt.Sprintf(entry, entryCommand))
 			path, calls := prepare(t, contents)
 			err := EnsureClaudeCodeUserMCP()
 			wantError := "conflict"
@@ -5490,8 +5490,8 @@ func TestEnsureClaudeCodeUserMCPConflictAndRecovery(t *testing.T) {
 			t.Fatalf("error = %v", err)
 		}
 		want := [][]string{
-			{claude, "mcp", "add", "--transport", "stdio", "--scope", "user", "engram", "--", command, "mcp", "--tools=agent"},
-			{claude, "mcp", "remove", "engram", "--scope", "user"},
+			{claude, "mcp", "add", "--transport", "stdio", "--scope", "user", "qbit-jay", "--", command, "mcp", "--tools=agent"},
+			{claude, "mcp", "remove", "qbit-jay", "--scope", "user"},
 		}
 		if !reflect.DeepEqual(*calls, want) {
 			t.Fatalf("commands=%#v want=%#v", *calls, want)
@@ -5565,7 +5565,7 @@ func TestClaudeCodeUserMCPPathUsesClaudeJSONLocations(t *testing.T) {
 		t.Setenv("CLAUDE_CONFIG_DIR", override)
 		command := filepath.Join(t.TempDir(), "engram")
 		osExecutable = func() (string, error) { return command, nil }
-		if err := os.WriteFile(ClaudeCodeUserMCPPath(), []byte(fmt.Sprintf(`{"mcpServers":{"engram":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)), 0644); err != nil {
+		if err := os.WriteFile(ClaudeCodeUserMCPPath(), []byte(fmt.Sprintf(`{"mcpServers":{"qbit-jay":{"type":"stdio","command":%q,"args":["mcp","--tools=agent"]}}}`, command)), 0644); err != nil {
 			t.Fatalf("write overridden Claude config: %v", err)
 		}
 		lookPathFn = func(string) (string, error) {

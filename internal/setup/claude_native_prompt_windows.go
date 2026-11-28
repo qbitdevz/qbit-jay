@@ -15,8 +15,8 @@ import (
 	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
-const managedClaudePlugin = "engram@engram"
-const managedClaudeDirectory = ".engram-managed-plugin"
+const managedClaudePlugin = "qbit-jay@qbit-jay"
+const managedClaudeDirectory = ".qbit-jay-managed-plugin"
 
 type claudeMarketplace struct {
 	Name   string `json:"name"`
@@ -89,7 +89,7 @@ func setClaudeWindowsNativePrompt(enable, extendedGuard bool) error {
 		return nil
 	}
 	if !owned && market.Name != "" && (market.Source != "github" || !strings.EqualFold(market.Repo, claudeCodeMarketplace)) {
-		return errors.New("the engram marketplace uses a different source; keep the existing configuration")
+		return errors.New("the qbit-jay marketplace uses a different source; keep the existing configuration")
 	}
 	if !owned && market.Name == "" && installed.ID != "" {
 		return errors.New("the installed Engram plugin has no recognized marketplace")
@@ -164,7 +164,7 @@ func setClaudeWindowsNativePrompt(enable, extendedGuard bool) error {
 	if err := selected.publish(root); err != nil {
 		return err
 	}
-	if err := managedClaudeCommand(claude, "marketplace", "update", "engram"); err != nil {
+	if err := managedClaudeCommand(claude, "marketplace", "update", "qbit-jay"); err != nil {
 		return fmt.Errorf("managed prompt selection published; rerun the same setup command to reconcile Claude metadata: %w", err)
 	}
 	if err := managedClaudeCommand(claude, "update", managedClaudePlugin, "--scope", "user"); err != nil {
@@ -231,10 +231,10 @@ func readManagedClaudeMarketplace(claude string, run claudeSetupRunner) (claudeM
 	}
 	var market claudeMarketplace
 	for _, row := range rows {
-		if !strings.EqualFold(row.Name, "engram") {
+		if !strings.EqualFold(row.Name, "qbit-jay") {
 			continue
 		}
-		if market.Name != "" || row.Name != "engram" {
+		if market.Name != "" || row.Name != "qbit-jay" {
 			return claudeMarketplace{}, errors.New("ambiguous Claude Engram marketplace")
 		}
 		market = row
@@ -254,11 +254,11 @@ func managedClaudeInventory(claude string) (claudeMarketplace, claudeInstalledPl
 	}
 	for _, row := range rows {
 		name, _, _ := strings.Cut(row.ID, "@")
-		if !strings.EqualFold(name, "engram") {
+		if !strings.EqualFold(name, "qbit-jay") {
 			continue
 		}
 		if row.ID != managedClaudePlugin || row.Scope != "user" || !row.Enabled || installed.ID != "" {
-			return market, installed, errors.New("managed prompt setup requires a single enabled user-scope engram@engram")
+			return market, installed, errors.New("managed prompt setup requires a single enabled user-scope qbit-jay@qbit-jay")
 		}
 		installed = row
 	}

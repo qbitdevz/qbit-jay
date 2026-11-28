@@ -49,7 +49,7 @@ func TestClaudeMemoryWritePermissionOptIn(t *testing.T) {
 	}
 	// Independent expected list: no wildcard, destructive tool or future profile expansion.
 	want := []string{"Read"}
-	for _, prefix := range []string{"mcp__engram__", "mcp__plugin_engram_engram__"} {
+	for _, prefix := range []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__"} {
 		for _, tool := range []string{"mem_save", "mem_update", "mem_review", "mem_save_prompt", "mem_pin", "mem_unpin", "mem_session_summary", "mem_session_start", "mem_session_end", "mem_capture_passive", "mem_judge", "mem_compare"} {
 			want = append(want, prefix+tool)
 		}

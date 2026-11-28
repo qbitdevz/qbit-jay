@@ -75,7 +75,7 @@ type agentAdapter struct {
 	postInstall  []string      // "next steps" lines shown after install (nil = handled specially)
 }
 
-// displayDir returns the path shown to the user in `engram setup --help`.
+// displayDir returns the path shown to the user in `qbit-jay setup --help`.
 func (a agentAdapter) displayDir() string {
 	switch {
 	case a.installDir != nil:
@@ -116,7 +116,7 @@ func mcpTopKey(format mcpFormat) string {
 	}
 }
 
-// mcpEntry builds the engram server entry in the shape the given format expects,
+// mcpEntry builds the qbit-jay server entry in the shape the given format expects,
 // always resolving the absolute binary path so headless/Windows subprocesses
 // don't depend on PATH.
 func mcpEntry(format mcpFormat) any {
@@ -149,9 +149,9 @@ func mcpEntry(format mcpFormat) any {
 	}
 }
 
-// injectMCP registers the engram MCP server in the JSON config at path using the
+// injectMCP registers the qbit-jay MCP server in the JSON config at path using the
 // given format, preserving any other servers and top-level keys. Idempotent:
-// re-running updates the engram entry in place. Parent dirs are created as needed.
+// re-running updates the qbit-jay entry in place. Parent dirs are created as needed.
 func injectMCP(path string, format mcpFormat) error {
 	config, err := readJSONConfig(path)
 	if err != nil {
@@ -173,9 +173,9 @@ func injectMCP(path string, format mcpFormat) error {
 
 	entryJSON, err := jsonMarshalFn(mcpEntry(format))
 	if err != nil {
-		return fmt.Errorf("marshal engram entry: %w", err)
+		return fmt.Errorf("marshal qbit-jay entry: %w", err)
 	}
-	servers["engram"] = json.RawMessage(entryJSON)
+	servers[mcpServerName] = json.RawMessage(entryJSON)
 
 	blockJSON, err := jsonMarshalFn(servers)
 	if err != nil {
@@ -240,7 +240,7 @@ func StaleMCPCommands() ([]StaleMCPCommand, error) {
 			keys = append(keys, "transport", "enabled")
 		}
 		var fields map[string]json.RawMessage
-		if err := json.Unmarshal(servers["engram"], &fields); err != nil || len(fields) != len(keys) {
+		if err := json.Unmarshal(servers[mcpServerName], &fields); err != nil || len(fields) != len(keys) {
 			continue
 		}
 		matches := true
@@ -260,7 +260,7 @@ func StaleMCPCommands() ([]StaleMCPCommand, error) {
 			Transport string          `json:"transport"`
 			Enabled   *bool           `json:"enabled"`
 		}
-		if err := json.Unmarshal(servers["engram"], &entry); err != nil {
+		if err := json.Unmarshal(servers[mcpServerName], &entry); err != nil {
 			continue
 		}
 		var command string

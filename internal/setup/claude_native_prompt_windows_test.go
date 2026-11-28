@@ -17,7 +17,7 @@ import (
 func TestClaudeOrdinaryOwnershipProbeFallback(t *testing.T) {
 	const probe = "plugin marketplace list --json"
 	const add = "plugin marketplace add " + claudeCodeMarketplace
-	const install = "plugin install engram"
+	const install = "plugin install qbit-jay"
 	for _, tc := range []struct {
 		name        string
 		owned       bool
@@ -63,7 +63,7 @@ func TestClaudeOrdinaryOwnershipProbeFallback(t *testing.T) {
 				legacy = append(legacy, invocation)
 				if invocation == probe {
 					if tc.owned {
-						return json.Marshal([]claudeMarketplace{{Name: "engram", Source: "directory", Path: root}})
+						return json.Marshal([]claudeMarketplace{{Name: "qbit-jay", Source: "directory", Path: root}})
 					}
 					return []byte("[]"), nil
 				}
@@ -98,7 +98,7 @@ func TestManagedClaudePromptBundlePreservesAssets(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	pin := filepath.Join(root, "pinned core", "engram.exe")
+	pin := filepath.Join(root, "pinned core", "qbit-jay.exe")
 	native, err := files.stage(root, pin)
 	if err != nil {
 		t.Fatal(err)
@@ -310,10 +310,10 @@ func TestManagedClaudePromptDisableWithoutDependenciesOrOverrideAdmission(t *tes
 	runCommand = func(_ string, args ...string) ([]byte, error) {
 		switch strings.Join(args, " ") {
 		case "plugin marketplace list --json":
-			return json.Marshal([]claudeMarketplace{{Name: "engram", Source: "directory", Path: root}})
+			return json.Marshal([]claudeMarketplace{{Name: "qbit-jay", Source: "directory", Path: root}})
 		case "plugin list --json":
 			return json.Marshal([]claudeInstalledPlugin{{ID: managedClaudePlugin, Scope: "user", Enabled: true, Version: bash.version, ReadFromFolder: bash.folder}})
-		case "plugin marketplace update engram", "plugin update engram@engram --scope user":
+		case "plugin marketplace update qbit-jay", "plugin update qbit-jay@qbit-jay --scope user":
 			return nil, nil
 		default:
 			t.Fatalf("unexpected Claude operation %v", args)

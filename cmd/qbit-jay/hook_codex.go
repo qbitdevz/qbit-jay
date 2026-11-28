@@ -28,7 +28,7 @@ const codexUserPromptDeadline = 1500 * time.Millisecond
 // (up to 3s), and process startup and output.
 const codexCompactionResolveDeadline = 3 * time.Second
 
-const codexToolSearchMessage = "CRITICAL FIRST ACTION — Execute this ToolSearch NOW before responding to the user:\nselect:mcp__engram__mem_save,mcp__engram__mem_search,mcp__engram__mem_context,mcp__engram__mem_session_summary,mcp__engram__mem_session_start,mcp__engram__mem_session_end,mcp__engram__mem_get_observation,mcp__engram__mem_suggest_topic_key,mcp__engram__mem_capture_passive,mcp__engram__mem_save_prompt,mcp__engram__mem_update,mcp__engram__mem_current_project,mcp__engram__mem_judge\n\nAfter loading tools, call mem_context to check for prior session history before responding."
+const codexToolSearchMessage = "CRITICAL FIRST ACTION — Execute this ToolSearch NOW before responding to the user:\nselect:mcp__qbit-jay__mem_save,mcp__qbit-jay__mem_search,mcp__qbit-jay__mem_context,mcp__qbit-jay__mem_session_summary,mcp__qbit-jay__mem_session_start,mcp__qbit-jay__mem_session_end,mcp__qbit-jay__mem_get_observation,mcp__qbit-jay__mem_suggest_topic_key,mcp__qbit-jay__mem_capture_passive,mcp__qbit-jay__mem_save_prompt,mcp__qbit-jay__mem_update,mcp__qbit-jay__mem_current_project,mcp__qbit-jay__mem_judge\n\nAfter loading tools, call mem_context to check for prior session history before responding."
 
 type codexPromptInput struct {
 	CWD       string `json:"cwd"`

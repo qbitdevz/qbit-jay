@@ -3,7 +3,8 @@
 #
 # 1. Ensures the engram server is running
 # 2. Creates a session in engram
-# 3. Auto-imports git-synced chunks if .engram/manifest.json exists
+# 3. Auto-imports git-synced chunks if .qbit-jay/manifest.json (or the legacy
+#    .engram/manifest.json) exists
 # 4. Injects Memory Protocol instructions + memory context
 
 IMPORT_TIMEOUT_SECS=8
@@ -22,18 +23,18 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 # An explicit URL is an external-server opt-in. Only the default local endpoint
 # is owned by this data directory, so reachability alone is never sufficient.
 if [ "${ENGRAM_MANAGED_LOCAL:-0}" = 1 ]; then
-  ENGRAM_INSTANCE_ID=$(engram instance-id 2>/dev/null) || {
+  ENGRAM_INSTANCE_ID=$(qbit-jay instance-id 2>/dev/null) || {
     printf '%s\n' "warning: Engram could not resolve its local server identity." >&2
     exit 0
   }
 if ! engram_health_matches_instance "$ENGRAM_INSTANCE_ID"; then
-  ENGRAM_SERVE_DATA_DIR="${ENGRAM_DATA_DIR:-$HOME/.engram}"
+  ENGRAM_SERVE_DATA_DIR="${ENGRAM_DATA_DIR:-$HOME/.qbit-jay}"
   if mkdir -p "$ENGRAM_SERVE_DATA_DIR" 2>/dev/null && : >> "$ENGRAM_SERVE_DATA_DIR/serve.err.log" 2>/dev/null; then
     ENGRAM_SERVE_ERR_LOG="$ENGRAM_SERVE_DATA_DIR/serve.err.log"
   else
     ENGRAM_SERVE_ERR_LOG="${TMPDIR:-/tmp}/engram-serve.err.log"
   fi
-  ENGRAM_CLOUD_AUTOSYNC=1 engram serve > /dev/null 2>> "$ENGRAM_SERVE_ERR_LOG" &
+  QBIT_JAY_CLOUD_AUTOSYNC=1 qbit-jay serve > /dev/null 2>> "$ENGRAM_SERVE_ERR_LOG" &
   sleep 0.5
 fi
 if ! engram_health_matches_instance "$ENGRAM_INSTANCE_ID"; then
@@ -49,7 +50,7 @@ engram_claude_lifecycle_context "$SESSION_ID" "$CWD" "$INPUT"
 PROJECT="$CLAUDE_LIFECYCLE_PROJECT"
 
 # Auto-import git-synced chunks
-if [ -f "${CWD}/.engram/manifest.json" ]; then
+if [ -f "${CWD}/.qbit-jay/manifest.json" ] || [ -f "${CWD}/.engram/manifest.json" ]; then
   (
     cd "$CWD" 2>/dev/null || exit 0
     IMPORT_LOCK="/tmp/engram-sync-import-$(printf '%s' "$CWD" | cksum | cut -d ' ' -f 1).lock"
@@ -120,9 +121,9 @@ if [ -f "${CWD}/.engram/manifest.json" ]; then
     fi
     trap 'rm -f "$IMPORT_LOCK/info" 2>/dev/null || true; rmdir "$IMPORT_LOCK" 2>/dev/null || true' EXIT
     if command -v timeout >/dev/null 2>&1; then
-      timeout "${IMPORT_TIMEOUT_SECS}s" engram sync --import >/dev/null 2>&1 || true
+      timeout "${IMPORT_TIMEOUT_SECS}s" qbit-jay sync --import >/dev/null 2>&1 || true
     else
-      engram sync --import >/dev/null 2>&1 &
+      qbit-jay sync --import >/dev/null 2>&1 &
       IMPORT_PID=$!
       (sleep "$IMPORT_TIMEOUT_SECS"; kill "$IMPORT_PID" 2>/dev/null || true) &
       WAITER_PID=$!
@@ -150,7 +151,7 @@ fi
 # protocol-mode`. A missing/old engram binary or an unrecognized subcommand
 # never yields "slim" here, so this always defaults safely to full. $mode is
 # NEVER echoed/logged to this hook's own stdout.
-mode=$(engram protocol-mode claude-code 2>/dev/null)
+mode=$(qbit-jay protocol-mode claude-code 2>/dev/null)
 if [ "$mode" != "slim" ]; then
   mode="full"
 fi

@@ -4102,7 +4102,7 @@ func printPostInstallWithMemoryWrites(result *setup.Result, memoryWritesAllowed 
 		fmt.Println("  2. Verify with: claude plugin list")
 		if result.MCPConfigured {
 			fmt.Printf("  3. Claude CLI registered the user MCP server in %s using an absolute binary path\n", setup.ClaudeCodeUserMCPPath())
-			fmt.Println("     If the binary moves, run: claude mcp remove engram --scope user")
+			fmt.Println("     If the binary moves, run: claude mcp remove qbit-jay --scope user")
 			fmt.Println("     Then re-run: qbit-jay setup claude-code")
 		} else {
 			fmt.Println("  3. MCP configuration was not written. Re-run 'qbit-jay setup claude-code' after resolving the reported error.")

@@ -100,7 +100,16 @@ type Result struct {
 	TUIPluginEnabled bool
 }
 
-const claudeCodeMarketplace = "Gentleman-Programming/engram"
+const claudeCodeMarketplace = "qbitdevz/qbit-jay"
+
+// mcpServerName is the MCP server id setup writes into every agent config and
+// the Claude Code plugin name (spec S3). legacyMCPServerName is the upstream id:
+// setup never rewrites or removes it (replacing Engram entries is T0.5).
+const (
+	mcpServerName       = "qbit-jay"
+	legacyMCPServerName = "engram"
+	claudePluginName    = "qbit-jay"
+)
 const codexMarketplace = "Gentleman-Programming/engram"
 const claudeCodeSlimPluginFloor = "0.1.1"
 const claudeCodePluginListTimeout = 2 * time.Second // bounds only the read-only Claude plugin capability probe
@@ -134,10 +143,11 @@ func claudeCodePermissionTools(agentTools map[string]bool) []string {
 	}
 	sort.Strings(toolNames)
 
-	// Claude Code's bare/user-level MCP config uses the server id "engram".
+	// Claude Code's bare/user-level MCP config uses the server id "qbit-jay".
 	// Older plugin installs have been observed with a plugin-scoped server id;
 	// allowlisting both forms is harmless and keeps re-running setup idempotent.
-	prefixes := []string{"mcp__engram__", "mcp__plugin_engram_engram__"}
+	// Existing mcp__engram__* rules are never removed (that is T0.5).
+	prefixes := []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__"}
 	permissions := make([]string, 0, len(toolNames)*len(prefixes))
 	for _, prefix := range prefixes {
 		for _, toolName := range toolNames {
@@ -148,7 +158,7 @@ func claudeCodePermissionTools(agentTools map[string]bool) []string {
 }
 
 // codexEngramBlock is retained for non-Windows fallback compatibility tests.
-const codexEngramBlock = "[mcp_servers.engram]\ncommand = \"engram\"\nargs = [\"mcp\", \"--tools=agent\"]"
+const codexEngramBlock = "[mcp_servers.qbit-jay]\ncommand = \"qbit-jay\"\nargs = [\"mcp\", \"--tools=agent\"]"
 
 // windowsHookCommandMarkerPrefix identifies the first-line command pin consumed
 // by the Windows hook. Its value is JSON so PowerShell can decode it losslessly.
@@ -158,7 +168,7 @@ const windowsHookCommandMarkerPrefix = "# engram-windows-hook-command-v1: "
 // Engram command. installCodex resolves the command before it writes any setup
 // state so Windows cannot persist a PATH-dependent fallback.
 func codexEngramBlockStr(command string) string {
-	return "[mcp_servers.engram]\ncommand = " + fmt.Sprintf("%q", command) + "\nargs = [\"mcp\", \"--tools=agent\"]"
+	return "[mcp_servers.qbit-jay]\ncommand = " + fmt.Sprintf("%q", command) + "\nargs = [\"mcp\", \"--tools=agent\"]"
 }
 
 const memoryProtocolMarkdown = `## Engram Persistent Memory — Protocol
@@ -177,7 +187,7 @@ discovery depend on the host, not a universal bootstrap or deferred-tool split.
 - mem_update, mem_review, mem_pin, mem_unpin, mem_suggest_topic_key
 - mem_session_start, mem_session_end, mem_doctor, mem_capture_passive
 
-**Fallback**: If tools are unexpectedly unavailable, run engram setup <agent>
+**Fallback**: If tools are unexpectedly unavailable, run qbit-jay setup <agent>
 with your host's supported agent name and restart that host. Setup repairs its
 Engram registration; use that host's configuration and discovery conventions.
 
@@ -448,8 +458,10 @@ func warnPiMCPConfig(mcpPath string) error {
 		if err := json.Unmarshal(raw, &servers); err != nil {
 			return fmt.Errorf("parse Pi mcpServers: %w", err)
 		}
-		if _, exists := servers["engram"]; exists {
-			fmt.Fprintf(os.Stderr, "warning: %s contains mcpServers.engram; Pi native-only agent writes are not guaranteed while this MCP path remains. To use native-only writes, manually remove only mcpServers.engram from %s (preserve other servers), then restart/reload Pi.\n", mcpPath, mcpPath)
+		for _, name := range []string{mcpServerName, legacyMCPServerName} {
+			if _, exists := servers[name]; exists {
+				fmt.Fprintf(os.Stderr, "warning: %s contains mcpServers.%s; Pi native-only agent writes are not guaranteed while this MCP path remains. To use native-only writes, manually remove only mcpServers.%s from %s (preserve other servers), then restart/reload Pi.\n", mcpPath, name, name, mcpPath)
+			}
 		}
 	}
 	return nil
@@ -561,7 +573,7 @@ func installOpenCode() (*Result, error) {
 		cmd := resolveEngramCommand()
 		fmt.Fprintf(os.Stderr, "warning: could not auto-register MCP server in opencode.json: %v\n", err)
 		fmt.Fprintf(os.Stderr, "  Add manually to your opencode.json under \"mcp\":\n")
-		fmt.Fprintf(os.Stderr, "  \"engram\": { \"type\": \"local\", \"command\": [%q, \"mcp\", \"--tools=agent\"], \"enabled\": true }\n", cmd)
+		fmt.Fprintf(os.Stderr, "  \"qbit-jay\": { \"type\": \"local\", \"command\": [%q, \"mcp\", \"--tools=agent\"], \"enabled\": true }\n", cmd)
 	} else {
 		files++
 		mcpConfigured = true
@@ -648,12 +660,12 @@ func injectOpenCodeMCP() error {
 			if servers.members == nil {
 				return fmt.Errorf("parse mcp servers block: expected object")
 			}
-			if engram, registered := servers.members["engram"]; registered {
+			if engram, registered := servers.members[mcpServerName]; registered {
 				return reconcileOpenCodeMCPCommand(configPath, data, engram)
 			}
 			return insertOpenCodeMCPEntry(configPath, data, config, servers, false)
 		}
-		if engram, registered := mcpBlock.members["engram"]; registered {
+		if engram, registered := mcpBlock.members[mcpServerName]; registered {
 			return reconcileOpenCodeMCPCommand(configPath, data, engram)
 		}
 	}
@@ -663,9 +675,9 @@ func injectOpenCodeMCP() error {
 func insertOpenCodeMCPEntry(configPath string, data []byte, config, mcpBlock *jsoncObject, missingMCP bool) error {
 	entryJSON, err := jsonMarshalFn(mcpEntry(opencodeObject))
 	if err != nil {
-		return fmt.Errorf("marshal engram entry: %w", err)
+		return fmt.Errorf("marshal qbit-jay entry: %w", err)
 	}
-	member := append([]byte(`"engram":`), entryJSON...)
+	member := append([]byte(`"`+mcpServerName+`":`), entryJSON...)
 	object := mcpBlock
 	if missingMCP {
 		member = append(append([]byte(`"mcp":{`), member...), '}')
@@ -700,11 +712,11 @@ func reconcileOpenCodeMCPCommand(configPath string, data []byte, engram *jsoncOb
 	}
 	replacement, err := jsonMarshalFn(canonical)
 	if err != nil {
-		return fmt.Errorf("marshal engram command: %w", err)
+		return fmt.Errorf("marshal qbit-jay command: %w", err)
 	}
 	output, err := replaceJSONCString(data, command.values[0], replacement)
 	if err != nil {
-		return fmt.Errorf("replace engram command: %w", err)
+		return fmt.Errorf("replace qbit-jay command: %w", err)
 	}
 	if err := writeFileFn(configPath, output, 0644); err != nil {
 		return fmt.Errorf("write config: %w", err)
@@ -914,11 +926,11 @@ func parseClaudeCodePluginList(raw []byte) ([]claudeCodePlugin, error) {
 
 func isEngramClaudeCodePlugin(plugin claudeCodePlugin) bool {
 	name := strings.ToLower(strings.TrimSpace(plugin.Name))
-	if name != "engram" && name != "engram@engram" {
+	if name != claudePluginName && name != claudePluginName+"@"+claudePluginName {
 		return false
 	}
 	marketplace := strings.TrimSpace(plugin.Marketplace)
-	return strings.EqualFold(marketplace, "engram") || strings.EqualFold(marketplace, claudeCodeMarketplace)
+	return strings.EqualFold(marketplace, claudePluginName) || strings.EqualFold(marketplace, claudeCodeMarketplace)
 }
 
 func meetsClaudeCodeSlimPluginFloor(version string) bool {
@@ -1005,7 +1017,7 @@ func installClaudeCode() (*Result, error) {
 	// Claude's shared Bash hooks need both tools before installation can succeed.
 	for _, dependency := range []string{"jq", "curl"} {
 		if _, err := lookPathFn(dependency); err != nil {
-			return nil, fmt.Errorf("the Claude Code plugin requires %s in PATH — install jq and curl, ensure both are available in your shell (on Windows, install jq and use curl.exe or a curl distribution), then rerun engram setup claude-code", dependency)
+			return nil, fmt.Errorf("the Claude Code plugin requires %s in PATH — install jq and curl, ensure both are available in your shell (on Windows, install jq and use curl.exe or a curl distribution), then rerun qbit-jay setup claude-code", dependency)
 		}
 	}
 
@@ -1025,7 +1037,7 @@ func installClaudeCode() (*Result, error) {
 	}
 
 	// Step 2: Install the plugin
-	installOut, err := run(claudeBin, "plugin", "install", "engram")
+	installOut, err := run(claudeBin, "plugin", "install", claudePluginName)
 	installOutputStr := strings.TrimSpace(string(installOut))
 	if err != nil {
 		// If plugin is already installed, that's fine
@@ -1037,11 +1049,11 @@ func installClaudeCode() (*Result, error) {
 	// An existing installation is not necessarily current. Refresh the catalog
 	// before updating the cached plugin, regardless of install's exit status.
 	if strings.Contains(installOutputStr, "already") {
-		updateOut, updateErr := run(claudeBin, "plugin", "marketplace", "update", "engram")
+		updateOut, updateErr := run(claudeBin, "plugin", "marketplace", "update", claudePluginName)
 		if updateErr != nil {
 			return nil, claudeSetupCommandError("marketplace update failed", strings.TrimSpace(string(updateOut)), updateErr)
 		}
-		updateOut, updateErr = run(claudeBin, "plugin", "update", "engram@engram", "--scope", "user")
+		updateOut, updateErr = run(claudeBin, "plugin", "update", claudePluginName+"@"+claudePluginName, "--scope", "user")
 		if updateErr != nil {
 			return nil, claudeSetupCommandError("plugin update failed", strings.TrimSpace(string(updateOut)), updateErr)
 		}
@@ -1120,7 +1132,7 @@ type claudeCodeMCPServer struct {
 }
 
 // inspectClaudeCodeUserMCP reads only the documented user-scope top-level
-// mcpServers.engram entry. Unknown or malformed data is fail-closed.
+// mcpServers.qbit-jay entry. Unknown or malformed data is fail-closed.
 func inspectClaudeCodeUserMCP(command string) (claudeCodeMCPState, error) {
 	path := ClaudeCodeUserMCPPath()
 	data, err := readFileFn(path)
@@ -1149,13 +1161,13 @@ func inspectClaudeCodeUserMCP(command string) (claudeCodeMCPState, error) {
 		}
 		return claudeCodeMCPConflict, fmt.Errorf("parse Claude Code mcpServers in %s: %w", path, err)
 	}
-	rawServer, ok := servers["engram"]
+	rawServer, ok := servers[mcpServerName]
 	if !ok {
 		return claudeCodeMCPAbsent, nil
 	}
 	var server claudeCodeMCPServer
 	if err := json.Unmarshal(rawServer, &server); err != nil {
-		return claudeCodeMCPConflict, fmt.Errorf("parse Claude Code mcpServers.engram in %s: %w", path, err)
+		return claudeCodeMCPConflict, fmt.Errorf("parse Claude Code mcpServers.qbit-jay in %s: %w", path, err)
 	}
 	var fields map[string]json.RawMessage
 	if err := json.Unmarshal(rawServer, &fields); err != nil || fields == nil {
@@ -1165,7 +1177,7 @@ func inspectClaudeCodeUserMCP(command string) (claudeCodeMCPState, error) {
 	var exactType *string
 	if hasType {
 		if err := json.Unmarshal(rawType, &exactType); err != nil {
-			return claudeCodeMCPConflict, fmt.Errorf("parse Claude Code mcpServers.engram in %s: %w", path, err)
+			return claudeCodeMCPConflict, fmt.Errorf("parse Claude Code mcpServers.qbit-jay in %s: %w", path, err)
 		}
 	}
 	if (!hasType || exactType != nil && *exactType == "stdio") && server.Command == command && slices.Equal(server.Args, []string{"mcp", "--tools=agent"}) {
@@ -1202,14 +1214,14 @@ func ensureClaudeCodeUserMCP(run claudeSetupRunner) error {
 	case claudeCodeMCPExact:
 		return nil
 	case claudeCodeMCPConflict:
-		return fmt.Errorf("claude Code MCP conflict at %s: mcpServers.engram differs from Engram's expected stdio command; resolve it manually", ClaudeCodeUserMCPPath())
+		return fmt.Errorf("claude Code MCP conflict at %s: mcpServers.qbit-jay differs from Engram's expected stdio command; resolve it manually", ClaudeCodeUserMCPPath())
 	}
 
 	claudeBin, err := lookPathFn("claude")
 	if err != nil {
 		return fmt.Errorf("locate claude CLI: %w", err)
 	}
-	addArgs := []string{"mcp", "add", "--transport", "stdio", "--scope", "user", "engram", "--", command, "mcp", "--tools=agent"}
+	addArgs := []string{"mcp", "add", "--transport", "stdio", "--scope", "user", mcpServerName, "--", command, "mcp", "--tools=agent"}
 	if _, addErr := run(claudeBin, addArgs...); addErr != nil {
 		state, inspectErr := inspectClaudeCodeUserMCP(command)
 		if inspectErr != nil {
@@ -1228,13 +1240,13 @@ func ensureClaudeCodeUserMCP(run claudeSetupRunner) error {
 	if verifyErr == nil && state == claudeCodeMCPExact {
 		return nil
 	}
-	verification := fmt.Errorf("verify Claude Code MCP registration: mcpServers.engram is absent")
+	verification := fmt.Errorf("verify Claude Code MCP registration: mcpServers.qbit-jay is absent")
 	if verifyErr != nil {
 		verification = fmt.Errorf("verify Claude Code MCP registration: %w", verifyErr)
 	} else if state == claudeCodeMCPConflict {
 		verification = fmt.Errorf("verify Claude Code MCP registration: registered entry conflicts with expected stdio command")
 	}
-	if _, rollbackErr := run(claudeBin, "mcp", "remove", "engram", "--scope", "user"); rollbackErr != nil {
+	if _, rollbackErr := run(claudeBin, "mcp", "remove", mcpServerName, "--scope", "user"); rollbackErr != nil {
 		return fmt.Errorf("%v; rollback Claude MCP registration: %w", verification, rollbackErr)
 	}
 	return verification
@@ -1418,9 +1430,9 @@ func injectGeminiMCP(configPath string) error {
 	}
 	entryJSON, err := jsonMarshalFn(engramEntry)
 	if err != nil {
-		return fmt.Errorf("marshal engram entry: %w", err)
+		return fmt.Errorf("marshal qbit-jay entry: %w", err)
 	}
-	mcpServers["engram"] = json.RawMessage(entryJSON)
+	mcpServers[mcpServerName] = json.RawMessage(entryJSON)
 
 	mcpJSON, err := jsonMarshalFn(mcpServers)
 	if err != nil {
@@ -1440,23 +1452,23 @@ func injectGeminiMCP(configPath string) error {
 	return nil
 }
 
-// resolveEngramCommand returns the most stable command to spawn the engram
+// resolveEngramCommand returns the most stable command to spawn the qbit-jay
 // binary. It uses os.Executable() so that headless/systemd environments (where
 // PATH is not reliably inherited by child processes) still find the binary.
 //
-// Homebrew (and Linuxbrew) resolve the `engram` symlink to a versioned Cellar
-// path such as /opt/homebrew/Cellar/engram/1.16.1/bin/engram. That path is
+// Homebrew (and Linuxbrew) resolve the `qbit-jay` symlink to a versioned Cellar
+// path such as /opt/homebrew/Cellar/qbit-jay/1.16.1/bin/qbit-jay. That path is
 // removed on the next `brew upgrade`, so baking it into MCP client configs
 // leaves a stale command that fails to spawn (ENOENT). When the resolved
 // executable points into a versioned Cellar directory we prefer the stable
-// <brew-prefix>/bin/engram symlink, which brew repoints at the current version,
-// so registrations survive upgrades. It falls back to bare "engram" only when
+// <brew-prefix>/bin/qbit-jay symlink, which brew repoints at the current version,
+// so registrations survive upgrades. It falls back to bare "qbit-jay" only when
 // os.Executable() fails; an absolute executable is preserved if canonicalization
 // cannot resolve an absolute command.
 func resolveEngramCommand() string {
 	exe, err := osExecutable()
 	if err != nil {
-		return "engram" // fallback to PATH-based name
+		return "qbit-jay" // fallback to PATH-based name
 	}
 	canonical := canonicalEngramCommand(exe)
 	if filepath.IsAbs(exe) && !filepath.IsAbs(canonical) {
@@ -1466,9 +1478,9 @@ func resolveEngramCommand() string {
 }
 
 // canonicalEngramCommand resolves an already-obtained executable path to the
-// canonical engram command: it resolves symlinks via filepath.EvalSymlinks and
+// canonical qbit-jay command: it resolves symlinks via filepath.EvalSymlinks and
 // maps a versioned Homebrew/Linuxbrew Cellar path to the stable
-// <brew-prefix>/bin/engram symlink that brew keeps pointing at the current
+// <brew-prefix>/bin/qbit-jay symlink that brew keeps pointing at the current
 // version (see stableHomebrewEngramCommand), and a mise install path to the
 // existing mise shim (from environment, effective settings, or data dir) that keeps resolving to the active
 // version (see stableMiseEngramCommand). Other installs keep their resolved
@@ -1488,8 +1500,8 @@ func canonicalEngramCommand(exe string) string {
 }
 
 // claudeCodeEngramCommand is the caller-specific absolute-path policy for
-// writeClaudeCodeUserMCP. canonicalEngramCommand may return the bare "engram"
-// fallback when a Homebrew Cellar exe has no stable <brew-prefix>/bin/engram
+// writeClaudeCodeUserMCP. canonicalEngramCommand may return the bare "qbit-jay"
+// fallback when a Homebrew Cellar exe has no stable <brew-prefix>/bin/qbit-jay
 // symlink on disk — correct for resolveEngramCommand (PATH discovery), but
 // the durable Claude Code user MCP config must never persist a PATH-dependent
 // command. This helper preserves the already-obtained absolute exe on a
@@ -1502,67 +1514,67 @@ func claudeCodeEngramCommand(exe string) (string, error) {
 	if filepath.IsAbs(exe) {
 		return exe, nil
 	}
-	return "", fmt.Errorf("resolve absolute engram command: executable path %q is not absolute", exe)
+	return "", fmt.Errorf("resolve absolute qbit-jay command: executable path %q is not absolute", exe)
 }
 
 // stableHomebrewEngramCommand maps a versioned Homebrew Cellar path to the
-// stable "<brew-prefix>/bin/engram" symlink that brew keeps pointing at the
+// stable "<brew-prefix>/bin/qbit-jay" symlink that brew keeps pointing at the
 // current version. It returns ("", false) when exe is not a versioned Cellar
 // path, so non-Homebrew installs keep their resolved absolute path. When the
 // derived stable symlink does not exist on disk it falls back to the bare
-// "engram" name so the command still resolves via PATH.
+// "qbit-jay" name so the command still resolves via PATH.
 func stableHomebrewEngramCommand(exe string) (string, bool) {
-	const marker = "/Cellar/engram/"
+	const marker = "/Cellar/qbit-jay/"
 	clean := filepath.ToSlash(filepath.Clean(exe))
 	idx := strings.Index(clean, marker)
 	if idx < 0 {
 		return "", false
 	}
 	base := strings.ToLower(filepath.Base(clean))
-	if base != "engram" && base != "engram.exe" {
+	if base != "qbit-jay" && base != "qbit-jay.exe" {
 		return "", false
 	}
 	// Everything before "/Cellar/" is the brew prefix, e.g. /opt/homebrew or
 	// /home/linuxbrew/.linuxbrew. The bin symlink lives directly under it.
-	stable := clean[:idx] + "/bin/engram"
+	stable := clean[:idx] + "/bin/qbit-jay"
 	if _, err := statFn(stable); err == nil {
 		return filepath.FromSlash(stable), true
 	}
-	return "engram", true
+	return "qbit-jay", true
 }
 
 // stableMiseEngramCommand maps a mise install path to the stable mise shim.
 // An absolute MISE_SHIMS_DIR takes precedence over mise's effective shims_dir
 // setting; invalid settings fall back to <mise-data-dir>/shims. Mise installs
-// live under <mise-data-dir>/installs/engram/<version>/engram and `mise up` plus
+// live under <mise-data-dir>/installs/qbit-jay/<version>/qbit-jay and `mise up` plus
 // `mise prune` removes superseded version directories, so baking the resolved
 // path into MCP client configs leaves a stale command that fails to spawn
 // (ENOENT) after an upgrade. The shim is mise's documented launcher entry
 // point and keeps resolving to the active version, so registrations survive
-// upgrades. Unlike the <data-dir>/installs/engram/latest/engram alias it does
+// upgrades. Unlike the <data-dir>/installs/qbit-jay/latest/qbit-jay alias it does
 // not depend on which version the user pinned. On Windows the shim carries an
-// .exe extension (<data-dir>/shims/engram.exe), mirrored from the executable
+// .exe extension (<data-dir>/shims/qbit-jay.exe), mirrored from the executable
 // base. It returns ("", false) when exe is not a mise install path, so other
 // installs keep their resolved absolute path. When the derived shim does not
-// exist on disk it falls back to the bare "engram" name so the command still
+// exist on disk it falls back to the bare "qbit-jay" name so the command still
 // resolves via PATH.
 func stableMiseEngramCommand(exe string) (string, bool) {
-	const marker = "/installs/engram/"
+	const marker = "/installs/qbit-jay/"
 	clean := filepath.ToSlash(filepath.Clean(exe))
 	idx := strings.Index(clean, marker)
 	if idx < 0 {
 		return "", false
 	}
 	base := strings.ToLower(filepath.Base(clean))
-	if base != "engram" && base != "engram.exe" {
+	if base != "qbit-jay" && base != "qbit-jay.exe" {
 		return "", false
 	}
 	// Everything before "/installs/" is the mise data directory, e.g.
 	// ~/.local/share/mise, ~/.mise, or a custom $MISE_DATA_DIR. The shims
 	// directory lives directly under it unless an absolute override is available.
-	shimName := "engram"
-	if base == "engram.exe" {
-		shimName = "engram.exe"
+	shimName := "qbit-jay"
+	if base == "qbit-jay.exe" {
+		shimName = "qbit-jay.exe"
 	}
 	shimDir := filepath.FromSlash(clean[:idx] + "/shims")
 	if override := os.Getenv("MISE_SHIMS_DIR"); filepath.IsAbs(override) {
@@ -1579,7 +1591,7 @@ func stableMiseEngramCommand(exe string) (string, bool) {
 	if _, err := statFn(stable); err == nil {
 		return stable, true
 	}
-	return "engram", true
+	return "qbit-jay", true
 }
 
 // codexEngramCommand is the caller-specific executable policy for the sole
@@ -1591,7 +1603,7 @@ func codexEngramCommand() (string, error) {
 		if runtimeGOOS == "windows" {
 			return "", fmt.Errorf("resolve rooted absolute .exe Codex command: %w", err)
 		}
-		return "engram", nil
+		return "qbit-jay", nil
 	}
 
 	canonical := canonicalEngramCommand(exe)

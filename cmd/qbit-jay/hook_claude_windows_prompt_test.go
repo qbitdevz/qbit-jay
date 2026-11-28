@@ -123,8 +123,8 @@ func TestClaudeWindowsPromptBootstrapCLI(t *testing.T) {
 		}
 		context := reply.HookSpecificOutput.Context
 		if reply.HookSpecificOutput.Event != "UserPromptSubmit" ||
-			!strings.Contains(context, "select:mcp__plugin_engram_engram__mem_save,") ||
-			!strings.Contains(context, ",mcp__engram__mem_save,") ||
+			!strings.Contains(context, "select:mcp__plugin_qbit-jay_qbit-jay__mem_save,") ||
+			!strings.Contains(context, ",mcp__qbit-jay__mem_save,") ||
 			strings.Contains(output, "systemMessage") {
 			t.Fatalf("invalid first-prompt context: %s", output)
 		}

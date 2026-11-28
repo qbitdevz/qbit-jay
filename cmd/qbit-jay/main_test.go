@@ -596,7 +596,7 @@ func TestPrintPostInstall(t *testing.T) {
 		{
 			name:    "vscode-copilot",
 			result:  &setup.Result{Agent: "vscode-copilot"},
-			expects: []string{"Restart VS Code", "servers.engram", "engram.instructions.md"},
+			expects: []string{"Restart VS Code", "servers.qbit-jay", "engram.instructions.md"},
 		},
 		{
 			name:    "kilocode",

@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -39,10 +40,20 @@ var claudeEngramWriteAndSessionTools = []string{
 	"mem_compare",
 }
 
-var claudeEngramToolPrefixes = []string{
+// claudeQbitJayToolPrefixes are the tool-name prefixes of the MCP server that
+// `qbit-jay setup` registers (spec S3).
+var claudeQbitJayToolPrefixes = []string{
+	"mcp__qbit-jay__",
+	"mcp__plugin_qbit-jay_qbit-jay__",
+}
+
+// claudeEngramToolPrefixes is every prefix the guards recognize: the qbit-jay
+// server plus the upstream Engram server names, which setup leaves registered
+// until T0.5 replaces them, so their writes stay guarded.
+var claudeEngramToolPrefixes = append(slices.Clone(claudeQbitJayToolPrefixes),
 	"mcp__engram__",
 	"mcp__plugin_engram_engram__",
-}
+)
 
 // The default leaves one second of Claude's five-second host timeout for startup
 // and verdict output. A configured budget also requires a longer host timeout.

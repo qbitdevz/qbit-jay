@@ -35,7 +35,7 @@ fi
 # protocol-mode`. A missing/old engram binary or an unrecognized subcommand
 # never yields "slim" here, so this always defaults safely to full. $mode is
 # NEVER echoed/logged to this hook's own stdout.
-mode=$(engram protocol-mode claude-code 2>/dev/null)
+mode=$(qbit-jay protocol-mode claude-code 2>/dev/null)
 if [ "$mode" != "slim" ]; then
   mode="full"
 fi

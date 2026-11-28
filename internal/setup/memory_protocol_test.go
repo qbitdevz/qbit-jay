@@ -68,7 +68,7 @@ func TestMemoryProtocolHostAssets(t *testing.T) {
 			assertMemoryContract(t, text)
 			// Claude SKILL.md still references its own adapter names and discovery.
 			if strings.Contains(path, "claude-code") {
-				if !strings.Contains(text, "mcp__plugin_engram_engram__") {
+				if !strings.Contains(text, "mcp__plugin_qbit-jay_qbit-jay__") {
 					t.Error("Claude-specific registration guidance was lost")
 				}
 			}
@@ -230,7 +230,7 @@ func TestMemoryProtocolClaudeVersionFixtures(t *testing.T) {
 	} {
 		t.Run(fixture.name, func(t *testing.T) {
 			plugin := []byte(fmt.Sprintf(`{"version":%q}`, fixture.plugin))
-			marketplace := []byte(fmt.Sprintf(`{"plugins":[{"name":"engram","version":%q}]}`, fixture.marketplace))
+			marketplace := []byte(fmt.Sprintf(`{"plugins":[{"name":"qbit-jay","version":%q}]}`, fixture.marketplace))
 			if err := memoryVersionsMatch(plugin, marketplace); (err != nil) != fixture.wantError {
 				t.Fatalf("synchronization error = %v, want error %v", err, fixture.wantError)
 			}
@@ -253,7 +253,7 @@ func memoryVersionsMatch(pluginData, marketplaceData []byte) error {
 		return fmt.Errorf("Claude plugin version is empty")
 	}
 	for _, entry := range marketplace.Plugins {
-		if entry.Name == "engram" && entry.Version == plugin.Version {
+		if entry.Name == "qbit-jay" && entry.Version == plugin.Version {
 			return nil
 		}
 	}
