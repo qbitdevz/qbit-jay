@@ -127,15 +127,106 @@ gates. The first run was about twice as slow as the other two for
 cannot show a 5 % difference. To decide a gate, measure baseline and candidate
 alternately in the same session, several runs each, and compare the medians.
 
+## Evaluators E1, E2 and E3 (task T0.8)
+
+Run by `scripts/qbit/eval-baseline.sh` (the `internal/qbit/eval` package,
+`-tags eval`), alternating fork and upstream, two rounds, in one session on the
+same machine as above (Ryzen 7 7435HS, WSL2 Ubuntu 26.04, Go 1.26.11, ext4,
+both trees built from WSL-native clones with `core.autocrlf=false`).
+
+- Upstream: `11521f4` unchanged. It has no eval package, so a temporary clone
+  received a copy of it with two mechanical edits: the store import path
+  (`github.com/qbitdevz/qbit-jay/` to `github.com/Gentleman-Programming/engram/v3/`)
+  and `store.DatabaseFile` replaced by the literal `"engram.db"`. Nothing else.
+- Fork: branch `feat/t08-evaluators` at `878b57e` (evaluators and script; the
+  later merge of `origin/main` changes no code the evaluators call).
+- Corpus: synthetic, deterministic, seed `20261128`, sizes 1,000 and 10,000
+  memories (project filter, 100 k not run, see below). No real data.
+- Same-session caveat: the numbers are comparable only with each other; run
+  to run the latency varied by up to about 10 %.
+
+### E1: context (audit method)
+
+Hit rate is the share of sessions whose context contains at least one memory
+the session needed; recall is the share of needed memories included.
+
+| Size | Budget | Sessions | Hit rate | Recall | Mean bytes |
+| --- | --- | --- | --- | --- | --- |
+| 1,000 | 4,096 | 83 | 44.6 % | 36.7 % | 4,084 |
+| 1,000 | 16,384 | 83 | 74.7 % | 65.7 % | 6,956 |
+| 1,000 | unbounded | 83 | 74.7 % | 65.7 % | 6,956 |
+| 10,000 | 4,096 | 842 | 30.4 % | 22.3 % | 4,095 |
+| 10,000 | 16,384 | 842 | 61.4 % | 49.3 % | 7,040 |
+| 10,000 | unbounded | 842 | 61.4 % | 49.3 % | 7,040 |
+
+Fork and upstream are identical in every cell, in both rounds: the fork has
+not yet changed retrieval. These are the numbers a change to `mem_context`
+must beat.
+
+### E2: search
+
+450 queries (150 memories, three each: `same` paraphrase, `kw` keywords,
+`cross` other language) through the real `SearchPreviewsContext`, limit 10.
+Fixture: `internal/qbit/eval/testdata/e2_queries.json`, written once by an LLM
+(Claude, as the coding agent of this task) after reading the 150 synthetic
+memories, not from templates; `testdata/README.md` explains how to
+regenerate it. Fork and upstream give identical results.
+
+| Size | Mode | recall@5 | recall@10 | MRR | Zero results |
+| --- | --- | --- | --- | --- | --- |
+| 1,000 | all | 49.3 % | 49.3 % | 0.487 | 48.7 % |
+| 1,000 | any | 39.3 % | 40.2 % | 0.377 | 0.0 % |
+| 10,000 | all | 49.3 % | 49.3 % | 0.449 | 44.0 % |
+| 10,000 | any | 37.1 % | 37.3 % | 0.329 | 0.0 % |
+
+By kind at 10,000, `all` mode: `kw` 100 % recall@5 (MRR 0.906), `same` 43.3 %,
+`cross` 4.7 % (76 % zero results). Spanish query against English memory:
+0.0 % recall and 72.5 % zero results. The `any` mode never returns nothing
+but ranks worse. Cross-language retrieval is the weak spot.
+
+### E3: performance
+
+Store level (`internal/qbit/eval`), median of two rounds is not meaningful at
+two samples, so both rounds are shown (fork / upstream, ms):
+
+| Size | Load s | DB MiB | Search p50 | Search p95 | Context p50 | Context p95 |
+| --- | --- | --- | --- | --- | --- | --- |
+| 1,000, round 1 | 3.1 / 3.5 | 5.0 / 5.0 | 5.00 / 5.35 | 9.55 / 10.28 | 2.12 / 2.52 | 3.42 / 3.96 |
+| 1,000, round 2 | 3.2 / 3.4 | 5.0 / 5.0 | 5.60 / 5.31 | 11.40 / 10.56 | 2.12 / 2.14 | 3.59 / 3.16 |
+| 10,000, round 1 | 42.9 / 38.4 | 38.3 / 38.3 | 17.63 / 16.94 | 36.44 / 32.90 | 14.30 / 12.77 | 21.21 / 19.24 |
+| 10,000, round 2 | 35.2 / 37.6 | 38.3 / 38.3 | 17.75 / 17.11 | 37.67 / 35.20 | 12.93 / 13.17 | 19.77 / 19.54 |
+
+Through MCP (`scripts/qbit/e3latency`, one run each, alternating fork then
+upstream, 10,000 memories, 20,349,822 bytes of content, 300 searches, 100
+contexts; the first sequential run in the session, so one sample per tree):
+
+| Measure | Fork (`878b57e`) | Upstream (`11521f4`) |
+| --- | --- | --- |
+| `mem_save` p50 / p95 (ms) | 91.7 / 188.1 | 96.3 / 179.2 |
+| `mem_search` p50 / p95 (ms) | 90.8 / 133.0 | 84.8 / 124.1 |
+| `mem_context` p50 / p95 (ms) | 198.0 / 230.7 | 185.9 / 204.8 |
+| MCP startup p50 / p95 (ms) | 32.7 / 40.3 | 32.8 / 35.3 |
+| CLI startup p50 / p95 (ms) | 4.06 / 4.74 | 4.05 / 5.09 |
+| Peak RSS after `initialize` | 19.7 MiB (20,220 kB) | 19.4 MiB (19,820 kB) |
+| Peak RSS after workload | 36.7 MiB (37,592 kB) | 36.1 MiB (36,932 kB) |
+| Data directory | 113,881,121 B | 113,860,641 B |
+| `mem_context` response | 7,711 B | 7,709 B |
+| `tools/list` response | 30,115 B | 30,063 B |
+
+The differences between fork and upstream are within the run-to-run
+variation already documented; they show no regression, and they do not prove
+the absence of a 5 % one (see Run-to-run variation).
+
 ## Not measured or not passing
 
 | Item | State | What it needs |
 | --- | --- | --- |
 | `make perf-check`, `make perf-baseline` | Not run through `make` | Nothing; `make` is now installed. The same benchmarks were run directly |
-| Corpora of 10,000 and 100,000 memories | Not measured | Belongs to the evaluators of task T0.8 |
+| Corpus of 100,000 memories | Not measured | One tree takes about 5 minutes at 10,000 (E1+E2+E3 store level, mostly loading and E1), so 100,000 is an hour or more per tree; opt in with `QBIT_JAY_EVAL_SIZES=1000,10000,100000` |
+| E1 on a real database | Not measured | A copy at `QBIT_JAY_EVAL_DB`; never committed |
+| MCP latency at 10,000 repeated | One run per tree | More alternating runs to decide a 5 % gate |
 | Real database of the user | Not measured | A copy at `QBIT_JAY_EVAL_DB`; never committed |
 | Windows and macOS | Not measured | CI |
-| E1 (context) and E2 (search) quality | Not measured | Evaluators of task T0.8 |
 
 ## How to reproduce
 
@@ -150,3 +241,8 @@ go run ./scripts/qbit/e3latency -bin "$HOME/qbit-jay-baseline/<name>/out/engram-
 ```
 
 For the renamed fork, pass `-env-prefix QBIT_JAY` to `e3latency`.
+
+```sh
+# E1, E2 and E3 on upstream and fork, alternating (from WSL, not under /mnt/c)
+bash scripts/qbit/eval-baseline.sh <upstream-repo> 11521f4 <fork-checkout> "$HOME/qbit-jay-baseline/eval"
+```
