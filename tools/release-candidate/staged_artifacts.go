@@ -74,7 +74,7 @@ func readStagedArtifacts(ctx context.Context, filename string, want stagingExpec
 	if digest(data) != want.ZIPHash {
 		return fail("ZIP digest mismatch")
 	}
-	expected := map[string]bool{"manifest.json": true, "npm-pack.json": true, "gentle-engram-" + want.PiVersion + ".tgz": true}
+	expected := map[string]bool{"manifest.json": true, "npm-pack.json": true, "qbit-jay-pi-" + want.PiVersion + ".tgz": true}
 	for _, system := range []string{"linux", "darwin", "windows"} {
 		for _, arch := range []string{"amd64", "arm64"} {
 			n := "engram_" + system + "_" + arch
@@ -107,7 +107,7 @@ func readStagedArtifacts(ctx context.Context, filename string, want stagingExpec
 	if err := json.Unmarshal(members["manifest.json"], &manifest); err != nil {
 		return zero, err
 	}
-	if manifest.WorkflowSHA != want.WorkflowSHA || manifest.CandidateSHA != want.CandidateSHA || manifest.RunID != want.RunID || manifest.RunAttempt != want.RunAttempt || manifest.CoreVersion != want.CoreVersion || manifest.PackageName != "gentle-engram" || manifest.PackageVersion != want.PiVersion {
+	if manifest.WorkflowSHA != want.WorkflowSHA || manifest.CandidateSHA != want.CandidateSHA || manifest.RunID != want.RunID || manifest.RunAttempt != want.RunAttempt || manifest.CoreVersion != want.CoreVersion || manifest.PackageName != "qbit-jay-pi" || manifest.PackageVersion != want.PiVersion {
 		return fail("manifest context mismatch")
 	}
 	seen := map[string]bool{}
@@ -134,10 +134,10 @@ func readStagedArtifacts(ctx context.Context, filename string, want stagingExpec
 	if err := json.Unmarshal(members["npm-pack.json"], &pack); err != nil {
 		return zero, err
 	}
-	piName := "gentle-engram-" + want.PiVersion + ".tgz"
+	piName := "qbit-jay-pi-" + want.PiVersion + ".tgz"
 	pi := members[piName]
 	piHash := sha512.Sum512(pi)
-	if len(pack) != 1 || pack[0].Name != "gentle-engram" || pack[0].Version != want.PiVersion || pack[0].Filename != piName || pack[0].Integrity != "sha512-"+base64.StdEncoding.EncodeToString(piHash[:]) {
+	if len(pack) != 1 || pack[0].Name != "qbit-jay-pi" || pack[0].Version != want.PiVersion || pack[0].Filename != piName || pack[0].Integrity != "sha512-"+base64.StdEncoding.EncodeToString(piHash[:]) {
 		return fail("npm package context mismatch")
 	}
 	host := "engram_" + runtime.GOOS + "_" + runtime.GOARCH

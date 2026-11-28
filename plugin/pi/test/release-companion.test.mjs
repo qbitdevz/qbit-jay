@@ -5,16 +5,15 @@ import { test } from "node:test";
 
 const root = new URL("../../../", import.meta.url);
 const helper = new URL(".github/scripts/release-companion.mjs", root);
-const pkg = { name: "gentle-engram", version: "0.4.2", engram: { startupPolicy: 1, sessionOwned: 1 } };
-const pin = 'const piGentleEngramPackage = "npm:gentle-engram@0.4.2"';
-const paths = ["plugin/pi/package.json", "internal/setup/setup.go", ".github/workflows/release.yml"];
+const pkg = { name: "qbit-jay-pi", version: "0.4.2", engram: { startupPolicy: 1, sessionOwned: 1 } };
+const paths = ["plugin/pi/package.json", ".github/workflows/release.yml"];
 const before = paths.map(p => readFileSync(new URL(p, root), "utf8"));
 
-function run({ source = pkg, setup = pin, published = pkg, status = 200, failure, malformed = false, args = [] } = {}) {
+function run({ source = pkg, published = pkg, status = 200, failure, malformed = false, args = [] } = {}) {
 	const preload = `import fs from 'node:fs'; import {syncBuiltinESMExports} from 'node:module';
-const source=${JSON.stringify(source)}, setup=${JSON.stringify(setup)};
+const source=${JSON.stringify(source)};
 const original=fs.readFileSync;
-fs.readFileSync=function(path,...rest){ if(String(path).endsWith('plugin/pi/package.json')) return JSON.stringify(source); if(String(path).endsWith('internal/setup/setup.go')) return setup; return original.call(this,path,...rest); }; syncBuiltinESMExports();
+fs.readFileSync=function(path,...rest){ if(String(path).endsWith('plugin/pi/package.json')) return JSON.stringify(source); return original.call(this,path,...rest); }; syncBuiltinESMExports();
 let calls=0; process.on('exit',()=>console.error('TRANSPORT '+JSON.stringify({calls})));
 globalThis.fetch=async(url,options)=>{calls++; console.error('GET '+JSON.stringify({url, method:options.method, redirect:options.redirect, credentials:options.credentials, headers:options.headers, bounded:options.signal instanceof AbortSignal})); ${failure ? `throw new Error(${JSON.stringify(failure)});` : `return {ok:${status === 200},status:${status},json:async()=>{${malformed ? "throw new SyntaxError('bad JSON')" : `return ${JSON.stringify(published)}`}}};`} };
 `;
@@ -29,10 +28,10 @@ for (const owned of [true, false]) test(`exact public metadata succeeds (session
 	if (!owned) delete source.engram.sessionOwned;
 	const result = run({ source, published: source });
 	assert.equal(result.status, 0, result.stderr);
-	assert.match(result.stdout, /Companion available: gentle-engram@0.4.2/);
+	assert.match(result.stdout, /Companion available: qbit-jay-pi@0.4.2/);
 	assert.match(result.stderr, /TRANSPORT {"calls":1}/);
 	const request = JSON.parse(result.stderr.split("\n").find(l => l.startsWith("GET ")).slice(4));
-	assert.deepEqual(request, { url: "https://registry.npmjs.org/gentle-engram/0.4.2", method: "GET", redirect: "error", credentials: "omit", headers: { Accept: "application/json" }, bounded: true });
+	assert.deepEqual(request, { url: "https://registry.npmjs.org/qbit-jay-pi/0.4.2", method: "GET", redirect: "error", credentials: "omit", headers: { Accept: "application/json" }, bounded: true });
 });
 
 for (const [label, options, calls] of [
@@ -44,8 +43,6 @@ for (const [label, options, calls] of [
 	["public 0.4.2 lacks owned metadata", { published: { ...pkg, engram: { startupPolicy: 1 } } }, 1],
 	["startup", { published: { ...pkg, engram: { startupPolicy: 2, sessionOwned: 1 } } }, 1],
 	["null", { published: null }, 1],
-	["pin", { setup: pin.replace("0.4.2", "0.4.1") }, 0],
-	["legacy pin only", { setup: pin.replace("piGentleEngramPackage", "piLegacyGentleEngramPackage") }, 0],
 	["unsafe version", { source: { ...pkg, version: "../latest" } }, 0],
 	["wrong source name", { source: { ...pkg, name: "other" } }, 0],
 	["missing declaration", { source: { ...pkg, engram: {} } }, 0],

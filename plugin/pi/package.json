@@ -1,10 +1,10 @@
 {
-  "name": "gentle-engram",
+  "name": "qbit-jay-pi",
   "version": "0.8.0",
   "description": "Persistent memory for Pi agents — one local-or-cloud brain shared across sessions, compactions, and MCP agents",
   "type": "module",
   "license": "MIT",
-  "author": "qbitdevz (based on Engram by Gentleman Programming)",
+  "author": "qbitdevz",
   "homepage": "https://github.com/qbitdevz/qbit-jay",
   "repository": {
     "type": "git",

@@ -10,7 +10,7 @@
 //     the resolved absolute binary path.
 //   - Gemini CLI: injects MCP registration in ~/.gemini/settings.json
 //   - Codex: injects MCP registration in ~/.codex/config.toml
-//   - Pi: installs the gentle-engram package; native tools own Engram writes
+//   - Pi: not installed from npm (embedded plugin planned, T0.9); setup pi fails without touching settings
 package setup
 
 import (
@@ -128,18 +128,6 @@ const claudeCodeSlimPluginFloor = "0.1.1"
 const claudeCodePluginListTimeout = 2 * time.Second // bounds only the read-only Claude plugin capability probe
 
 const openCodeSubagentStatuslinePlugin = "opencode-subagent-statusline"
-
-const (
-	piGentleEngramPackage             = "npm:gentle-engram@0.8.0"
-	piLegacyGentleEngramPackage       = "npm:gentle-engram@0.1.8"
-	piPreviousGentleEngramPackage     = "npm:gentle-engram@0.1.11"
-	piPriorGentleEngramPackage        = "npm:gentle-engram@0.1.12"
-	piPredecessorGentleEngramPackage  = "npm:gentle-engram@0.1.14"
-	piFormerGentleEngramPackage       = "npm:gentle-engram@0.1.15"
-	piEarlierGentleEngramPackage      = "npm:gentle-engram@0.1.16"
-	piPriorReleaseGentleEngramPackage = "npm:gentle-engram@0.2.0"
-	piLastReleaseGentleEngramPackage  = "npm:gentle-engram@0.3.0"
-)
 
 // claudeCodeMCPTools are the MCP tool permission names for the agent profile
 // registered in the durable Claude Code user-level MCP config.
@@ -322,126 +310,15 @@ func piAgentDir() string {
 	return filepath.Join(home, ".pi", "agent")
 }
 
+// errPiNotOnNpm explains why setup pi installs nothing. The qbit-jay Pi plugin
+// is not published to npm and never will be: an unregistered package name could
+// be claimed by anyone, so setup must not write or install any npm source for
+// it. T0.9 replaces this with the plugin embedded in the binary.
+var errPiNotOnNpm = errors.New("the qbit-jay Pi plugin is not distributed through npm; install it from a local checkout with `pi install <repo>/plugin/pi`")
+
+// installPi fails before reading or writing any Pi setting.
 func installPi() (*Result, error) {
-	agentDir := piAgentDir()
-	settingsPath := filepath.Join(agentDir, "settings.json")
-	if err := installPiPackage(settingsPath); err != nil {
-		return nil, fmt.Errorf("install %s: %w", piGentleEngramPackage, err)
-	}
-
-	files := 0
-
-	// ensurePiNpmCommand must run before ensurePiPackageSettings so that a single
-	// write covers both npm command pinning and package list updates when both are
-	// needed on a fresh install. If npmCommand was already set we still proceed and
-	// let ensurePiPackageSettings handle the packages field independently.
-	npmChanged, err := ensurePiNpmCommand(settingsPath)
-	if err != nil {
-		return nil, err
-	}
-
-	settingsChanged, err := ensurePiPackageSettings(settingsPath)
-	if err != nil {
-		return nil, err
-	}
-	if npmChanged || settingsChanged {
-		files++
-	}
-
-	if err := warnPiMCPConfig(filepath.Join(agentDir, "mcp.json")); err != nil {
-		return nil, err
-	}
-
-	return &Result{Agent: "pi", Destination: agentDir, Files: files}, nil
-}
-
-func ensurePiPackageSettings(settingsPath string) (bool, error) {
-	config, err := readJSONConfig(settingsPath)
-	if err != nil {
-		return false, fmt.Errorf("read Pi settings: %w", err)
-	}
-	packages, err := readRawArrayField(config, "packages", settingsPath)
-	if err != nil {
-		return false, err
-	}
-	changed := false
-	updatedPackages := make([]json.RawMessage, 0, len(packages)+1)
-	hasGentleEngramPackage := false
-	for _, raw := range packages {
-		var pkg string
-		if err := json.Unmarshal(raw, &pkg); err == nil {
-			switch pkg {
-			case piGentleEngramPackage:
-				if hasGentleEngramPackage {
-					changed = true
-					continue
-				}
-				hasGentleEngramPackage = true
-			default:
-				if isPiManagedPackage(pkg) {
-					changed = true
-					continue
-				}
-			}
-		}
-		updatedPackages = append(updatedPackages, raw)
-	}
-	packages = updatedPackages
-	if !hasGentleEngramPackage {
-		raw, err := jsonMarshalFn(piGentleEngramPackage)
-		if err != nil {
-			return false, fmt.Errorf("marshal Pi package %q: %w", piGentleEngramPackage, err)
-		}
-		packages = append(packages, raw)
-		changed = true
-	}
-	if !changed {
-		return false, nil
-	}
-	config["packages"], err = jsonMarshalFn(packages)
-	if err != nil {
-		return false, fmt.Errorf("marshal Pi packages: %w", err)
-	}
-	return true, writeJSONConfig(settingsPath, config)
-}
-
-// ensurePiNpmCommand pins the npm command in Pi's settings.json when mise is
-// detected. This prevents Node version drift from silently changing which npm
-// root Pi uses for package lookups and installs.
-//
-// Behavior:
-//   - If mise is not found in PATH: no-op (returns false, nil).
-//   - If npmCommand already exists in settings.json: no-op (returns false, nil).
-//   - Otherwise: writes npmCommand as ["mise", "exec", "<node-spec>", "--", "npm"].
-//
-// The node spec is resolved via "mise current node". If resolution fails,
-// the bare "node" tool name is used so mise still picks the active version.
-func ensurePiNpmCommand(settingsPath string) (bool, error) {
-	if _, err := lookPathFn("mise"); err != nil {
-		return false, nil // mise not present — nothing to pin
-	}
-
-	config, err := readJSONConfig(settingsPath)
-	if err != nil {
-		return false, fmt.Errorf("read Pi settings for npmCommand: %w", err)
-	}
-
-	if _, exists := config["npmCommand"]; exists {
-		return false, nil // user already configured npmCommand — preserve it
-	}
-
-	nodeSpec := resolveMiseNodeVersionFn()
-	if nodeSpec == "" {
-		nodeSpec = "node" // fallback: let mise pick the active version at runtime
-	}
-
-	npmCmd := []string{"mise", "exec", nodeSpec, "--", "npm"}
-	raw, err := jsonMarshalFn(npmCmd)
-	if err != nil {
-		return false, fmt.Errorf("marshal Pi npmCommand: %w", err)
-	}
-	config["npmCommand"] = raw
-	return true, writeJSONConfig(settingsPath, config)
+	return nil, errPiNotOnNpm
 }
 
 // resolveMiseNodeVersion returns the active Node version managed by mise as a
@@ -457,27 +334,6 @@ func resolveMiseNodeVersion() string {
 		return ""
 	}
 	return "node@" + version
-}
-
-// warnPiMCPConfig detects legacy registrations without rewriting user-owned
-// MCP config. Even a dead command may belong to a deliberate direct client.
-func warnPiMCPConfig(mcpPath string) error {
-	config, err := readJSONConfig(mcpPath)
-	if err != nil {
-		return fmt.Errorf("read Pi MCP config: %w", err)
-	}
-	if raw, ok := config["mcpServers"]; ok {
-		var servers map[string]json.RawMessage
-		if err := json.Unmarshal(raw, &servers); err != nil {
-			return fmt.Errorf("parse Pi mcpServers: %w", err)
-		}
-		for _, name := range []string{mcpServerName, legacyMCPServerName} {
-			if _, exists := servers[name]; exists {
-				fmt.Fprintf(os.Stderr, "warning: %s contains mcpServers.%s; Pi native-only agent writes are not guaranteed while this MCP path remains. To use native-only writes, manually remove only mcpServers.%s from %s (preserve other servers), then restart/reload Pi.\n", mcpPath, name, name, mcpPath)
-			}
-		}
-	}
-	return nil
 }
 
 func readJSONConfig(path string) (map[string]json.RawMessage, error) {
@@ -507,18 +363,6 @@ func writeJSONConfig(path string, config map[string]json.RawMessage) error {
 		return fmt.Errorf("create %s: %w", filepath.Dir(path), err)
 	}
 	return writeFileFn(path, append(output, '\n'), 0644)
-}
-
-func readRawArrayField(config map[string]json.RawMessage, key, path string) ([]json.RawMessage, error) {
-	raw, ok := config[key]
-	if !ok {
-		return nil, nil
-	}
-	var values []json.RawMessage
-	if err := json.Unmarshal(raw, &values); err != nil {
-		return nil, fmt.Errorf("parse %s %q: %w", path, key, err)
-	}
-	return values, nil
 }
 
 // ─── OpenCode ────────────────────────────────────────────────────────────────
