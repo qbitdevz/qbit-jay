@@ -27,7 +27,7 @@ func buildFakeBinary(t *testing.T) []byte {
 	t.Helper()
 	goTool, err := exec.LookPath("go")
 	if err != nil {
-		goTool = filepath.Join(runtime.GOROOT(), "bin", "go")
+		t.Skip("requires the go tool on PATH to build the fixture binary")
 	}
 	dir := t.TempDir()
 	src := filepath.Join(dir, "main.go")
