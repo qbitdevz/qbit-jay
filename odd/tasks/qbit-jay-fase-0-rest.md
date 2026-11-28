@@ -36,8 +36,6 @@ Assumptions (not user specs):
 - [x] T2 (T0.6) gentle-ai compatibility (commits `45eafa1`, `36898bf`): inventory of every gentle-ai invocation of the engram binary, compatibility test running qbit-jay with them (`ENGRAM_BIN`), `eco-update` behavior, `docs/INTEGRATION.md` — S5–S7 — explore + worker — Risk: item 3
 - [x] T3 (T0.7) Local telemetry in `internal/qbit/telemetry`, separate `telemetry.db`, on by default, `QBIT_JAY_TELEMETRY=off`, retention and delete command, `stats --telemetry` — S8, S9 — worker — Risk: item 1
 - [x] T4 (T0.8) Evaluators E1, E2 (synthetic fixture), E3 on synthetic corpora; BASELINE.md with upstream and fork — S10, S11 — worker
-- [x] T3 (T0.7) Local telemetry in `internal/qbit/telemetry`, separate `telemetry.db`, on by default, `QBIT_JAY_TELEMETRY=off`, retention and delete command, `stats --telemetry` — S8, S9 — worker — Risk: item 1
-- [x] T4 (T0.8) Evaluators E1, E2 (synthetic fixture), E3 on synthetic corpora; BASELINE.md with upstream and fork — S10, S11 — worker
 - [x] T5 (T0.9) Releases: GoReleaser to qbitdevz, GitHub Releases with checksums, curl and PowerShell install scripts verifying checksums, `go install`, Homebrew tap and Scoop bucket; embedded Pi plugin installed as a local Pi package; adapt or disable upstream-only workflows (SignPath, issue/PR policy, publish-pi, cloud-image, CodeRabbit) — S12, S13, S16 — worker — Risk: item 5
 - [x] T6 (T0.10) Parity checklist with evidence per item, release v0.1.0 — S14, S15 — parent — Risk: item 5
 
