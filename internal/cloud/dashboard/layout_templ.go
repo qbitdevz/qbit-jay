@@ -35,33 +35,41 @@ func Layout(title string, username string, activeTab string, isAdmin bool, versi
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" data-theme=\"dark\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"color-scheme\" content=\"light dark\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/dashboard/static/qbit-jay-isotype.svg\"><title>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var2 string
 		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 15, Col: 17}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 17, Col: 17}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " — Engram Cloud</title><link rel=\"stylesheet\" href=\"/dashboard/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/styles.css\"><script src=\"/dashboard/static/htmx.min.js\"></script></head><body class=\"shell-body\"><div class=\"shell-backdrop\"><div class=\"status-ribbon\"><span class=\"status-pill\">CLOUD ACTIVE</span> <span class=\"status-copy\">shared memory index / local-first replication / org policy controls</span></div><div class=\"app-shell\"><header class=\"shell-header\"><div class=\"brand-stack\"><a href=\"/dashboard/\" class=\"brand\">Engram Cloud</a><p class=\"brand-subtitle\">An elephant never forgets.</p></div><div class=\"user-info\"><span class=\"user-name\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " — qbit-jay Cloud</title><link rel=\"stylesheet\" href=\"/dashboard/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/theme.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/styles.css\"><script src=\"/dashboard/static/htmx.min.js\"></script></head><body class=\"shell-body\"><div class=\"shell-backdrop\"><div class=\"status-ribbon\"><span class=\"status-pill\">CLOUD ACTIVE</span> <span class=\"status-copy\">shared memory index / local-first replication / org policy controls</span></div><div class=\"app-shell\"><header class=\"shell-header\"><div class=\"brand-stack\"><a href=\"/dashboard/\" class=\"brand\" aria-label=\"qbit-jay Cloud\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BrandMark("brand-mark brand-mark-glow").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<span class=\"brand-word\">qbit-jay</span> <span class=\"brand-product\">Cloud</span></a><p class=\"brand-subtitle\">Hides acorns. Remembers where.</p></div><div class=\"user-info\"><span class=\"user-name\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(username)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 33, Col: 41}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 40, Col: 41}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span><form method=\"post\" action=\"/dashboard/logout\" style=\"margin:0\"><button type=\"submit\" class=\"user-link logout-link\">Logout</button></form></div></header><nav class=\"shell-nav\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><form method=\"post\" action=\"/dashboard/logout\" style=\"margin:0\"><button type=\"submit\" class=\"user-link logout-link\">Logout</button></form></div></header><nav class=\"shell-nav\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -69,7 +77,7 @@ func Layout(title string, username string, activeTab string, isAdmin bool, versi
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</nav><main class=\"shell-main\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</nav><main class=\"shell-main\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -77,20 +85,20 @@ func Layout(title string, username string, activeTab string, isAdmin bool, versi
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</main><footer class=\"shell-footer\"><small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</main><footer class=\"shell-footer\"><small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(versionMarker(version))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 48, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `layout.templ`, Line: 55, Col: 91}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</small></footer></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</small></footer></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

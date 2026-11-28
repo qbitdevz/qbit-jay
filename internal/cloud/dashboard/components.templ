@@ -132,7 +132,7 @@ templ DashboardHome(username string) {
 	<section class="hero-panel">
 		<div class="hero-copy">
 			<p class="section-kicker">OPERATOR { username }</p>
-			<h2>Welcome to Engram Cloud</h2>
+			<h2>Welcome to qbit-jay Cloud</h2>
 			<p class="hero-lead">Your shared memory workspace is ready. Local SQLite stays authoritative, while cloud turns it into an index your team and agents can actually use.</p>
 		</div>
 		<div class="data-frame" id="dashboard-stats" hx-get="/dashboard/stats" hx-trigger="load" hx-swap="innerHTML">
@@ -1030,7 +1030,7 @@ templ ManagedUserDetailPage(user cloudstore.HumanUser, tokens []cloudstore.Princ
 					<input type="text" name="name" placeholder="Token label (optional)" autocomplete="off"/>
 					<button type="submit">Create Token</button>
 				</form>
-				<p class="muted">Tokens are shown only once, immediately after creation. Engram Cloud cannot redisplay a raw token afterward — revoke it and create a new one if it is lost.</p>
+				<p class="muted">Tokens are shown only once, immediately after creation. qbit-jay Cloud cannot redisplay a raw token afterward — revoke it and create a new one if it is lost.</p>
 			} else if canManageManagedUsers {
 				<div class="policy-note danger-note">
 					<p><strong>Token creation unavailable.</strong> Enable this managed user before creating a managed token.</p>
@@ -1137,7 +1137,7 @@ templ ManagedUserDetailPage(user cloudstore.HumanUser, tokens []cloudstore.Princ
 
 templ ManagedUserAdministrationNotice() {
 	<div class="data-frame policy-note">
-		<p><strong>Managed-user administration requires a managed admin token.</strong> Sign in with a token issued by <code>engram cloud bootstrap admin --issue-token ...</code>. If the sole enabled managed admin has no token, use <code>engram cloud bootstrap recover-token</code>.</p>
+		<p><strong>Managed-user administration requires a managed admin token.</strong> Sign in with a token issued by <code>qbit-jay cloud bootstrap admin --issue-token ...</code>. If the sole enabled managed admin has no token, use <code>qbit-jay cloud bootstrap recover-token</code>.</p>
 	</div>
 }
 
@@ -1157,7 +1157,7 @@ templ ManagedUserTokenCreatedPage(user cloudstore.HumanUser, rawToken string, to
 			</div>
 		</div>
 		<div class="data-frame policy-note danger-note">
-			<p><strong>This raw token is shown only once.</strong> Engram Cloud never stores or displays it again — copy it now and store it securely.</p>
+			<p><strong>This raw token is shown only once.</strong> qbit-jay Cloud never stores or displays it again — copy it now and store it securely.</p>
 			<pre class="token-reveal">{ rawToken }</pre>
 			<p class="muted">Prefix { token.TokenPrefix } — { emptyDash(token.Name) } — created { formatTimeValue(token.CreatedAt) }</p>
 		</div>

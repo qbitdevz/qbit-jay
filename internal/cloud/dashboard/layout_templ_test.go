@@ -45,7 +45,7 @@ func TestLayoutRendersVersionInFooterWhenMountConfigVersionSet(t *testing.T) {
 	// The version marker must sit inside the same <small> as the canonical
 	// footer copy so the chrome stays one cohesive row instead of a new
 	// free-floating label.
-	if !strings.Contains(body, "ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · v1.2.3-test</small>") {
+	if !strings.Contains(body, "QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · v1.2.3-test</small>") {
 		t.Errorf("expected canonical footer copy + version marker inside one <small>, body=%q", body)
 	}
 }
@@ -72,7 +72,7 @@ func TestLayoutShowsUnknownWhenMountConfigVersionEmpty(t *testing.T) {
 		t.Fatalf("expected 200, got %d body=%q", rec.Code, rec.Body.String())
 	}
 	body := rec.Body.String()
-	if !strings.Contains(body, "<small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · version unknown</small>") {
+	if !strings.Contains(body, "<small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · version unknown</small>") {
 		t.Errorf("expected full footer with unknown version, body=%q", body)
 	}
 }
@@ -197,7 +197,7 @@ func TestChromeErrorPathsPreserveVersion(t *testing.T) {
 					if label == "" {
 						label = "version unknown"
 					}
-					footer := "<small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · " + label + "</small>"
+					footer := "<small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · " + label + "</small>"
 					if strings.Count(body, footer) != 1 || strings.Count(body, " · "+label+"</small>") != 1 {
 						t.Errorf("expected exactly one canonical footer %q; body=%q", footer, body)
 					}
@@ -228,7 +228,7 @@ func TestLoginPageShowsUnknownWhenMountConfigVersionEmpty(t *testing.T) {
 		t.Fatalf("expected 200, got %d body=%q", rec.Code, rec.Body.String())
 	}
 	body := rec.Body.String()
-	if !strings.Contains(body, "<small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · version unknown</small>") {
+	if !strings.Contains(body, "<small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY · version unknown</small>") {
 		t.Errorf("expected full footer with unknown version, body=%q", body)
 	}
 }

@@ -14,9 +14,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/a-h/templ"
 	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
-	"github.com/a-h/templ"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/theme"
 )
 
 type SyncStatus struct {
@@ -145,6 +146,12 @@ func (h *handlers) requireScopedSession(next dashboardHandler) http.HandlerFunc 
 	})
 }
 
+func serveThemeCSS(w http.ResponseWriter, _ *http.Request) {
+	w.Header().Set("Content-Type", "text/css; charset=utf-8")
+	w.Header().Set("Cache-Control", "no-cache")
+	_, _ = w.Write([]byte(theme.CSS()))
+}
+
 func Mount(mux *http.ServeMux, cfg MountConfig) {
 	h := &handlers{cfg: cfg}
 
@@ -152,6 +159,9 @@ func Mount(mux *http.ServeMux, cfg MountConfig) {
 	if err != nil {
 		log.Fatalf("dashboard: failed to create static sub FS: %v", err)
 	}
+	// Design tokens are generated from internal/qbit/theme (S14), not stored
+	// in static/, so the stylesheet cannot drift from the Go values.
+	mux.HandleFunc("GET /dashboard/static/theme.css", serveThemeCSS)
 	mux.Handle("GET /dashboard/static/", http.StripPrefix("/dashboard/static/", http.FileServer(http.FS(staticSub))))
 
 	mux.HandleFunc("GET /dashboard/health", h.handleHealth)
@@ -225,10 +235,10 @@ func renderSyncStatusPage(status SyncStatus) string {
 	message = html.EscapeString(message)
 
 	return fmt.Sprintf(`<html>
-<head><title>Engram Cloud Dashboard</title></head>
+<head><title>qbit-jay Cloud Dashboard</title></head>
 <body>
   <main>
-    <h1>Engram Cloud Dashboard</h1>
+    <h1>qbit-jay Cloud Dashboard</h1>
     <p>phase: %s</p>
     <section>
       <h2>%s</h2>

@@ -8,12 +8,15 @@ package dashboard
 // Empty version displays "version unknown", as on the login page.
 templ Layout(title string, username string, activeTab string, isAdmin bool, version string, content templ.Component) {
 	<!DOCTYPE html>
-	<html lang="en" data-theme="dark">
+	<html lang="en">
 		<head>
 			<meta charset="utf-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1"/>
-			<title>{ title } — Engram Cloud</title>
+			<meta name="color-scheme" content="light dark"/>
+			<link rel="icon" type="image/svg+xml" href="/dashboard/static/qbit-jay-isotype.svg"/>
+			<title>{ title } — qbit-jay Cloud</title>
 			<link rel="stylesheet" href="/dashboard/static/pico.min.css"/>
+			<link rel="stylesheet" href="/dashboard/static/theme.css"/>
 			<link rel="stylesheet" href="/dashboard/static/styles.css"/>
 			<script src="/dashboard/static/htmx.min.js"></script>
 		</head>
@@ -26,8 +29,12 @@ templ Layout(title string, username string, activeTab string, isAdmin bool, vers
 				<div class="app-shell">
 					<header class="shell-header">
 						<div class="brand-stack">
-							<a href="/dashboard/" class="brand">Engram Cloud</a>
-							<p class="brand-subtitle">An elephant never forgets.</p>
+							<a href="/dashboard/" class="brand" aria-label="qbit-jay Cloud">
+								@BrandMark("brand-mark brand-mark-glow")
+								<span class="brand-word">qbit-jay</span>
+								<span class="brand-product">Cloud</span>
+							</a>
+							<p class="brand-subtitle">Hides acorns. Remembers where.</p>
 						</div>
 						<div class="user-info">
 							<span class="user-name">{ username }</span>
@@ -45,7 +52,7 @@ templ Layout(title string, username string, activeTab string, isAdmin bool, vers
 						@content
 					</main>
 					<footer class="shell-footer">
-						<small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY{ versionMarker(version) }</small>
+						<small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY{ versionMarker(version) }</small>
 					</footer>
 				</div>
 			</div>
