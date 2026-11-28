@@ -2,21 +2,21 @@
 
 # Interfaces
 
-**Engram exposes one local memory core through several interfaces: CLI, MCP, local HTTP API, and TUI.** Keep interface code thin: parse input, call the right package, return a clear response.
+**qbit-jay exposes one local memory core through several interfaces: CLI, MCP, local HTTP API, and TUI.** Keep interface code thin: parse input, call the right package, return a clear response.
 
-## CLI: `cmd/engram`
+## CLI: `cmd/qbit-jay`
 
-`cmd/engram/main.go` and neighboring files are the binary entry point. They connect store, HTTP, MCP, TUI, sync, autosync, setup, doctor, conflicts, cloud, and Obsidian.
+`cmd/qbit-jay/main.go` and neighboring files are the binary entry point. They connect store, HTTP, MCP, TUI, sync, autosync, setup, doctor, conflicts, cloud, and Obsidian.
 
 Do not put core behavior in the command if it can live in a testable package. The command should coordinate, parse flags, and adapt errors for humans.
 
 ## MCP: `internal/mcp`
 
-`internal/mcp/mcp.go` exposes Engram to agents over stdio. It has tool profiles:
+`internal/mcp/mcp.go` exposes qbit-jay to agents over stdio. It has tool profiles:
 
 | Profile | Use |
 |---|---|
-| `all` | Default for `engram mcp`; registers all tools. |
+| `all` | Default for `qbit-jay mcp`; registers all tools. |
 | `agent` | Normal agent tools, such as save/search/context/session summary/current project/judge/doctor. |
 | `admin` | Manual curation: stats, delete, timeline, merge. |
 
@@ -53,7 +53,7 @@ The TUI uses Bubbletea and reads from the local store. The separation is classic
 ### MCP tools
 
 - [ ] The tool uses store as the source of truth.
-- [ ] Project resolution respects `.engram/config.json`, cwd, and the `ambiguous_project` flow.
+- [ ] Project resolution respects `.qbit-jay/config.json`, cwd, and the `ambiguous_project` flow.
 - [ ] The `agent`/`admin` profile remains intentional.
 - [ ] Errors return useful envelopes for agents.
 - [ ] Tests in `internal/mcp/*_test.go` cover the contract.
@@ -61,7 +61,7 @@ The TUI uses Bubbletea and reads from the local store. The separation is classic
 
 ### Local API
 
-- [ ] The route belongs to `engram serve`, not cloud.
+- [ ] The route belongs to `qbit-jay serve`, not cloud.
 - [ ] `internal/server/server.go` only orchestrates request/response and calls store/services.
 - [ ] Status codes and JSON errors are deterministic.
 - [ ] Tests in `internal/server/*_test.go` cover errors and success.

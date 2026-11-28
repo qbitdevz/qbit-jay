@@ -1,8 +1,8 @@
 [← Back to README](../README.md)
 
-# Engram Cloud (Moved)
+# qbit-jay Cloud (Moved)
 
-Engram Cloud docs now live under:
+qbit-jay Cloud docs now live under:
 
 - [docs/engram-cloud/README.md](./engram-cloud/README.md) — landing page
 - [docs/engram-cloud/quickstart.md](./engram-cloud/quickstart.md) — one recommended path first

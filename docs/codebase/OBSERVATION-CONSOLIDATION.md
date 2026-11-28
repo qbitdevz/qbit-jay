@@ -85,7 +85,7 @@ The survivor inherits the newest source session/scope; no session is synthesized
 Preview example:
 
 ```json
-{"ids_to_delete":[12,18],"new_title":"Consolidated decision","new_content":"Approved summary","expected_project":"engram"}
+{"ids_to_delete":[12,18],"new_title":"Consolidated decision","new_content":"Approved summary","expected_project":"qbit-jay"}
 ```
 
 Inspect the JSON-text result's `plan.sources`, `plan.survivor`, `plan.project`

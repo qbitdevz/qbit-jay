@@ -148,8 +148,8 @@ subsequently recorded:
   one prebuilt-binary opt-in skip. Syntax/whitespace checks returned 0.
 - Corrected `npm --prefix plugin/pi test`: 0; **634 total, 632 passed, zero
   failed/cancelled, two skipped**. The skipped installed-host lifecycle needs
-  `ENGRAM_PI_LIFECYCLE_CLI`; the packaged positive workflow needs
-  `ENGRAM_PI_TEST_SERVER_BINARY`. Neither omitted proof is promoted to pass.
+  `QBIT_JAY_PI_LIFECYCLE_CLI`; the packaged positive workflow needs
+  `QBIT_JAY_PI_TEST_SERVER_BINARY`. Neither omitted proof is promoted to pass.
 - Ten selected MCP/HTTP inventory, search, history and batch-judgment top-level
   tests passed without skips, with `GOPROXY=off GOSUMDB=off`, `-count=1 -v`.
   The exact selection command is in the owner record; this is not a full Go suite.

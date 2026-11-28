@@ -1,12 +1,12 @@
 # Brand plug-in points
 
 The visual identity of qbit-jay was chosen on 2026-11-27 (direction 03, see
-"Chosen identity"). The final assets exist in `assets/branding/`, but nothing
-uses them yet: wiring them into the README, docs, TUI and web, and removing
-Engram's assets, belongs to task T0.4. This document records where that
-identity plugs in, so it can be applied without searching the codebase.
+"Chosen identity"). The final assets live in `assets/branding/`. The README,
+the TUI, the web dashboard and the docs use them, and Engram's logos and
+screenshots have been removed (task T0.4). This document records where the
+identity plugs in.
 
-Status: inventory at upstream commit `11521f4`, plus the new assets.
+Status: applied in T0.4; the README header uses `qbit-jay-banner.gif`.
 
 ## Name and story
 
@@ -20,8 +20,10 @@ the story:
   espacial: Un solo arrendajo esconde entre 3.000 y 5.000 bellotas por temporada
   en miles de lugares distintos, y las recupera meses después."
 
-The design session and the README in T0.4 should build on these. Before the
-acorn figure appears in public copy, cite a source for it.
+The README tells the jay story with the sourced episodic-memory fact and the
+banner phrase "Hides thousands of acorns. Remembers where, months later."
+Before the figure "3.000 a 5.000 bellotas" appears in public copy, cite a
+source for it.
 
 ## Chosen identity
 
@@ -45,35 +47,35 @@ wordmark and banner text converted to paths (Outfit), so they need no font.
 - **Minimum size** (qbit-jay decision): isotype 32 px.
 - **Fonts**: Outfit (wordmark and headlines), Inter (body), JetBrains Mono
   (labels), all SIL OFL 1.1, taken from `qbitdev-brand/fonts`.
-- The Engram images in `assets/branding/` are removed in T0.4.
+- Engram's images are removed from `assets/branding/` and `plugin/pi/assets/`; a test (`TestNoUpstreamBrandAssetsAreShipped`) fails if any returns.
 
 ## Rules
 
 - A fork must use its own name and identity (`TRADEMARKS.md`). "Based on
   Engram" and "compatible with Engram" are allowed when true; Engram logos and
   confusingly similar names are not.
-- Until T0.4 lands, the TUI and web keep their provisional theme. Do not
-  imitate Engram's identity.
+- Do not imitate Engram's identity: the TUI and web read the qbit-jay tokens
+  from `internal/qbit/theme`.
 
 ## Where identity lives today
 
 | Surface | Location | What it holds |
 | --- | --- | --- |
-| Images | `assets/branding/` | `qbit-jay-*` final assets (new, not wired in yet); Engram banner, logo and Cloud elephant images: to be removed in T0.4 |
-| Screenshots | `assets/*.png` | TUI and agent screenshots showing Engram branding: to be retaken |
-| TUI theme | `internal/tui/styles.go` | Lip Gloss colours (Catppuccin Mocha) |
-| Web theme | `internal/cloud/dashboard/static/styles.css` | Dashboard CSS on top of `pico.min.css` |
-| Cloud branding notes | `docs/ENGRAM-CLOUD-BRANDING.md` | Upstream's branding guidance for the Cloud dashboard |
+| Images | `assets/branding/` | `qbit-jay-*` final assets; no Engram image remains |
+| Screenshots | `assets/screenshots/` | TUI screens rendered by `internal/tui` (`TestRenderPreviewScreens`) with sample data |
+| TUI theme | `internal/tui/styles.go` | Lip Gloss colours read from `internal/qbit/theme` |
+| Web theme | `internal/cloud/dashboard/static/styles.css` | Dashboard CSS on `--qj-*` variables generated from `internal/qbit/theme` |
+| Cloud branding | `docs/engram-cloud/branding.md` | Points to this document and `design/system.md` |
 
-## Planned single source of theme tokens
+## Single source of theme tokens
 
-`internal/qbit/theme` (to be created in T0.4) will hold the tokens for light and
-dark themes: colours, typography and spacing. The TUI reads them as Lip Gloss
-styles and the web interface as CSS variables. Replacing the provisional theme
-then means editing that one package.
+`internal/qbit/theme` holds the tokens for light and dark themes: colours,
+typography and spacing. The TUI reads them as Lip Gloss styles and the web
+interface as CSS variables, so a change to the identity is a change to that one
+package (checked against `design/system.md` by tests).
 
 | Element | Plugs into | State |
 | --- | --- | --- |
-| Logo | `assets/branding/` and the README header | Designed (direction 03); wiring pending in T0.4 |
-| Palette | `internal/qbit/theme` | Designed (`design/system.md`); theme package pending in T0.4 |
-| Typography | `internal/qbit/theme` | Chosen (Outfit, Inter, JetBrains Mono); theme package pending in T0.4 |
+| Logo | `assets/branding/` and the README header | Applied |
+| Palette | `internal/qbit/theme` | Applied (`design/system.md`) |
+| Typography | `internal/qbit/theme`, embedded dashboard fonts | Applied (Outfit, Inter, JetBrains Mono) |

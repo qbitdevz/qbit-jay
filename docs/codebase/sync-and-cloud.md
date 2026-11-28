@@ -2,22 +2,22 @@
 
 # Sync and Cloud
 
-**Sync moves local-first memory without changing ownership: local SQLite stays authoritative.** Engram has git-friendly chunk sync and opt-in cloud sync for explicit projects.
+**Sync moves local-first memory without changing ownership: local SQLite stays authoritative.** qbit-jay has git-friendly chunk sync and opt-in cloud sync for explicit projects.
 
 ## Local sync and cloud sync
 
-Engram has two related but distinct ideas:
+qbit-jay has two related but distinct ideas:
 
-1. **Git sync through chunks**: export/import to `.engram/manifest.json` and `.engram/chunks/*.jsonl.gz`.
-2. **Opt-in cloud sync**: push/pull against `engram cloud serve` for an explicit project.
+1. **Git sync through chunks**: export/import to `.qbit-jay/manifest.json` and `.qbit-jay/chunks/*.jsonl.gz`.
+2. **Opt-in cloud sync**: push/pull against `qbit-jay cloud serve` for an explicit project.
 
 ```text
 Local SQLite
    │
-   ├── engram sync
-   │     └── .engram/manifest.json + gzip JSONL chunks
+   ├── qbit-jay sync
+   │     └── .qbit-jay/manifest.json + gzip JSONL chunks
    │
-   └── engram sync --cloud --project <name>
+   └── qbit-jay sync --cloud --project <name>
          └── internal/cloud/remote
                 └── HTTP /sync/*
                        └── internal/cloud/cloudserver
@@ -28,9 +28,9 @@ Local SQLite
 
 `internal/sync/sync.go` avoids one large shared JSON file. Each sync creates new chunks and a small manifest. That reduces merge conflicts and lets multiple machines generate memory in parallel.
 
-Project-scoped Git chunks carry sessions, observations, and the non-orphaned `memory_relations` graph for observations in that project. **Prompts are excluded by default**, including previously imported prompts. Intentional sharing requires `engram sync --include-prompts`; the core API is `ExportWithOptions` with `GitExportOptions{IncludePrompts: true}`. Relation rows travel as existing `relation` sync mutations inside the chunk so imports reuse the same idempotent relation apply path as cloud sync.
+Project-scoped Git chunks carry sessions, observations, and the non-orphaned `memory_relations` graph for observations in that project. **Prompts are excluded by default**, including previously imported prompts. Intentional sharing requires `qbit-jay sync --include-prompts`; the core API is `ExportWithOptions` with `GitExportOptions{IncludePrompts: true}`. Relation rows travel as existing `relation` sync mutations inside the chunk so imports reuse the same idempotent relation apply path as cloud sync.
 
-Prompt exclusion happens before serialization, hashing, and counting, without changing local SQLite data. Prompt-delete tombstones still travel: they share identity and deletion metadata, not prompt content. Cloud replication and standalone `engram export` retain their existing prompt behavior; the Git opt-in option is rejected in cloud mode before effects. Import remains compatible with historical prompt-bearing chunks.
+Prompt exclusion happens before serialization, hashing, and counting, without changing local SQLite data. Prompt-delete tombstones still travel: they share identity and deletion metadata, not prompt content. Cloud replication and standalone `qbit-jay export` retain their existing prompt behavior; the Git opt-in option is rejected in cloud mode before effects. Import remains compatible with historical prompt-bearing chunks.
 
 During incremental local project exports, an observation absent from available chunk history bypasses the manifest watermark. For an existing observation, the newest readable creation or update timestamp in its exported history is the comparison point: a newer chunk from another machine does not hide a local edit to that observation. Direct historical rows and observation upserts contribute version timestamps; identity-only or unreadable live history causes a conservative re-export to establish version evidence. A readable delete timestamp remains a floor against stale upserts; legacy undated tombstones retain the manifest-watermark fallback. A direct historical row or an observation mutation, including a tombstone, establishes historical presence. Opt-in prompts use stable-ID presence in available history, not their creation timestamps: prompts omitted by earlier exports remain eligible even after other memories advance the watermark. Both legacy prompt arrays and prompt mutations establish presence; tombstoned identities remain suppressed. Repeated opt-in does not resend those identities. Sessions retain timestamp filtering, but parents needed by emitted observations or prompts are included once per chunk for dependency closure.
 
@@ -38,7 +38,7 @@ If the current local export generates a known chunk ID whose payload is missing,
 
 This is not redaction: observations and other shared fields can still contain sensitive data. Inspect chunks before committing. Existing chunks are never rewritten, and excluding prompts now does not remove content already retained in Git history.
 
-Cloud exports are size-bounded: `engram sync --cloud` splits the pending mutation replay into deterministic, dependency-complete chunks of at most 4 MiB each, so a large initial replay stays within the server's `ENGRAM_CLOUD_MAX_PUSH_BYTES` limit (default 8 MiB). Each chunk acknowledges only its own mutation sequences after a successful push, so an interrupted sync resumes from the first unacknowledged mutation instead of replaying acknowledged work.
+Cloud exports are size-bounded: `qbit-jay sync --cloud` splits the pending mutation replay into deterministic, dependency-complete chunks of at most 4 MiB each, so a large initial replay stays within the server's `QBIT_JAY_CLOUD_MAX_PUSH_BYTES` limit (default 8 MiB). Each chunk acknowledges only its own mutation sequences after a successful push, so an interrupted sync resumes from the first unacknowledged mutation instead of replaying acknowledged work.
 
 Guardrails:
 
@@ -82,8 +82,8 @@ advances. A payload that does not decode at all stays fail-closed — that is a
 transport fault, not known-corrupt historical data.
 
 Quarantined mutations are never silent, so the "no silent drops" rule holds:
-`engram doctor --check invalid_session_identity` reports each one as a warning
-finding with reason code `quarantined_pulled_session_identity`, and `engram
+`qbit-jay doctor --check invalid_session_identity` reports each one as a warning
+finding with reason code `quarantined_pulled_session_identity`, and `qbit-jay
 conflicts deferred` lists the raw row. The same doctor check reports blank
 identities found in the local `sessions` table as blocking findings. Neither is
 auto-repaired, because inventing a canonical session ID would fabricate identity
@@ -140,7 +140,7 @@ it is not a historical identity repair command.
 
 ### Session directory admission: local-partial, cloud ownership-aware, cloud-mutation-compatible
 
-Session `directory` follows a two-domain contract (engram#1287), with one Cloud
+Session `directory` follows a two-domain contract (qbit-jay#1287), with one Cloud
 compatibility exception for historical per-mutation events.
 
 **Local pulled chunks admit a partial directory.** The local validator accepts
@@ -210,7 +210,7 @@ error naming the offending session.
 - `GET /sync/mutations/pull`
 - `/dashboard/*`
 
-`POST /sync/push` and `POST /sync/mutations/push` enforce the server-side push request body limit from `ENGRAM_CLOUD_MAX_PUSH_BYTES` (default 8 MiB).
+`POST /sync/push` and `POST /sync/mutations/push` enforce the server-side push request body limit from `QBIT_JAY_CLOUD_MAX_PUSH_BYTES` (default 8 MiB).
 
 For complete route details, use [DOCS.md — HTTP API Endpoints](../../DOCS.md#http-api-endpoints).
 

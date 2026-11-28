@@ -71,8 +71,7 @@ func TestModulePathMatchesReleaseMajorVersion(t *testing.T) {
 		t.Fatalf("go.mod module line = %q, want %q", firstLine, want)
 	}
 
-	// docs/INSTALLATION.md still names cmd/engram until the docs task (T7) rewrites it.
-	install := "go install " + modulePath + "/cmd/engram@latest"
+	install := "go install " + modulePath + "/cmd/qbit-jay@latest"
 	installation := releaseConfigFile(t, filepath.Join(root, "docs", "INSTALLATION.md"))
 	if strings.Count(installation, install) < 2 {
 		t.Fatalf("docs/INSTALLATION.md must document %q for both Windows and macOS/Linux", install)

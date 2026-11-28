@@ -13,9 +13,9 @@
 | Recent context | Session summary and context for a new session. | `internal/store`, `internal/mcp` |
 | Prompt capture | Saves user prompts as retrievable context. | `internal/store`, `internal/mcp`, plugins |
 | Topic upserts | Updates evolving decisions with `topic_key`. | `internal/store`, `internal/mcp` |
-| Conflict surfacing | Detects/judges relationships between memories. | `internal/store/relations.go`, `internal/mcp`, `cmd/engram/conflicts.go` |
-| Doctor/repair | Operational diagnostics and guided repair. | `internal/diagnostic`, `cmd/engram/doctor.go`, `docs/DOCTOR.md` |
-| Git sync | Chunk export/import in `.engram/`. | `internal/sync` |
+| Conflict surfacing | Detects/judges relationships between memories. | `internal/store/relations.go`, `internal/mcp`, `cmd/qbit-jay/conflicts.go` |
+| Doctor/repair | Operational diagnostics and guided repair. | `internal/diagnostic`, `cmd/qbit-jay/doctor.go`, `docs/DOCTOR.md` |
+| Git sync | Chunk export/import in `.qbit-jay/`. | `internal/sync` |
 | Cloud sync | Per-project replication against cloud. | `internal/cloud/*`, `internal/sync` |
 | Autosync | Background push/pull with degraded status. | `internal/cloud/autosync` |
 | Dashboard | Web visibility for projects, activity, admin, audit. | `internal/cloud/dashboard`, `internal/cloud/cloudstore` |
@@ -23,7 +23,7 @@
 | TUI | Terminal memory navigation. | `internal/tui` |
 | Obsidian beta | Experimental export/plugin to Obsidian. | `internal/obsidian`, `plugin/obsidian`, `docs/beta/obsidian-brain.md` |
 
-Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/engram/doctor.go`.
+Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/qbit-jay/doctor.go`.
 `internal/diagnostic/repair.go` owns repair orchestration and result aggregation;
 `internal/store` retains each repair's data, transaction, and backup behavior.
 
@@ -34,7 +34,7 @@ Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/engram/doctor.go
 1. **Product and commands**: `README.md`.
 2. **Full technical reference**: `DOCS.md`.
 3. **Existing architecture**: `docs/ARCHITECTURE.md`.
-4. **Binary entry point**: `cmd/engram/main.go` and `cmd/engram/cloud.go`.
+4. **Binary entry point**: `cmd/qbit-jay/main.go` and `cmd/qbit-jay/cloud.go`.
 5. **Data core**: `internal/store/store.go`.
 6. **Access surfaces**: `internal/mcp/mcp.go`, `internal/server/server.go`, `internal/tui/`.
 7. **Sync and cloud**: `internal/sync/sync.go`, `internal/cloud/*`.
@@ -64,7 +64,7 @@ Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/engram/doctor.go
 
 - Local SQLite is the user's source of truth.
 - Cloud is opt-in and project-scoped.
-- `engram sync --cloud --project <name>` is explicit; avoid implicit “sync everything”.
+- `qbit-jay sync --cloud --project <name>` is explicit; avoid implicit “sync everything”.
 - A local client must be able to keep working without cloud.
 
 ### Technical boundaries
@@ -103,7 +103,7 @@ Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/engram/doctor.go
 ### MCP tools change
 
 - [ ] The tool uses store as the source of truth.
-- [ ] Project resolution respects `.engram/config.json`, cwd, and the `ambiguous_project` flow.
+- [ ] Project resolution respects `.qbit-jay/config.json`, cwd, and the `ambiguous_project` flow.
 - [ ] The `agent`/`admin` profile remains intentional.
 - [ ] Errors return useful envelopes for agents.
 - [ ] Tests in `internal/mcp/*_test.go` cover the contract.
@@ -111,7 +111,7 @@ Doctor keeps CLI parsing, errors, and JSON presentation in `cmd/engram/doctor.go
 
 ### Local API change
 
-- [ ] The route belongs to `engram serve`, not cloud.
+- [ ] The route belongs to `qbit-jay serve`, not cloud.
 - [ ] `internal/server/server.go` only orchestrates request/response and calls store/services.
 - [ ] Status codes and JSON errors are deterministic.
 - [ ] Tests in `internal/server/*_test.go` cover errors and success.
@@ -183,7 +183,7 @@ Does it affect browser experience?        dashboard
 Does it affect background replication?    autosync
 Does it affect remote transport?          remote/cloudserver
 Does it affect a specific agent or host?  plugin/setup
-Does it affect human commands?            cmd/engram + docs
+Does it affect human commands?            cmd/qbit-jay + docs
 ```
 
 ---

@@ -1,6 +1,6 @@
 # Copy-based bundled recovery
 
-`engram migrate-copy` is an explicit operator recovery command. It does not
+`qbit-jay migrate-copy` is an explicit operator recovery command. It does not
 change Shell's admission policy, register provenance, stop servers, select an
 active directory, or promote a copy. Shell integration is a separate step.
 An offline `compatibility` observation still never authorizes opening an
@@ -25,7 +25,7 @@ For example, with isolated source data under `/srv/engram-old`, and no clients
 using it:
 
 ```sh
-engram migrate-copy --data-dir /srv/engram-old \
+qbit-jay migrate-copy --data-dir /srv/engram-old \
   --output-dir /srv/engram-new --confirm-quiescent --json
 ```
 
@@ -38,7 +38,7 @@ operator's explicit confirmation, not an automatically inferred lease.
 The command reads source files without opening source SQLite. It copies the
 whole directory, including the database, WAL, configuration, local identity,
 replication cursors/journals, tombstones and other non-exported state. Only
-`engram.db-shm` is omitted: SQLite regenerates that coordination cache in the
+`qbit-jay.db-shm` is omitted: SQLite regenerates that coordination cache in the
 output. Files retain their permission bits; the output root and copied
 directories are private (`0700`). Symlinks and special files are rejected.
 
@@ -117,9 +117,9 @@ copy as independent syncing instances.
 
 The four flags in the example are mandatory and accepted once only. Unknown flags, positional
 arguments, missing values, relative paths and duplicates exit 2 with empty
-stdout and one `engram migrate-copy: ...` diagnostic on stderr; parsing occurs
+stdout and one `qbit-jay migrate-copy: ...` diagnostic on stderr; parsing occurs
 before source access/default configuration/update checks/orphan migration.
-`engram migrate-copy --help` is the sole help form and exits 0 without opening
+`qbit-jay migrate-copy --help` is the sole help form and exits 0 without opening
 any data.
 
 For a rejected v3.4.0-era store, add `--catalog-diagnostics=v3.4.0` and use a new
@@ -138,7 +138,7 @@ must require exit 0 and a complete valid JSON result, not a partial stdout prefi
 
 ## Evidence boundaries
 
-The reported Linux bundled upgrade from Engram 3.3.2 to 3.4.0 is user evidence,
+The reported Linux bundled upgrade from qbit-jay 3.3.2 to 3.4.0 is user evidence,
 not an executed Linux reproduction here. Tests use isolated temporary state,
 including WAL-only changes, configuration and non-exported replication rows.
 The existing derived legacy fixture was originally based on the local `v3.3.2`

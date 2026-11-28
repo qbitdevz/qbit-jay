@@ -1,6 +1,6 @@
-[← Back to Engram Cloud](./engram-cloud/README.md)
+[← Back to qbit-jay Cloud](./engram-cloud/README.md)
 
-# Engram Cloud Branding (Moved)
+# qbit-jay Cloud Branding (Moved)
 
 Branding guidance moved to:
 

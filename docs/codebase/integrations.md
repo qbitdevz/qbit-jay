@@ -2,20 +2,20 @@
 
 # Integrations
 
-**Agent integrations should be thin adapters around Engram's Go behavior.** Setup and plugin code may connect agents to MCP, sessions, hooks, and local API, but core memory semantics belong in Go.
+**Agent integrations should be thin adapters around qbit-jay's Go behavior.** Setup and plugin code may connect agents to MCP, sessions, hooks, and local API, but core memory semantics belong in Go.
 
 ## Integration map
 
-Engram supports agents through MCP and through plugins that add lifecycle/session management.
+qbit-jay supports agents through MCP and through plugins that add lifecycle/session management.
 
 ```text
 Agent
   │
   ├── Bare MCP
-  │     └── engram mcp --tools=agent
+  │     └── qbit-jay mcp --tools=agent
   │
   ├── OpenCode plugin
-  │     ├── plugin/opencode/engram.ts
+  │     ├── plugin/opencode/qbit-jay.ts
   │     └── internal/setup setup opencode
   │
   ├── Claude Code plugin
@@ -49,7 +49,7 @@ manual MCP configs documented in `docs/AGENT-SETUP.md`.
 
 Plugins may:
 
-- start or find `engram serve`,
+- start or find `qbit-jay serve`,
 - create sessions,
 - import chunks,
 - inject the Memory Protocol,
@@ -63,14 +63,14 @@ For per-agent details, use [docs/AGENT-SETUP.md](../AGENT-SETUP.md) and [docs/PL
 
 ## Runtime session identity
 
-Adapters translate host runtime identity into an Engram session; they do not own
+Adapters translate host runtime identity into a qbit-jay session; they do not own
 persistence or decide which session an omitted ID should select.
 
-| Adapter | Runtime-to-Engram mapping | Registration before identity use |
+| Adapter | Runtime-to-qbit-jay mapping | Registration before identity use |
 | --- | --- | --- |
-| Claude Code | SessionStart posts the host `session_id` with its resolved project and directory. | SessionStart alone does not confirm registration. Before binding a classified Engram write/session tool, PreToolUse confirms project-owned registration for the host ID: a registered session is confirmed against its registered owner project (#1717), and only first registration derives the project from the cwd. Confirmation requires HTTP 201, matching `id`, and `status: "created"`; otherwise it denies the call with the cause the server reports. |
+| Claude Code | SessionStart posts the host `session_id` with its resolved project and directory. | SessionStart alone does not confirm registration. Before binding a classified qbit-jay write/session tool, PreToolUse confirms project-owned registration for the host ID: a registered session is confirmed against its registered owner project (#1717), and only first registration derives the project from the cwd. Confirmation requires HTTP 201, matching `id`, and `status: "created"`; otherwise it denies the call with the cause the server reports. |
 | Codex | Genuine startup/resume/clear registers with `resume: true`. Go validates HTTP 201, `status: "created"`, and an exact root ID or numeric continuation with matching `resumed_from`. | PreToolUse, prompt capture and post-compaction resolve the existing effective identity through `/runtime-sessions/resolve`, without registration. Failed confirmation blocks attributed writes and withholds the active protocol. Host closing uses `/runtime-sessions/end`; model `mem_session_end` is rewritten to the resolved effective ID for unchanged exact-ID MCP ending. No private identity map or raw-ID fallback is used. |
-| OpenCode | The plugin follows authoritative `parentID` links to the root host session; child sessions do not own top-level Engram sessions. The core selects a live continuation when the root has ended. | Before session-attributed tool writes it registers the root with `resume: true`, rechecks host ownership, and injects the acknowledged effective `id` as `session_id`. Injection requires an HTTP-success response with `status: "created"` and an `id` equal to the root or prefixed by `<root>:resume:`; missing or foreign acknowledgements block injection. |
+| OpenCode | The plugin follows authoritative `parentID` links to the root host session; child sessions do not own top-level qbit-jay sessions. The core selects a live continuation when the root has ended. | Before session-attributed tool writes it registers the root with `resume: true`, rechecks host ownership, and injects the acknowledged effective `id` as `session_id`. Injection requires an HTTP-success response with `status: "created"` and an `id` equal to the root or prefixed by `<root>:resume:`; missing or foreign acknowledgements block injection. |
 
 Clients that have confirmed an effective session ID can send it as
 `expected_effective_id` to `POST /runtime-sessions/end` when `GET /health`
@@ -83,7 +83,7 @@ behavior.
 Claude and Codex PreToolUse confirmation use a four-second total HTTP budget
 by default for the session lookup followed by Claude's owner-bound registration
 or Codex's health preflight, cwd project resolution and runtime resolution.
-Set `ENGRAM_HOOK_SESSION_CONFIRMATION_TIMEOUT` in the hook process environment
+Set `QBIT_JAY_HOOK_SESSION_CONFIRMATION_TIMEOUT` in the hook process environment
 to a positive Go duration (for example, `8s` or `500ms`) to override this budget.
 Unset, blank, invalid, overflowed, zero, or negative values retain `4s`.
 All confirmation requests share the same deadline; there is no per-request reset.

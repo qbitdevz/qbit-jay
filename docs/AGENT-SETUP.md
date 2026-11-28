@@ -2,51 +2,51 @@
 
 # Agent Setup
 
-Engram works with **any MCP-compatible agent**. Pick your agent below.
+qbit-jay works with **any MCP-compatible agent**. Pick your agent below.
 
-> Cloud bootstrap automation in agent scripts/plugins is intentionally deferred in this rollout. Use `engram cloud ...` manually for now.
+> Cloud bootstrap automation in agent scripts/plugins is intentionally deferred in this rollout. Use `qbit-jay cloud ...` manually for now.
 >
 > Deferred validation scope for this rollout:
 >
 > - Setup/plugin scripts are **not** yet validated as cloud enrollment/login orchestrators.
-> - `engram setup ...` installs MCP/plugin integrations only; it does **not** auto-run `engram cloud config/enroll/upgrade`.
+> - `qbit-jay setup ...` installs MCP/plugin integrations only; it does **not** auto-run `qbit-jay cloud config/enroll/upgrade`.
 > - Cloud onboarding contract remains CLI-first until script-level cloud flows are explicitly implemented.
 
-If a generic MCP client retains an absolute Engram executable path after you move or replace the binary, run `engram doctor` to identify the affected client, then run `engram setup <agent>` with the new binary to refresh its Engram registration (Pi is an exception: its Engram MCP entry is user-owned and must be updated manually). Doctor is read-only and does not flag bare custom commands or missing registrations. Setup preserves unrelated MCP server entries.
+If a generic MCP client retains an absolute qbit-jay executable path after you move or replace the binary, run `qbit-jay doctor` to identify the affected client, then run `qbit-jay setup <agent>` with the new binary to refresh its qbit-jay registration (Pi is an exception: its qbit-jay MCP entry is user-owned and must be updated manually). Doctor is read-only and does not flag bare custom commands or missing registrations. Setup preserves unrelated MCP server entries.
 
 ## Quick Reference
 
 | Agent         | One-liner                                                                                    | Manual Config                                      |
 | ------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------- |
-| Claude Code   | `engram setup claude-code`                                                                    | [Details](#claude-code)                            |
-| Pi            | `engram setup pi`                                                                            | [Details](#pi)                                     |
-| OpenCode      | `engram setup opencode`                                                                      | [Details](#opencode)                               |
-| Gemini CLI    | `engram setup gemini-cli`                                                                    | [Details](#gemini-cli)                             |
-| Codex           | `engram setup codex`                                                                         | [Details](#codex)                                  |
-| Antigravity CLI | `engram setup antigravity-cli`                                                               | [Details](#antigravity)                            |
-| Windsurf        | `engram setup windsurf`                                                                      | [Details](#windsurf)                               |
-| Qwen Code       | `engram setup qwen`                                                                          | [Details](#qwen-code)                              |
-| Kiro            | `engram setup kiro`                                                                          | [Details](#kiro)                                   |
-| Cursor          | `engram setup cursor`                                                                        | [Details](#cursor)                                 |
-| VS Code Copilot | `engram setup vscode-copilot`                                                                | [Details](#vs-code-copilot--claude-code-extension) |
-| Kilo Code       | `engram setup kilocode`                                                                      | [Details](#kilo-code)                              |
-| Kimi Code       | `engram setup kimi`                                                                          | [Details](#kimi-code)                              |
-| CommandCode     | `engram setup commandcode`                                                                   | [Details](#commandcode)                            |
-| Any MCP agent   | `engram mcp` (stdio)                                                                         | [Details](#any-other-mcp-agent)                    |
+| Claude Code   | `qbit-jay setup claude-code`                                                                    | [Details](#claude-code)                            |
+| Pi            | `qbit-jay setup pi`                                                                            | [Details](#pi)                                     |
+| OpenCode      | `qbit-jay setup opencode`                                                                      | [Details](#opencode)                               |
+| Gemini CLI    | `qbit-jay setup gemini-cli`                                                                    | [Details](#gemini-cli)                             |
+| Codex           | `qbit-jay setup codex`                                                                         | [Details](#codex)                                  |
+| Antigravity CLI | `qbit-jay setup antigravity-cli`                                                               | [Details](#antigravity)                            |
+| Windsurf        | `qbit-jay setup windsurf`                                                                      | [Details](#windsurf)                               |
+| Qwen Code       | `qbit-jay setup qwen`                                                                          | [Details](#qwen-code)                              |
+| Kiro            | `qbit-jay setup kiro`                                                                          | [Details](#kiro)                                   |
+| Cursor          | `qbit-jay setup cursor`                                                                        | [Details](#cursor)                                 |
+| VS Code Copilot | `qbit-jay setup vscode-copilot`                                                                | [Details](#vs-code-copilot--claude-code-extension) |
+| Kilo Code       | `qbit-jay setup kilocode`                                                                      | [Details](#kilo-code)                              |
+| Kimi Code       | `qbit-jay setup kimi`                                                                          | [Details](#kimi-code)                              |
+| CommandCode     | `qbit-jay setup commandcode`                                                                   | [Details](#commandcode)                            |
+| Any MCP agent   | `qbit-jay mcp` (stdio)                                                                         | [Details](#any-other-mcp-agent)                    |
 
-> **Native setup for all agents above.** `engram setup <agent>` configures the
-> supported integration and Memory Protocol idempotently. Pi uses native tools instead of registering Engram MCP; Claude Code is the
+> **Native setup for all agents above.** `qbit-jay setup <agent>` configures the
+> supported integration and Memory Protocol idempotently. Pi uses native tools instead of registering qbit-jay MCP; Claude Code is the
 > exception to direct config writes: its CLI owns user-scope MCP registration. The
 > per-agent sections below describe each integration's authoritative owner and
 > manual equivalent.
 
-> The OpenCode adapter treats optional `ENGRAM_BIN`, `ENGRAM_PORT`, and `ENGRAM_URL` values containing only whitespace as unset and uses their normal defaults.
+> The OpenCode adapter treats optional `QBIT_JAY_BIN`, `QBIT_JAY_PORT`, and `QBIT_JAY_URL` values containing only whitespace as unset and uses their normal defaults.
 
 ### Protocol verbosity
 
-`engram setup claude-code --protocol=slim` requests the slim session-start
+`qbit-jay setup claude-code --protocol=slim` requests the slim session-start
 protocol. Slim is honored only for the `claude-code` agent; all other agents
-remain on `full`. For Claude Code, slim activates only when Engram is a clean
+remain on `full`. For Claude Code, slim activates only when qbit-jay is a clean
 tagged release at or above 1.4.0. Local `dev`, Go pseudo-version, dirty, and
 other non-release builds remain on `full`; setup persists the selection and
 warns so you can install a supported tagged release.
@@ -56,23 +56,23 @@ marketplace plugin, it warns without changing the selected mode; session-only
 
 ## Pi
 
-Install Engram's Pi-native package:
+Install qbit-jay's Pi-native package:
 
 ```bash
-engram setup pi
+qbit-jay setup pi
 ```
 
-This version of `engram setup pi` installs `npm:gentle-engram@0.8.0`, replaces recognized historical npm pin strings, and preserves custom package entries.
+This version of `qbit-jay setup pi` installs `npm:gentle-engram@0.8.0`, replaces recognized historical npm pin strings, and preserves custom package entries.
 
-Pi agent writes use native `mem_*` tools. If Pi already has an Engram MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.engram` key from that file and restart Pi. Keep the entries for your other MCP servers.
+Pi agent writes use native `mem_*` tools. If Pi already has a qbit-jay MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.qbit-jay` key from that file and restart Pi. Keep the entries for your other MCP servers.
 
-Pi 0.99.0 and later ship built-in MCP (`mcp.json`, `/mcp`, `pi mcp add`); an installed `pi-mcp-adapter` replaces that built-in support, so neither `engram setup pi` nor `pi-engram init` adds it. An existing adapter entry in `settings.json` is left untouched.
+Pi 0.99.0 and later ship built-in MCP (`mcp.json`, `/mcp`, `pi mcp add`); an installed `pi-mcp-adapter` replaces that built-in support, so neither `qbit-jay setup pi` nor `pi-qbit-jay init` adds it. An existing adapter entry in `settings.json` is left untouched.
 
-For versioned mise installations, setup selects the shim directory from an absolute `MISE_SHIMS_DIR`, the effective absolute `shims_dir` reported by `mise settings get shims_dir` (including global config), or the mise data directory's default `shims` folder, in that order. Invalid settings output or an unavailable mise CLI leaves the default directory as the fallback. If the shim is missing from the selected directory, the caller uses its existing executable/PATH fallback policy; setup never writes mise warnings as the Engram MCP command.
+For versioned mise installations, setup selects the shim directory from an absolute `MISE_SHIMS_DIR`, the effective absolute `shims_dir` reported by `mise settings get shims_dir` (including global config), or the mise data directory's default `shims` folder, in that order. Invalid settings output or an unavailable mise CLI leaves the default directory as the fallback. If the shim is missing from the selected directory, the caller uses its existing executable/PATH fallback policy; setup never writes mise warnings as the qbit-jay MCP command.
 
-When [mise](https://mise.jdx.dev/) is detected in `PATH`, `engram setup pi` also auto-pins `npmCommand` in Pi's `settings.json` to `["mise", "exec", "node@<version>", "--", "npm"]`, preventing Node version drift from silently changing which npm root Pi uses. If `npmCommand` already exists in `settings.json`, the existing value is preserved. This step is a no-op when mise is not installed.
+When [mise](https://mise.jdx.dev/) is detected in `PATH`, `qbit-jay setup pi` also auto-pins `npmCommand` in Pi's `settings.json` to `["mise", "exec", "node@<version>", "--", "npm"]`, preventing Node version drift from silently changing which npm root Pi uses. If `npmCommand` already exists in `settings.json`, the existing value is preserved. This step is a no-op when mise is not installed.
 
-For a manual upgrade of the personal Pi package on Engram 3.7.2, run the following command. Use it when an older native `mem_update` tool is still active and its schema lacks `expected_project`.
+For a manual upgrade of the personal Pi package on qbit-jay 3.7.2, run the following command. Use it when an older native `mem_update` tool is still active and its schema lacks `expected_project`.
 
 ```bash
 pi install npm:gentle-engram@0.8.0
@@ -84,43 +84,43 @@ Restart Pi and check that the native `mem_update` tool exposes `expected_project
 
 The package has two paths:
 
-- **HTTP event capture**: the Pi extension sends prompts, summaries, passive task learnings, and compact Pi-native `mem_*` tool calls to `engram serve`.
-- **Other MCP servers**: use Pi's built-in MCP (`mcp.json`) for servers such as Notion. Deliberate standalone/direct MCP clients can still launch `engram mcp` separately; do not register it in Pi for native-only agent writes. Earlier `0.1.16` init still registers Engram MCP; `0.2.0` init does not create or change `mcp.json`.
+- **HTTP event capture**: the Pi extension sends prompts, summaries, passive task learnings, and compact Pi-native `mem_*` tool calls to `qbit-jay serve`.
+- **Other MCP servers**: use Pi's built-in MCP (`mcp.json`) for servers such as Notion. Deliberate standalone/direct MCP clients can still launch `qbit-jay mcp` separately; do not register it in Pi for native-only agent writes. Earlier `0.1.16` init still registers qbit-jay MCP; `0.2.0` init does not create or change `mcp.json`.
 
-Use an existing Engram HTTP server:
+Use an existing qbit-jay HTTP server:
 
 ```bash
-# Set ENGRAM_URL before launching the Pi agent CLI ("pi" is the command, not part of the URL)
-ENGRAM_URL=http://127.0.0.1:7437 pi
+# Set QBIT_JAY_URL before launching the Pi agent CLI ("pi" is the command, not part of the URL)
+QBIT_JAY_URL=http://127.0.0.1:7437 pi
 ```
 
-`ENGRAM_URL` tells the `gentle-engram` Pi extension to use an already-running `engram serve` instance instead of auto-starting one. This is standard shell syntax: `KEY=value command`. The URL is the HTTP REST API base; it is not an MCP endpoint.
+`QBIT_JAY_URL` tells the `gentle-engram` Pi extension to use an already-running `qbit-jay serve` instance instead of auto-starting one. This is standard shell syntax: `KEY=value command`. The URL is the HTTP REST API base; it is not an MCP endpoint.
 
 ### Local server ownership
 
-Loopback reachability is not an ownership boundary. Engram stores an opaque identity in each local data directory and default-managed Claude Code, Codex, Pi, and OpenCode startups only adopt a matching local server. A different or older local server without that identity is reported instead of silently sharing memory. Set an explicit `ENGRAM_URL` to opt into an external server, or use `ENGRAM_PORT` or `ENGRAM_SOCKET` to isolate local servers.
+Loopback reachability is not an ownership boundary. qbit-jay stores an opaque identity in each local data directory and default-managed Claude Code, Codex, Pi, and OpenCode startups only adopt a matching local server. A different or older local server without that identity is reported instead of silently sharing memory. Set an explicit `QBIT_JAY_URL` to opt into an external server, or use `QBIT_JAY_PORT` or `QBIT_JAY_SOCKET` to isolate local servers.
 
-Use a custom Engram binary for MCP tools and local auto-start:
+Use a custom qbit-jay binary for MCP tools and local auto-start:
 
 ```bash
-ENGRAM_BIN=/path/to/engram pi
+QBIT_JAY_BIN=/path/to/qbit-jay pi
 ```
 
 If the binary is missing, Pi-native local server startup reports an error without crashing Pi.
 
 ### Project auto-detection (important)
 
-`mem_save` resolves its write project in this order: validated explicit `project`, existing `session_id` association, repo `.engram/config.json`/cwd detection, then directory-basename fallback. Automatic Git detection stores the first normalized remote/root label in private shared Git metadata, so remote renames, linked worktrees, and repository moves keep using that label. If that binding is corrupt or cannot be written, detection fails closed; set `.engram/config.json` to the intended project rather than relying on the current remote name. Global local/cloud `project_id` propagation and alias migration remain deferred. Use an explicit `project` when you intentionally want to target a known project; invalid or unbacked names fail loudly instead of silently falling back.
+`mem_save` resolves its write project in this order: validated explicit `project`, existing `session_id` association, repo `.qbit-jay/config.json`/cwd detection, then directory-basename fallback. Automatic Git detection stores the first normalized remote/root label in private shared Git metadata, so remote renames, linked worktrees, and repository moves keep using that label. If that binding is corrupt or cannot be written, detection fails closed; set `.qbit-jay/config.json` to the intended project rather than relying on the current remote name. Global local/cloud `project_id` propagation and alias migration remain deferred. Use an explicit `project` when you intentionally want to target a known project; invalid or unbacked names fail loudly instead of silently falling back.
 
 MCP also exposes deferred `mem_judge_many` (ordered per-item decisions) and `mem_session_finalize` (atomic caller-authored summary plus close). Finalize requires an existing exact session and matching project ownership; retries are local-only. These tools do not change the native Pi/HTTP wrappers or host lifecycle hooks. See [the MCP reference](../DOCS.md#mcp-tools-27-tools).
 
-Other write tools still primarily use cwd/repo detection unless their schema says otherwise. Start the MCP server from the repo or add `.engram/config.json` when you want deterministic default writes.
+Other write tools still primarily use cwd/repo detection unless their schema says otherwise. Start the MCP server from the repo or add `.qbit-jay/config.json` when you want deterministic default writes.
 
 OpenCode binds `mem_save`, `mem_save_prompt`, `mem_session_summary`, and `mem_capture_passive` to its confirmed top-level runtime session and maps subagents to their authoritative parent.
 
 Pi binds `mem_save`, `mem_save_prompt`, `mem_session_summary`, and `mem_capture_passive` to the exact `ctx.sessionManager.getSessionId()` runtime session. Those four wrappers ignore model-supplied session IDs, and a missing or unacknowledged runtime session fails safely instead of writing under a synthesized ID.
 
-To lock write tools to the canonical project for a repo, add `.engram/config.json` at the repo root:
+To lock write tools to the canonical project for a repo, add `.qbit-jay/config.json` at the repo root:
 
 ```json
 {
@@ -130,11 +130,11 @@ To lock write tools to the canonical project for a repo, add `.engram/config.jso
 
 When present, `project_name` is the default auto-detected target for writes from the repo and its subdirectories and overrides lower-confidence cwd/git detection. It is NOT an unbreakable lock against an explicit `mem_save(project=...)`, but explicit project writes are still validated against known context before they are accepted. Read tools can still use an explicit `project` filter when you need to query another existing project. Empty or invalid `project_name` values fail writes loudly instead of falling back silently.
 
-For monorepos, prefer subproject configs such as `backend/.engram/config.json` and `frontend/.engram/config.json`. Engram uses the **nearest** config under the enclosing git root, so backend/frontend can resolve as separate projects while still blocking `$HOME/.engram/config.json` ancestor leakage.
+For monorepos, prefer subproject configs such as `backend/.qbit-jay/config.json` and `frontend/.qbit-jay/config.json`. qbit-jay uses the **nearest** config under the enclosing git root, so backend/frontend can resolve as separate projects while still blocking `$HOME/.qbit-jay/config.json` ancestor leakage.
 
-**Recommended first call:** `mem_current_project` — confirms which project Engram detected before you start writing. Returns `project_source` (how it was detected) and `available_projects` (if cwd is ambiguous).
+**Recommended first call:** `mem_current_project` — confirms which project qbit-jay detected before you start writing. Returns `project_source` (how it was detected) and `available_projects` (if cwd is ambiguous).
 
-**Cross-project recall:** when the detected project is empty or the wrong one, call `mem_list_projects` to enumerate every known project with counts, then scope `mem_search`/`mem_context` to the project you need. `mem_list_projects` is included in the `agent` profile, and `engram mcp` registers all tools by default — `--tools=agent` is not required. The Pi-native `gentle-engram` plugin exposes the same listing over HTTP (`GET /projects`) and also offers `mem_pin`/`mem_unpin` for local observation pin state.
+**Cross-project recall:** when the detected project is empty or the wrong one, call `mem_list_projects` to enumerate every known project with counts, then scope `mem_search`/`mem_context` to the project you need. `mem_list_projects` is included in the `agent` profile, and `qbit-jay mcp` registers all tools by default — `--tools=agent` is not required. The Pi-native `gentle-engram` plugin exposes the same listing over HTTP (`GET /projects`) and also offers `mem_pin`/`mem_unpin` for local observation pin state.
 
 Unexpected MCP project-resolution failures return `project_resolution_failed` with the underlying error detail. They do not offer project-choice recovery or a recovery token. Existing specific error codes remain distinct; `ambiguous_project` and its recovery guidance apply only to actual project ambiguity.
 
@@ -144,7 +144,7 @@ If a write tool returns `ambiguous_project`, the agent must not guess. This happ
 /Users/you/work
 ├── alan-thegentleman/
 ├── angular-18-jest-playwright/
-└── engram/
+└── qbit-jay/
 ```
 
 The first write fails with an error like:
@@ -155,7 +155,7 @@ The first write fails with an error like:
   "available_projects": [
     "alan-thegentleman",
     "angular-18-jest-playwright",
-    "engram"
+    "qbit-jay"
   ]
 }
 ```
@@ -173,13 +173,13 @@ On success, `mem_save` writes to the selected project and reports the recovery s
 
 ```json
 {
-  "project": "engram",
+  "project": "qbit-jay",
   "project_source": "user_selected_after_ambiguous_project",
-  "project_path": "/Users/you/work/engram"
+  "project_path": "/Users/you/work/qbit-jay"
 }
 ```
 
-If the exact choices normalize to the same stored project bucket, Engram returns `project_name_collision` instead of writing. Ask the user to rename or disambiguate the colliding projects before retrying.
+If the exact choices normalize to the same stored project bucket, qbit-jay returns `project_name_collision` instead of writing. Ask the user to rename or disambiguate the colliding projects before retrying.
 
 ### Ambiguous-project recovery rules
 
@@ -187,7 +187,7 @@ Normal `mem_save` precedence:
 
 - explicit `project`
 - existing `session_id` project
-- repo `.engram/config.json` / cwd detection
+- repo `.qbit-jay/config.json` / cwd detection
 - directory-basename fallback
 
 Additional rules:
@@ -196,7 +196,7 @@ Additional rules:
 - Empty, whitespace-only, path-like, or control-character names are rejected.
 - Names are normalized the same way the store normalizes projects.
 - Invalid explicit `project` names fail loudly.
-- Valid-looking explicit `project` names are accepted only when backed by known context: an existing local project in the store, a matching existing session project, the nearest resolvable repo/subproject `.engram/config.json`, or exact ambiguous-project recovery.
+- Valid-looking explicit `project` names are accepted only when backed by known context: an existing local project in the store, a matching existing session project, the nearest resolvable repo/subproject `.qbit-jay/config.json`, or exact ambiguous-project recovery.
 - Unbacked explicit `project` values are rejected; `mem_save(project=...)` is a validated selection, not an arbitrary project-creation path.
 - If `session_id` is provided and no session exists, `mem_save` fails loudly instead of falling back to cwd/config detection.
 - If both explicit `project` and `session_id` are supplied, they must match after normalization or the write is rejected.
@@ -228,12 +228,12 @@ user chooses one exact value from available_projects
         ↓
 agent retries with project + project_choice_reason
         ↓
-Engram validates the exact choice and writes to that repo
+qbit-jay validates the exact choice and writes to that repo
 ```
 
 If validation returns `project_name_collision`, do not guess. Ask the user to disambiguate the project names first.
 
-Alternatives: `cd` into the target repo before starting the MCP server, or add repo `.engram/config.json`.
+Alternatives: `cd` into the target repo before starting the MCP server, or add repo `.qbit-jay/config.json`.
 
 **Read tools** (`mem_search`, `mem_context`, `mem_stats`, `mem_timeline`, `mem_doctor`, `mem_get_observation`) accept an optional `project` override validated against known projects. Omit it to use the process override or cwd detection. For `mem_get_observation`, `project` selects response-envelope context only; the observation is still retrieved by ID without ownership filtering.
 
@@ -247,48 +247,48 @@ This is an intentional compatibility break for clients omitting `expected_projec
 
 ## OpenCode
 
-> **Prerequisite**: Install the `engram` binary first (via [Homebrew](INSTALLATION.md#homebrew-macos--linux), [Windows binary](INSTALLATION.md#windows), [binary download](INSTALLATION.md#download-binary-all-platforms), or [source](INSTALLATION.md#install-from-source-macos--linux)). The plugin needs it for the MCP server and session tracking.
+> **Prerequisite**: Install the `qbit-jay` binary first (with `go install` on [Windows](INSTALLATION.md#windows) or [macOS / Linux](INSTALLATION.md#install-from-source-macos--linux); no package manager or prebuilt release exists yet). The plugin needs it for the MCP server and session tracking.
 
 **Recommended: Full setup with one command** — installs the plugin AND registers the MCP server in your global `opencode.json` or `opencode.jsonc` automatically:
 
 ```bash
-engram setup opencode
+qbit-jay setup opencode
 ```
 
 This does three things:
 
-1. Copies the plugin to `~/.config/opencode/plugins/engram.ts` (session tracking, Memory Protocol, compaction recovery)
-2. Adds the `engram` MCP server entry to your global OpenCode configuration with `--tools=agent` (21 agent-facing tools)
+1. Copies the plugin to `~/.config/opencode/plugins/qbit-jay.ts` (session tracking, Memory Protocol, compaction recovery)
+2. Adds the `qbit-jay` MCP server entry to your global OpenCode configuration with `--tools=agent` (21 agent-facing tools)
 3. Adds `opencode-subagent-statusline` to your `tui.json` or `tui.jsonc` so OpenCode shows sub-agent activity in the sidebar/home footer
 
-MCP registration adds a missing local Engram entry and refreshes only `command[0]` for an existing local entry, preserving all other configuration bytes, including comments, trailing commas, formatting, key order, flags, options, and other servers. It supports both V1 `mcp.engram` and V2 `mcp.servers.engram`; remote entries are left untouched. Setup uses `opencode.jsonc` when it exists, otherwise `opencode.json`; OpenCode loads both global files and merges `.jsonc` last. The directory is `$XDG_CONFIG_HOME/opencode` when set, otherwise `~/.config/opencode` on all platforms. Project and environment overrides may take precedence over this global entry.
+MCP registration adds a missing local qbit-jay entry and refreshes only `command[0]` for an existing local entry, preserving all other configuration bytes, including comments, trailing commas, formatting, key order, flags, options, and other servers. It supports both V1 `mcp.qbit-jay` and V2 `mcp.servers.qbit-jay`; remote entries are left untouched. Setup uses `opencode.jsonc` when it exists, otherwise `opencode.json`; OpenCode loads both global files and merges `.jsonc` last. The directory is `$XDG_CONFIG_HOME/opencode` when set, otherwise `~/.config/opencode` on all platforms. Project and environment overrides may take precedence over this global entry.
 
 Malformed or ambiguous MCP configuration (including duplicate keys, a non-object root, or a non-object `mcp` or `mcp.servers` block) is refused without changing that file. Setup still installs the plugin and attempts TUI registration, but prints the existing manual-MCP warning. This byte-preservation guarantee applies to MCP registration, not the separate `tui.json(c)` writer.
 
-### Recover after moving the Engram binary
+### Recover after moving the qbit-jay binary
 
-Setup bakes the current executable path into the OpenCode plugin. After a disk migration or binary move, run `engram setup opencode` using the current Engram installation, then restart OpenCode. A nonblank `ENGRAM_BIN` overrides that baked default; correct or unset a stale override before restarting. A missing selected binary does not trigger automatic PATH fallback.
+Setup bakes the current executable path into the OpenCode plugin. After a disk migration or binary move, run `qbit-jay setup opencode` using the current qbit-jay installation, then restart OpenCode. A nonblank `QBIT_JAY_BIN` overrides that baked default; correct or unset a stale override before restarting. A missing selected binary does not trigger automatic PATH fallback.
 
-Early local readiness diagnostics distinguish `binary-not-found`, `identity-command-failed` (launch error or nonzero exit), and `identity-output-invalid` (not a 32-character lowercase hexadecimal identity). They identify `ENGRAM_BIN override` versus `setup-default` without exposing paths or command output. `identity-mismatch` separately means the responding server did not match the selected binary's identity; do not bypass that check or replace a running server to silence it. HTTP rejection and acknowledgement diagnostics remain separate.
+Early local readiness diagnostics distinguish `binary-not-found`, `identity-command-failed` (launch error or nonzero exit), and `identity-output-invalid` (not a 32-character lowercase hexadecimal identity). They identify `QBIT_JAY_BIN override` versus `setup-default` without exposing paths or command output. `identity-mismatch` separately means the responding server did not match the selected binary's identity; do not bypass that check or replace a running server to silence it. HTTP rejection and acknowledgement diagnostics remain separate.
 
 These diagnostics narrow an early failure; they do not establish or resolve the original cause of attribution failures with an otherwise healthy server.
 
 ### Verify each layer after setup
 
-`engram setup opencode` confirms only that it wrote the plugin and, when no warning was printed, the OpenCode MCP registration. It cannot confirm that OpenCode connected to the server or that an already-running agent session exposes the tools.
+`qbit-jay setup opencode` confirms only that it wrote the plugin and, when no warning was printed, the OpenCode MCP registration. It cannot confirm that OpenCode connected to the server or that an already-running agent session exposes the tools.
 
-1. Restart OpenCode, then run `opencode mcp list`. Confirm that OpenCode reports the `engram` server as connected. This verifies the client/server connection, not tool exposure in an agent session.
-2. Start a **new** OpenCode agent session and confirm that it can use an `engram_mem_*` tool before relying on Engram. A connected server, HTTP health check, or successful `engram setup` does not by itself prove that tools are visible in the active agent session.
+1. Restart OpenCode, then run `opencode mcp list`. Confirm that OpenCode reports the `qbit-jay` server as connected. This verifies the client/server connection, not tool exposure in an agent session.
+2. Start a **new** OpenCode agent session and confirm that it can use an `qbit-jay_mem_*` tool before relying on qbit-jay. A connected server, HTTP health check, or successful `qbit-jay setup` does not by itself prove that tools are visible in the active agent session.
 
-If the server is connected but the new session does not expose Engram tools, restart OpenCode and create another new session. Engram cannot directly inspect or verify the tool exposure of the active OpenCode agent session.
+If the server is connected but the new session does not expose qbit-jay tools, restart OpenCode and create another new session. qbit-jay cannot directly inspect or verify the tool exposure of the active OpenCode agent session.
 
 The plugin auto-starts the HTTP server if needed for session tracking. If your environment blocks background processes, run it manually:
 
 ```bash
-engram serve &
+qbit-jay serve &
 ```
 
-> **Windows**: OpenCode uses `~/.config/opencode/` on Windows too (it does not read `%APPDATA%\opencode\`). `engram setup opencode` writes to `~/.config/opencode/plugins/` and the global `opencode.json(c)` selected as described above. To run the server in the background: `Start-Process engram -ArgumentList "serve" -WindowStyle Hidden` (PowerShell) or just run `engram serve` in a separate terminal.
+> **Windows**: OpenCode uses `~/.config/opencode/` on Windows too (it does not read `%APPDATA%\opencode\`). `qbit-jay setup opencode` writes to `~/.config/opencode/plugins/` and the global `opencode.json(c)` selected as described above. To run the server in the background: `Start-Process qbit-jay -ArgumentList "serve" -WindowStyle Hidden` (PowerShell) or just run `qbit-jay serve` in a separate terminal.
 
 **Alternative: Manual MCP-only setup** (no plugin, all 27 tools by default):
 
@@ -297,9 +297,9 @@ Add to your `opencode.json` (global: `~/.config/opencode/opencode.json` on all p
 ```json
 {
   "mcp": {
-    "engram": {
+    "qbit-jay": {
       "type": "local",
-      "command": ["engram", "mcp"],
+      "command": ["qbit-jay", "mcp"],
       "enabled": true
     }
   }
@@ -312,13 +312,13 @@ See [Plugins → OpenCode Plugin](PLUGINS.md#opencode-plugin) for details on wha
 
 ## Claude Code
 
-> **Prerequisite**: Install the `engram` binary first (via [Homebrew](INSTALLATION.md#homebrew-macos--linux), [Windows binary](INSTALLATION.md#windows), [binary download](INSTALLATION.md#download-binary-all-platforms), or [source](INSTALLATION.md#install-from-source-macos--linux)). The plugin needs it for the MCP server and session tracking scripts.
+> **Prerequisite**: Install the `qbit-jay` binary first (with `go install` on [Windows](INSTALLATION.md#windows) or [macOS / Linux](INSTALLATION.md#install-from-source-macos--linux); no package manager or prebuilt release exists yet). The plugin needs it for the MCP server and session tracking scripts.
 
 **Option A: Plugin via marketplace** — installs session hooks, scripts, compaction recovery, and the Memory Protocol skill:
 
 ```bash
-claude plugin marketplace add Gentleman-Programming/engram
-claude plugin install engram
+claude plugin marketplace add qbitdevz/qbit-jay
+claude plugin install qbit-jay
 ```
 
 Marketplace installation provides plugin assets only; it does not register the MCP server.
@@ -337,73 +337,73 @@ Marketplace installation provides plugin assets only; it does not register the M
 **Option B: Supported complete setup (required for plugin MCP)** — run after Option A, or run it alone to install or refresh the marketplace plugin and register MCP:
 
 ```bash
-engram setup claude-code
+qbit-jay setup claude-code
 ```
 
 The supported plugin-and-hook setup requires `jq` and `curl` on `PATH` before installation. On Windows, `curl.exe` satisfies curl detection, but `jq` must also be installed and available to the shell Claude Code uses. If those hook prerequisites are unavailable, use **Option C (Bare MCP)**, the MCP-only fallback; it does not install or run plugin hooks.
 
-When the plugin is already installed, `engram setup claude-code` runs `claude plugin marketplace update engram` followed by `claude plugin update engram@engram --scope user`. Setup installs and updates the user-scope copy; it does not update existing project- or local-scope copies. If either update fails, setup returns an error before MCP registration. Restart Claude Code after updating to load the new hooks. Updating the Engram binary alone does not update the plugin.
+When the plugin is already installed, `qbit-jay setup claude-code` runs `claude plugin marketplace update qbit-jay` followed by `claude plugin update qbit-jay@qbit-jay --scope user`. Setup installs and updates the user-scope copy; it does not update existing project- or local-scope copies. If either update fails, setup returns an error before MCP registration. Restart Claude Code after updating to load the new hooks. Updating the qbit-jay binary alone does not update the plugin.
 
-`engram setup claude-code` delegates MCP registration to Claude CLI. Claude writes the user-scope top-level `mcpServers.engram` entry in `~/.claude.json` (Windows: `%USERPROFILE%\\.claude.json`); when `CLAUDE_CONFIG_DIR` is set, Claude uses `$CLAUDE_CONFIG_DIR/.claude.json`. Engram reads only that documented entry: an omitted `type` or explicit `"stdio"` with the exact absolute command and arguments (`<absolute-engram-path> mcp --tools=agent`) is a no-op; explicit `null`, empty or other types, and mismatched commands or arguments remain conflicts. A missing entry is added with `claude mcp add --transport stdio --scope user engram -- <absolute-engram-path> mcp --tools=agent` and then verified. A mismatched or unreadable entry is reported as a conflict and is never overwritten. If verification fails after a proven-absent add, setup asks Claude to remove that user-scope entry and reports both errors if rollback fails. You'll be asked whether to add Engram's agent-profile MCP tools to `~/.claude/settings.json` `permissions.allow`. Existing marketplace plugin copies receive hooks, scripts, and skills updates through normal Claude Code plugin updates; do not edit the plugin cache manually.
+`qbit-jay setup claude-code` delegates MCP registration to Claude CLI. Claude writes the user-scope top-level `mcpServers.qbit-jay` entry in `~/.claude.json` (Windows: `%USERPROFILE%\\.claude.json`); when `CLAUDE_CONFIG_DIR` is set, Claude uses `$CLAUDE_CONFIG_DIR/.claude.json`. qbit-jay reads only that documented entry: an omitted `type` or explicit `"stdio"` with the exact absolute command and arguments (`<absolute-qbit-jay-path> mcp --tools=agent`) is a no-op; explicit `null`, empty or other types, and mismatched commands or arguments remain conflicts. A missing entry is added with `claude mcp add --transport stdio --scope user qbit-jay -- <absolute-qbit-jay-path> mcp --tools=agent` and then verified. A mismatched or unreadable entry is reported as a conflict and is never overwritten. If verification fails after a proven-absent add, setup asks Claude to remove that user-scope entry and reports both errors if rollback fails. You'll be asked whether to add qbit-jay's agent-profile MCP tools to `~/.claude/settings.json` `permissions.allow`. Existing marketplace plugin copies receive hooks, scripts, and skills updates through normal Claude Code plugin updates; do not edit the plugin cache manually.
 
-`engram setup claude-code --protocol=slim` requires Engram plugin version 0.1.1 or later. Setup checks `claude plugin list --json` after a successful install and warns, without failing or changing the selected slim mode, when it cannot verify the installed enabled marketplace plugin. Update through your normal Claude Code plugin update path and restart Claude Code. Session-only `claude --plugin-dir ...` plugins cannot be detected by this check.
+`qbit-jay setup claude-code --protocol=slim` requires qbit-jay plugin version 0.1.1 or later. Setup checks `claude plugin list --json` after a successful install and warns, without failing or changing the selected slim mode, when it cannot verify the installed enabled marketplace plugin. Update through your normal Claude Code plugin update path and restart Claude Code. Session-only `claude --plugin-dir ...` plugins cannot be detected by this check.
 
 **Option C: Bare MCP** — 23 agent-profile tools, no session management:
 
-Use Claude CLI to register the user-scope server (replace the placeholder with the absolute Engram executable path):
+Use Claude CLI to register the user-scope server (replace the placeholder with the absolute qbit-jay executable path):
 
 ```bash
-claude mcp add --transport stdio --scope user engram -- <absolute-engram-path> mcp --tools=agent
+claude mcp add --transport stdio --scope user qbit-jay -- <absolute-qbit-jay-path> mcp --tools=agent
 ```
 
-Claude rejects an existing user-scope server with the same name rather than overwriting it. To remove the registration later, run `claude mcp remove engram --scope user`.
+Claude rejects an existing user-scope server with the same name rather than overwriting it. To remove the registration later, run `claude mcp remove qbit-jay --scope user`.
 
-With the Claude plugin, the host `PreToolUse` hook denies Engram write/session tools when host-session registration cannot be confirmed (including an explicitly malformed `ENGRAM_PORT`); it does not silently use the default port. Direct/manual MCP calls do not pass through this hook and retain the generic MCP handler's behavior, including writes to an ended session ID. Disabling or bypassing hooks, or a host hook timeout, cannot provide this hook-level guarantee.
+With the Claude plugin, the host `PreToolUse` hook denies qbit-jay write/session tools when host-session registration cannot be confirmed (including an explicitly malformed `QBIT_JAY_PORT`); it does not silently use the default port. Direct/manual MCP calls do not pass through this hook and retain the generic MCP handler's behavior, including writes to an ended session ID. Disabling or bypassing hooks, or a host hook timeout, cannot provide this hook-level guarantee.
 
-With bare MCP, add a [Surviving Compaction](#surviving-compaction-recommended) prompt to your `CLAUDE.md` so the agent remembers to use Engram after context resets.
+With bare MCP, add a [Surviving Compaction](#surviving-compaction-recommended) prompt to your `CLAUDE.md` so the agent remembers to use qbit-jay after context resets.
 
-> **Windows note:** Claude Code lifecycle adapters use bash scripts. On Windows, Claude Code runs them through Git Bash (bundled with [Git for Windows](https://gitforwindows.org/)) or WSL. For `PreToolUse` on Engram write/session MCP tools, Claude Code launches `engram.exe` from PATH with the arguments `hook` and `claude-pre-tool-use` without starting a shell. The `UserPromptSubmit` hook automatically switches to a fork-light safe path under Git Bash/MSYS2: the first-prompt ToolSearch still runs, while later save-reminder checks are skipped so prompt submission does not block. If Git Bash itself is blocked by Defender/EDR, the plugin also ships `scripts/user-prompt-submit.ps1` as a native PowerShell fallback for local override/testing. That fallback applies only to `UserPromptSubmit`; the complete plugin setup still requires `jq` and `curl` for its shared Bash hooks. **Option C (Bare MCP)** remains the no-hook fallback and works natively on Windows without any shell dependency. Windows usernames containing spaces (e.g. `C:\Users\John Doe\...`) are supported — all hook commands quote `${CLAUDE_PLUGIN_ROOT}` so the path is passed as a single argument even when it contains spaces.
+> **Windows note:** Claude Code lifecycle adapters use bash scripts. On Windows, Claude Code runs them through Git Bash (bundled with [Git for Windows](https://gitforwindows.org/)) or WSL. For `PreToolUse` on qbit-jay write/session MCP tools, Claude Code launches `qbit-jay.exe` from PATH with the arguments `hook` and `claude-pre-tool-use` without starting a shell. The `UserPromptSubmit` hook automatically switches to a fork-light safe path under Git Bash/MSYS2: the first-prompt ToolSearch still runs, while later save-reminder checks are skipped so prompt submission does not block. If Git Bash itself is blocked by Defender/EDR, the plugin also ships `scripts/user-prompt-submit.ps1` as a native PowerShell fallback for local override/testing. That fallback applies only to `UserPromptSubmit`; the complete plugin setup still requires `jq` and `curl` for its shared Bash hooks. **Option C (Bare MCP)** remains the no-hook fallback and works natively on Windows without any shell dependency. Windows usernames containing spaces (e.g. `C:\Users\John Doe\...`) are supported — all hook commands quote `${CLAUDE_PLUGIN_ROOT}` so the path is passed as a single argument even when it contains spaces.
 
 On Windows with a private user-owned Claude profile on local NTFS, opt in to the native first-prompt hook and restart Claude Code. The fresh and GitHub migration flows have been verified with Claude Code 2.1.326.
 
 ```powershell
-engram setup claude-code --native-windows-prompt=enable
+qbit-jay setup claude-code --native-windows-prompt=enable
 ```
 
-Enable pins and checks the running Engram executable and selects a complete local variant of the existing user-scope `engram@engram` plugin. Remove any Engram prompt override from Claude's user settings before enabling, including the PowerShell example below. Both commands honor `CLAUDE_CONFIG_DIR`. Run ordinary Claude setup if you also need to register MCP.
+Enable pins and checks the running qbit-jay executable and selects a complete local variant of the existing user-scope `qbit-jay@qbit-jay` plugin. Remove any qbit-jay prompt override from Claude's user settings before enabling, including the PowerShell example below. Both commands honor `CLAUDE_CONFIG_DIR`. Run ordinary Claude setup if you also need to register MCP.
 
-If Claude times out while waiting for Engram's `PreToolUse` session check on a slow Windows host, select the extended deadlines and restart Claude Code.
+If Claude times out while waiting for qbit-jay's `PreToolUse` session check on a slow Windows host, select the extended deadlines and restart Claude Code.
 
 ```powershell
-engram setup claude-code --native-windows-prompt=enable --windows-pretooluse=extended
+qbit-jay setup claude-code --native-windows-prompt=enable --windows-pretooluse=extended
 ```
 
-This variant gives Claude 10 seconds to run the pinned hook and gives Engram 7 seconds to confirm the session. The hook still denies the write if it cannot confirm the session within that time. Run the enable command without `--windows-pretooluse` to return to the standard deadlines.
+This variant gives Claude 10 seconds to run the pinned hook and gives qbit-jay 7 seconds to confirm the session. The hook still denies the write if it cannot confirm the session within that time. Run the enable command without `--windows-pretooluse` to return to the standard deadlines.
 
 To return the same managed plugin to its Bash hook, run the disable command and restart Claude Code.
 
 ```powershell
-engram setup claude-code --native-windows-prompt=disable
+qbit-jay setup claude-code --native-windows-prompt=disable
 ```
 
 Disable leaves user hooks and other settings in place. It can select Bash even if `jq` or `curl` is missing. The Bash hooks still need their usual dependencies to run.
 
-After updating Engram, rerun the command for your desired mode with the new executable and restart Claude Code. Use `enable` to qualify the new native executable or `disable` to refresh the managed Bash bundle from the new build. Ordinary setup keeps the current managed hook selection and pin. If a Claude command times out during managed setup, Engram stops the command and keeps the profile locked until Windows confirms its processes have exited. Windows can take longer to finish pending I/O. Once setup returns, rerun the desired command to reconcile the profile.
+After updating qbit-jay, rerun the command for your desired mode with the new executable and restart Claude Code. Use `enable` to qualify the new native executable or `disable` to refresh the managed Bash bundle from the new build. Ordinary setup keeps the current managed hook selection and pin. If a Claude command times out during managed setup, qbit-jay stops the command and keeps the profile locked until Windows confirms its processes have exited. Windows can take longer to finish pending I/O. Once setup returns, rerun the desired command to reconcile the profile.
 
-If the managed copy of `engram.exe` is missing and the first prompt no longer loads ToolSearch, rerun `enable` from your verified Engram executable and restart Claude Code. Setup recreates the missing copy. If setup reports `pinned Engram core checksum changed`, use `disable` and restart Claude Code to restore the Bash hook. Resolve the discrepancy in the managed copy before enabling native mode again. Setup preserves the mismatched file for inspection.
+If the managed copy of `qbit-jay.exe` is missing and the first prompt no longer loads ToolSearch, rerun `enable` from your verified qbit-jay executable and restart Claude Code. Setup recreates the missing copy. If setup reports `pinned qbit-jay core checksum changed`, use `disable` and restart Claude Code to restore the Bash hook. Resolve the discrepancy in the managed copy before enabling native mode again. Setup preserves the mismatched file for inspection.
 
 For Windows provisioning, run the capability check against the exact executable you intend to pin.
 
 ```powershell
-& "C:\path\to\engram.exe" hook claude-windows-user-prompt-submit --check
+& "C:\path\to\qbit-jay.exe" hook claude-windows-user-prompt-submit --check
 ```
 
-The check returns exit code 0 and `{"hook":"claude-windows-user-prompt-submit","version":1}` on a supported Windows binary. It requires no stdin and creates no session marker or Engram data directory. Provisioning should require both the successful exit and the matching versioned response to qualify the executable. The native action without `--check` accepts Claude's prompt event on stdin and emits the first-prompt ToolSearch bootstrap. The marketplace plugin uses the Bash entry by default.
+The check returns exit code 0 and `{"hook":"claude-windows-user-prompt-submit","version":1}` on a supported Windows binary. It requires no stdin and creates no session marker or qbit-jay data directory. Provisioning should require both the successful exit and the matching versioned response to qualify the executable. The native action without `--check` accepts Claude's prompt event on stdin and emits the first-prompt ToolSearch bootstrap. The marketplace plugin uses the Bash entry by default.
 
 PowerShell fallback test and local override example:
 
 ```powershell
-'{"session_id":"edr/test:1"}' | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\path\to\engram\plugin\claude-code\scripts\user-prompt-submit.ps1"
+'{"session_id":"edr/test:1"}' | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\path\to\qbit-jay\plugin\claude-code\scripts\user-prompt-submit.ps1"
 ```
 
 ```json
@@ -414,7 +414,7 @@ PowerShell fallback test and local override example:
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\engram\\plugin\\claude-code\\scripts\\user-prompt-submit.ps1\"",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\qbit-jay\\plugin\\claude-code\\scripts\\user-prompt-submit.ps1\"",
             "timeout": 10
           }
         ]
@@ -428,19 +428,19 @@ See [Plugins → Claude Code Plugin](PLUGINS.md#claude-code-plugin) for details 
 
 ### Troubleshooting: Claude Code plugin install on Linux
 
-If `claude plugin install engram` fails on Linux with an error like:
+If `claude plugin install qbit-jay` fails on Linux with an error like:
 
 ```
 EXDEV: cross-device link not permitted
 ```
 
-this is a Node.js `fs.rename` limitation, not an Engram bug. Node uses `fs.rename` to move the downloaded plugin archive from the system temp directory (`/tmp`) to the plugin destination under your home directory. On many Linux systems `/tmp` and `/home` live on separate filesystems (common with `tmpfs` on `/tmp`), and the kernel rejects cross-device renames.
+this is a Node.js `fs.rename` limitation, not a qbit-jay bug. Node uses `fs.rename` to move the downloaded plugin archive from the system temp directory (`/tmp`) to the plugin destination under your home directory. On many Linux systems `/tmp` and `/home` live on separate filesystems (common with `tmpfs` on `/tmp`), and the kernel rejects cross-device renames.
 
 **One-shot workaround** — set `TMPDIR` to a location on the same filesystem as your home directory before running the install:
 
 ```bash
 mkdir -p ~/.cache/claude-tmp
-TMPDIR=~/.cache/claude-tmp claude plugin install engram
+TMPDIR=~/.cache/claude-tmp claude plugin install qbit-jay
 ```
 
 **Permanent fix** — add the export to your shell rc file so all future `claude plugin install` commands work without the prefix:
@@ -453,7 +453,7 @@ mkdir -p "$TMPDIR"
 
 Then reload your shell (`source ~/.bashrc`) and re-run the install.
 
-> This is an upstream Claude Code CLI limitation that affects any plugin installed via `claude plugin install`, not just Engram. Docker-based environments are typically not affected because the container's `/tmp` and `/home` usually share the same overlay filesystem.
+> This is an upstream Claude Code CLI limitation that affects any plugin installed via `claude plugin install`, not just qbit-jay. Docker-based environments are typically not affected because the container's `/tmp` and `/home` usually share the same overlay filesystem.
 
 ---
 
@@ -462,24 +462,24 @@ Then reload your shell (`source ~/.bashrc`) and re-run the install.
 Recommended: one command to set up MCP + compaction recovery instructions:
 
 ```bash
-engram setup gemini-cli
+qbit-jay setup gemini-cli
 ```
 
-`engram setup gemini-cli` now does three things:
+`qbit-jay setup gemini-cli` now does three things:
 
-- Registers `mcpServers.engram` in `~/.gemini/settings.json` (Windows: `%APPDATA%\gemini\settings.json`)
-- Writes `~/.gemini/system.md` with the Engram Memory Protocol, including post-compaction recovery and the required `mem_session_summary` then `mem_session_end` close sequence
+- Registers `mcpServers.qbit-jay` in `~/.gemini/settings.json` (Windows: `%APPDATA%\gemini\settings.json`)
+- Writes `~/.gemini/system.md` with the qbit-jay Memory Protocol, including post-compaction recovery and the required `mem_session_summary` then `mem_session_end` close sequence
 - Removes a legacy `GEMINI_SYSTEM_MD` override from `~/.gemini/.env`; Gemini CLI loads `system.md` directly and the override resolves it relative to the working directory
 
-> `engram setup gemini-cli` automatically writes the full Memory Protocol to `~/.gemini/system.md`, so the agent knows exactly when to save, search, and close sessions. No additional configuration needed.
+> `qbit-jay setup gemini-cli` automatically writes the full Memory Protocol to `~/.gemini/system.md`, so the agent knows exactly when to save, search, and close sessions. No additional configuration needed.
 
 Manual alternative: add to your `~/.gemini/settings.json` (global) or `.gemini/settings.json` (project); on Windows: `%APPDATA%\gemini\settings.json`:
 
 ```json
 {
   "mcpServers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp"]
     }
   }
@@ -489,7 +489,7 @@ Manual alternative: add to your `~/.gemini/settings.json` (global) or `.gemini/s
 Or via the CLI:
 
 ```bash
-gemini mcp add engram engram mcp
+gemini mcp add qbit-jay qbit-jay mcp
 ```
 
 ---
@@ -499,39 +499,39 @@ gemini mcp add engram engram mcp
 Recommended: one command to set up MCP + compaction recovery instructions:
 
 ```bash
-engram setup codex
+qbit-jay setup codex
 ```
 
-`engram setup codex` does four things:
+`qbit-jay setup codex` does four things:
 
-- Registers `[mcp_servers.engram]` in the active Codex config (`$CODEX_HOME/config.toml` when `CODEX_HOME` is absolute, otherwise `~/.codex/config.toml`; on Windows the default is `%USERPROFILE%\.codex\config.toml`) and pins the current absolute executable path
+- Registers `[mcp_servers.qbit-jay]` in the active Codex config (`$CODEX_HOME/config.toml` when `CODEX_HOME` is absolute, otherwise `~/.codex/config.toml`; on Windows the default is `%USERPROFILE%\.codex\config.toml`) and pins the current absolute executable path
 - Writes `engram-instructions.md` and `engram-compact-prompt.md` beside the active config as informational copies of the Memory Protocol
-- Installs the Codex plugin with `codex plugin marketplace add Gentleman-Programming/engram --ref main` and `codex plugin add engram@engram`. The plugin hooks inject the Memory Protocol additively, so this is how Codex actually receives it. If the CLI is missing or either command fails, setup returns an error, not complete success. The MCP config and informational instruction files remain written, but plugin activation is incomplete. Ensure `codex` is in `PATH`, resolve the reported command error, and run both commands above manually (or rerun `engram setup codex`), then restart Codex. Do not wire the informational files into prompt override keys as a workaround.
-- Removes complete top-level legacy `model_instructions_file` / `experimental_compact_prompt_file` string assignments, including quoted keys and multiline strings, if a previous Engram version wrote them
+- Installs the Codex plugin with `codex plugin marketplace add qbitdevz/qbit-jay --ref main` and `codex plugin add qbit-jay@qbit-jay`. The plugin hooks inject the Memory Protocol additively, so this is how Codex actually receives it. If the CLI is missing or either command fails, setup returns an error, not complete success. The MCP config and informational instruction files remain written, but plugin activation is incomplete. Ensure `codex` is in `PATH`, resolve the reported command error, and run both commands above manually (or rerun `qbit-jay setup codex`), then restart Codex. Do not wire the informational files into prompt override keys as a workaround.
+- Removes complete top-level legacy `model_instructions_file` / `experimental_compact_prompt_file` string assignments, including quoted keys and multiline strings, if a previous qbit-jay version wrote them
 
-Setup prepares legacy-key cleanup and MCP changes before writing `config.toml`. It preserves unrelated text, comments, and line endings. If a string/container is unterminated, an obsolete setting has a non-string value, or MCP is registered through an unsupported dotted/inline form instead of `[mcp_servers.engram]`, setup returns an error without changing the config or invoking the Codex plugin commands. Resolve the reported input manually and rerun setup. This bounded preservation check is not a general TOML validator and adds no parser dependency.
+Setup prepares legacy-key cleanup and MCP changes before writing `config.toml`. It preserves unrelated text, comments, and line endings. If a string/container is unterminated, an obsolete setting has a non-string value, or MCP is registered through an unsupported dotted/inline form instead of `[mcp_servers.qbit-jay]`, setup returns an error without changing the config or invoking the Codex plugin commands. Resolve the reported input manually and rerun setup. This bounded preservation check is not a general TOML validator and adds no parser dependency.
 
-> **Do not set `model_instructions_file` in Codex.** Unlike most instruction mechanisms, that key *replaces* Codex's built-in system instructions instead of adding to them. Pointing it at `engram-instructions.md` wipes Codex's own base prompt (`You are Codex, ...`) and degrades the agent. Earlier Engram versions did this automatically; current versions strip the keys instead. If you set them manually, you are deliberately opting into overriding Codex's base prompt.
+> **Do not set `model_instructions_file` in Codex.** Unlike most instruction mechanisms, that key *replaces* Codex's built-in system instructions instead of adding to them. Pointing it at `engram-instructions.md` wipes Codex's own base prompt (`You are Codex, ...`) and degrades the agent. Earlier qbit-jay versions did this automatically; current versions strip the keys instead. If you set them manually, you are deliberately opting into overriding Codex's base prompt.
 
-On Windows, setup also writes an executable marker at the first line of `config.toml`; the native `UserPromptSubmit` hook reads it from the same active config. If `engram.exe` moves, rerun `engram setup codex` before restarting Codex to refresh both pins.
+On Windows, setup also writes an executable marker at the first line of `config.toml`; the native `UserPromptSubmit` hook reads it from the same active config. If `qbit-jay.exe` moves, rerun `qbit-jay setup codex` before restarting Codex to refresh both pins.
 
 The Codex plugin passes the exact runtime `session_id` into model context only after the server confirms registration. On confirmed registration, startup, resume, clear, and post-compaction hooks instruct the model to reuse that binding for memory writes and retain it across compaction. On failed or unconfirmed registration, those hooks withhold the active memory-tool protocol while preserving the handoff warning, any fetched context, and the compacted summary for the current task. Stop agent-attributed memory writes until the host hook re-registers the same runtime ID on startup or resume; do not invent an ID or retry MCP writes without `session_id`.
 
-When Codex `PreToolUse` runs for a classified Engram MCP write/session tool, it confirms the current project for the host cwd and requires a matching successful registration before allowing and binding the host ID (`id` for session start/end). Registration retains shared ownership, including cross-project writes. Supported namespaced calls such as `mcp__plugin_engram_engram__mem_save` are bound too; other arguments are preserved. Failed or ended registration and malformed calls are denied without updated input, and an explicitly malformed `ENGRAM_PORT` never falls back to the default. Successful rewrites require `permissionDecision: "allow"` with `updatedInput`. This hook is best-effort: skipped, bypassed, or timed-out hooks provide no guarantee, and no claim is made for every Codex prompt pathway. Direct/manual MCP calls remain independent of the hook and retain generic MCP behavior (including ended-session writes); independent CLI/manual saves cannot substitute for agent session attribution. Post-compaction uses the same explicit `ENGRAM_URL` (or local `ENGRAM_PORT`) as startup.
+When Codex `PreToolUse` runs for a classified qbit-jay MCP write/session tool, it confirms the current project for the host cwd and requires a matching successful registration before allowing and binding the host ID (`id` for session start/end). Registration retains shared ownership, including cross-project writes. Supported namespaced calls such as `mcp__plugin_qbit-jay_qbit-jay__mem_save` are bound too; other arguments are preserved. Failed or ended registration and malformed calls are denied without updated input, and an explicitly malformed `QBIT_JAY_PORT` never falls back to the default. Successful rewrites require `permissionDecision: "allow"` with `updatedInput`. This hook is best-effort: skipped, bypassed, or timed-out hooks provide no guarantee, and no claim is made for every Codex prompt pathway. Direct/manual MCP calls remain independent of the hook and retain generic MCP behavior (including ended-session writes); independent CLI/manual saves cannot substitute for agent session attribution. Post-compaction uses the same explicit `QBIT_JAY_URL` (or local `QBIT_JAY_PORT`) as startup.
 
-Manual alternative: add to your active Codex `config.toml` (Windows default: `%USERPROFILE%\.codex\config.toml`). On Windows, run `engram setup codex` to pin the MCP and native hook executable to its current absolute path:
+Manual alternative: add to your active Codex `config.toml` (Windows default: `%USERPROFILE%\.codex\config.toml`). On Windows, run `qbit-jay setup codex` to pin the MCP and native hook executable to its current absolute path:
 
 If `CODEX_HOME` is set, adjust the instruction-file paths below to that directory.
 
 ```toml
-[mcp_servers.engram]
-command = "engram"
+[mcp_servers.qbit-jay]
+command = "qbit-jay"
 args = ["mcp"]
 ```
 
 ### Troubleshooting: "MCP Transport closed"
 
-Codex communicates with Engram over a stdio MCP session that is started fresh each time Codex launches. If that session becomes stale — for example after replacing the `engram` binary, editing `config.toml` or the instruction files, or force-stopping an `engram` process — subsequent tool calls fail with:
+Codex communicates with qbit-jay over a stdio MCP session that is started fresh each time Codex launches. If that session becomes stale — for example after replacing the `qbit-jay` binary, editing `config.toml` or the instruction files, or force-stopping an `qbit-jay` process — subsequent tool calls fail with:
 
 ```
 Transport closed
@@ -540,18 +540,18 @@ Transport closed
 **Recovery sequence**
 
 1. Close the current Codex chat or window entirely.
-2. If any `engram` processes are still running, stop them:
-   - macOS/Linux: `pkill -x engram`
-   - Windows: `taskkill /IM engram.exe /F`
-3. Open a new Codex chat. Codex starts a fresh `engram mcp` stdio process on launch, which clears the stale session.
+2. If any `qbit-jay` processes are still running, stop them:
+   - macOS/Linux: `pkill -x qbit-jay`
+   - Windows: `taskkill /IM qbit-jay.exe /F`
+3. Open a new Codex chat. Codex starts a fresh `qbit-jay mcp` stdio process on launch, which clears the stale session.
 
 **Prevention**
 
-- After replacing `engram.exe` / the `engram` binary, rerun `engram setup codex` on Windows, then start a new Codex chat before using memory tools.
+- After replacing `qbit-jay.exe` / the `qbit-jay` binary, rerun `qbit-jay setup codex` on Windows, then start a new Codex chat before using memory tools.
 - After editing the active Codex `config.toml`, `engram-instructions.md`, or `engram-compact-prompt.md`, restart Codex to pick up the new config.
-- Avoid force-killing `engram` while a Codex session is active; prefer closing the chat first so Codex can shut down the MCP process cleanly.
+- Avoid force-killing `qbit-jay` while a Codex session is active; prefer closing the chat first so Codex can shut down the MCP process cleanly.
 
-> **Windows note:** On Windows the stale process is most commonly left behind after an in-place binary replacement. The `taskkill` command above reliably clears it. If Codex shows the error immediately on a fresh chat, rerun `engram setup codex` so the MCP and native hook pins point to the current executable.
+> **Windows note:** On Windows the stale process is most commonly left behind after an in-place binary replacement. The `taskkill` command above reliably clears it. If Codex shows the error immediately on a fresh chat, rerun `qbit-jay setup codex` so the MCP and native hook pins point to the current executable.
 
 ---
 
@@ -562,10 +562,10 @@ VS Code supports MCP servers natively in its chat panel (Copilot agent mode). Th
 **Automated (user profile):**
 
 ```bash
-engram setup vscode-copilot
+qbit-jay setup vscode-copilot
 ```
 
-This registers the engram server under the `servers` object (with `type: stdio`) in your VS Code User `mcp.json` and writes a Copilot instructions file at `<User>/prompts/engram.instructions.md` (frontmatter `applyTo: "**"`). User dir per platform: macOS `~/Library/Application Support/Code/User/`, Linux `~/.config/Code/User/`, Windows `%APPDATA%\Code\User\`.
+This registers the qbit-jay server under the `servers` object (with `type: stdio`) in your VS Code User `mcp.json` and writes a Copilot instructions file at `<User>/prompts/engram.instructions.md` (frontmatter `applyTo: "**"`). User dir per platform: macOS `~/Library/Application Support/Code/User/`, Linux `~/.config/Code/User/`, Windows `%APPDATA%\Code\User\`.
 
 **Option A: Workspace config** (recommended for teams — commit to source control):
 
@@ -574,8 +574,8 @@ Add to `.vscode/mcp.json` in your project:
 ```json
 {
   "servers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp"]
     }
   }
@@ -586,7 +586,7 @@ Add to `.vscode/mcp.json` in your project:
 
 1. Open Command Palette (`Cmd+Shift+P` / `Ctrl+Shift+P`)
 2. Run **MCP: Open User Configuration**
-3. Add the same `engram` server entry above to VS Code User `mcp.json`:
+3. Add the same `qbit-jay` server entry above to VS Code User `mcp.json`:
    - macOS: `~/Library/Application Support/Code/User/mcp.json`
    - Linux: `~/.config/Code/User/mcp.json`
    - Windows: `%APPDATA%\Code\User\mcp.json`
@@ -594,12 +594,12 @@ Add to `.vscode/mcp.json` in your project:
 **Option C: CLI one-liner:**
 
 ```bash
-code --add-mcp "{\"name\":\"engram\",\"command\":\"engram\",\"args\":[\"mcp\"]}"
+code --add-mcp "{\"name\":\"qbit-jay\",\"command\":\"qbit-jay\",\"args\":[\"mcp\"]}"
 ```
 
 > **Using Claude Code extension in VS Code?** The Claude Code extension runs inside VS Code but uses its own MCP config. Follow the [Claude Code](#claude-code) instructions above — the `.claude/settings.json` config works whether you use Claude Code as a CLI or as a VS Code extension.
 
-> **Windows**: Make sure `engram.exe` is in your `PATH`. VS Code resolves MCP commands from the system PATH.
+> **Windows**: Make sure `qbit-jay.exe` is in your `PATH`. VS Code resolves MCP commands from the system PATH.
 
 **Adding the Memory Protocol** (recommended — teaches the agent when to save and search memories):
 
@@ -635,8 +635,8 @@ The reliable fix is to pin the project explicitly at startup time. Both forms be
 ```json
 {
   "servers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp", "--project=my-project", "--tools=agent"]
     }
   }
@@ -648,26 +648,26 @@ The reliable fix is to pin the project explicitly at startup time. Both forms be
 ```json
 {
   "servers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp", "--tools=agent"],
       "env": {
-        "ENGRAM_PROJECT": "my-project"
+        "QBIT_JAY_PROJECT": "my-project"
       }
     }
   }
 }
 ```
 
-Both `--project=my-project` and `ENGRAM_PROJECT=my-project` set `MCPConfig.DefaultProject`, which takes precedence over cwd detection for current-project tools for the lifetime of that MCP process. Deliberately global operations keep their own omission contract.
+Both `--project=my-project` and `QBIT_JAY_PROJECT=my-project` set `MCPConfig.DefaultProject`, which takes precedence over cwd detection for current-project tools for the lifetime of that MCP process. Deliberately global operations keep their own omission contract.
 
-> The `--project` flag and `ENGRAM_PROJECT` env var are the same mechanism. If both are supplied, the flag wins. The value must be a project name, not a path. Operations that cannot establish project context reject unknown values; documented creation and recovery writes retain their creation semantics.
+> The `--project` flag and `QBIT_JAY_PROJECT` env var are the same mechanism. If both are supplied, the flag wins. The value must be a project name, not a path. Operations that cannot establish project context reject unknown values; documented creation and recovery writes retain their creation semantics.
 
 Same pattern applies to:
 
 - WSL terminals where VS Code opens a remote window (`\\wsl$\...` paths) — the MCP server process runs inside WSL but VS Code does not forward the workspace directory as cwd.
 - CI pipelines (GitHub Actions, GitLab CI, etc.) where the agent runs in a container and the checkout path differs from the project name you use locally.
-- Any Docker-based agent host where the container cwd does not match your Engram project name.
+- Any Docker-based agent host where the container cwd does not match your qbit-jay project name.
 
 ---
 
@@ -678,18 +678,18 @@ Same pattern applies to:
 **Automated:**
 
 ```bash
-engram setup antigravity-cli
+qbit-jay setup antigravity-cli
 ```
 
-This registers `mcpServers.engram` in the shared `~/.gemini/config/mcp_config.json` (read by Antigravity CLI, IDE, and SDK) and writes the Memory Protocol as a marker-delimited block in `~/.gemini/GEMINI.md`, preserving any existing content.
+This registers `mcpServers.qbit-jay` in the shared `~/.gemini/config/mcp_config.json` (read by Antigravity CLI, IDE, and SDK) and writes the Memory Protocol as a marker-delimited block in `~/.gemini/GEMINI.md`, preserving any existing content.
 
 **Manual** — open the MCP Store (`...` dropdown in the agent panel) → **Manage MCP Servers** → **View raw config**, and add to `~/.gemini/config/mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp", "--tools=agent"]
     }
   }
@@ -698,7 +698,7 @@ This registers `mcpServers.engram` in the shared `~/.gemini/config/mcp_config.js
 
 Then add the Memory Protocol as a global rule in `~/.gemini/GEMINI.md`. See [DOCS.md](../DOCS.md#memory-protocol-full-text) for the full text.
 
-> **Note:** Antigravity has its own skill, rule, and MCP systems separate from VS Code. Do not use `.vscode/mcp.json`. This is distinct from `engram setup gemini-cli`, which writes the Gemini CLI's own `settings.json` / `system.md`.
+> **Note:** Antigravity has its own skill, rule, and MCP systems separate from VS Code. Do not use `.vscode/mcp.json`. This is distinct from `qbit-jay setup gemini-cli`, which writes the Gemini CLI's own `settings.json` / `system.md`.
 
 ---
 
@@ -707,25 +707,25 @@ Then add the Memory Protocol as a global rule in `~/.gemini/GEMINI.md`. See [DOC
 **Automated:**
 
 ```bash
-engram setup cursor
+qbit-jay setup cursor
 ```
 
-This registers `mcpServers.engram` in the global `~/.cursor/mcp.json` and writes the Memory Protocol to `~/.cursor/engram-memory-protocol.md` as an informational file for you to paste into User Rules (see the note below).
+This registers `mcpServers.qbit-jay` in the global `~/.cursor/mcp.json` and writes the Memory Protocol to `~/.cursor/engram-memory-protocol.md` as an informational file for you to paste into User Rules (see the note below).
 
 **Manual** — add to your `.cursor/mcp.json` (global: `~/.cursor/mcp.json`; or project-relative `.cursor/mcp.json`):
 
 ```json
 {
   "mcpServers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp", "--tools=agent"]
     }
   }
 }
 ```
 
-> **Windows**: Make sure `engram.exe` is in your `PATH`. Cursor resolves MCP commands from the system PATH.
+> **Windows**: Make sure `qbit-jay.exe` is in your `PATH`. Cursor resolves MCP commands from the system PATH.
 
 > **Memory Protocol:** Setup writes the protocol to `~/.cursor/engram-memory-protocol.md` as an informational file — Cursor does not load it automatically. Open it, copy the contents, and paste them into Cursor's **Customize → Rules → User Rules**.
 >
@@ -740,18 +740,18 @@ This registers `mcpServers.engram` in the global `~/.cursor/mcp.json` and writes
 **Automated:**
 
 ```bash
-engram setup windsurf
+qbit-jay setup windsurf
 ```
 
-This registers `mcpServers.engram` in `~/.codeium/windsurf/mcp_config.json` (Cascade's MCP config) and writes the Memory Protocol as a marker block in `~/.codeium/windsurf/memories/global_rules.md`.
+This registers `mcpServers.qbit-jay` in `~/.codeium/windsurf/mcp_config.json` (Cascade's MCP config) and writes the Memory Protocol as a marker block in `~/.codeium/windsurf/memories/global_rules.md`.
 
 **Manual** — add to `~/.codeium/windsurf/mcp_config.json`:
 
 ```json
 {
   "mcpServers": {
-    "engram": {
-      "command": "engram",
+    "qbit-jay": {
+      "command": "qbit-jay",
       "args": ["mcp", "--tools=agent"]
     }
   }
@@ -767,10 +767,10 @@ This registers `mcpServers.engram` in `~/.codeium/windsurf/mcp_config.json` (Cas
 **Automated:**
 
 ```bash
-engram setup qwen
+qbit-jay setup qwen
 ```
 
-Registers `mcpServers.engram` in `~/.qwen/settings.json` and writes the Memory Protocol as a marker block in `~/.qwen/QWEN.md`.
+Registers `mcpServers.qbit-jay` in `~/.qwen/settings.json` and writes the Memory Protocol as a marker block in `~/.qwen/QWEN.md`.
 
 ---
 
@@ -779,10 +779,10 @@ Registers `mcpServers.engram` in `~/.qwen/settings.json` and writes the Memory P
 **Automated:**
 
 ```bash
-engram setup kiro
+qbit-jay setup kiro
 ```
 
-Registers `mcpServers.engram` in `~/.kiro/settings/mcp.json` and writes the Memory Protocol as a marker block in `~/.kiro/steering/engram.md`. (Kiro uses a split layout: MCP and steering live under `~/.kiro/` regardless of where the IDE keeps app settings.)
+Registers `mcpServers.qbit-jay` in `~/.kiro/settings/mcp.json` and writes the Memory Protocol as a marker block in `~/.kiro/steering/engram.md`. (Kiro uses a split layout: MCP and steering live under `~/.kiro/` regardless of where the IDE keeps app settings.)
 
 ---
 
@@ -791,10 +791,10 @@ Registers `mcpServers.engram` in `~/.kiro/settings/mcp.json` and writes the Memo
 **Automated:**
 
 ```bash
-engram setup kilocode
+qbit-jay setup kilocode
 ```
 
-Registers the engram server under the OpenCode-style `mcp` object in `~/.config/kilo/opencode.json` and writes the Memory Protocol as a marker block in `~/.config/kilo/AGENTS.md`.
+Registers the qbit-jay server under the OpenCode-style `mcp` object in `~/.config/kilo/opencode.json` and writes the Memory Protocol as a marker block in `~/.config/kilo/AGENTS.md`.
 
 ---
 
@@ -803,12 +803,12 @@ Registers the engram server under the OpenCode-style `mcp` object in `~/.config/
 **Automated:**
 
 ```bash
-engram setup kimi
+qbit-jay setup kimi
 ```
 
-Registers `mcpServers.engram` in `~/.kimi-code/mcp.json` and writes the Memory Protocol as a marker block in `~/.kimi-code/AGENTS.md`. Both files live under the Kimi Code data root, so when `KIMI_CODE_HOME` is set the setup honors it and writes there instead.
+Registers `mcpServers.qbit-jay` in `~/.kimi-code/mcp.json` and writes the Memory Protocol as a marker block in `~/.kimi-code/AGENTS.md`. Both files live under the Kimi Code data root, so when `KIMI_CODE_HOME` is set the setup honors it and writes there instead.
 
-**`KIMI_CODE_HOME` is only honored when it is an absolute path.** A relative value (for example `KIMI_CODE_HOME=.kimi-code`) is ignored and setup falls back to the default `~/.kimi-code` root, so config never lands in whatever directory you happened to run `engram` from. The `Next steps` printed after setup name the files that were actually written, so they follow the override.
+**`KIMI_CODE_HOME` is only honored when it is an absolute path.** A relative value (for example `KIMI_CODE_HOME=.kimi-code`) is ignored and setup falls back to the default `~/.kimi-code` root, so config never lands in whatever directory you happened to run `qbit-jay` from. The `Next steps` printed after setup name the files that were actually written, so they follow the override.
 
 ---
 
@@ -817,31 +817,31 @@ Registers `mcpServers.engram` in `~/.kimi-code/mcp.json` and writes the Memory P
 **Automated:**
 
 ```bash
-engram setup commandcode
+qbit-jay setup commandcode
 ```
 
-Registers `mcpServers.engram` in the user-scope `~/.commandcode/mcp.json` (private, available across all projects) and writes the Memory Protocol as a marker block in the user-tier `~/.commandcode/AGENTS.md`. Memory is re-read every request, so `AGENTS.md` edits apply on the next turn with no restart; restart the session so the MCP server is picked up. On Windows the CLI binary is `cmdc` instead of `cmd`, but the config paths are the same.
+Registers `mcpServers.qbit-jay` in the user-scope `~/.commandcode/mcp.json` (private, available across all projects) and writes the Memory Protocol as a marker block in the user-tier `~/.commandcode/AGENTS.md`. Memory is re-read every request, so `AGENTS.md` edits apply on the next turn with no restart; restart the session so the MCP server is picked up. On Windows the CLI binary is `cmdc` instead of `cmd`, but the config paths are the same.
 
 ---
 
 ## Any other MCP agent
 
-The pattern is always the same — point your agent's MCP config to `engram mcp` via stdio transport.
+The pattern is always the same — point your agent's MCP config to `qbit-jay mcp` via stdio transport.
 
 ---
 
 ## Surviving Compaction (Recommended)
 
-> **Is this step required?** No — `engram setup` handles all the MCP wiring. These snippets are an optional resilience layer. Add them if your agent forgets about Engram after long sessions or context resets. They are especially useful for agents that do not have a full plugin (VS Code, Cursor, Windsurf, Antigravity) and have no automated session tracking.
+> **Is this step required?** No — `qbit-jay setup` handles all the MCP wiring. These snippets are an optional resilience layer. Add them if your agent forgets about qbit-jay after long sessions or context resets. They are especially useful for agents that do not have a full plugin (VS Code, Cursor, Windsurf, Antigravity) and have no automated session tracking.
 
-When your agent compacts (summarizes long conversations to free context), it starts fresh — and might forget about Engram. To make memory truly resilient, add this to your agent's system prompt or config file:
+When your agent compacts (summarizes long conversations to free context), it starts fresh — and might forget about qbit-jay. To make memory truly resilient, add this to your agent's system prompt or config file:
 
 **For Claude Code** (`CLAUDE.md`):
 
 ```markdown
 ## Memory
 
-You have access to Engram persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
+You have access to qbit-jay persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
 
 - Save proactively after significant work — don't wait to be asked.
 - After any compaction or context reset, first persist the injected summary with `mem_session_summary`. Request `mem_context` only if additional context is needed.
@@ -859,7 +859,7 @@ Save memories proactively with mem_save after significant work.
 ```markdown
 ## Memory
 
-You have access to Engram persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
+You have access to qbit-jay persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
 
 - Save proactively after significant work — don't wait to be asked.
 - After any compaction or context reset, first persist the injected summary with `mem_session_summary`. Request `mem_context` only if additional context is needed.
@@ -870,7 +870,7 @@ You have access to Engram persistent memory via MCP tools (mem_save, mem_search,
 ```markdown
 ## Memory
 
-You have access to Engram persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
+You have access to qbit-jay persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
 
 - Save proactively after significant work — don't wait to be asked.
 - After any compaction or context reset, first persist the injected summary with `mem_session_summary`. Request `mem_context` only if additional context is needed.
@@ -881,7 +881,7 @@ You have access to Engram persistent memory via MCP tools (mem_save, mem_search,
 ```markdown
 ## Memory
 
-You have access to Engram persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
+You have access to qbit-jay persistent memory via MCP tools (mem_save, mem_search, mem_session_summary, etc.).
 
 - Save proactively after significant work — don't wait to be asked.
 - After any compaction or context reset, first persist the injected summary with `mem_session_summary`. Request `mem_context` only if additional context is needed.
@@ -890,14 +890,14 @@ You have access to Engram persistent memory via MCP tools (mem_save, mem_search,
 **For Cursor** (Customize → Rules → User Rules; the generated `~/.cursor/engram-memory-protocol.md` is informational and is not loaded automatically):
 
 ```text
-You have access to Engram persistent memory (mem_save, mem_search, mem_context, mem_session_summary).
+You have access to qbit-jay persistent memory (mem_save, mem_search, mem_context, mem_session_summary).
 Save proactively after significant work. After context resets, first persist the injected summary with mem_session_summary. Request mem_context only if additional context is needed.
 ```
 
 **For Windsurf** (`.windsurfrules`):
 
 ```text
-You have access to Engram persistent memory (mem_save, mem_search, mem_context, mem_session_summary).
+You have access to qbit-jay persistent memory (mem_save, mem_search, mem_context, mem_session_summary).
 Save proactively after significant work. After context resets, first persist the injected summary with mem_session_summary. Request mem_context only if additional context is needed.
 ```
 
@@ -907,7 +907,7 @@ This is the **nuclear option** — system prompts survive everything, including 
 
 ## Conflict Surfacing (automatic)
 
-When you save a memory with `mem_save`, Engram automatically scans for similar existing observations using FTS5 full-text search. If any candidates are found above a relevance threshold, the response includes a `candidates[]` array and `judgment_required: true`. Nothing to configure — this runs on every save.
+When you save a memory with `mem_save`, qbit-jay automatically scans for similar existing observations using FTS5 full-text search. If any candidates are found above a relevance threshold, the response includes a `candidates[]` array and `judgment_required: true`. Nothing to configure — this runs on every save.
 
 ### What the agent sees
 
@@ -964,7 +964,7 @@ Once the agent calls `mem_judge` with a verdict:
 - If the relation is `conflicts_with`, future `mem_search` results show `conflicts: #<id> (<title>)` on both observations.
 - If the relation is `compatible`, `related`, `scoped`, or `not_conflict`, the judgment is stored in `memory_relations` but no annotation appears in search results.
 
-**Cloud sync**: when the project is enrolled in Engram Cloud and autosync is enabled, `mem_judge` verdicts propagate to other machines via the standard mutation push/pull cycle. The annotation appears in `mem_search` results on any machine that has pulled the relevant mutations. Relations that reference an observation not yet present locally are deferred and retried automatically on subsequent pull cycles — the verdict is never lost.
+**Cloud sync**: when the project is enrolled in qbit-jay Cloud and autosync is enabled, `mem_judge` verdicts propagate to other machines via the standard mutation push/pull cycle. The annotation appears in `mem_search` results on any machine that has pulled the relevant mutations. Relations that reference an observation not yet present locally are deferred and retried automatically on subsequent pull cycles — the verdict is never lost.
 
 Nothing breaks if `mem_judge` is never called — pending relations accumulate unjudged but do not affect other operations.
 
@@ -978,28 +978,28 @@ See [Plugins → mem_compare reference](PLUGINS.md#mcp-tool-reference--mem_compa
 
 ## Cloud Autosync toggle
 
-`engram serve` and `engram mcp` support continuous background replication to an Engram Cloud server. This is **opt-in** and never fatal on missing config.
+`qbit-jay serve` and `qbit-jay mcp` support continuous background replication to a qbit-jay Cloud server. This is **opt-in** and never fatal on missing config.
 
 ### Prerequisites
 
-1. A running Engram Cloud server (see `docker-compose.cloud.yml` or `engram cloud serve`). The server must be a build that includes the mutation endpoints (`POST /sync/mutations/push`, `GET /sync/mutations/pull`). If the server is older, autosync enters `PhaseBackoff` with `reason_code: transport_failed` and logs `server_unsupported` to stderr.
+1. A running qbit-jay Cloud server (see `docker-compose.cloud.yml` or `qbit-jay cloud serve`). The server must be a build that includes the mutation endpoints (`POST /sync/mutations/push`, `GET /sync/mutations/pull`). If the server is older, autosync enters `PhaseBackoff` with `reason_code: transport_failed` and logs `server_unsupported` to stderr.
 
 2. A valid bearer token configured on the server.
 
 ### Enable autosync
 
 ```sh
-export ENGRAM_CLOUD_AUTOSYNC=1          # exact "1" only
-export ENGRAM_CLOUD_TOKEN=your-token    # bearer token
-export ENGRAM_CLOUD_SERVER=https://cloud.engram.example.com
+export QBIT_JAY_CLOUD_AUTOSYNC=1          # exact "1" only
+export QBIT_JAY_CLOUD_TOKEN=your-token    # bearer token
+export QBIT_JAY_CLOUD_SERVER=https://cloud.example.com
 
-engram serve
+qbit-jay serve
 # or
-engram mcp
+qbit-jay mcp
 ```
 
 The process logs `[autosync] started (server=...)` on success. Missing token or server URL logs `[autosync] ERROR: ...` and the process starts normally without autosync.
-For `engram mcp`, autosync runs for the lifetime of the stdio MCP process and is stopped when that process exits.
+For `qbit-jay mcp`, autosync runs for the lifetime of the stdio MCP process and is stopped when that process exits.
 
 ---
 

@@ -1,10 +1,10 @@
 [← Back to README](../README.md)
 
-# Engram Codebase Guide
+# qbit-jay Codebase Guide
 
-**This guide is for maintainers and contributors who need to understand where Engram responsibilities live, which invariants are non-negotiable, and which file to open when something needs to change.**
+**This guide is for maintainers and contributors who need to understand where qbit-jay responsibilities live, which invariants are non-negotiable, and which file to open when something needs to change.**
 
-Engram is a local-first persistent memory system for coding agents. The center of the product is a Go binary that writes to SQLite + FTS5; the CLI, MCP, HTTP API, TUI, plugins, sync, cloud, and dashboard are interfaces around that core.
+qbit-jay is a local-first persistent memory system for coding agents. The center of the product is a Go binary that writes to SQLite + FTS5; the CLI, MCP, HTTP API, TUI, plugins, sync, cloud, and dashboard are interfaces around that core.
 
 ## 90-second mental model
 
@@ -14,11 +14,11 @@ Coding agent
         │
         │ MCP stdio, plugin hooks, or local API
         ▼
-cmd/engram
+cmd/qbit-jay
   CLI + local runtime + cloud runtime
         │
         ├── internal/mcp        mem_* tools for agents
-        ├── internal/server     local JSON API: engram serve
+        ├── internal/server     local JSON API: qbit-jay serve
         ├── internal/tui        Bubbletea terminal UI
         ├── internal/setup      automated integration installation
         │
@@ -30,7 +30,7 @@ internal/store
         └── internal/cloud/autosync         optional background push/pull
                 │
                 ▼
-        internal/cloud/remote ── HTTP ── engram cloud serve
+        internal/cloud/remote ── HTTP ── qbit-jay cloud serve
                                       │
                                       ├── internal/cloud/cloudserver
                                       ├── internal/cloud/cloudstore  Postgres

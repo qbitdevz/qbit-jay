@@ -3,10 +3,9 @@
 # Installation
 
 - [Choose a release channel before installing](#choose-a-release-channel-before-installing)
-- [Homebrew (macOS / Linux)](#homebrew-macos--linux)
+- [Package managers and releases (coming later)](#package-managers-and-releases-coming-later)
 - [Windows](#windows)
 - [Install from source (macOS / Linux)](#install-from-source-macos--linux)
-- [Download binary (all platforms)](#download-binary-all-platforms)
 - [After upgrading](#after-upgrading)
 - [Requirements](#requirements)
 - [Data-directory filesystem safety](#data-directory-filesystem-safety)
@@ -17,119 +16,62 @@
 
 ## Choose a release channel before installing
 
-The latest stable release is the production and security-supported line. Release candidates are prerelease validation and feedback builds, not a universal production recommendation or a guaranteed security-supported channel. See the [Release Policy](./RELEASE-POLICY.md) for channel, upgrade, and rollback guidance.
+qbit-jay has no stable release yet, so `go install ...@latest` resolves to the newest tagged version, or to the latest commit while no tag exists. The [Release Policy](./RELEASE-POLICY.md) is inherited from upstream and describes how channels, upgrades and rollback are meant to work once qbit-jay publishes releases.
 
 ---
 
-## Homebrew (macOS / Linux)
+## Package managers and releases (coming later)
 
-```bash
-brew install gentleman-programming/tap/engram
-```
-
-Upgrade to latest:
-
-```bash
-brew update && brew upgrade engram
-```
-
-> **Migrating from Cask?** If you installed engram before v1.0.1, it was distributed as a Cask. Uninstall first, then reinstall:
-> ```bash
-> brew uninstall --cask engram 2>/dev/null; brew install gentleman-programming/tap/engram
-> ```
-
-> **Upgrading a running server?** Replacing the binary does not guarantee that an existing `engram serve` process exits or restarts. Follow [After upgrading](#after-upgrading) to restart it and verify the running version. For supervised startup on macOS, see [Using launchd](../DOCS.md#using-launchd-macos).
+qbit-jay has no published release yet. There is no Homebrew formula, Scoop bucket, npm package, install script or prebuilt binary, so the only supported install today is from source with Go (below). When releases exist, this page will list each channel here.
 
 ---
 
 ## Windows
 
-**Option A: Install via `go install` (recommended for technical users)**
+**Option A: Install via `go install` (recommended)**
 
-If you have Go installed, you can compile the binary locally from source, but this does not guarantee protection from antivirus alerts or Windows security-policy blocking.
-
-Go's [Semantic Import Versioning](https://go.dev/ref/mod#major-version-suffixes) rule puts the major version in the module path starting at major version 2, so each major line has its own `go install` path. Pick the line that matches the major version you want:
+With Go installed, the binary is compiled locally from source. This does not guarantee protection from antivirus alerts or Windows security-policy blocking.
 
 ```powershell
-# Current line (v3.x)
-go install github.com/qbitdevz/qbit-jay/cmd/engram@latest
-
-# Previous lines, only if you must stay on an older major version
-go install github.com/Gentleman-Programming/engram/v2/cmd/engram@latest
-go install github.com/Gentleman-Programming/engram/cmd/engram@latest
-# Binary goes to %GOPATH%\bin\engram.exe (typically %USERPROFILE%\go\bin\)
+go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
+# Binary goes to %GOPATH%\bin\qbit-jay.exe (typically %USERPROFILE%\go\bin\)
 ```
-
-The `/v3` command requires `v3.0.0` or a later v3 release. `@latest` selects the latest released version for the requested module path only; it never moves you to another major line.
 
 Ensure `%GOPATH%\bin` (or `%USERPROFILE%\go\bin`) is on your `PATH`.
 
 **Option B: Build from source**
 
 ```powershell
-git clone https://github.com/Gentleman-Programming/engram.git
-cd engram
-go install ./cmd/engram
-# Binary goes to %GOPATH%\bin\engram.exe (typically %USERPROFILE%\go\bin\)
+git clone https://github.com/qbitdevz/qbit-jay.git
+cd qbit-jay
+go install ./cmd/qbit-jay
+# Binary goes to %GOPATH%\bin\qbit-jay.exe (typically %USERPROFILE%\go\bin\)
 ```
 
 > **Want a real version string instead of `dev`?**
 >
-> `go install` always stamps the binary as `dev`. To get a meaningful version, pick one of these — not both. Running them both leaves two binaries on disk and `engram version` keeps reporting `dev` because PATH still resolves to the `go install` build.
+> `go install` always stamps the binary as `dev`. To get a meaningful version, pick one of these — not both. Running them both leaves two binaries on disk and `qbit-jay version` keeps reporting `dev` because PATH still resolves to the `go install` build.
 >
 > **Option B1 — version-stamped `go install` (binary stays on PATH):**
 >
 > ```powershell
 > $v = git describe --tags --always
-> go install -ldflags="-X main.version=local-$v" ./cmd/engram
+> go install -ldflags="-X main.version=local-$v" ./cmd/qbit-jay
 > ```
 >
 > **Option B2 — `go build` and move the result onto PATH:**
 >
 > ```powershell
 > $v = git describe --tags --always
-> go build -ldflags="-X main.version=local-$v" -o engram.exe ./cmd/engram
-> Move-Item -Force engram.exe "$env:USERPROFILE\go\bin\engram.exe"
+> go build -ldflags="-X main.version=local-$v" -o qbit-jay.exe ./cmd/qbit-jay
+> Move-Item -Force qbit-jay.exe "$env:USERPROFILE\go\bin\qbit-jay.exe"
 > ```
 >
-> After either option, `engram version` should print `local-<git-describe>` instead of `dev`.
-
-**Option C: Download the prebuilt binary**
-
-1. Go to [GitHub Releases](https://github.com/Gentleman-Programming/engram/releases)
-2. Download `engram_<version>_windows_amd64.zip` (or `arm64` for ARM devices)
-3. Extract `engram.exe` to a folder in your `PATH` (e.g. `C:\Users\<you>\bin\`)
-
-```powershell
-# Example: extract and add to PATH (PowerShell)
-Expand-Archive engram_*_windows_amd64.zip -DestinationPath "$env:USERPROFILE\bin"
-# Add to PATH permanently (run once):
-[Environment]::SetEnvironmentVariable("Path", "$env:USERPROFILE\bin;" + [Environment]::GetEnvironmentVariable("Path", "User"), "User")
-```
-
-> **Antivirus false positives on prebuilt binaries**
->
-> Windows Defender and other antivirus tools (ESET, Brave's built-in scanner) have flagged some
-> engram prebuilt releases as malware (`Trojan:Script/Wacatac.H!ml` or similar). This is a
-> **heuristic false positive**. The binary is built reproducibly from the public source code
-> via GoReleaser and contains no malicious code.
->
-> **Why does this happen?** Prebuilt binaries from small open-source projects are unsigned (code
-> signing certificates cost hundreds of dollars per year). Many AV engines automatically flag
-> unsigned executables from unknown publishers, especially recently compiled Go binaries. The
-> same alert has been observed on Claude Code's own MSIX installer, which confirms this is an
-> AV heuristic issue, not a code problem.
->
-> **Maintainer stance:** We will not pay for a code signing certificate at this time. This is a
-> distribution trust problem, not a security problem. The source code is fully auditable.
->
-> **Recommended workaround:** Technical Windows users should prefer **Option A (`go install`)** or
-> **Option B (build from source)**. Building locally is an option, not a guarantee against
-> antivirus alerts or Windows security-policy blocking.
+> After either option, `qbit-jay version` should print `local-<git-describe>` instead of `dev`.
 
 > **Other Windows notes:**
-> - Data is stored in `%USERPROFILE%\.engram\engram.db`
-> - Override with `ENGRAM_DATA_DIR` environment variable
+> - Data is stored in `%USERPROFILE%\.qbit-jay\qbit-jay.db`
+> - Override with `QBIT_JAY_DATA_DIR` environment variable
 > - All core features work natively: CLI, MCP server, TUI, HTTP API, Git Sync
 > - No WSL required for the core binary — it's a native Windows executable
 
@@ -138,10 +80,9 @@ Expand-Archive engram_*_windows_amd64.zip -DestinationPath "$env:USERPROFILE\bin
 ## Windows troubleshooting: executable blocked before MCP starts
 
 **Distinguish a missing executable from Windows rejecting an existing one.**
-Smart App Control or another security policy can prevent `engram.exe` from
+Smart App Control or another security policy can prevent `qbit-jay.exe` from
 starting, including a locally compiled `go install` binary. Building locally is
-not a guarantee against security-policy blocking, despite the antivirus guidance
-above.
+not a guarantee against security-policy blocking, even though it is not a prebuilt download.
 
 | Observation | What to check |
 |-------------|---------------|
@@ -151,7 +92,7 @@ above.
 | Authenticode status is `NotSigned` | This describes the file's signature, but does not by itself prove which policy blocked it. A signature status alone is not a policy diagnosis. |
 
 Issue #1703 reports Windows 11 Smart App Control enabled, an unsigned
-`engram.exe`, a PowerShell policy rejection, Git Bash exit 126, and a Claude Code
+`qbit-jay.exe`, a PowerShell policy rejection, Git Bash exit 126, and a Claude Code
 MCP `EUNKNOWN: uv_spawn` error. These are reported observations, not an
 independently reproduced diagnosis for every similar startup failure.
 
@@ -178,78 +119,54 @@ organization's policy rather than attempting a bypass.
 
 ## Install from source (macOS / Linux)
 
-Pick the line that matches the major version you want — the `/vN` suffix exists starting at major version 2 because of Go's [Semantic Import Versioning](https://go.dev/ref/mod#major-version-suffixes) rule:
-
 ```bash
-# Current line (v3.x)
-go install github.com/qbitdevz/qbit-jay/cmd/engram@latest
-
-# Previous lines, only if you must stay on an older major version
-go install github.com/Gentleman-Programming/engram/v2/cmd/engram@latest
-go install github.com/Gentleman-Programming/engram/cmd/engram@latest
+go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
 # Binary goes to $GOPATH/bin (typically ~/go/bin/)
 ```
-
-The `/v3` command requires `v3.0.0` or a later v3 release. `@latest` selects the latest released version for the requested module path only; it never moves you to another major line.
 
 Or build from a local clone:
 
 ```bash
-git clone https://github.com/Gentleman-Programming/engram.git
-cd engram
-go install ./cmd/engram
+git clone https://github.com/qbitdevz/qbit-jay.git
+cd qbit-jay
+go install ./cmd/qbit-jay
 ```
 
 > **Want a real version string instead of `dev`?**
 >
-> `go install` always stamps the binary as `dev`. To get a meaningful version, pick one of these — not both. Running them both leaves two binaries on disk and `engram version` keeps reporting `dev` because PATH still resolves to the `go install` build.
+> `go install` always stamps the binary as `dev`. To get a meaningful version, pick one of these — not both. Running them both leaves two binaries on disk and `qbit-jay version` keeps reporting `dev` because PATH still resolves to the `go install` build.
 >
 > **Option 1 — version-stamped `go install` (binary stays on PATH):**
 >
 > ```bash
-> go install -ldflags="-X main.version=local-$(git describe --tags --always)" ./cmd/engram
+> go install -ldflags="-X main.version=local-$(git describe --tags --always)" ./cmd/qbit-jay
 > ```
 >
 > **Option 2 — `go build` and move the result onto PATH:**
 >
 > ```bash
-> go build -ldflags="-X main.version=local-$(git describe --tags --always)" -o engram ./cmd/engram
-> mv engram "$(go env GOPATH)/bin/engram"
+> go build -ldflags="-X main.version=local-$(git describe --tags --always)" -o qbit-jay ./cmd/qbit-jay
+> mv qbit-jay "$(go env GOPATH)/bin/qbit-jay"
 > ```
 >
-> After either option, `engram version` should print `local-<git-describe>` instead of `dev`.
-
----
-
-## Download binary (all platforms)
-
-Grab the latest release for your platform from [GitHub Releases](https://github.com/Gentleman-Programming/engram/releases).
-
-| Platform | File |
-|----------|------|
-| macOS (Apple Silicon) | `engram_<version>_darwin_arm64.tar.gz` |
-| macOS (Intel) | `engram_<version>_darwin_amd64.tar.gz` |
-| Linux (x86_64) | `engram_<version>_linux_amd64.tar.gz` |
-| Linux (ARM64) | `engram_<version>_linux_arm64.tar.gz` |
-| Windows (x86_64) | `engram_<version>_windows_amd64.zip` |
-| Windows (ARM64) | `engram_<version>_windows_arm64.zip` |
+> After either option, `qbit-jay version` should print `local-<git-describe>` instead of `dev`.
 
 ---
 
 ## After upgrading
 
-These steps apply to Homebrew, source installs, and downloaded binaries. Keep the
+These steps apply to source installs, and to other channels once they exist. Keep the
 backup and compatibility checks in the [release policy](./RELEASE-POLICY.md#upgrade-deliberately).
 
 1. Confirm that your supervisor or launcher points to the updated executable.
-   `engram version` reports the executable selected by your shell; a service may
+   `qbit-jay version` reports the executable selected by your shell; a service may
    use a different absolute path.
-2. Restart any already-running `engram serve` HTTP server through the supervisor or launcher
+2. Restart any already-running `qbit-jay serve` HTTP server through the supervisor or launcher
    that owns it, keeping the same service account and data-directory configuration.
    Use your configured [systemd service](../DOCS.md#using-systemd-linux),
    [launchd agent](../DOCS.md#using-launchd-macos), or
    [Windows scheduled task](../DOCS.md#using-windows-task-scheduler). For a manually
-   started foreground `engram serve`, stop that process and start the updated
+   started foreground `qbit-jay serve`, stop that process and start the updated
    executable with the same arguments and environment. Replacing a binary alone
    does not make an older process serve the new code. If a Windows task launches
    a separate child process, confirm that the previous server has actually stopped;
@@ -261,7 +178,7 @@ For a local server using the default port and no additional authentication,
 read both versions with:
 
 ```sh
-engram version
+qbit-jay version
 curl --fail --silent --show-error http://127.0.0.1:7437/health
 ```
 
@@ -273,13 +190,13 @@ If it differs, check the launcher's executable path and restart the intended
 server through its owner. A missing version or `dev` does not confirm which
 release is running.
 
-`engram cloud status` reporting `Local daemon: running` proves liveness only.
+`qbit-jay cloud status` reporting `Local daemon: running` proves liveness only.
 Its `Versions:` line compares the server's reported semantic release version
 with the installed CLI and prints `Restart pending` when both are known and
-differ. `engram ps` shows the same comparison for its identity-confirmed daemon.
+differ. `qbit-jay ps` shows the same comparison for its identity-confirmed daemon.
 Missing, malformed or development versions are `unknown`; build metadata is
 ignored. This comparison does not authenticate a listener or restart anything.
-Use the intended server's existing supervisor; `engram restart` manages only
+Use the intended server's existing supervisor; `qbit-jay restart` manages only
 the pidfile-tracked daemon. Successful local CLI, doctor, or direct-store MCP
 operations do not confirm the version of a separate HTTP server.
 
@@ -287,7 +204,7 @@ operations do not confirm the version of a separate HTTP server.
 
 ## Requirements
 
-- **Go 1.26+** to build from source (not needed if installing via Homebrew or downloading a binary)
+- **Go 1.26+** to build from source
 - That's it. No runtime dependencies.
 
 The binary includes SQLite (via [modernc.org/sqlite](https://pkg.go.dev/modernc.org/sqlite) — pure Go, no CGO). Works natively on **macOS**, **Linux**, and **Windows** (x86_64 and ARM64).
@@ -296,26 +213,26 @@ The binary includes SQLite (via [modernc.org/sqlite](https://pkg.go.dev/modernc.
 
 ## Data-directory filesystem safety
 
-Engram uses persistent SQLite WAL and rejects known NFS and SMB/CIFS data directories before changing the SQLite files. Use a local disk for `ENGRAM_DATA_DIR`; an unknown filesystem remains compatible but is not proven local.
+qbit-jay uses persistent SQLite WAL and rejects known NFS and SMB/CIFS data directories before changing the SQLite files. Use a local disk for `QBIT_JAY_DATA_DIR`; an unknown filesystem remains compatible but is not proven local.
 
-For local stores, Engram sets SQLite's journal size limit to 64 MiB. SQLite
+For local stores, qbit-jay sets SQLite's journal size limit to 64 MiB. SQLite
 reclaims excess WAL space when it can safely reuse the file or close the last
 connection. Active readers and writers can still retain more than 64 MiB while
-they need those frames. Engram keeps the WAL and shared-memory sidecar files.
+they need those frames. qbit-jay keeps the WAL and shared-memory sidecar files.
 
-If startup rejects a network data directory, stop **all** Engram processes. Copy the complete `engram.db`, `engram.db-wal`, and `engram.db-shm` triplet to local storage, set `ENGRAM_DATA_DIR` to the absolute path of that local directory (relative paths are rejected), then start Engram and run `engram doctor`. Check SQLite integrity with the command for your shell:
+If startup rejects a network data directory, stop **all** qbit-jay processes. Copy the complete `qbit-jay.db`, `qbit-jay.db-wal`, and `qbit-jay.db-shm` triplet to local storage, set `QBIT_JAY_DATA_DIR` to the absolute path of that local directory (relative paths are rejected), then start qbit-jay and run `qbit-jay doctor`. Check SQLite integrity with the command for your shell:
 
 ```bash
 # POSIX shell or Git Bash
-sqlite3 "$ENGRAM_DATA_DIR/engram.db" "PRAGMA integrity_check;"
+sqlite3 "$QBIT_JAY_DATA_DIR/qbit-jay.db" "PRAGMA integrity_check;"
 ```
 
 ```powershell
 # PowerShell
-sqlite3 (Join-Path $env:ENGRAM_DATA_DIR 'engram.db') 'PRAGMA integrity_check;'
+sqlite3 (Join-Path $env:QBIT_JAY_DATA_DIR 'qbit-jay.db') 'PRAGMA integrity_check;'
 ```
 
-Engram does not auto-repair, quarantine, checkpoint, or use rollback journaling as a fallback.
+qbit-jay does not auto-repair, quarantine, checkpoint, or use rollback journaling as a fallback.
 
 ---
 
@@ -323,15 +240,15 @@ Engram does not auto-repair, quarantine, checkpoint, or use rollback journaling 
 
 | Variable | Description | Default |
 |---|---|---|
-| `ENGRAM_DATA_DIR` | Engram CLI data directory. Empty or whitespace-only values use the platform default; nonblank values are used as provided. | `~/.engram` (Windows: `%USERPROFILE%\.engram`) |
-| `ENGRAM_PORT` | HTTP server port. Use an unsigned decimal value from `1` through `65535`; invalid values fall back to `7437` in `engram serve` and Claude Bash hooks. | `7437` |
-| `ENGRAM_SOCKET` | POSIX-only Unix-domain socket path. Run `engram serve --socket /path/to/engram.sock` (or set `ENGRAM_SOCKET`) to listen exclusively on the socket; do not combine it with an explicit TCP port. Claude Bash hooks use the same socket when the variable is exported and warn on stderr if socket transport cannot preserve memory capture. PowerShell remains TCP-only. | (unset) |
-| `ENGRAM_STARTUP_PHASES` | Set to `1` to report startup phases on stderr during a shared foreground TCP serve. | (unset) |
+| `QBIT_JAY_DATA_DIR` | qbit-jay CLI data directory. Empty or whitespace-only values use the platform default; nonblank values are used as provided. | `~/.qbit-jay` (Windows: `%USERPROFILE%\.qbit-jay`) |
+| `QBIT_JAY_PORT` | HTTP server port. Use an unsigned decimal value from `1` through `65535`; invalid values fall back to `7437` in `qbit-jay serve` and Claude Bash hooks. | `7437` |
+| `QBIT_JAY_SOCKET` | POSIX-only Unix-domain socket path. Run `qbit-jay serve --socket /path/to/qbit-jay.sock` (or set `QBIT_JAY_SOCKET`) to listen exclusively on the socket; do not combine it with an explicit TCP port. Claude Bash hooks use the same socket when the variable is exported and warn on stderr if socket transport cannot preserve memory capture. PowerShell remains TCP-only. | (unset) |
+| `QBIT_JAY_STARTUP_PHASES` | Set to `1` to report startup phases on stderr during a shared foreground TCP serve. | (unset) |
 
 ### Diagnose a slow local server start
 
-Set `ENGRAM_STARTUP_PHASES=1` for a planned foreground `engram serve` startup.
-Each `ENGRAM_STARTUP_PHASE v1` line contains elapsed milliseconds and a fixed
+Set `QBIT_JAY_STARTUP_PHASES=1` for a planned foreground `qbit-jay serve` startup.
+Each `QBIT_JAY_STARTUP_PHASE v1` line contains elapsed milliseconds and a fixed
 phase label. If the early listener is allocated, the trace separates advisory
 lock admission, SQLite connection setup and migration work. A
 `*-retrying` marker records an advisory lock attempt that needs another try.
@@ -342,13 +259,13 @@ marker. `http-dispatch` marks handoff to the server loop. Use `GET /health`
 to measure when the server becomes ready.
 
 When reporting an incident, share the lines starting with
-`ENGRAM_STARTUP_PHASE v1`. These contain only elapsed time and fixed labels.
+`QBIT_JAY_STARTUP_PHASE v1`. These contain only elapsed time and fixed labels.
 
 ---
 
 ## Windows Config Paths
 
-When using `engram setup`, config files are written to platform-appropriate locations:
+When using `qbit-jay setup`, config files are written to platform-appropriate locations:
 
 | Agent | macOS / Linux | Windows |
 |-------|---------------|---------|
@@ -365,4 +282,4 @@ When using `engram setup`, config files are written to platform-appropriate loca
 | Kilo Code | `~/.config/kilo/opencode.json` + `~/.config/kilo/AGENTS.md` | `%USERPROFILE%\.config\kilo\...` |
 | Kimi Code | `~/.kimi-code/mcp.json` + `~/.kimi-code/AGENTS.md` | `%USERPROFILE%\.kimi-code\...` |
 | CommandCode | `~/.commandcode/mcp.json` + `~/.commandcode/AGENTS.md` | `%USERPROFILE%\.commandcode\mcp.json` + `%USERPROFILE%\.commandcode\AGENTS.md` |
-| Data directory | `~/.engram/` | `%USERPROFILE%\.engram\` |
+| Data directory | `~/.qbit-jay/` | `%USERPROFILE%\.qbit-jay\` |

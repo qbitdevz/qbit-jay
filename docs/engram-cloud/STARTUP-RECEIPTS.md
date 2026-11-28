@@ -1,8 +1,8 @@
 # Prepare a Cloud startup receipt
 
-An enrolled Engram Cloud operator can prepare a local receipt before restarting the server. The receipt records which PostgreSQL snapshot already had complete session indexing and mutation chunk coverage. Later starts try a bounded audit check and run ordinary startup repair if that check cannot prove coverage.
+An enrolled qbit-jay Cloud operator can prepare a local receipt before restarting the server. The receipt records which PostgreSQL snapshot already had complete session indexing and mutation chunk coverage. Later starts try a bounded audit check and run ordinary startup repair if that check cannot prove coverage.
 
-This opt-in expects a Linux Cloud process, PostgreSQL 16 or later, and a finite `ENGRAM_CLOUD_ALLOWED_PROJECTS` list. The PostgreSQL database and client connection must both use UTF-8 so the proof can bound the bytes returned by PostgreSQL. Use an existing private directory owned by the Cloud process user for `ENGRAM_CLOUD_STARTUP_RECEIPT_DIR`. The process needs to read and write the directory. Use storage local to the Cloud deployment with persistent space for the receipt. Each directory serves one configured PostgreSQL database and project list.
+This opt-in expects a Linux Cloud process, PostgreSQL 16 or later, and a finite `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` list. The PostgreSQL database and client connection must both use UTF-8 so the proof can bound the bytes returned by PostgreSQL. Use an existing private directory owned by the Cloud process user for `QBIT_JAY_CLOUD_STARTUP_RECEIPT_DIR`. The process needs to read and write the directory. Use storage local to the Cloud deployment with persistent space for the receipt. Each directory serves one configured PostgreSQL database and project list.
 
 The `cloud_mutations`, `cloud_chunks` and `cloud_project_sessions` tables in `public` must be ordinary permanent tables without row security or inheritance. Enrollment rejects unsupported sources. After enrollment, startup uses ordinary repair whenever source eligibility cannot be verified or a replicated write needs verification through the full scan.
 
@@ -20,15 +20,15 @@ The `cloud_mutations`, `cloud_chunks` and `cloud_project_sessions` tables in `pu
 
    The script grants the Cloud login read access to receipt evidence and permission to record verification witnesses. It grants the retention role access to the maintenance functions. A missing role, ineligible source table, database lock timeout or default privilege outside those grants rolls back the installation.
 
-3. In the same execution environment that will run Cloud, set `ENGRAM_DATABASE_URL`, `ENGRAM_CLOUD_ALLOWED_PROJECTS` and `ENGRAM_CLOUD_STARTUP_RECEIPT_DIR`. Run the preparation command using the runtime login.
+3. In the same execution environment that will run Cloud, set `QBIT_JAY_DATABASE_URL`, `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` and `QBIT_JAY_CLOUD_STARTUP_RECEIPT_DIR`. Run the preparation command using the runtime login.
 
    ```sh
-   engram cloud repair prepare-startup-receipt
+   qbit-jay cloud repair prepare-startup-receipt
    ```
 
-   The command verifies an existing PostgreSQL snapshot without changing application rows. It commits a witness in the audit schema in that same transaction before storing `startup-receipt-v3.json` in the private directory. If preparation reports incomplete coverage, start normally so Engram can run repair, then prepare again. A storage error calls for checking the space and write permissions of the receipt directory before retrying.
+   The command verifies an existing PostgreSQL snapshot without changing application rows. It commits a witness in the audit schema in that same transaction before storing `startup-receipt-v3.json` in the private directory. If preparation reports incomplete coverage, start normally so qbit-jay can run repair, then prepare again. A storage error calls for checking the space and write permissions of the receipt directory before retrying.
 
-4. Restart `engram cloud serve` with the same settings. The log entry `protected receipt reused` confirms bounded startup. When scope or database enrollment changes, prepare a new receipt. A timeout, a missing witness after a physical restore, or a declined proof resumes ordinary startup repair. Quiet restarts reuse the existing witness. A verified append records a fresh witness before advancing the receipt. Retention prunes old witnesses with the audit history.
+4. Restart `qbit-jay cloud serve` with the same settings. The log entry `protected receipt reused` confirms bounded startup. When scope or database enrollment changes, prepare a new receipt. A timeout, a missing witness after a physical restore, or a declined proof resumes ordinary startup repair. Quiet restarts reuse the existing witness. A verified append records a fresh witness before advancing the receipt. Retention prunes old witnesses with the audit history.
 
 ## Adopt a separate runtime from the Compose bootstrap
 
@@ -41,7 +41,7 @@ following against the Cloud database.
 
 ```sh
 psql -X --dbname='service=engram-audit-admin' \
-  --set=previous_owner=engram \
+  --set=previous_owner=qbit-jay \
   --set=runtime_role=engram_cloud_runtime \
   --file=scripts/cloud/adopt-startup-receipt-runtime.sql
 ```
@@ -60,7 +60,7 @@ After the upgrade has run its migration, follow [Remove enrollment](#remove-enro
 
 ## Remove enrollment
 
-Unset `ENGRAM_CLOUD_STARTUP_RECEIPT_DIR` and restart Cloud normally. Use the administrator connection to remove the named audit objects. The operation runs as one transaction and fails if an unexpected dependency requires removal.
+Unset `QBIT_JAY_CLOUD_STARTUP_RECEIPT_DIR` and restart Cloud normally. Use the administrator connection to remove the named audit objects. The operation runs as one transaction and fails if an unexpected dependency requires removal.
 
 ```sh
 psql --dbname='service=engram-audit-admin' \

@@ -37,10 +37,10 @@
 
 | File/directory | Why it matters |
 |---|---|
-| `cmd/engram/main.go` | Main binary wiring. |
-| `cmd/engram/cloud.go` | Cloud subcommands and runtime. |
-| `cmd/engram/doctor.go` | CLI doctor. |
-| `cmd/engram/conflicts.go` | Conflicts CLI. |
+| `cmd/qbit-jay/main.go` | Main binary wiring. |
+| `cmd/qbit-jay/cloud.go` | Cloud subcommands and runtime. |
+| `cmd/qbit-jay/doctor.go` | CLI doctor. |
+| `cmd/qbit-jay/conflicts.go` | Conflicts CLI. |
 | `internal/store/store.go` | Local persistence core. |
 | `internal/store/relations.go` | Memory relationships/judgments. |
 | `internal/mcp/mcp.go` | MCP tools and profiles. |
@@ -68,7 +68,7 @@
 | `internal/diagnostic/` | Operational checks/repair. |
 | `internal/llm/` | Runners for semantic scanning with agent CLIs. |
 | `internal/obsidian/` | Obsidian beta export/watch/hub. |
-| `plugin/opencode/engram.ts` | OpenCode adapter. |
+| `plugin/opencode/qbit-jay.ts` | OpenCode adapter. |
 | `plugin/claude-code/` | Claude Code plugin, hooks, and skill. |
 | `plugin/obsidian/` | Experimental Obsidian plugin. |
 | `skills/` | Agent contribution rules. |
@@ -77,7 +77,7 @@
 
 | Page | Purpose |
 |---|---|
-| [Mental Model](mental-model.md) | What Engram is/is not and the 90-second architecture model. |
+| [Mental Model](mental-model.md) | What qbit-jay is/is not and the 90-second architecture model. |
 | [Repository Map](repository-map.md) | Package ownership and placement rules. |
 | [Memory Core](memory-core.md) | Store entities, save/retrieve flow, and invariants. |
 | [Interfaces](interfaces.md) | CLI, MCP, local API, and TUI responsibilities. |
