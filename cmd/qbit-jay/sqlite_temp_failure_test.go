@@ -58,7 +58,7 @@ func TestSQLiteTempFailurePaths(t *testing.T) {
 			}
 			wantStderr := ""
 			if strings.HasSuffix(mode, "preparation") {
-				wantStderr = "qbit-jay: prepare SQLite temp directory: data directory must be an absolute path, got \"relative-data\" — set ENGRAM_DATA_DIR or ensure your home directory is resolvable\n"
+				wantStderr = "qbit-jay: prepare SQLite temp directory: data directory must be an absolute path, got \"relative-data\" — set QBIT_JAY_DATA_DIR or ensure your home directory is resolvable\n"
 				if strings.HasPrefix(mode, "isolation-") {
 					wantStderr += wantStderr
 				}
