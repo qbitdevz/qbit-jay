@@ -27,6 +27,9 @@ work="${4:?work directory}"
 go_root="${QBIT_JAY_GOROOT:-$HOME/sdk/go1.26.11}"
 sizes="${QBIT_JAY_EVAL_SIZES:-1000,10000}"
 rounds="${QBIT_JAY_EVAL_ROUNDS:-2}"
+case "${rounds}" in
+'' | *[!0-9]* | 0) echo "QBIT_JAY_EVAL_ROUNDS must be a positive integer, got '${rounds}'" >&2; exit 2 ;;
+esac
 
 export PATH="${go_root}/bin:${PATH}"
 export GOTOOLCHAIN=local
@@ -43,21 +46,29 @@ if [ ! -d "${up}/.git" ]; then
 fi
 git -c safe.directory='*' -C "${up}" checkout --quiet --detach "${up_ref}" || exit 1
 
+# Start from an empty fork tree so files removed from the checkout are not measured.
+rm -rf "${fork}"
 mkdir -p "${fork}"
 (cd "${fork_src}" && tar --exclude=.git -cf - .) | tar -xf - -C "${fork}" || exit 1
 
 # The eval package into the upstream clone, adapted.
 mkdir -p "${up}/internal/qbit"
+rm -rf "${up}/internal/qbit/eval"
 cp -r "${fork}/internal/qbit/eval" "${up}/internal/qbit/"
 sed -i \
 	-e 's#github.com/qbitdevz/qbit-jay/#github.com/Gentleman-Programming/engram/v3/#' \
 	-e 's#store\.DatabaseFile#"engram.db"#' \
 	"${up}"/internal/qbit/eval/*.go
+if grep -rq 'github.com/qbitdevz/qbit-jay/\|store\.DatabaseFile' "${up}/internal/qbit/eval"; then
+	echo "upstream adaptation incomplete: fork-only references remain in ${up}/internal/qbit/eval" >&2
+	exit 1
+fi
 
 up_commit="$(git -c safe.directory='*' -C "${up}" rev-parse --short HEAD)"
 fork_commit="${QBIT_JAY_EVAL_COMMIT:-$(git -c safe.directory='*' -C "${fork_src}" rev-parse --short HEAD 2>/dev/null || echo unknown)}"
 
 n=0
+failed=0
 for _ in $(seq "${rounds}"); do
 	for tree in fork upstream; do
 		n=$((n + 1))
@@ -72,6 +83,13 @@ for _ in $(seq "${rounds}"); do
 			QBIT_JAY_EVAL_COMMIT="${commit}" QBIT_JAY_EVAL_JSON="${out}/${tree}-${n}.json" \
 			go test -tags eval -count=1 -timeout 240m ./internal/qbit/eval/ -run TestEval -v) \
 			>"${out}/${tree}-${n}.log" 2>&1
-		echo "  exit $? -> ${out}/${tree}-${n}.log"
+		rc=$?
+		echo "  exit ${rc} -> ${out}/${tree}-${n}.log"
+		if [ "${rc}" -ne 0 ]; then failed=$((failed + 1)); fi
 	done
 done
+
+if [ "${failed}" -ne 0 ]; then
+	echo "${failed} of ${n} runs failed; see the logs in ${out}" >&2
+	exit 1
+fi
