@@ -153,7 +153,7 @@ func Explicit(src, dataDir string, force bool, o Options) (*Result, error) {
 	}
 	info, err := os.Stat(src)
 	if err != nil {
-		return nil, fmt.Errorf("Engram source %s: %w", src, err)
+		return nil, fmt.Errorf("engram source %s: %w", src, err)
 	}
 	srcDB := src
 	if info.IsDir() {
