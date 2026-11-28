@@ -6,6 +6,17 @@
 # 3. Auto-imports git-synced chunks if .engram/manifest.json exists
 # 4. Injects Memory Protocol instructions + memory context
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only.
+for _qbit_jay_name in PORT SOCKET URL DATA_DIR NUDGE_COOLDOWN_SECS; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
+
 ENGRAM_PORT="${ENGRAM_PORT:-7437}"
 ENGRAM_EXTERNAL_URL="${ENGRAM_URL:-}"
 ENGRAM_EXTERNAL_URL="${ENGRAM_EXTERNAL_URL#"${ENGRAM_EXTERNAL_URL%%[![:space:]]*}"}"
@@ -32,21 +43,21 @@ CWD=$(echo "$INPUT" | jq -r '.cwd // empty')
 
 # Explicit ENGRAM_URL intentionally delegates ownership to an external server.
 if [ "$ENGRAM_MANAGED_LOCAL" = 1 ]; then
-  ENGRAM_INSTANCE_ID=$(engram instance-id 2>/dev/null) || {
+  ENGRAM_INSTANCE_ID=$(qbit-jay instance-id 2>/dev/null) || {
     printf '%s\n' "warning: Engram could not resolve its local server identity." >&2
     exit 0
   }
 if ! engram_health_matches_instance "$ENGRAM_INSTANCE_ID"; then
-  ENGRAM_SERVE_DATA_DIR="${ENGRAM_DATA_DIR:-$HOME/.engram}"
+  ENGRAM_SERVE_DATA_DIR="${ENGRAM_DATA_DIR:-$HOME/.qbit-jay}"
   if mkdir -p "$ENGRAM_SERVE_DATA_DIR" 2>/dev/null && : >> "$ENGRAM_SERVE_DATA_DIR/serve.err.log" 2>/dev/null; then
     ENGRAM_SERVE_ERR_LOG="$ENGRAM_SERVE_DATA_DIR/serve.err.log"
   else
-    ENGRAM_SERVE_ERR_LOG="${TMPDIR:-/tmp}/engram-serve.err.log"
+    ENGRAM_SERVE_ERR_LOG="${TMPDIR:-/tmp}/qbit-jay-serve.err.log"
   fi
   if [ "${OS:-}" = "Windows_NT" ]; then
-    ENGRAM_CLOUD_AUTOSYNC=1 engram serve-background "$ENGRAM_SERVE_ERR_LOG" || true
+    QBIT_JAY_CLOUD_AUTOSYNC=1 qbit-jay serve-background "$ENGRAM_SERVE_ERR_LOG" || true
   else
-    ENGRAM_CLOUD_AUTOSYNC=1 engram serve > /dev/null 2>> "$ENGRAM_SERVE_ERR_LOG" &
+    QBIT_JAY_CLOUD_AUTOSYNC=1 qbit-jay serve > /dev/null 2>> "$ENGRAM_SERVE_ERR_LOG" &
   fi
   sleep 0.5
 fi
@@ -62,7 +73,7 @@ PROJECT=$(resolve_project "$CWD") || PROJECT=""
 SESSION_HANDOFF=$(engram_session_handoff "$INPUT" "$PROJECT" "$CWD" codex-register) && SESSION_REGISTERED=1 || SESSION_REGISTERED=0
 
 # Auto-import git-synced chunks
-if [ -f "${CWD}/.engram/manifest.json" ]; then
+if [ -f "${CWD}/.qbit-jay/manifest.json" ] || [ -f "${CWD}/.engram/manifest.json" ]; then
   (
     cd "$CWD" 2>/dev/null || exit 0
     IMPORT_LOCK="/tmp/engram-sync-import-$(printf '%s' "$CWD" | cksum | cut -d ' ' -f 1).lock"
@@ -133,9 +144,9 @@ if [ -f "${CWD}/.engram/manifest.json" ]; then
     fi
     trap 'rm -f "$IMPORT_LOCK/info" 2>/dev/null || true; rmdir "$IMPORT_LOCK" 2>/dev/null || true' EXIT
     if command -v timeout >/dev/null 2>&1; then
-      timeout "${IMPORT_TIMEOUT_SECS}s" engram sync --import >/dev/null 2>&1 || true
+      timeout "${IMPORT_TIMEOUT_SECS}s" qbit-jay sync --import >/dev/null 2>&1 || true
     else
-      engram sync --import >/dev/null 2>&1 &
+      qbit-jay sync --import >/dev/null 2>&1 &
       IMPORT_PID=$!
       (sleep "$IMPORT_TIMEOUT_SECS"; kill "$IMPORT_PID" 2>/dev/null || true) &
       WAITER_PID=$!
@@ -162,7 +173,7 @@ You have Engram memory tools. The agent MUST follow this protocol without waitin
 
 ### AVAILABLE TOOLS
 Use the Engram tools actually exposed by Codex, with their registered MCP names
-(`mcp__engram__mem_*` or `mcp__plugin_engram_engram__mem_*`). The names below are
+(`mcp__qbit-jay__mem_*` or `mcp__plugin_qbit-jay_qbit-jay__mem_*`). The names below are
 logical names; availability and discovery follow Codex's host-specific interface.
 
 mem_save, mem_search, mem_context, mem_session_summary, mem_get_observation, mem_save_prompt, mem_current_project, mem_judge, mem_compare
@@ -205,8 +216,8 @@ Use `mem_save` as the primary path for significant, verified knowledge. Explicit
 `mem_capture_passive(content)` extraction is a safety net, not a replacement for `mem_save`.
 
 ### SESSION BINDING
-Codex's PreToolUse command `engram hook codex-pre-tool-use` matches
-`mcp__engram__mem_*` and `mcp__plugin_engram_engram__mem_*`. Supported mutating
+Codex's PreToolUse command `qbit-jay hook codex-pre-tool-use` matches
+`mcp__qbit-jay__mem_*` and `mcp__plugin_qbit-jay_qbit-jay__mem_*`. Supported mutating
 Engram calls resolve the authoritative host session before binding `session_id`
 for writes and `id` for session start/end. Never invent or override this identity.
 Read-only tools are unchanged; malformed input or unconfirmed host resolution denies mutating calls.

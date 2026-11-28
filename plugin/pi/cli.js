@@ -27,12 +27,12 @@ const LEGACY_PACKAGE_NAMES = new Set([
   "npm:gentle-engram@0.7.0",
   "npm:gentle-engram@0.7.1",
 ]);
-const HELP = `pi-engram
+const HELP = `pi-qbit-jay
 
 Usage:
-  pi-engram init [--force]
+  pi-qbit-jay init [--force]
 
-Ensures gentle-engram is declared in settings.json.
+Ensures qbit-jay is declared in settings.json.
 Does not create or modify Pi MCP config and does not add an MCP adapter
 extension (Pi's built-in MCP reads mcp.json). Install the extension with:
 pi install ${PACKAGE_NAME}
@@ -91,8 +91,11 @@ function ensureEngramPackage(settingsPath) {
 
 function warnExistingEngramMcp(mcpPath) {
   const config = readJsonObject(mcpPath);
-  if (config.mcpServers && typeof config.mcpServers === "object" && !Array.isArray(config.mcpServers) && Object.hasOwn(config.mcpServers, "engram")) {
-    console.warn(`Warning: ${mcpPath} contains mcpServers.engram. Pi native-only agent writes are not guaranteed while this MCP path remains. To use native-only writes, manually remove only mcpServers.engram from ${mcpPath} (preserve other servers), then restart/reload Pi.`);
+  if (!config.mcpServers || typeof config.mcpServers !== "object" || Array.isArray(config.mcpServers)) return;
+  // "qbit-jay" is this fork's server name; "engram" is the upstream name older setups wrote.
+  for (const name of ["qbit-jay", "engram"]) {
+    if (!Object.hasOwn(config.mcpServers, name)) continue;
+    console.warn(`Warning: ${mcpPath} contains mcpServers.${name}. Pi native-only agent writes are not guaranteed while this MCP path remains. To use native-only writes, manually remove only mcpServers.${name} from ${mcpPath} (preserve other servers), then restart/reload Pi.`);
   }
 }
 
@@ -106,8 +109,8 @@ function init() {
 
   console.log(`Pi agent dir: ${agentDir}`);
   console.log(`${packageChanged ? "Added" : "Kept"} ${PACKAGE_NAME} in settings.json`);
-  console.log("Pi-native mem_* tools own agent writes; no Engram MCP registration is created.");
-  console.log("Set ENGRAM_URL for an existing engram serve instance, or ENGRAM_BIN for a custom engram binary path.");
+  console.log("Pi-native mem_* tools own agent writes; no qbit-jay MCP registration is created.");
+  console.log("Set QBIT_JAY_URL for an existing qbit-jay serve instance, or QBIT_JAY_BIN for a custom qbit-jay binary path (ENGRAM_URL and ENGRAM_BIN still work).");
 }
 
 const command = process.argv[2];

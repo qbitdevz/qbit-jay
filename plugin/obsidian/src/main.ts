@@ -35,7 +35,7 @@ export default class EngramBrainPlugin extends Plugin {
 		// Ribbon button (REQ-PLUGIN-03)
 		const ribbonEl = this.addRibbonIcon(
 			"brain",
-			"Sync Engram Brain",
+			"Sync qbit-jay",
 			async () => {
 				await this.syncNow();
 			}
@@ -44,8 +44,8 @@ export default class EngramBrainPlugin extends Plugin {
 
 		// Command palette entry (bonus usability)
 		this.addCommand({
-			id: "sync-engram",
-			name: "Sync Engram Brain",
+			id: "sync-qbit-jay",
+			name: "Sync qbit-jay",
 			callback: () => {
 				this.syncNow();
 			},
@@ -53,7 +53,7 @@ export default class EngramBrainPlugin extends Plugin {
 
 		// Status bar (REQ-PLUGIN-05)
 		this.statusBarItem = this.addStatusBarItem();
-		this.statusBarItem.setText("Engram: ready");
+		this.statusBarItem.setText("qbit-jay: ready");
 
 		// Optional auto-sync polling (REQ-PLUGIN-01)
 		if (this.settings.autoSyncMinutes > 0) {
@@ -125,7 +125,7 @@ export default class EngramBrainPlugin extends Plugin {
 	 * - Persists lastSyncAt + lastSyncCount on success
 	 */
 	async syncNow(): Promise<void> {
-		this.setStatusBar("Engram: syncing…");
+		this.setStatusBar("qbit-jay: syncing…");
 
 		let result: SyncResult;
 		try {
@@ -153,7 +153,7 @@ export default class EngramBrainPlugin extends Plugin {
 		if (skipped > 0) parts.push(`${skipped} unchanged`);
 
 		const summary = parts.length > 0 ? parts.join(", ") : "nothing changed";
-		new Notice(`Engram: ${summary}`);
+		new Notice(`qbit-jay: ${summary}`);
 
 		// Persist sync metadata
 		const now = new Date().toISOString();
@@ -178,7 +178,7 @@ export default class EngramBrainPlugin extends Plugin {
 	}
 
 	/**
-	 * REQ-PLUGIN-05 — Success: "Engram: N notes · synced just now"
+	 * REQ-PLUGIN-05 — Success: "qbit-jay: N notes · synced just now"
 	 *
 	 * Uses `lastSyncCount` from settings so that re-opens after restart
 	 * show the previously synced count until a new sync completes.
@@ -187,17 +187,17 @@ export default class EngramBrainPlugin extends Plugin {
 		const timeStr = this.settings.lastSyncAt
 			? formatRelative(new Date(this.settings.lastSyncAt))
 			: "just now";
-		this.setStatusBar(`Engram: ${count} notes · synced ${timeStr}`);
+		this.setStatusBar(`qbit-jay: ${count} notes · synced ${timeStr}`);
 	}
 
 	/**
-	 * REQ-PLUGIN-05 — Failure: "Engram: sync failed · {relative time}"
+	 * REQ-PLUGIN-05 — Failure: "qbit-jay: sync failed · {relative time}"
 	 *
 	 * Does NOT overwrite `lastSuccessCount` — preserved from the last
 	 * successful sync so the count shown in settings is still accurate.
 	 */
 	private setStatusBarFailure() {
 		const timeStr = formatRelative(new Date());
-		this.setStatusBar(`Engram: sync failed · ${timeStr}`);
+		this.setStatusBar(`qbit-jay: sync failed · ${timeStr}`);
 	}
 }

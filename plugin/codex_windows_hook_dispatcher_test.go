@@ -428,7 +428,7 @@ func TestCodexWindowsBashHookDispatcherBackground(t *testing.T) {
 	}
 	root := repoRoot(t)
 	dir := t.TempDir()
-	binary := filepath.Join(dir, "engram.exe")
+	binary := filepath.Join(dir, "qbit-jay.exe")
 	build := exec.Command("go", "build", "-o", binary, "./cmd/qbit-jay")
 	build.Dir = root
 	if output, err := build.CombinedOutput(); err != nil {
@@ -445,11 +445,11 @@ func TestCodexWindowsBashHookDispatcherBackground(t *testing.T) {
 			t.Fatal(err)
 		}
 		if name == "session-start.sh" && os.Getenv("ENGRAM_TEST_ORIGINAL_LAUNCH") == "1" {
-			before := []byte("ENGRAM_CLOUD_AUTOSYNC=1 engram serve-background \"$ENGRAM_SERVE_ERR_LOG\" || true")
+			before := []byte("QBIT_JAY_CLOUD_AUTOSYNC=1 qbit-jay serve-background \"$ENGRAM_SERVE_ERR_LOG\" || true")
 			if !bytes.Contains(data, before) {
 				t.Fatal("cannot reconstruct original Bash launch")
 			}
-			data = bytes.Replace(data, before, []byte("ENGRAM_CLOUD_AUTOSYNC=1 engram serve > /dev/null 2>> \"$ENGRAM_SERVE_ERR_LOG\" &"), 1)
+			data = bytes.Replace(data, before, []byte("QBIT_JAY_CLOUD_AUTOSYNC=1 qbit-jay serve > /dev/null 2>> \"$ENGRAM_SERVE_ERR_LOG\" &"), 1)
 		}
 		if err := os.WriteFile(filepath.Join(scripts, name), data, 0755); err != nil {
 			t.Fatal(err)

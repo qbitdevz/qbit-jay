@@ -109,7 +109,7 @@ test('consumer refusal preserves unavailable transport and self-heal without pri
       const result = await pending;
       assert.equal(Date.now(), 10000, 'expiry uses one shared startup budget');
       assert.equal(result.isError, true);
-      assert.equal(result.content[0].text, 'gentle-engram could not reach the Engram HTTP server. Run mem_doctor or restart Engram.');
+      assert.equal(result.content[0].text, 'qbit-jay could not reach the Engram HTTP server. Run mem_doctor or restart Engram.');
       assert.doesNotMatch(JSON.stringify(result), /private-password|private-query|private-bearer/);
       assert.ok(calls.length > 1, 'initial refusal polls only the pinned contract endpoint');
       const startupCalls = calls.length;

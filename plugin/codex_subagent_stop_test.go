@@ -223,7 +223,7 @@ func writeCodexStopConfirmation(t *testing.T, dir string) {
 [ "$#" = 2 ] && [ "$1" = hook ] && [ "$2" = codex-resolve ] && [ "$ENGRAM_HOOK_OUTPUT" = json ] || exit 97
 jq -c '{session_id: .session_id}'
 `
-	if err := os.WriteFile(filepath.Join(dir, "engram"), []byte(script), 0755); err != nil {
+	if err := os.WriteFile(filepath.Join(dir, "qbit-jay"), []byte(script), 0755); err != nil {
 		t.Fatal(err)
 	}
 }

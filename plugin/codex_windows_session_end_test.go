@@ -85,7 +85,7 @@ func TestCodexSessionEndHook(t *testing.T) {
 			t.Fatalf("read Windows session-end adapter: %v", err)
 		}
 		content := string(data)
-		for _, required := range []string{"[Console]::In.ReadToEnd()", "engram hook codex-session-end", "*> $null", "exit 0"} {
+		for _, required := range []string{"[Console]::In.ReadToEnd()", "qbit-jay hook codex-session-end", "*> $null", "exit 0"} {
 			if !strings.Contains(content, required) {
 				t.Errorf("Windows session-end adapter must contain %q", required)
 			}
@@ -96,7 +96,7 @@ func TestCodexSessionEndHook(t *testing.T) {
 		if err != nil {
 			t.Fatalf("read Unix session-end adapter: %v", err)
 		}
-		if !strings.Contains(string(shellData), "engram hook codex-session-end >/dev/null 2>&1") {
+		if !strings.Contains(string(shellData), "qbit-jay hook codex-session-end >/dev/null 2>&1") {
 			t.Error("Unix adapter must delegate bounded closure with detached output")
 		}
 	})

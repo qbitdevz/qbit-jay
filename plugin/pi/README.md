@@ -1,15 +1,15 @@
 # Engram for Pi
 
 <p align="center">
-  <img width="960" alt="Engram — One Brain. Local or Cloud." src="https://raw.githubusercontent.com/Gentleman-Programming/engram/main/assets/branding/engram-banner.png" />
+  <img width="960" alt="qbit-jay — One Brain. Local or Cloud." src="https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/assets/branding/qbit-jay-banner.gif" />
 </p>
 
 <p align="center">
   <a href="https://www.npmjs.com/package/gentle-engram"><img alt="npm" src="https://img.shields.io/npm/v/gentle-engram?color=blue" /></a>
-  <a href="https://github.com/Gentleman-Programming/engram"><img alt="GitHub stars" src="https://img.shields.io/github/stars/Gentleman-Programming/engram?style=flat&color=yellow" /></a>
-  <a href="https://github.com/Gentleman-Programming/engram/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/Gentleman-Programming/engram?color=brightgreen" /></a>
-  <a href="https://github.com/Gentleman-Programming/engram/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/Gentleman-Programming/engram/ci.yml?label=CI" /></a>
-  <a href="https://github.com/Gentleman-Programming/engram/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/Gentleman-Programming/engram" /></a>
+  <a href="https://github.com/qbitdevz/qbit-jay"><img alt="GitHub stars" src="https://img.shields.io/github/stars/qbitdevz/qbit-jay?style=flat&color=yellow" /></a>
+  <a href="https://github.com/qbitdevz/qbit-jay/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/qbitdevz/qbit-jay?color=brightgreen" /></a>
+  <a href="https://github.com/qbitdevz/qbit-jay/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/qbitdevz/qbit-jay/ci.yml?label=CI" /></a>
+  <a href="https://github.com/qbitdevz/qbit-jay/blob/main/LICENSE"><img alt="License" src="https://img.shields.io/github/license/qbitdevz/qbit-jay" /></a>
   <a href="https://www.youtube.com/c/GentlemanProgramming"><img alt="YouTube" src="https://img.shields.io/badge/YouTube-Gentleman%20Programming-red?logo=youtube&logoColor=white" /></a>
 </p>
 
@@ -21,20 +21,20 @@ Engram is persistent memory for AI coding agents. `gentle-engram` connects Pi to
 
 ## Shared daemon lifecycle
 
-Without an explicit `ENGRAM_URL` or session-owned mode, the companion starts the
-local server with `engram run -d`. The standard `engram ps`, `stop`, `logs` and
+Without an explicit `QBIT_JAY_URL` or session-owned mode, the companion starts the
+local server with `qbit-jay run -d`. The standard `qbit-jay ps`, `stop`, `logs` and
 `restart` commands can manage that daemon. This is a bounded capability probe,
 not a SemVer assumption: supported releases and source builds reporting `main`
 both use it, while older cores or a failed daemon handoff fall back to detached
-`engram serve`.
+`qbit-jay serve`.
 
 ## Opt-in session-owned HTTP transport
 
-Unset `ENGRAM_SERVER_MODE` to retain the existing shared-daemon behavior. To use
+Unset `QBIT_JAY_SERVER_MODE` to retain the existing shared-daemon behavior. To use
 an EOF-bound private child with supporting published core and companion releases:
 
 ```sh
-env -u ENGRAM_URL -u ENGRAM_PORT -u ENGRAM_SOCKET ENGRAM_SERVER_MODE=session-owned pi
+env -u QBIT_JAY_URL -u QBIT_JAY_PORT -u QBIT_JAY_SOCKET QBIT_JAY_SERVER_MODE=session-owned pi
 ```
 
 Only literal `session-owned` is accepted when the variable is present; empty,
@@ -43,8 +43,8 @@ variables (even empty ones) conflict with owned mode. Managed external URLs and
 shared daemons remain unchanged when the mode is absent; they are never stopped
 on companion shutdown.
 
-The companion spawns `engram serve --session-owned` non-detached, retains its
-stdin pipe, and supplies a fresh random 256-bit hex `ENGRAM_TOKEN` to that child.
+The companion spawns `qbit-jay serve --session-owned` non-detached, retains its
+stdin pipe, and supplies a fresh random 256-bit hex `QBIT_JAY_TOKEN` to that child.
 The CLI rejects conflicting transport configuration and missing/invalid tokens
 before opening the store. It binds only `127.0.0.1:0`, then emits one newline-ended
 JSON record on stdout (at most 1024 bytes):
@@ -56,7 +56,7 @@ JSON record on stdout (at most 1024 bytes):
 The record contains runtime identity, **not credentials**. No extra fields,
 nonliteral loopback URLs, invalid ports or mismatched child PIDs are accepted.
 All HTTP routes, including health, reads, writes and recovery lookups, require
-`Authorization: Bearer <ENGRAM_TOKEN>`. The token stays private to the child and
+`Authorization: Bearer <QBIT_JAY_TOKEN>`. The token stays private to the child and
 companion; do not log it or place it in the readiness record.
 
 Closing the owning pipe or losing the parent also cancels startup waits for the
@@ -131,7 +131,7 @@ consumer responsibilities, not a process-global readiness signal.
 
 Until a consumer of this protocol ships, the Claude Code plugin suppresses its own
 hooks with the guard that pi-claude-bridge documents for Claude Code hooks: when
-`PI_CODING_AGENT` is non-empty, every plugin hook script and `engram hook claude-pre-tool-use`
+`PI_CODING_AGENT` is non-empty, every plugin hook script and `qbit-jay hook claude-pre-tool-use`
 exit 0 with no output and no requests. Pi's native Engram owns the session and its
 prompts, so the Claude child that the bridge starts records nothing. A Pi without
 native Engram therefore gets no capture from those hooks either.
@@ -173,7 +173,7 @@ Install it once. Keep coding. Pi remembers.
 - **Cloud when the team needs it** — Engram Cloud adds opt-in, project-scoped replication, shared access, and a browser dashboard while keeping local SQLite authoritative.
 - **Token-efficient by design** — Engram stores curated summaries, decisions, prompts, and session handoffs instead of a noisy firehose of raw tool calls. Agents search first, then fetch only the relevant memory.
 - **Compaction survival** — before context resets, the Memory Protocol pushes summaries into Engram so the next session can recover what matters.
-- **Simple Pi setup** — install the Pi package, retain the MCP adapter for other servers, run `pi-engram init`, restart Pi.
+- **Simple Pi setup** — install the Pi package, retain the MCP adapter for other servers, run `pi-qbit-jay init`, restart Pi.
 - **Built by Gentleman Programming** — Engram comes from the Gentleman Programming ecosystem: an open-source engineering community, YouTube channel, and hands-on agentic-coding workflow around real tools instead of toy demos.
 - **Real open-source project** — Engram ships docs, releases, beta programs, contributor guidelines, issue templates, CI, and a growing contributor/community workflow around the main repository.
 
@@ -184,7 +184,7 @@ Engram is not an abandoned side script or a black-box SaaS. It is built in publi
 - **YouTube channel**: tutorials, demos, and product thinking around AI coding workflows — <https://www.youtube.com/c/GentlemanProgramming>
 - **Engram + Skills demo**: <https://www.youtube.com/watch?v=UoS_LP-PCG8>
 - **Engram Cloud demo**: <https://www.youtube.com/watch?v=JPZkbGgJNUQ>
-- **GitHub community**: issues, discussions, beta feedback, contributors, and transparent roadmap work — <https://github.com/Gentleman-Programming/engram>
+- **GitHub community**: issues, discussions, beta feedback, contributors, and transparent roadmap work — <https://github.com/qbitdevz/qbit-jay>
 
 The goal is simple: make agentic development feel like a real engineering system — memory, specs, skills, cloud sync, review discipline, and community learning all connected.
 
@@ -204,8 +204,8 @@ Engram does not try to make the model read everything. It gives the model a disc
 ## See the memory
 
 <p align="center">
-  <img width="380" alt="Engram TUI dashboard" src="https://raw.githubusercontent.com/Gentleman-Programming/engram/main/assets/tui-dashboard.png" />
-  <img width="380" alt="Engram search results" src="https://raw.githubusercontent.com/Gentleman-Programming/engram/main/assets/tui-search.png" />
+  <img width="380" alt="Engram TUI dashboard" src="https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/assets/tui-dashboard.png" />
+  <img width="380" alt="Engram search results" src="https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/assets/tui-search.png" />
 </p>
 
 Engram includes a terminal UI for browsing sessions, observations, prompts, projects, timelines, and search results. Engram Cloud adds browser visibility for shared project memory.
@@ -262,7 +262,7 @@ it does not resolve either incident or weaken session guards.
 
 ## Opt-in Pi session registration trace
 
-For an affected quit/resume cycle, set `ENGRAM_PI_SESSION_TRACE=1` before launching
+For an affected quit/resume cycle, set `QBIT_JAY_PI_SESSION_TRACE=1` before launching
 Pi with `gentle-engram` 0.4.0 or a local source checkout. The older `0.2.0` package
 does not include this instrumentation. When using a local extension, do not load
 an installed npm copy at the same time.
@@ -276,7 +276,7 @@ From the repository root in a POSIX shell, set `SESSION_ID` to the ID
 of the conversation you intend to resume, then run:
 
 ```bash
-ENGRAM_PI_SESSION_TRACE=1 pi -e ./plugin/pi/index.ts --session "${SESSION_ID:?Set SESSION_ID to the conversation you intend to resume}"
+QBIT_JAY_PI_SESSION_TRACE=1 pi -e ./plugin/pi/index.ts --session "${SESSION_ID:?Set SESSION_ID to the conversation you intend to resume}"
 ```
 
 Use the entrypoint that actually fails; the printed launcher hint is not known to
@@ -326,23 +326,23 @@ retains the session-owned validation requirements and historical preparation ver
 
 ```bash
 pi install npm:gentle-engram@0.8.0
-pi-engram init
+pi-qbit-jay init
 ```
 
-This source version of Go's `engram setup pi` pins `0.8.0` and migrates the known `0.7.1`, `0.7.0` and `0.6.0` pins along with older managed pins. Already-published core binaries retain their original installer pins; installing a newer companion does not change them. Use the validated core/companion pair rather than changing installed metadata. Earlier `0.1.16` still registers Engram MCP during `pi-engram init`, so do not use it for native-only setup.
+This source version of Go's `qbit-jay setup pi` pins `0.8.0` and migrates the known `0.7.1`, `0.7.0` and `0.6.0` pins along with older managed pins. Already-published core binaries retain their original installer pins; installing a newer companion does not change them. Use the validated core/companion pair rather than changing installed metadata. Earlier `0.1.16` still registers Engram MCP during `pi-qbit-jay init`, so do not use it for native-only setup.
 
-Go's `engram setup pi` preserves a custom same-name npm entry across `pi install` only when Pi's
+Go's `qbit-jay setup pi` preserves a custom same-name npm entry across `pi install` only when Pi's
 change matches its known source replacement. Unexpected settings changes stop
 setup and retain an `.engram-pi-settings-*` recovery copy at the reported path;
 inspect it before retrying. This does not lock settings against concurrent edits.
 
 The direct `pi install` command above does not provide this protection. Pi 0.99.0
-can replace the first custom same-name npm source before `pi-engram init` runs.
-To preserve that source, use the matching core's `engram setup pi` instead.
+can replace the first custom same-name npm source before `pi-qbit-jay init` runs.
+To preserve that source, use the matching core's `qbit-jay setup pi` instead.
 
 Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
 
-`gentle-engram` does not need an MCP extension. Pi 0.99.0 and later ship built-in MCP support that reads `mcp.json` in the Pi agent directory and is managed with `/mcp` or `pi mcp add`. An installed `pi-mcp-adapter` replaces that built-in support, so `pi-engram init` does not add it; an existing adapter entry in `settings.json` is left for you to keep or remove.
+`gentle-engram` does not need an MCP extension. Pi 0.99.0 and later ship built-in MCP support that reads `mcp.json` in the Pi agent directory and is managed with `/mcp` or `pi mcp add`. An installed `pi-mcp-adapter` replaces that built-in support, so `pi-qbit-jay init` does not add it; an existing adapter entry in `settings.json` is left for you to keep or remove.
 
 ## What gets installed
 
@@ -351,16 +351,16 @@ Restart Pi after installation, then ask Pi what it remembers about the current p
 | Path         | Purpose                                                                                                                                |
 | ------------ | -------------------------------------------------------------------------------------------------------------------------------------- |
 | Pi extension | Captures prompts/session events, injects the Memory Protocol, and exposes compact Pi-native `mem_*` tools over the Engram HTTP server. |
-| Direct MCP (manual) | Standalone MCP clients may still run `engram mcp`; Pi setup does not register Engram MCP. Other MCP servers use Pi's built-in MCP (`mcp.json`). |
+| Direct MCP (manual) | Standalone MCP clients may still run `qbit-jay mcp`; Pi setup does not register Engram MCP. Other MCP servers use Pi's built-in MCP (`mcp.json`). |
 
 Pi-native `mem_session_end` accepts only the current Pi host session ID; a different, missing, or empty ID is refused before an end request. If a resumed conversation has a distinct persisted session ID, the matching host request ends that effective ID through the same coordination as session shutdown. A raw host-ID end requires locally confirmed registration; an uncertain registration cannot authorize it. A pending resumed ID whose end acknowledgement was lost can be reconciled without another end request only when Engram confirms that exact ID is already ended under the resolved local project. To end an independent/manual session, use a separate direct client rather than supplying its ID to the Pi-native tool.
 
 ```text
-Pi events/tools -> gentle-engram extension -> ENGRAM_URL / engram serve -> SQLite
+Pi events/tools -> gentle-engram extension -> QBIT_JAY_URL / qbit-jay serve -> SQLite
 Standalone MCP client -> engram mcp -> SQLite (deliberate, separate setup)
 ```
 
-Pi-native compact tools use the same HTTP server path as event capture, including project detection, diagnostics, passive capture, lifecycle review, conflict-judgment tools such as `mem_current_project`, `mem_doctor`, `mem_capture_passive`, `mem_review`, `mem_judge`, and `mem_compare`, cross-project discovery through `mem_list_projects`, and local pin curation through `mem_pin`/`mem_unpin`. MCP tools remain a separate stdio path, so direct MCP usage still needs an Engram binary even when `ENGRAM_URL` points at a remote HTTP server. Engram MCP is not registered by Pi setup. An existing Pi MCP entry remains active until you manually remove it and restart/reload Pi; native-only agent writes are not guaranteed while it remains.
+Pi-native compact tools use the same HTTP server path as event capture, including project detection, diagnostics, passive capture, lifecycle review, conflict-judgment tools such as `mem_current_project`, `mem_doctor`, `mem_capture_passive`, `mem_review`, `mem_judge`, and `mem_compare`, cross-project discovery through `mem_list_projects`, and local pin curation through `mem_pin`/`mem_unpin`. MCP tools remain a separate stdio path, so direct MCP usage still needs an Engram binary even when `QBIT_JAY_URL` points at a remote HTTP server. Engram MCP is not registered by Pi setup. An existing Pi MCP entry remains active until you manually remove it and restart/reload Pi; native-only agent writes are not guaranteed while it remains.
 
 To keep per-turn prompts small, tools the Memory Protocol never names (`mem_search_prompts`, `mem_consolidate`, `mem_session_finalize`, `mem_session_start`, `mem_judge_many`, `mem_compare`, `mem_list_projects`, `mem_pin`, `mem_unpin`) are registered with `exposure: "deferred"`: Pi does not declare them on every turn, and the model reaches them through `tool_search` or codemode scripts. A session without either (Pi turns `tool_search` off by default) gets them back as direct tools before its first request: at the start of each prompt, when the active tools include a `mem_*` tool but neither `codemode` nor `tool_search`, or when Pi does not report its active tools, gentle-engram re-registers them as direct, and they stay direct for the rest of the session. Pi versions without tool exposure ignore the field and keep them direct. When Pi reports the active tools (`systemPromptOptions.selectedTools`) and none of them is a `mem_*` tool, as in a subagent launched with `--tools read,bash`, the Memory Protocol is not injected; prompt capture is unchanged.
 
@@ -380,11 +380,11 @@ compute a digest or infer runtime compatibility from versions. Before readiness
 and every memory request (including retries and observation recovery), the adapter
 rechecks `GET /runtime-contract`. Missing, malformed, older, unknown or mismatching
 projections block dispatch with upgrade/restart guidance, including with explicit
-`ENGRAM_URL`. Explicit URLs still bypass local binary ownership checks and never
+`QBIT_JAY_URL`. Explicit URLs still bypass local binary ownership checks and never
 authorize local restart. Qualification privately pins URL, effective transport
 credential and instance identity; an identity change requires restarting Pi.
 Concurrent callers share bounded read-only probes, with independent cancellation.
-During initial shared-mode startup with `ENGRAM_URL` configured, a refused connection
+During initial shared-mode startup with `QBIT_JAY_URL` configured, a refused connection
 to that endpoint is polled every 100 ms within one 10-second startup budget. Each
 contract probe keeps its 3-second maximum, capped by the remaining startup time.
 The original hook waits for qualification before registration and prompt capture,
@@ -399,7 +399,7 @@ writes, or release eligibility.
 
 ## Default agent profile
 
-Pi registers exactly the 23 tools in Go's current `ProfileAgent`. Administrative tools (`mem_delete`, `mem_stats`, `mem_timeline`, and `mem_merge_projects`) are not model-callable through this default native profile. Use a deliberate standalone `engram mcp --tools=admin` client or the applicable CLI/TUI administrative workflow instead; Pi does not provide an administrative opt-in profile. Reload or restart Pi after updating the extension to replace the previous registered inventory.
+Pi registers exactly the 23 tools in Go's current `ProfileAgent`. Administrative tools (`mem_delete`, `mem_stats`, `mem_timeline`, and `mem_merge_projects`) are not model-callable through this default native profile. Use a deliberate standalone `qbit-jay mcp --tools=admin` client or the applicable CLI/TUI administrative workflow instead; Pi does not provide an administrative opt-in profile. Reload or restart Pi after updating the extension to replace the previous registered inventory.
 
 Tool chrome is presentation metadata only: a rendering label or legacy renderer does not grant registration or administrative access.
 
@@ -413,7 +413,7 @@ Stored prompts may include child-session task instructions authored by an agent.
 
 ### Compound agent workflows
 
-The Go server must provide the [compound HTTP workflow routes](../../docs/HTTP-AGENT-WORKFLOWS.md); older servers may refuse these calls. In shared mode, Pi reads `ENGRAM_HTTP_TOKEN` when the extension loads and sends it as a Bearer credential to its configured Engram endpoint. An absent or empty token preserves zero-config behavior. Restart/reload the extension after changing the shared token. Session-owned mode continues using only its private runtime token, never this shared credential; Go's authorization checks are unchanged. Tokens are not included in tool arguments or results.
+The Go server must provide the [compound HTTP workflow routes](../../docs/HTTP-AGENT-WORKFLOWS.md); older servers may refuse these calls. In shared mode, Pi reads `QBIT_JAY_HTTP_TOKEN` when the extension loads and sends it as a Bearer credential to its configured Engram endpoint. An absent or empty token preserves zero-config behavior. Restart/reload the extension after changing the shared token. Session-owned mode continues using only its private runtime token, never this shared credential; Go's authorization checks are unchanged. Tokens are not included in tool arguments or results.
 
 - `mem_consolidate` forwards the exact source IDs, owner assertion and survivor fields to Go. Omitted `confirm` previews without writes. Inspect that plan and repeat the same arguments with `confirm=true` and its opaque `fingerprint`; a drift refusal exposes Go's replacement plan but never confirms it automatically. No client hashing or source/session/scope reassignment occurs.
 - `mem_judge_many` sends 1–32 judgments in one POST with optional shared provenance. Results stay ordered; item errors do not roll back successful items or trigger individual fallback requests. Unlike legacy `mem_judge`, omitted shared provenance is omitted, not replaced by the host ID. The batch is not exactly-once.
@@ -703,8 +703,8 @@ require `ENGRAM_PI_TEST_PATH_BINARY` pointing to a separately built
 `test/support/runtime-path-binary/main.go` executable. They never build Go implicitly;
 absence explicitly skips these two cases, while a supplied blank, missing or invalid
 binary fails. The executable is a stdlib-only **synthetic CLI/transport fixture**,
-not production Go handlers. Tests copy it as `engram`/`engram.exe` onto an isolated
-PATH without `ENGRAM_BIN`, checking cold startup, refusal recovery and qualification
+not production Go handlers. Tests copy it as `qbit-jay`/`qbit-jay.exe` onto an isolated
+PATH without `QBIT_JAY_BIN`, checking cold startup, refusal recovery and qualification
 before writes, or rejection before writes for a mismatching projection. Its metadata
 comes from the current generated JSON; no independent inventory or digest is defined.
 Existing owned-mode tests retain the real Node preload/argv protocol and SDK stubs.
@@ -790,15 +790,15 @@ production CLI startup, model quality, external providers or other integrations.
 ## Requirements
 
 - Pi coding agent with npm package support.
-- Engram installed as `engram` on `PATH`, or `ENGRAM_BIN` pointing at the binary.
+- qbit-jay installed as `qbit-jay` on `PATH`, or `QBIT_JAY_BIN` pointing at the binary (`ENGRAM_BIN` is still accepted).
 - For Pi-native `mem_list_projects`, a running Engram core server v2.1.0 or later, which provides HTTP `GET /projects`. If `/health` returns 200 but this tool gets a 404, upgrade and restart the server; updating `gentle-engram` alone does not add the route. The optional `org` input is forwarded as `GET /projects?org=...`; a server that predates org filtering ignores it and returns the unfiltered list. Pi-native `mem_save` sends a nonblank explicit `org` in the `POST /observations` body; when omitted or blank, it inherits the nearest applicable `.engram/config.json` org from core's existing project detection for the caller cwd (or an explicitly supplied `cwd`), independently of an explicit project override. The default label follows the session's project-detection snapshot; restart Pi after changing that configuration, or pass `org`/`cwd` explicitly. The resolved org is frozen with the existing save/recovery payload. This inheritance requires a core that exposes the optional `org` metadata; an older core omits it. `mem_current_project` exposes that same optional label. Pi-native `mem_search` forwards a nonblank, trimmed `org` as `GET /search?org=...`; a server that predates the `/search` org filter ignores it and returns unfiltered results.
 - No MCP extension: Pi-native `mem_*` tools come from `gentle-engram`. Pi 0.99.0 and later provide built-in MCP for other servers.
 
-For HTTP session capture against a separately managed Engram server, set `ENGRAM_URL`. The extension will not auto-start a local `engram serve` process; initial connection refusal waits within the bounded startup policy above.
+For HTTP session capture against a separately managed Engram server, set `QBIT_JAY_URL`. The extension will not auto-start a local `qbit-jay serve` process; initial connection refusal waits within the bounded startup policy above.
 
 Background session registration reports exhausted timeout or unknown transport outcomes with safe-retry guidance, separately from invalid acknowledgement identities. Both failures block passive observations until registration is confirmed.
 
-When `ENGRAM_URL` is unset, a confirmed local server that later refuses connections gets one bounded restart attempt per initialized runtime. Pi gives ordinary reads a bounded 10-second retry policy. A full `mem_doctor` report uses one GET with a 45-second deadline including its response body. Filtered checks keep the 15-second retry policy. Session registration uses a separate bounded 5-second replay policy because Engram core implements that route as idempotent. Other writes are sent once with a short deadline: if their transport outcome is ambiguous, Pi reports it as **unknown** and tells you to verify before retrying rather than risking a duplicate mutation. Caller cancellation is propagated, not reported as a transport failure.
+When `QBIT_JAY_URL` is unset, a confirmed local server that later refuses connections gets one bounded restart attempt per initialized runtime. Pi gives ordinary reads a bounded 10-second retry policy. A full `mem_doctor` report uses one GET with a 45-second deadline including its response body. Filtered checks keep the 15-second retry policy. Session registration uses a separate bounded 5-second replay policy because Engram core implements that route as idempotent. Other writes are sent once with a short deadline: if their transport outcome is ambiguous, Pi reports it as **unknown** and tells you to verify before retrying rather than risking a duplicate mutation. Caller cancellation is propagated, not reported as a transport failure.
 
 Native `mem_save` is the single exception. It creates one operation UUID and freezes the redacted request bytes and Engram destination before its first `POST /observations`. After an ambiguous acknowledgement it performs `GET /observations/save-result?operation_id=...`. Only the exact typed `404` body with `code: "observation_save_result_not_found"` and `error: "no committed result found for operation_id"` for a never-recorded operation permits one byte-identical replay after a cancellable 250ms backoff. A soft-deleted or tombstoned operation returns `410` and remains **unknown** without a replay or another lookup. An ambiguous initial `POST` outcome, including a malformed or invalid/non-positive successful receipt, proceeds to the result lookup; only its exact typed `404` may authorize one replay. A legacy `400`, generic or malformed `404`, lookup transport failure, or malformed or invalid/non-positive lookup receipt remains **unknown** without replay. An ambiguous replay—including `409` or `410`—gets one final lookup and never another POST. The complete recovery is bounded; cancellation during any lookup, backoff, replay, or final lookup is propagated. The local operation ledger retains receipts indefinitely, so callers must not replace an uncertain operation ID automatically. Recovery telemetry remains deferred.
 
@@ -815,17 +815,17 @@ When the local health probe observes a different instance ID, Pi fails closed: i
 Stop the foreign server from its owning environment, or choose a free local port and relaunch:
 
 ```bash
-ENGRAM_PORT=17437 pi
+QBIT_JAY_PORT=17437 pi
 ```
 
-This local-port remedy requires `ENGRAM_URL` to be unset. `ENGRAM_PORT` alone never overrides an explicit `ENGRAM_URL`; an explicit URL opts into an externally managed server and skips local ownership checks.
+This local-port remedy requires `QBIT_JAY_URL` to be unset. `QBIT_JAY_PORT` alone never overrides an explicit `QBIT_JAY_URL`; an explicit URL opts into an externally managed server and skips local ownership checks.
 
 ## Configuration
 
 ### Startup safety policy
 
 The 0.8.0 source retains `engram.startupPolicy: 1` and `engram.sessionOwned: 1` in package metadata. These declarations do not prove that the matching core/companion artifacts have been published or validated.
-Launchers can set `ENGRAM_STARTUP_POLICY=disabled` before loading the extension
+Launchers can set `QBIT_JAY_STARTUP_POLICY=disabled` before loading the extension
 when safe use of an existing store cannot be established. Pi remains usable:
 no memory tools, memory protocol, bridge responder, normal lifecycle hooks,
 subprocesses (including `instance-id` and `version`), HTTP requests, retries or
@@ -836,9 +836,9 @@ Absent policy preserves standalone behavior. Literal `allow` also preserves
 normal startup; it is **not** evidence of schema compatibility or permission to
 migrate. Every other supplied value, including empty, whitespace or wrong case,
 fails closed. Policy is read when the extension loads; restart/reload Pi after
-changing it. It takes precedence over an explicit `ENGRAM_URL`.
+changing it. It takes precedence over an explicit `QBIT_JAY_URL`.
 
-Optional `ENGRAM_STARTUP_NOTICE` appends display-only warning text. The provider
+Optional `QBIT_JAY_STARTUP_NOTICE` appends display-only warning text. The provider
 never executes or interprets it as commands, never injects it into the memory
 protocol, and does not use it to enable memory. Back up the existing data, update
 Engram and restart its server, then recheck safety before enabling memory.
@@ -852,45 +852,47 @@ alone protects the store.
 Use an already running Engram HTTP server:
 
 ```bash
-ENGRAM_URL=http://127.0.0.1:7437 pi
+QBIT_JAY_URL=http://127.0.0.1:7437 pi
 ```
 
-When `ENGRAM_URL` is set, the extension treats the server as externally managed and does not auto-start `engram serve`.
+When `QBIT_JAY_URL` is set, the extension treats the server as externally managed and does not auto-start `qbit-jay serve`.
 
 ### Custom Engram binary
 
 Use a custom Engram binary for MCP tools and local auto-start:
 
 ```bash
-ENGRAM_BIN=/path/to/engram pi
+QBIT_JAY_BIN=/path/to/qbit-jay pi
 ```
 
 If the binary is missing, Pi keeps running and memory degrades instead of crashing with `spawn engram ENOENT`.
 
 ## Environment variables
 
-The Pi extension treats absent, empty, and whitespace-only `ENGRAM_URL`, `ENGRAM_BIN`, and `ENGRAM_PORT` values as unset. It detects blankness without trimming nonblank explicit values.
+Every `QBIT_JAY_*` variable also reads the upstream `ENGRAM_*` name as a fallback (gentle-ai and existing setups keep working); when both are set, the `QBIT_JAY_*` value wins and an empty one does not mask a set `ENGRAM_*` value.
+
+The Pi extension treats absent, empty, and whitespace-only `QBIT_JAY_URL`, `QBIT_JAY_BIN`, and `QBIT_JAY_PORT` values as unset. It detects blankness without trimming nonblank explicit values.
 
 | Variable          | Default  | Effect                                                                                                                                                                                                                                                                                  |
 | ----------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `ENGRAM_URL`      | unset    | Adopt an already running Engram HTTP server (for example `http://127.0.0.1:7437`). When set, the extension skips spawning `engram serve` and skips local instance-identity ownership checks; the server is treated as externally managed.                                                |
-| `ENGRAM_BIN`      | `engram` | Binary override. The named executable is resolved from `PATH` and used to auto-start the local server, resolve its instance identity (`instance-id`), and report its version (`version`). Binaries older than v2.0.0-rc.11 cannot resolve an identity and are reported with upgrade guidance. |
-| `ENGRAM_PORT`     | `7437`   | Port of the local server the extension spawns and probes when `ENGRAM_URL` is unset.                                                                                                                                                                                                       |
-| `ENGRAM_STARTUP_POLICY` | unset | `allow` preserves normal startup; `disabled` and all other supplied values disable the native provider before registration or effects. |
-| `ENGRAM_STARTUP_NOTICE` | unset | Display-only text appended to the disabled-memory warning; never executed. |
-| `ENGRAM_DEFER_MEMORY` | unset | Literal `1` skips injecting the Memory Protocol text into the system prompt (both the legacy fallback and structured per-run options) while keeping the `mem_*` tools registered and functional; any other value or absence keeps the injection. |
-| `ENGRAM_DATA_DIR` | unset    | Data directory inherited by the spawned `engram serve` process. When unset, the server stores memory in `~/.engram` (`%USERPROFILE%\.engram` on Windows).                                                                                                                               |
+| `QBIT_JAY_URL`      | unset    | Adopt an already running Engram HTTP server (for example `http://127.0.0.1:7437`). When set, the extension skips spawning `qbit-jay serve` and skips local instance-identity ownership checks; the server is treated as externally managed.                                                |
+| `QBIT_JAY_BIN`      | `qbit-jay` | Binary override. The named executable is resolved from `PATH` and used to auto-start the local server, resolve its instance identity (`instance-id`), and report its version (`version`). Binaries older than v2.0.0-rc.11 cannot resolve an identity and are reported with upgrade guidance. |
+| `QBIT_JAY_PORT`     | `7437`   | Port of the local server the extension spawns and probes when `QBIT_JAY_URL` is unset.                                                                                                                                                                                                       |
+| `QBIT_JAY_STARTUP_POLICY` | unset | `allow` preserves normal startup; `disabled` and all other supplied values disable the native provider before registration or effects. |
+| `QBIT_JAY_STARTUP_NOTICE` | unset | Display-only text appended to the disabled-memory warning; never executed. |
+| `QBIT_JAY_DEFER_MEMORY` | unset | Literal `1` skips injecting the Memory Protocol text into the system prompt (both the legacy fallback and structured per-run options) while keeping the `mem_*` tools registered and functional; any other value or absence keeps the injection. |
+| `QBIT_JAY_DATA_DIR` | unset    | Data directory inherited by the spawned `qbit-jay serve` process. When unset, the server stores memory in `~/.qbit-jay` (`%USERPROFILE%\.qbit-jay` on Windows).                                                                                                                               |
 
 ## Install command details
 
-With this Pi package version, `pi-engram init` updates Pi-owned config in the Pi agent directory:
+With this Pi package version, `pi-qbit-jay init` updates Pi-owned config in the Pi agent directory:
 
 - `settings.json`: with the prepared matching core, ensures `npm:gentle-engram@0.8.0` is declared, replacing affected `npm:gentle-engram@0.1.5`, `npm:gentle-engram@0.1.6`, `npm:gentle-engram@0.1.7`, `npm:gentle-engram@0.1.8`, `npm:gentle-engram@0.1.11`, `npm:gentle-engram@0.1.12`, `npm:gentle-engram@0.1.13`, `npm:gentle-engram@0.1.14`, `npm:gentle-engram@0.1.15`, `npm:gentle-engram@0.1.16`, `npm:gentle-engram@0.2.0`, `npm:gentle-engram@0.3.0`, `npm:gentle-engram@0.4.0`, `npm:gentle-engram@0.4.1`, `npm:gentle-engram@0.4.2`, `npm:gentle-engram@0.5.0`, `npm:gentle-engram@0.5.1`, `npm:gentle-engram@0.6.0`, `npm:gentle-engram@0.7.0`, and `npm:gentle-engram@0.7.1` pins when present. It does not add `npm:pi-mcp-adapter` and leaves an existing adapter entry untouched.
-- `mcp.json`: never created or changed by init. Existing `mcpServers.engram` triggers a warning with its exact config path. Manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
+- `mcp.json`: never created or changed by init. Existing `mcpServers.qbit-jay` (or the upstream `mcpServers.engram`) triggers a warning with its exact config path. Manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
 
-`engram setup pi` also auto-pins `npmCommand` in Pi's `settings.json` when [mise](https://mise.jdx.dev/) is detected in `PATH`. It sets `npmCommand` to `["mise", "exec", "node@<version>", "--", "npm"]` so Pi always uses the mise-managed Node version. Existing `npmCommand` values are never overwritten; if mise is not found, this step is a no-op.
+`qbit-jay setup pi` also auto-pins `npmCommand` in Pi's `settings.json` when [mise](https://mise.jdx.dev/) is detected in `PATH`. It sets `npmCommand` to `["mise", "exec", "node@<version>", "--", "npm"]` so Pi always uses the mise-managed Node version. Existing `npmCommand` values are never overwritten; if mise is not found, this step is a no-op.
 
-Existing `mcpServers.engram` entries are preserved even with `--force`; the flag does not bypass native-only safety guidance. The published `mcp-template.json` is a legacy **Pi MCP configuration shape** for explicit, optional Pi MCP clients; it is not a generic standalone MCP template and neither `pi-engram init` nor `engram setup pi` uses it.
+Existing `mcpServers.engram` entries are preserved even with `--force`; the flag does not bypass native-only safety guidance. The published `mcp-template.json` is a legacy **Pi MCP configuration shape** for explicit, optional Pi MCP clients; it is not a generic standalone MCP template and neither `pi-qbit-jay init` nor `qbit-jay setup pi` uses it.
 
 The command respects `PI_CODING_AGENT_DIR`; otherwise it writes to `~/.pi/agent`.
 
@@ -950,21 +952,21 @@ There is no automatic inference: editing files in another repository never chang
 
 | Symptom                                                      | Fix                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mem_*` tools are missing                                    | After the candidate pair is published and validated, install/verify `npm:gentle-engram@0.8.0` with its matching core, run `pi-engram init`, then restart Pi. Earlier `0.1.16` init still registers Engram MCP; do not use it for native-only setup.                                                                                                 |
-| Pi cannot find `engram`                                      | Set `ENGRAM_BIN=/absolute/path/to/engram`.                                                                                                                                                                                                                              |
-| Session capture should use another server                    | Set `ENGRAM_URL=http://host:7437`.                                                                                                                                                                                                                                      |
+| `mem_*` tools are missing                                    | After the candidate pair is published and validated, install/verify `npm:gentle-engram@0.8.0` with its matching core, run `pi-qbit-jay init`, then restart Pi. Earlier `0.1.16` init still registers Engram MCP; do not use it for native-only setup.                                                                                                 |
+| Pi cannot find `qbit-jay`                                      | Set `QBIT_JAY_BIN=/absolute/path/to/qbit-jay`.                                                                                                                                                                                                                              |
+| Session capture should use another server                    | Set `QBIT_JAY_URL=http://host:7437`.                                                                                                                                                                                                                                      |
 | Pi shows `error MCP: 0/N servers` but `mem_*` works          | That status covers Pi's MCP servers, not Engram's Pi-native HTTP tools. Check `~/.pi/agent/mcp.json` for stale/unreachable servers such as remote OAuth services. |
 | Existing Pi `mcpServers.engram` entry                         | Manually remove only that key from the warned `mcp.json` path and restart/reload Pi; setup never replaces user-owned MCP config.                                                                                                                                                                                                                                           |
-| `mem_current_project` reports `/project/current` unsupported | Restart or upgrade the running `engram serve`; check `ENGRAM_URL`/`ENGRAM_BIN`. If `.engram/config.json` exists, Pi uses it as a temporary fallback.                                                                                                                    |
+| `mem_current_project` reports `/project/current` unsupported | Restart or upgrade the running `qbit-jay serve`; check `QBIT_JAY_URL`/`QBIT_JAY_BIN`. If `.engram/config.json` exists, Pi uses it as a temporary fallback.                                                                                                                    |
 | `mem_session_summary` cannot detect a project                | Ask the user which project should receive the summary, then retry `mem_session_summary` with `project: "name"`.                                                                                                                                                         |
 | Pi warns that its runtime session belongs to another project | Pi registers runtime sessions as `project_owned`. If Engram already persists that session under another nonblank project, its structured `409 session_project_conflict` response suppresses prompt and passive capture even after Pi restarts. Start a fresh Pi session in the current project. To save into another project from this session, pass `project` or `cwd` explicitly (see [Cross-project saves](#cross-project-saves)). |
 | Status bar shows `🧠 repos · ambiguous project`             | Pi was started from a parent directory that contains multiple git repos. Run Pi from inside a single repo, or add `.engram/config.json` with `"project_name": "my-project"` to the ambiguous directory.                                                                 |
 
 ## Next steps
 
-- Run `engram tui` to inspect stored memories.
+- Run `qbit-jay tui` to inspect stored memories.
 - Use `mem_current_project` to confirm project detection before writing memories.
-- Read the main Engram setup guide: <https://github.com/Gentleman-Programming/engram/blob/main/docs/AGENT-SETUP.md>
-- Explore Engram Cloud: <https://github.com/Gentleman-Programming/engram/blob/main/docs/engram-cloud/README.md>
+- Read the main Engram setup guide: <https://github.com/qbitdevz/qbit-jay/blob/main/docs/AGENT-SETUP.md>
+- Explore Engram Cloud: <https://github.com/qbitdevz/qbit-jay/blob/main/docs/engram-cloud/README.md>
 - Watch Gentleman Programming on YouTube: <https://www.youtube.com/c/GentlemanProgramming>
-- Join the project through issues, discussions, and beta feedback: <https://github.com/Gentleman-Programming/engram>
+- Join the project through issues, discussions, and beta feedback: <https://github.com/qbitdevz/qbit-jay>

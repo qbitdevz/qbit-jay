@@ -25,16 +25,16 @@ import (
 )
 
 func TestEmbeddedOpenCodePluginMatchesSourceByteForByte(t *testing.T) {
-	source, err := os.ReadFile(filepath.Join("..", "..", "plugin", "opencode", "engram.ts"))
+	source, err := os.ReadFile(filepath.Join("..", "..", "plugin", "opencode", "qbit-jay.ts"))
 	if err != nil {
 		t.Fatalf("read OpenCode source plugin: %v", err)
 	}
-	embedded, err := os.ReadFile(filepath.Join("plugins", "opencode", "engram.ts"))
+	embedded, err := os.ReadFile(filepath.Join("plugins", "opencode", "qbit-jay.ts"))
 	if err != nil {
 		t.Fatalf("read embedded OpenCode plugin: %v", err)
 	}
 	if !bytes.Equal(source, embedded) {
-		t.Fatal("embedded OpenCode plugin drifted from plugin/opencode/engram.ts; regenerate the embedded copy")
+		t.Fatal("embedded OpenCode plugin drifted from plugin/opencode/qbit-jay.ts; regenerate the embedded copy")
 	}
 }
 
@@ -600,7 +600,7 @@ func assertCodexPluginSetupError(t *testing.T, result *Result, err error, reason
 	if result != nil || err == nil {
 		t.Fatalf("expected nil result and partial setup error, got %#v, %v", result, err)
 	}
-	for _, want := range []string{reason, "MCP config and instruction files were written", "plugin was not installed", "codex plugin marketplace add " + codexMarketplace + " --ref main", "codex plugin add engram@engram"} {
+	for _, want := range []string{reason, "MCP config and instruction files were written", "plugin was not installed", "codex plugin marketplace add " + codexMarketplace + " --ref main", "codex plugin add qbit-jay@qbit-jay"} {
 		if !strings.Contains(err.Error(), want) {
 			t.Errorf("error %q missing %q", err, want)
 		}
@@ -715,12 +715,12 @@ func TestInstallCodexPluginCLIPresent(t *testing.T) {
 	for _, cmd := range commands {
 		if len(cmd) >= 4 &&
 			cmd[0] == "/usr/local/bin/codex" &&
-			cmd[1] == "plugin" && cmd[2] == "add" && cmd[3] == "engram@engram" {
+			cmd[1] == "plugin" && cmd[2] == "add" && cmd[3] == "qbit-jay@qbit-jay" {
 			foundPluginAdd = true
 		}
 	}
 	if !foundPluginAdd {
-		t.Fatalf("expected 'codex plugin add engram@engram' to be invoked, got: %v", commands)
+		t.Fatalf("expected 'codex plugin add qbit-jay@qbit-jay' to be invoked, got: %v", commands)
 	}
 }
 
@@ -1296,7 +1296,7 @@ func TestInstallOpenCodeSuccessAndMCPRegistered(t *testing.T) {
 		t.Fatal("expected successful OpenCode install to report MCP configuration")
 	}
 
-	pluginPath := filepath.Join(xdg, "opencode", "plugins", "engram.ts")
+	pluginPath := filepath.Join(xdg, "opencode", "plugins", "qbit-jay.ts")
 	if _, err := os.Stat(pluginPath); err != nil {
 		t.Fatalf("expected plugin file to exist: %v", err)
 	}
@@ -1351,7 +1351,7 @@ func TestInstallOpenCodeReadEmbeddedError(t *testing.T) {
 	}
 
 	_, err := installOpenCode()
-	if err == nil || !strings.Contains(err.Error(), "read embedded engram.ts") {
+	if err == nil || !strings.Contains(err.Error(), "read embedded qbit-jay.ts") {
 		t.Fatalf("expected read embedded error, got %v", err)
 	}
 }
@@ -5192,11 +5192,11 @@ func TestInstallOpenCodeWarningUsesResolvedCommand(t *testing.T) {
 // TestPatchEngramBINLine verifies that patchEngramBINLine() preserves an
 // explicit environment override and uses a baked absolute or bare fallback.
 func TestPatchEngramBINLine(t *testing.T) {
-	const original = `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram"`
+	const original = `const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"`
 
 	t.Run("bakes in an absolute fallback without Bun", func(t *testing.T) {
 		result := string(patchEngramBINLine([]byte(original), "/usr/local/bin/engram"))
-		want := `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/usr/local/bin/engram"`
+		want := `const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/usr/local/bin/engram"`
 		if result != want {
 			t.Fatalf("patched line = %q, want %q", result, want)
 		}
@@ -5215,8 +5215,8 @@ func TestPatchEngramBINLine(t *testing.T) {
 		}
 	})
 
-	t.Run("preserves bare engram fallback when os.Executable failed", func(t *testing.T) {
-		result := string(patchEngramBINLine([]byte(original), "engram"))
+	t.Run("preserves bare qbit-jay fallback when os.Executable failed", func(t *testing.T) {
+		result := string(patchEngramBINLine([]byte(original), "qbit-jay"))
 		if result != original {
 			t.Fatalf("bare fallback = %q, want %q", result, original)
 		}
@@ -5235,7 +5235,7 @@ func TestPatchEngramBINLine(t *testing.T) {
 		doubled := original + "\n" + original
 		result := string(patchEngramBINLine([]byte(doubled), "/bin/engram"))
 		// One line should be replaced, the other should remain as-is
-		if strings.Count(result, `?? "engram"`) != 1 {
+		if strings.Count(result, `?? "qbit-jay"`) != 1 {
 			t.Fatalf("expected exactly one original line to remain, got:\n%s", result)
 		}
 	})
@@ -5259,7 +5259,7 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 			t.Fatalf("unexpected agent: %q", result.Agent)
 		}
 
-		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "engram.ts")
+		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "qbit-jay.ts")
 		raw, err := os.ReadFile(pluginPath)
 		if err != nil {
 			t.Fatalf("read installed plugin: %v", err)
@@ -5267,24 +5267,24 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 		content := string(raw)
 
 		// Must have env var override as first priority
-		if !strings.Contains(content, `process.env.ENGRAM_BIN`) {
+		if !strings.Contains(content, `process.env.QBIT_JAY_BIN`) || !strings.Contains(content, `process.env.ENGRAM_BIN`) {
 			t.Fatalf("installed plugin must keep process.env.ENGRAM_BIN override")
 		}
 		if strings.Contains(content, `Bun.which`) {
 			t.Fatalf("installed Node plugin must not reference Bun, got:\n%s", content)
 		}
-		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/usr/local/bin/engram"`) {
+		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/usr/local/bin/engram"`) {
 			t.Fatalf("installed plugin must contain the expected absolute fallback, got:\n%s", content)
 		}
 		if !strings.Contains(content, `return value?.trim() ? value : undefined`) {
 			t.Fatalf("installed plugin must treat blank and whitespace ENGRAM_BIN overrides as unset, got:\n%s", content)
 		}
 		// Source plugin file must remain unchanged (no patching of the template)
-		srcRaw, err := openCodeReadFile("plugins/opencode/engram.ts")
+		srcRaw, err := openCodeReadFile("plugins/opencode/qbit-jay.ts")
 		if err != nil {
 			t.Fatalf("read embedded plugin: %v", err)
 		}
-		if !strings.Contains(string(srcRaw), `?? "engram"`) {
+		if !strings.Contains(string(srcRaw), `?? "qbit-jay"`) {
 			t.Fatalf("source embedded plugin must remain unpatched")
 		}
 	})
@@ -5302,7 +5302,7 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 			t.Fatalf("installOpenCode failed: %v", err)
 		}
 
-		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "engram.ts")
+		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "qbit-jay.ts")
 		raw, err := os.ReadFile(pluginPath)
 		if err != nil {
 			t.Fatalf("read installed plugin: %v", err)
@@ -5310,9 +5310,9 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 		content := string(raw)
 
 		// The line must have the form:
-		// const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/abs/path"
+		// const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/abs/path"
 		// where process.env.ENGRAM_BIN remains the leftmost input (wins when nonblank).
-		envIdx := strings.Index(content, `process.env.ENGRAM_BIN`)
+		envIdx := strings.Index(content, `process.env.QBIT_JAY_BIN`)
 		absIdx := strings.Index(content, `"/usr/local/bin/engram"`)
 		if envIdx == -1 || absIdx == -1 || strings.Contains(content, `Bun.which`) {
 			t.Fatalf("missing Node-compatible ENGRAM_BIN line in installed plugin:\n%s", content)
@@ -5333,14 +5333,14 @@ func TestInstallOpenCodeBakesENGRAMBIN(t *testing.T) {
 			t.Fatalf("installOpenCode failed: %v", err)
 		}
 
-		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "engram.ts")
+		pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "qbit-jay.ts")
 		raw, err := os.ReadFile(pluginPath)
 		if err != nil {
 			t.Fatalf("read installed plugin: %v", err)
 		}
 		content := string(raw)
 
-		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"`) {
+		if !strings.Contains(content, `const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"`) {
 			t.Fatalf("must preserve the normalized bare fallback when os.Executable fails, got:\n%s", content)
 		}
 		if strings.Contains(content, `Bun.which`) {
@@ -5589,7 +5589,7 @@ func TestPluginSubAgentFiltering(t *testing.T) {
 		t.Fatalf("installOpenCode failed: %v", err)
 	}
 
-	pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "engram.ts")
+	pluginPath := filepath.Join(home, "xdg", "opencode", "plugins", "qbit-jay.ts")
 	raw, err := os.ReadFile(pluginPath)
 	if err != nil {
 		t.Fatalf("read installed plugin: %v", err)

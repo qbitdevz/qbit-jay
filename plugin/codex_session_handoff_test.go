@@ -168,7 +168,7 @@ func TestCodexPreToolUseManifestRegistersNativeBinder(t *testing.T) {
 		t.Fatal(err)
 	}
 	entries := manifest.Hooks["PreToolUse"]
-	if len(entries) != 1 || len(entries[0].Hooks) != 1 || entries[0].Matcher != "mcp__engram__mem_*|mcp__plugin_engram_engram__mem_*" || entries[0].Hooks[0].Command != "engram hook codex-pre-tool-use" {
+	if len(entries) != 1 || len(entries[0].Hooks) != 1 || entries[0].Matcher != "mcp__qbit-jay__mem_*|mcp__plugin_qbit-jay_qbit-jay__mem_*|mcp__engram__mem_*|mcp__plugin_engram_engram__mem_*" || entries[0].Hooks[0].Command != "qbit-jay hook codex-pre-tool-use" {
 		t.Fatalf("unexpected Codex PreToolUse registration: %+v", entries)
 	}
 }
@@ -197,7 +197,7 @@ func codexDeliveredBinderContract(t *testing.T, binary, prose string) {
 	entry := entries[0]
 	matcher := regexp.MustCompile("^(?:" + strings.ReplaceAll(entry.Matcher, "*", ".*") + ")$")
 	command := strings.Fields(entry.Hooks[0].Command)
-	if len(command) != 3 || command[0] != "engram" {
+	if len(command) != 3 || command[0] != "qbit-jay" {
 		t.Fatalf("unexpected public hook command: %q", entry.Hooks[0].Command)
 	}
 	root := t.TempDir()
@@ -223,7 +223,7 @@ func codexDeliveredBinderContract(t *testing.T, binary, prose string) {
 	defer fixture.Close()
 	codexFixtureProject(t, root, "binder-probe")
 	env := codexHandoffEnv(t, root, fixture.URL)
-	for _, prefix := range []string{"mcp__engram__", "mcp__plugin_engram_engram__"} {
+	for _, prefix := range []string{"mcp__qbit-jay__", "mcp__plugin_qbit-jay_qbit-jay__", "mcp__engram__", "mcp__plugin_engram_engram__"} {
 		for _, tc := range []struct {
 			tool, field string
 			deny, read  bool
@@ -478,7 +478,7 @@ func TestCodexRegisteredSessionHandoff(t *testing.T) {
 							for _, want := range []string{
 								"The agent MUST follow this protocol without waiting for activation",
 								"tools actually exposed by Codex", "registered MCP names",
-								"mcp__engram__mem_*", "mcp__plugin_engram_engram__mem_*",
+								"mcp__qbit-jay__mem_*", "mcp__plugin_qbit-jay_qbit-jay__mem_*",
 								"verified knowledge that is durable and costly to reconstruct",
 								"decisions with rationale", "Group related conclusions deliberately",
 								"not every task, response, or event", "### PASSIVE CAPTURE",
@@ -601,7 +601,7 @@ func buildCodexFixtureCLI(t *testing.T) string {
 		if codexFixtureErr != nil {
 			return
 		}
-		codexFixturePath = filepath.ToSlash(filepath.Join(codexFixtureDir, "engram.exe"))
+		codexFixturePath = filepath.ToSlash(filepath.Join(codexFixtureDir, "qbit-jay.exe"))
 		cmd := exec.Command("go", "build", "-o", codexFixturePath, "./cmd/qbit-jay")
 		cmd.Dir = root
 		if output, err := cmd.CombinedOutput(); err != nil {
@@ -630,11 +630,11 @@ func codexFixtureProject(t *testing.T, cwd, project string) {
 func codexHandoffToolGuard() string {
 	// MSYS pays for each command-substitution fork. Collect all lookups in one
 	// subprocess while retaining the exact type/path pair for every tool.
-	return `resolved=$(for name in engram curl cat dirname jq date touch bash; do
+	return `resolved=$(for name in qbit-jay curl cat dirname jq date touch bash; do
   type -t "$name" && command -v "$name" || exit 92
 done) || exit 92
 expected=
-for name in engram curl cat dirname jq date touch bash; do
+for name in qbit-jay curl cat dirname jq date touch bash; do
   expected="${expected}file
 $bin/$name
 "
@@ -697,10 +697,9 @@ func codexHandoffEnv(t *testing.T, cwd, serverURL string, binary ...string) []st
 		writeTool(name, "exec "+resolve(name)+` "$@"`)
 	}
 	reject := "printf '%s\\n' rejected >> " + quote(posix[filepath.ToSlash(filepath.Join(cwd, "guard-rejected"))]) + "; exit 97"
-	// The Claude Code scripts call qbit-jay; the Codex scripts still call engram until T5.
+	// The Codex scripts call qbit-jay only; an engram executable must never be needed.
 	writeBinary := func(body string) {
 		t.Helper()
-		writeTool("engram", body)
 		writeTool("qbit-jay", body)
 	}
 	writeBinary(reject)
@@ -763,7 +762,7 @@ cd "$root" || exit 91
 export PATH="$bin"
 hash -r
 ` + codexHandoffToolGuard() + `
-if command -v engram.exe >/dev/null || command -v curl.exe >/dev/null; then
+if command -v qbit-jay.exe >/dev/null || command -v curl.exe >/dev/null; then
   exit 93
 fi
 `
@@ -860,7 +859,7 @@ func TestCodexHandoffTransportBoundary(t *testing.T) {
 			t.Fatalf("transport guard did not reject arguments %q: %v", args, err)
 		}
 	}
-	guard := exec.Command(codexTestBash(t), filepath.Join(cwd, "bin", "engram"), "hook", "codex-resolve")
+	guard := exec.Command(codexTestBash(t), filepath.Join(cwd, "bin", "qbit-jay"), "hook", "codex-resolve")
 	guard.Env, guard.Dir = env, cwd
 	if err := guard.Run(); err == nil || guard.ProcessState.ExitCode() != 97 {
 		t.Fatal("fixture selected an ambient CLI rather than its rejecting guard")
@@ -872,7 +871,7 @@ func TestCodexHandoffTransportBoundary(t *testing.T) {
 		t.Fatalf("missing rejection evidence: %v", err)
 	}
 	positive := exec.Command(codexTestBash(t), "--noprofile", "--norc", "-c", `
-for name in engram curl cat dirname jq date touch bash; do
+for name in qbit-jay curl cat dirname jq date touch bash; do
   [ "$(type -t "$name")" = file ] && [ "$(command -v "$name")" = "$PATH/$name" ] || exit 92
 done
 curl -sf "$1/sessions" --max-time 1

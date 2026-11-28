@@ -8,6 +8,17 @@
 # Runs synchronously (Codex does not support async: true). The HTTP call
 # completes well within the 10s timeout on a local engram server.
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only.
+for _qbit_jay_name in PORT SOCKET URL DATA_DIR NUDGE_COOLDOWN_SECS; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
+
 ENGRAM_PORT="${ENGRAM_PORT:-7437}"
 ENGRAM_URL="http://127.0.0.1:${ENGRAM_PORT}"
 
@@ -35,7 +46,7 @@ else
   OUTPUT_JSON=$(jq -n --arg content "$OUTPUT" '$content')
 fi
 PROJECT=$(resolve_project "$CWD") || {
-  printf 'engram: unable to resolve project for cwd %q; skipping passive capture\n' "$CWD" >&2
+  printf 'qbit-jay: unable to resolve project for cwd %q; skipping passive capture\n' "$CWD" >&2
   emit_hook_result
   exit 0
 }

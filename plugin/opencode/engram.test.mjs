@@ -11,7 +11,7 @@ const require = createRequire(import.meta.url)
 const childProcess = require("node:child_process")
 const fs = require("node:fs")
 
-const source = readFileSync(new URL("./engram.ts", import.meta.url), "utf8")
+const source = readFileSync(new URL("./qbit-jay.ts", import.meta.url), "utf8")
 
 // Prose contract only: these checks do not establish actual model compliance.
 test("selective cadence preserves OpenCode session-only recovery and adapter ownership", () => {
@@ -141,7 +141,7 @@ function assertNoRegistration(runtime, message) {
 
 async function createRuntime(t, {
   directory = "/work/engram",
-  adapterPath = "./engram.ts",
+  adapterPath = "./qbit-jay.ts",
   projectCurrentResponse = { project: "engram", project_source: "git_remote" },
 	projectCurrentOK = true,
 	manifestExists = false,
@@ -159,6 +159,7 @@ async function createRuntime(t, {
   configuredEngramURL,
   realServerFetch = false,
   engramBin,
+  qbitJayBin,
   engramPort,
   healthOK = true,
   selectLegacyDefault = false,
@@ -175,6 +176,7 @@ async function createRuntime(t, {
 	const originalBun = globalThis.Bun
 	const originalEngramURL = process.env.ENGRAM_URL
   const originalEngramBin = process.env.ENGRAM_BIN
+  const originalQbitJayBin = process.env.QBIT_JAY_BIN
   const originalEngramPort = process.env.ENGRAM_PORT
   const originalSpawnSync = childProcess.spawnSync
   const originalSpawn = childProcess.spawn
@@ -190,6 +192,8 @@ async function createRuntime(t, {
 	else process.env.ENGRAM_URL = configuredEngramURL
   if (engramBin === undefined) delete process.env.ENGRAM_BIN
   else process.env.ENGRAM_BIN = engramBin
+  if (qbitJayBin === undefined) delete process.env.QBIT_JAY_BIN
+  else process.env.QBIT_JAY_BIN = qbitJayBin
   if (engramPort === undefined) delete process.env.ENGRAM_PORT
   else process.env.ENGRAM_PORT = engramPort
   if (installBun) {
@@ -313,6 +317,8 @@ async function createRuntime(t, {
 		else process.env.ENGRAM_URL = originalEngramURL
     if (originalEngramBin === undefined) delete process.env.ENGRAM_BIN
     else process.env.ENGRAM_BIN = originalEngramBin
+    if (originalQbitJayBin === undefined) delete process.env.QBIT_JAY_BIN
+    else process.env.QBIT_JAY_BIN = originalQbitJayBin
     if (originalEngramPort === undefined) delete process.env.ENGRAM_PORT
     else process.env.ENGRAM_PORT = originalEngramPort
     childProcess.spawnSync = originalSpawnSync
@@ -324,8 +330,8 @@ async function createRuntime(t, {
   if (bakedBin) {
     const dir = mkdtempSync(join(tmpdir(), "engram-opencode-baked-"))
     t.after(() => fs.rmSync(dir, { recursive: true, force: true }))
-    const file = join(dir, "engram.ts")
-    fs.writeFileSync(file, source.replace('?? "engram"', `?? ${JSON.stringify(bakedBin)}`))
+    const file = join(dir, "qbit-jay.ts")
+    fs.writeFileSync(file, source.replace('?? "qbit-jay"', `?? ${JSON.stringify(bakedBin)}`))
     adapterPath = pathToFileURL(file).href
   }
   const moduleURL = new URL(`${adapterPath}?sdk-runtime=${runtimeImport}`, import.meta.url)
@@ -333,7 +339,7 @@ async function createRuntime(t, {
   let factory = module.Engram
   if (selectLegacyDefault) {
     assert.equal(typeof module.default, "object", "V1 loader needs a default entrypoint")
-    assert.equal(module.default.id, "engram")
+    assert.equal(module.default.id, "qbit-jay")
     assert.strictEqual(module.default.server, module.Engram)
     assert.equal(typeof module.shouldNudgeForObservations, "function", "named helper remains exported")
     factory = module.default.server
@@ -637,7 +643,7 @@ test("V1 default selection initializes only the Engram factory once", async (t) 
   assert.equal(runtime.startupEvents.filter((event) => event === "project-current:response").length, 1)
 })
 
-for (const adapterPath of ["./engram.ts", "../../internal/setup/plugins/opencode/engram.ts"]) {
+for (const adapterPath of ["./qbit-jay.ts", "../../internal/setup/plugins/opencode/qbit-jay.ts"]) {
   test(`Windows internal launches preserve options and hide consoles: ${adapterPath}`, async (t) => {
     let healthChecks = 0
     const runtime = await createRuntime(t, {
@@ -690,10 +696,29 @@ test("adapter treats blank optional Engram environment values as unset at its im
       const runtime = await createRuntime(t, { ...scenario, healthOK: false })
       const server = runtime.spawns.find(({ args }) => args[1] === "run")
 
-      assert.equal(server?.args[0], scenario.engramBin?.trim() ? scenario.engramBin : "engram")
+      assert.equal(server?.args[0], scenario.engramBin?.trim() ? scenario.engramBin : "qbit-jay")
       assert.equal(new URL(runtime.healthURLs[0]).port, scenario.engramPort?.trim() ? scenario.engramPort : "7437")
     })
   }
+})
+
+test("QBIT_JAY_BIN wins over ENGRAM_BIN and ENGRAM_BIN remains the compatibility fallback", async (t) => {
+  for (const scenario of [
+    { name: "both set", qbitJayBin: "/qj/qbit-jay", engramBin: "/legacy/engram", want: "/qj/qbit-jay" },
+    { name: "only legacy", engramBin: "/legacy/engram", want: "/legacy/engram" },
+    { name: "blank qbit-jay does not mask legacy", qbitJayBin: " ", engramBin: "/legacy/engram", want: "/legacy/engram" },
+    { name: "only qbit-jay", qbitJayBin: "/qj/qbit-jay", want: "/qj/qbit-jay" },
+  ]) {
+    await t.test(scenario.name, async (t) => {
+      const runtime = await createRuntime(t, { qbitJayBin: scenario.qbitJayBin, engramBin: scenario.engramBin, healthOK: false })
+      assert.equal(runtime.spawns.find(({ args }) => args[1] === "run")?.args[0], scenario.want)
+    })
+  }
+})
+
+test("readiness diagnostic names QBIT_JAY_BIN when that override is the one in use", async (t) => {
+  const runtime = await createRuntime(t, { qbitJayBin: "C:\\private\\qj.exe", identityResult: { status: null, error: { code: "ENOENT" }, stdout: "" } })
+  await assert.rejects(runtime.before({ sessionID: "runtime", tool: "mem_save" }, toolOutput()), /binary-not-found.*QBIT_JAY_BIN override.*Correct or unset QBIT_JAY_BIN/)
 })
 
 test("an explicit OpenCode ENGRAM_URL keeps precedence and its exact value", async (t) => {
@@ -717,7 +742,7 @@ test("adapter returns hooks when local identity lookup fails", async (t) => {
 })
 
 for (const scenario of [
-  { name: "stale baked path", bakedBin: "C:\\private\\old\\engram.exe", identityResult: { status: null, error: { code: "ENOENT" }, stdout: "" }, reason: /binary-not-found.*setup-default/, recovery: /engram setup opencode.*restart OpenCode/ },
+  { name: "stale baked path", bakedBin: "C:\\private\\old\\engram.exe", identityResult: { status: null, error: { code: "ENOENT" }, stdout: "" }, reason: /binary-not-found.*setup-default/, recovery: /qbit-jay setup opencode.*restart OpenCode/ },
   { name: "invalid override", engramBin: "C:\\private\\override.exe", identityResult: { status: null, error: { code: "ENOENT" }, stdout: "" }, reason: /binary-not-found.*ENGRAM_BIN override/, recovery: /Correct or unset ENGRAM_BIN/ },
   { name: "launch failure", identityResult: { status: null, error: { code: "EACCES" }, stdout: "private stdout" }, reason: /identity-command-failed/, recovery: /instance-id/ },
   { name: "nonzero exit", identityResult: { status: 1, stdout: "private stdout" }, reason: /identity-command-failed/, recovery: /instance-id/ },
@@ -739,7 +764,7 @@ for (const scenario of [
     if (scenario.identityResult) {
       assert.deepEqual(runtime.healthURLs, [])
       assert.deepEqual(runtime.spawns, [])
-      assert.ok(runtime.syncSpawns.every(({ args }) => args[0] === (scenario.engramBin ?? scenario.bakedBin ?? "engram")))
+      assert.ok(runtime.syncSpawns.every(({ args }) => args[0] === (scenario.engramBin ?? scenario.bakedBin ?? "qbit-jay")))
     }
     const warning = { output: "original" }
     await runtime.after({ tool: "read", sessionID: "runtime" }, warning)
@@ -1109,7 +1134,7 @@ test("a stale project resolution failure cannot overwrite a newer success", asyn
 })
 
 test("embedded and distributable OpenCode plugins remain identical", () => {
-  const embedded = readFileSync(new URL("../../internal/setup/plugins/opencode/engram.ts", import.meta.url), "utf8")
+  const embedded = readFileSync(new URL("../../internal/setup/plugins/opencode/qbit-jay.ts", import.meta.url), "utf8")
   assert.equal(embedded, source)
 })
 
@@ -1191,6 +1216,8 @@ test("qualified Engram write IDs inject the authoritative root session", async (
     { tool: "engram_mem_save_prompt", sessionID: "root", expectedSessionID: "root" },
     { tool: "engram_mem_session_summary", sessionID: "leaf", expectedSessionID: "root" },
     { tool: "engram_mem_capture_passive", sessionID: "root", expectedSessionID: "root" },
+    { tool: "qbit-jay_mem_save", sessionID: "root", expectedSessionID: "root" },
+    { tool: "qbit-jay_mem_session_summary", sessionID: "leaf", expectedSessionID: "root" },
   ]) {
     const output = toolOutput(undefined)
     await runtime.before({ tool, sessionID }, output)
@@ -1198,7 +1225,7 @@ test("qualified Engram write IDs inject the authoritative root session", async (
   }
 
   assert.deepEqual(runtime.sessionGetIDs, ["root", "leaf"])
-  assert.deepEqual(runtime.registeredIDs, ["root", "root", "root", "root"], "a child must renew the authoritative root, never register itself")
+  assert.deepEqual(runtime.registeredIDs, ["root", "root", "root", "root", "root", "root"], "a child must renew the authoritative root, never register itself")
 })
 
 test("subagent sessions resolve to the authoritative parent and never register themselves", () => {
@@ -1637,7 +1664,7 @@ for (const system of [[], ["base prompt"], ["base prompt", "host override"]]) {
     assert.equal((instructions.match(/# Engram Persistent Memory — Protocol/g) ?? []).length, 1)
     assert.equal((instructions.match(/## OpenCode plugin binding/g) ?? []).length, 1)
     assert.match(instructions, /The agent MUST follow this protocol without waiting for activation/)
-    assert.match(instructions, /engram_mem_save/)
+    assert.match(instructions, /qbit-jay_mem_save/)
     assert.doesNotMatch(instructions, /ToolSearch|Deferred tools|mcp__engram__|permissions allowlist/)
     assert.match(instructions, /verified knowledge that is durable and costly to reconstruct/)
     assert.match(instructions, /decisions with rationale/)

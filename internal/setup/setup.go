@@ -110,7 +110,7 @@ const (
 	legacyMCPServerName = "engram"
 	claudePluginName    = "qbit-jay"
 )
-const codexMarketplace = "Gentleman-Programming/engram"
+const codexMarketplace = "qbitdevz/qbit-jay"
 const claudeCodeSlimPluginFloor = "0.1.1"
 const claudeCodePluginListTimeout = 2 * time.Second // bounds only the read-only Claude plugin capability probe
 
@@ -515,28 +515,28 @@ func readRawArrayField(config map[string]json.RawMessage, key, path string) ([]j
 //
 // Original line in source:
 //
-//	const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram"
+//	const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"
 //
 // Patched line in installed copy:
 //
-//	const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/abs/path/engram"
+//	const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "/abs/path/qbit-jay"
 //
 // Priority (left to right, first defined wins):
-//  1. Nonblank ENGRAM_BIN env var — explicit user override, always respected.
+//  1. Nonblank QBIT_JAY_BIN, then ENGRAM_BIN env var — explicit user override, always respected.
 //  2. Absolute baked-in path — works in headless/systemd where PATH is stripped.
 //
-// If absBin is already bare "engram" (os.Executable fallback), retain the
+// If absBin is already bare "qbit-jay" (os.Executable fallback), retain the
 // source fallback so the installed Node plugin has no Bun runtime dependency.
 func patchEngramBINLine(src []byte, absBin string) []byte {
-	const marker = `const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram"`
+	const marker = `const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "qbit-jay"`
 
 	var replacement string
-	if absBin == "engram" {
+	if absBin == "qbit-jay" {
 		// os.Executable failed — retain the source bare-command fallback.
 		replacement = marker
 	} else {
 		// Normal case: bake in the absolute path as the final fallback.
-		replacement = fmt.Sprintf(`const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? %q`, absBin)
+		replacement = fmt.Sprintf(`const ENGRAM_BIN = optionalEnvironmentValue(process.env.QBIT_JAY_BIN) ?? optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? %q`, absBin)
 	}
 
 	return []byte(strings.Replace(string(src), marker, replacement, 1))
@@ -548,9 +548,9 @@ func installOpenCode() (*Result, error) {
 		return nil, fmt.Errorf("create plugin dir %s: %w", dir, err)
 	}
 
-	data, err := openCodeReadFile("plugins/opencode/engram.ts")
+	data, err := openCodeReadFile("plugins/opencode/qbit-jay.ts")
 	if err != nil {
-		return nil, fmt.Errorf("read embedded engram.ts: %w", err)
+		return nil, fmt.Errorf("read embedded qbit-jay.ts: %w", err)
 	}
 
 	// Patch ENGRAM_BIN in the installed copy so the plugin can find the binary
@@ -560,7 +560,7 @@ func installOpenCode() (*Result, error) {
 	// file is not modified — it keeps the simple env-var form for development flexibility.
 	data = patchEngramBINLine(data, resolveEngramCommand())
 
-	dest := filepath.Join(dir, "engram.ts")
+	dest := filepath.Join(dir, "qbit-jay.ts")
 	if err := openCodeWriteFileFn(dest, data, 0644); err != nil {
 		return nil, fmt.Errorf("write %s: %w", dest, err)
 	}
@@ -1703,7 +1703,7 @@ func installCodex() (*Result, error) {
 
 	// The additive memory protocol requires the plugin hooks. Files already
 	// written remain available for manual recovery if activation fails.
-	const pluginRecovery = "MCP config and instruction files were written, but the Engram plugin was not installed. Ensure codex is in PATH, then run:\n  codex plugin marketplace add " + codexMarketplace + " --ref main\n  codex plugin add engram@engram"
+	const pluginRecovery = "MCP config and instruction files were written, but the qbit-jay plugin was not installed (it comes from github.com/qbitdevz/qbit-jay, branch main, which must be reachable and carry the qbit-jay Codex marketplace). Ensure codex is in PATH, then run:\n  codex plugin marketplace add " + codexMarketplace + " --ref main\n  codex plugin add qbit-jay@qbit-jay"
 	codexBin, err := lookPathFn("codex")
 	if err != nil {
 		return nil, fmt.Errorf("codex CLI not found in PATH: %w; %s", err, pluginRecovery)
@@ -1717,7 +1717,7 @@ func installCodex() (*Result, error) {
 	}
 
 	// Step 2: install the plugin (idempotent — tolerate "already" in output).
-	pluginOut, err := runCommand(codexBin, "plugin", "add", "engram@engram")
+	pluginOut, err := runCommand(codexBin, "plugin", "add", "qbit-jay@qbit-jay")
 	pluginOutputStr := strings.TrimSpace(string(pluginOut))
 	if err != nil && !strings.Contains(strings.ToLower(pluginOutputStr), "already") {
 		return nil, fmt.Errorf("codex plugin add failed: %w (output: %s); %s", err, pluginOutputStr, pluginRecovery)

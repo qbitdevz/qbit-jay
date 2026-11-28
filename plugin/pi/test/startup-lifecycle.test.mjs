@@ -352,7 +352,7 @@ for (const mismatch of [false, true]) {
     try {
       for (const key of Object.keys(process.env)) if (key.startsWith("ENGRAM_") || key.startsWith("GENTLE_")) delete process.env[key];
       delete process.env.NODE_OPTIONS;
-      const binary = join(dir, process.platform === "win32" ? "engram.exe" : "engram");
+      const binary = join(dir, process.platform === "win32" ? "qbit-jay.exe" : "qbit-jay");
       await copyFile(sourceBinary, binary);
       await chmod(binary, 0o755);
       process.env.PATH = `${dir}${delimiter}${saved.PATH ?? ""}`;
@@ -1026,7 +1026,7 @@ test("a pre-rc.11 binary surfaces the upgrade guidance instead of a generic iden
 
     assert.equal(result.isError, true);
     assert.match(result.content[0].text, /does not support "instance-id" and predates v2\.0\.0-rc\.11/);
-    assert.match(result.content[0].text, /Upgrade the binary, or point ENGRAM_BIN at the current one/);
+    assert.match(result.content[0].text, /Upgrade the binary, or point QBIT_JAY_BIN at the current one/);
   });
 });
 

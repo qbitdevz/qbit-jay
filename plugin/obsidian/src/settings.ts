@@ -4,13 +4,13 @@ import type EngramBrainPlugin from "./main";
 // ─── Settings Interface ────────────────────────────────────────────────────────
 
 export interface EngramSettings {
-	/** Base URL of the Engram server. Default: http://127.0.0.1:7437 */
+	/** Base URL of the qbit-jay server. Default: http://127.0.0.1:7437 */
 	engramUrl: string;
 	/** Auto-sync interval in minutes. 0 = manual only. */
 	autoSyncMinutes: number;
 	/** Project name filter. Empty string = sync all projects. */
 	projectFilter: string;
-	/** Vault subfolder where notes are written. Default: "engram". */
+	/** Vault subfolder where notes are written. Default: "qbit-jay". */
 	vaultSubfolder: string;
 	/** ISO timestamp of the last successful sync. Empty = never synced. */
 	lastSyncAt: string;
@@ -22,7 +22,7 @@ export const DEFAULT_SETTINGS: EngramSettings = {
 	engramUrl: "http://127.0.0.1:7437",
 	autoSyncMinutes: 0,
 	projectFilter: "",
-	vaultSubfolder: "engram",
+	vaultSubfolder: "qbit-jay",
 	lastSyncAt: "",
 	lastSyncCount: 0,
 };
@@ -41,17 +41,17 @@ export class EngramSettingTab extends PluginSettingTab {
 		const { containerEl } = this;
 		containerEl.empty();
 
-		containerEl.createEl("h2", { text: "Engram Brain" });
+		containerEl.createEl("h2", { text: "qbit-jay" });
 		containerEl.createEl("p", {
-			text: "Sync your Engram persistent memory into this vault as interconnected markdown notes.",
+			text: "Sync your qbit-jay persistent memory into this vault as interconnected markdown notes.",
 			cls: "setting-item-description",
 		});
 
 		// ── Engram URL ──────────────────────────────────────────────────────────
 		new Setting(containerEl)
-			.setName("Engram URL")
+			.setName("qbit-jay URL")
 			.setDesc(
-				"Base URL of the running Engram server. Must be reachable from Obsidian."
+				"Base URL of the running qbit-jay server. Must be reachable from Obsidian."
 			)
 			.addText((text) => {
 				text
@@ -66,11 +66,11 @@ export class EngramSettingTab extends PluginSettingTab {
 			.addButton((button) => {
 				button
 					.setButtonText("Test Connection")
-					.setTooltip("Verify the Engram server is reachable")
+					.setTooltip("Verify the qbit-jay server is reachable")
 					.onClick(async () => {
 						const url = this.plugin.settings.engramUrl.trim();
 						if (!url) {
-							new Notice("Engram URL is required");
+							new Notice("qbit-jay URL is required");
 							return;
 						}
 						try {
@@ -78,7 +78,7 @@ export class EngramSettingTab extends PluginSettingTab {
 								signal: AbortSignal.timeout(3000),
 							});
 							if (res.ok) {
-								new Notice("✓ Connected to Engram server");
+								new Notice("✓ Connected to qbit-jay server");
 							} else {
 								new Notice(
 									`Connection failed: server returned ${res.status}`
@@ -86,7 +86,7 @@ export class EngramSettingTab extends PluginSettingTab {
 							}
 						} catch {
 							new Notice(
-								"Sync failed: could not reach engram server"
+								"Sync failed: could not reach qbit-jay server"
 							);
 						}
 					});
@@ -123,7 +123,7 @@ export class EngramSettingTab extends PluginSettingTab {
 			)
 			.addText((text) => {
 				text
-					.setPlaceholder("e.g. engram or my-project")
+					.setPlaceholder("e.g. qbit-jay or my-project")
 					.setValue(this.plugin.settings.projectFilter)
 					.onChange(async (value) => {
 						this.plugin.settings.projectFilter = value.trim();
@@ -135,14 +135,14 @@ export class EngramSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Vault subfolder")
 			.setDesc(
-				"Folder inside this vault where Engram notes are written. Never touches files outside this folder."
+				"Folder inside this vault where qbit-jay notes are written. Never touches files outside this folder."
 			)
 			.addText((text) => {
 				text
-					.setPlaceholder("engram")
+					.setPlaceholder("qbit-jay")
 					.setValue(this.plugin.settings.vaultSubfolder)
 					.onChange(async (value) => {
-						const folder = value.trim() || "engram";
+						const folder = value.trim() || "qbit-jay";
 						this.plugin.settings.vaultSubfolder = folder;
 						await this.plugin.saveSettings();
 					});
@@ -158,7 +158,7 @@ export class EngramSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName("Sync now")
-			.setDesc("Manually trigger a sync with the Engram server.")
+			.setDesc("Manually trigger a sync with the qbit-jay server.")
 			.addButton((button) => {
 				button
 					.setButtonText("Sync")

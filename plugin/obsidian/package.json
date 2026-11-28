@@ -1,7 +1,7 @@
 {
-  "name": "engram-brain",
+  "name": "qbit-jay-obsidian",
   "version": "1.0.0",
-  "description": "Obsidian plugin to sync Engram persistent memory into your vault",
+  "description": "Obsidian plugin to sync qbit-jay persistent memory into your vault",
   "main": "main.js",
   "private": true,
   "files": [
@@ -16,7 +16,7 @@
     "dev": "node esbuild.config.mjs --watch",
     "test": "node --test test/*.test.mjs"
   },
-  "keywords": ["obsidian-plugin", "engram", "memory", "ai"],
+  "keywords": ["obsidian-plugin", "qbit-jay", "memory", "ai"],
   "license": "MIT",
   "devDependencies": {
     "@types/node": "^20.0.0",

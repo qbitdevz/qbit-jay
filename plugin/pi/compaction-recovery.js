@@ -60,7 +60,7 @@ export function extractCompactedSummary(event) {
 export function recoveryInstruction(project) {
   return (
     `CRITICAL INSTRUCTION FOR COMPACTED SUMMARY:\n` +
-    `The agent has access to Engram persistent memory via MCP tools when gentle-engram and the Engram MCP tools are installed and active.\n` +
+    `The agent has access to Engram persistent memory via MCP tools when qbit-jay and the Engram MCP tools are installed and active.\n` +
     `FIRST ACTION REQUIRED: Call mem_session_summary with the content of this compacted summary. ` +
     `Use project: '${project}'. This preserves what was accomplished before compaction. Do this BEFORE any other work.\n` +
     `If mem_session_summary is unavailable, manually save this compacted summary once Engram tools are available.`
@@ -69,7 +69,7 @@ export function recoveryInstruction(project) {
 
 function persistedAcknowledgement(project) {
   return (
-    `Compaction recovery summary was already saved to Engram (${project}) by gentle-engram. ` +
+    `Compaction recovery summary was already saved to Engram (${project}) by qbit-jay. ` +
     `No manual mem_session_summary call is needed for this compaction. ` +
     `Call mem_context if you need additional recent project memory.`
   );
@@ -86,7 +86,7 @@ function unknownArchiveInstruction(project) {
 function unavailableRecoveryInstruction() {
   return (
     "CRITICAL INSTRUCTION FOR COMPACTED SUMMARY:\n" +
-    "gentle-engram could not safely confirm the runtime session and project, so it did not archive the summary. " +
+    "qbit-jay could not safely confirm the runtime session and project, so it did not archive the summary. " +
     "Before saving manually, verify the active Engram session and project with mem_current_project or mem_doctor. " +
     "Save the summary once only after that verification."
   );

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Engram — Shared helpers for Codex hooks
+# qbit-jay — Shared helpers for Codex hooks
 # WARNING: Do not read from stdin here — scripts source this before reading their hook input.
 
 engram_health_matches_instance() {
@@ -32,7 +32,7 @@ resolve_project() {
 # Only native dispatch uses the original URL intent; curl keeps its transport URL.
 # Unsnapshotted callers retain their existing environment contract.
 engram_native_hook() {
-  ENGRAM_URL="${ENGRAM_NATIVE_URL-${ENGRAM_URL:-}}" ENGRAM_HOOK_OUTPUT=json engram hook "$@"
+  QBIT_JAY_URL="${ENGRAM_NATIVE_URL-${ENGRAM_URL:-}}" ENGRAM_URL="${ENGRAM_NATIVE_URL-${ENGRAM_URL:-}}" ENGRAM_HOOK_OUTPUT=json qbit-jay hook "$@"
 }
 
 # Transport the server-confirmed runtime identity; never choose a session here.

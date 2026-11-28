@@ -10,7 +10,7 @@ function Write-EmptyHookResponse {
 function Write-HookDiagnostic {
     param([string]$Message)
 
-    [Console]::Error.WriteLine("engram: $Message")
+    [Console]::Error.WriteLine("qbit-jay: $Message")
 }
 
 function Resolve-EngramProject {
@@ -74,6 +74,9 @@ try {
         }
 
         if (-not [string]::IsNullOrEmpty($output)) {
+            if (-not [string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable('QBIT_JAY_PORT'))) {
+                [Environment]::SetEnvironmentVariable('ENGRAM_PORT', [Environment]::GetEnvironmentVariable('QBIT_JAY_PORT'))
+            }
             $portText = [Environment]::GetEnvironmentVariable('ENGRAM_PORT')
             if ([string]::IsNullOrWhiteSpace($portText)) {
                 $portText = '7437'

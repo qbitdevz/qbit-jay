@@ -1,11 +1,11 @@
 {
-  "name": "engram",
+  "name": "qbit-jay",
   "interface": {
-    "displayName": "Engram Persistent Memory"
+    "displayName": "qbit-jay Persistent Memory"
   },
   "plugins": [
     {
-      "name": "engram",
+      "name": "qbit-jay",
       "source": {
         "source": "local",
         "path": "./plugin/codex"

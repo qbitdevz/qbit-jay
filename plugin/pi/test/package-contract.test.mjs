@@ -8,7 +8,7 @@ import { fileURLToPath } from "node:url";
 
 // Regression test for https://github.com/Gentleman-Programming/engram/issues/853
 //
-// gentle-engram runs inside pi and only ever imports `Text` from
+// qbit-jay runs inside pi and only ever imports `Text` from
 // @earendil-works/pi-tui, yet declared it as a hard `^0.74.0` dependency. That gave
 // npm a legal reason to hoist pi-tui 0.74.x to the root of `~/.pi/agent/npm` over the
 // `^0.84.x` range declared by the installed pi-coding-agent, crashing every pi child
@@ -158,7 +158,7 @@ test("the peer declaration stays justified by actual pi-tui usage", () => {
 	);
 });
 
-test("pi-engram init adds the current package and help names its install command", () => {
+test("pi-qbit-jay init adds the current package and help names its install command", () => {
 	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
 	try {
 		const output = runCli(agentDir, "init");
@@ -170,7 +170,7 @@ test("pi-engram init adds the current package and help names its install command
 	}
 });
 
-test("pi-engram init does not register Engram MCP on a fresh profile", () => {
+test("pi-qbit-jay init does not register Engram MCP on a fresh profile", () => {
 	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
 	try {
 		const output = runCli(agentDir, "init", "--force");
@@ -188,7 +188,7 @@ test("pi-engram init does not register Engram MCP on a fresh profile", () => {
 
 // Pi >= 0.99.0 ships built-in MCP; an installed pi-mcp-adapter replaces it, so init
 // must never add the adapter. An existing entry is left alone for the user to manage.
-test("pi-engram init does not add pi-mcp-adapter and keeps an existing entry", () => {
+test("pi-qbit-jay init does not add pi-mcp-adapter and keeps an existing entry", () => {
 	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
 	try {
 		const output = runCli(agentDir, "init");
@@ -203,8 +203,8 @@ test("pi-engram init does not add pi-mcp-adapter and keeps an existing entry", (
 	}
 });
 
-test("published legacy Pi MCP template retains its opt-in launcher and ENGRAM_BIN fallback", () => {
-	const server = mcpTemplate.mcpServers.engram;
+test("Pi MCP template retains its opt-in launcher, QBIT_JAY_BIN first and the ENGRAM_BIN fallback", () => {
+	const server = mcpTemplate.mcpServers["qbit-jay"];
 	assert.deepEqual(
 		{ command: server.command, lifecycle: server.lifecycle, directTools: server.directTools },
 		{ command: "node", lifecycle: "lazy", directTools: false },
@@ -215,21 +215,23 @@ test("published legacy Pi MCP template retains its opt-in launcher and ENGRAM_BI
 
 	const launcherPrefix = server.args[1].slice(0, server.args[1].indexOf("const child = spawn"));
 	assert.notEqual(launcherPrefix, server.args[1], "launcher must select a binary before spawning it");
-	const selectBin = (engramBin) => Function("require", "process", `${launcherPrefix}; return bin;`)(
+	const selectBin = (env) => Function("require", "process", `${launcherPrefix}; return bin;`)(
 		(moduleName) => {
 			assert.equal(moduleName, "node:child_process");
 			return { spawn() {} };
 		},
-		{ env: engramBin === undefined ? {} : { ENGRAM_BIN: engramBin } },
+		{ env },
 	);
 
-	assert.equal(selectBin(undefined), "engram", "an absent ENGRAM_BIN falls back to engram");
-	assert.equal(selectBin(""), "engram", "an empty ENGRAM_BIN falls back to engram");
-	assert.equal(selectBin(" \t "), "engram", "a whitespace-only ENGRAM_BIN falls back to engram");
-	assert.equal(selectBin("  /custom/engram  "), "  /custom/engram  ", "a nonblank ENGRAM_BIN is preserved exactly");
+	assert.equal(selectBin({}), "qbit-jay", "absent binary variables fall back to qbit-jay");
+	assert.equal(selectBin({ ENGRAM_BIN: "" }), "qbit-jay", "an empty ENGRAM_BIN falls back to qbit-jay");
+	assert.equal(selectBin({ ENGRAM_BIN: " \t " }), "qbit-jay", "a whitespace-only ENGRAM_BIN falls back to qbit-jay");
+	assert.equal(selectBin({ ENGRAM_BIN: "  /custom/bin  " }), "  /custom/bin  ", "a nonblank ENGRAM_BIN is preserved exactly");
+	assert.equal(selectBin({ QBIT_JAY_BIN: "/qj", ENGRAM_BIN: "/legacy" }), "/qj", "QBIT_JAY_BIN wins over ENGRAM_BIN");
+	assert.equal(selectBin({ QBIT_JAY_BIN: " ", ENGRAM_BIN: "/legacy" }), "/legacy", "a blank QBIT_JAY_BIN does not mask ENGRAM_BIN");
 });
 
-test("pi-engram init replaces legacy package entries without disturbing other packages", () => {
+test("pi-qbit-jay init replaces legacy package entries without disturbing other packages", () => {
 	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
 	try {
 		writeFileSync(
@@ -263,7 +265,7 @@ test("pi-engram init replaces legacy package entries without disturbing other pa
 });
 
 for (const previousVersion of ["0.1.5", "0.1.6", "0.1.7", "0.1.13", "0.2.0", "0.3.0", "0.4.0", "0.4.1", "0.4.2", "0.5.0", "0.5.1", "0.6.0", "0.7.0", "0.7.1"]) {
-test(`pi-engram init upgrades ${previousVersion} without changing unrelated config and remains idempotent`, () => {
+test(`pi-qbit-jay init upgrades ${previousVersion} without changing unrelated config and remains idempotent`, () => {
 	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-upgrade-"));
 	try {
 		const settingsPath = join(agentDir, "settings.json");
@@ -282,8 +284,8 @@ test(`pi-engram init upgrades ${previousVersion} without changing unrelated conf
 			assert.equal(result.stdout, [
 				`Pi agent dir: ${agentDir}`,
 				`${action} npm:gentle-engram@0.8.0 in settings.json`,
-				"Pi-native mem_* tools own agent writes; no Engram MCP registration is created.",
-				"Set ENGRAM_URL for an existing engram serve instance, or ENGRAM_BIN for a custom engram binary path.",
+				"Pi-native mem_* tools own agent writes; no qbit-jay MCP registration is created.",
+				"Set QBIT_JAY_URL for an existing qbit-jay serve instance, or QBIT_JAY_BIN for a custom qbit-jay binary path (ENGRAM_URL and ENGRAM_BIN still work).",
 				"",
 			].join("\n"));
 			assert.deepEqual(JSON.parse(readFileSync(settingsPath, "utf8")), {

@@ -162,7 +162,7 @@ func TestCodexSubagentStopConfirmedIdentity(t *testing.T) {
 					exit = 1
 				}
 				stub := "#!/bin/bash -p\nprintf '%s' " + codexIntentQuote(tc.confirmation) + fmt.Sprintf("\nexit %d\n", exit)
-				if err := os.WriteFile(filepath.Join(root, "bin", "engram"), []byte(stub), 0700); err != nil {
+				if err := os.WriteFile(filepath.Join(root, "bin", "qbit-jay"), []byte(stub), 0700); err != nil {
 					t.Fatal(err)
 				}
 			}

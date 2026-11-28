@@ -292,7 +292,7 @@ case "$*" in
     exit 1
   fi
   printf "unsupported local compaction\n" >> "$INTENT_CALLS"
-  printf "usage: engram hook codex-pre-tool-use|codex-user-prompt-submit\n" >&2
+  printf "usage: qbit-jay hook codex-pre-tool-use|codex-user-prompt-submit\n" >&2
   exit 1 ;;
  "hook codex-register"|"hook codex-resolve")
   [ "$#" = 2 ] && [ "${ENGRAM_HOOK_OUTPUT:-}" = json ] || reject
@@ -301,7 +301,7 @@ case "$*" in
   printf "%s" "${ENGRAM_URL:-}" > "$INTENT_MARKER"
   printf '\''{"session_id":"intent-host"}\n'\'' ;;
  *) reject ;;
-esac' > "$root/bin/engram"
+esac' > "$root/bin/qbit-jay"
 printf '#!%s -p\n%s\n' "$bash_alias" '
 reject() { printf "curl\n" >> "$INTENT_REJECTED"; exit 97; }
 [ "$#" = 4 ] && [ "$1" = -sf ] && [ "$3" = --max-time ] || reject
@@ -313,14 +313,14 @@ case "$2" in
 esac
 printf "curl %s\n" "$route" >> "$INTENT_CALLS"
 printf "%s" "$body"' > "$root/bin/curl"
-"$chmod" 0700 "$root/bin/cat" "$root/bin/dirname" "$root/bin/jq" "$root/bin/engram" "$root/bin/curl"
+"$chmod" 0700 "$root/bin/cat" "$root/bin/dirname" "$root/bin/jq" "$root/bin/qbit-jay" "$root/bin/curl"
 export PATH="$root/bin"
 hash -r
 # This identical guard precedes both preflight and every public hook invocation.
-for name in engram curl cat dirname jq; do
+for name in qbit-jay curl cat dirname jq; do
  [ "$(type -t "$name")" = file ] && [ "$(command -v "$name")" = "$root/bin/$name" ] || exit 92
 done
-if command -v engram.exe >/dev/null || command -v curl.exe >/dev/null; then exit 93; fi
+if command -v qbit-jay.exe >/dev/null || command -v curl.exe >/dev/null; then exit 93; fi
 # Prove the private working directory and the actual hook cwd before any hook.
 cwd_fs=$(convert "$INTENT_RAW_CWD")
 [ . -ef "$root" ] && [ "$cwd_fs" -ef "$root" ] || exit 98
@@ -328,11 +328,11 @@ cwd_fs=$(convert "$INTENT_RAW_CWD")
 [ ! -f "$INTENT_RAW_CWD/.engram/manifest.json" ] || exit 98
 case "$1" in
  preflight)
-  [ "$(engram instance-id)" = fixture-instance ] || exit 94
+  [ "$(qbit-jay instance-id)" = fixture-instance ] || exit 94
   [ "$(curl -sf http://127.0.0.1:19437/health --max-time 1)" = '{"instance_id":"fixture-instance"}' ] || exit 94
-  result=$(ENGRAM_HOOK_OUTPUT=json engram hook codex-register < "$root/input.json")
+  result=$(ENGRAM_HOOK_OUTPUT=json qbit-jay hook codex-register < "$root/input.json")
   [ "$result" = '{"session_id":"intent-host"}' ] || exit 94
-  if engram serve; then exit 95; else [ "$?" = 97 ] || exit 95; fi
+  if qbit-jay serve; then exit 95; else [ "$?" = 97 ] || exit 95; fi
   if curl -sf https://example.invalid --max-time 1; then exit 95; else [ "$?" = 97 ] || exit 95; fi
   [ "$(< "$INTENT_REJECTED")" = $'engram\ncurl' ] || exit 95
   printf 'isolation-preflight-ok\n' ;;

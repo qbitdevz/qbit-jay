@@ -79,7 +79,7 @@ For maintainers, distinguish these ownership paths:
 
 - `internal/setup/setup.go` maintains `memoryProtocolMarkdown` independently. Setup uses that embedded text for installed agent instructions; it is not generated from DOCS.md. Compare behavior when editing either prose surface.
 - `skills/memory-protocol/SKILL.md` is a manually maintained contributor skill. `plugin/claude-code/skills/memory/SKILL.md` and `plugin/codex/skills/memory/SKILL.md` are host-adapted, manually maintained skills. Consider their relevant instructions alongside the canonical prose rather than assuming byte identity or automatic sync.
-- `plugin/opencode/engram.ts` contains OpenCode's agent instructions. Its verified generated copy is `internal/setup/plugins/opencode/engram.ts`: `go generate ./internal/setup/` copies source to embedded destination, and `TestEmbeddedOpenCodePluginMatchesSourceByteForByte` checks equality. This generation direction applies to the OpenCode plugin copy, not the other prose and skill surfaces above.
+- `plugin/opencode/qbit-jay.ts` contains OpenCode's agent instructions. Its verified generated copy is `internal/setup/plugins/opencode/qbit-jay.ts`: `go generate ./internal/setup/` copies source to embedded destination, and `TestEmbeddedOpenCodePluginMatchesSourceByteForByte` checks equality. This generation direction applies to the OpenCode plugin copy, not the other prose and skill surfaces above.
 
 ### Documentation surface catalog
 
@@ -125,7 +125,7 @@ This catalog covers the tracked Markdown documentation surfaces. **Owner `GP`** 
 | [skills/catalog.md](skills/catalog.md) | Contributor agents | Instruction: skill index | Living | GP |
 | [skills/*/SKILL.md](skills/) | Contributor agents | Instruction: domain skills | Living | GP |
 
-The memory protocol's canonical prose is [Memory Protocol](#memory-protocol-full-text); `internal/setup/setup.go` independently maintains `memoryProtocolMarkdown` for installed generated instructions. Claude and Codex plugin skill files above are manually maintained. OpenCode's source `plugin/opencode/engram.ts` has a verified generated embedded copy at `internal/setup/plugins/opencode/engram.ts`; neither is a separate Markdown catalog entry. Historical OpenSpec/SDD changes are transient, non-shipped records, not evidence of current behavior.
+The memory protocol's canonical prose is [Memory Protocol](#memory-protocol-full-text); `internal/setup/setup.go` independently maintains `memoryProtocolMarkdown` for installed generated instructions. Claude and Codex plugin skill files above are manually maintained. OpenCode's source `plugin/opencode/qbit-jay.ts` has a verified generated embedded copy at `internal/setup/plugins/opencode/qbit-jay.ts`; neither is a separate Markdown catalog entry. Historical OpenSpec/SDD changes are transient, non-shipped records, not evidence of current behavior.
 
 ---
 

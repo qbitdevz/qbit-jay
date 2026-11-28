@@ -81,8 +81,8 @@ func TestPluginAssetsDoNotLeakSpanishTriggers(t *testing.T) {
 
 func TestOpenCodeEmbeddedAssetMatchesCanonicalSource(t *testing.T) {
 	root := repoRoot(t)
-	canonicalPath := filepath.Join(root, "plugin", "opencode", "engram.ts")
-	embeddedPath := filepath.Join(root, "internal", "setup", "plugins", "opencode", "engram.ts")
+	canonicalPath := filepath.Join(root, "plugin", "opencode", "qbit-jay.ts")
+	embeddedPath := filepath.Join(root, "internal", "setup", "plugins", "opencode", "qbit-jay.ts")
 
 	canonical, err := os.ReadFile(canonicalPath)
 	if err != nil {
