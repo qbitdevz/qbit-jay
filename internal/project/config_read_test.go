@@ -63,7 +63,7 @@ func TestConfigReadDiagnosticControls(t *testing.T) {
 					t.Fatalf("missing config must permit existing fallback: found=%v result=%+v", found, res)
 				}
 			case tc.invalid:
-				if !found || res.Project != "" || !errors.Is(res.Error, ErrInvalidConfig) || !strings.HasPrefix(res.Error.Error(), "invalid .engram/config.json") {
+				if !found || res.Project != "" || !errors.Is(res.Error, ErrInvalidConfig) || !strings.HasPrefix(res.Error.Error(), "invalid .qbit-jay/config.json") {
 					t.Fatalf("invalid content classification changed: found=%v result=%+v", found, res)
 				}
 			default:

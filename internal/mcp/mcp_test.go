@@ -1385,12 +1385,12 @@ func TestOmittedSessionIDRejectsAmbiguousActiveSessions(t *testing.T) {
 				t.Fatal("expected ambiguous omitted session_id to fail")
 			}
 			got := callResultText(t, res)
-			for _, want := range []string{"multiple active runtime sessions", "provide session_id", "end other active matching sessions", "engram save", `resolved project is "engram"`, "pass that exact name as the --project value", "never invent another", "writes to an independent project manual-save session and does not bind it to this MCP session"} {
+			for _, want := range []string{"multiple active runtime sessions", "provide session_id", "end other active matching sessions", "qbit-jay save", `resolved project is "engram"`, "pass that exact name as the --project value", "never invent another", "writes to an independent project manual-save session and does not bind it to this MCP session"} {
 				if !strings.Contains(got, want) {
 					t.Fatalf("expected actionable ambiguity error containing %q, got %q", want, got)
 				}
 			}
-			for _, forbidden := range []string{"--project PROJECT", `engram save "TITLE" "CONTENT"`, `--project "engram"`} {
+			for _, forbidden := range []string{"--project PROJECT", `qbit-jay save "TITLE" "CONTENT"`, `--project "engram"`} {
 				if strings.Contains(got, forbidden) {
 					t.Fatalf("ambiguity error must not contain a copyable project command template %q: %q", forbidden, got)
 				}
@@ -1437,7 +1437,7 @@ func TestAmbiguousSessionGuidanceTreatsResolvedProjectAsData(t *testing.T) {
 			t.Fatalf("expected project data guidance containing %q, got %q", want, got)
 		}
 	}
-	for _, forbidden := range []string{`--project "$(command)"`, `engram save "TITLE" "CONTENT"`} {
+	for _, forbidden := range []string{`--project "$(command)"`, `qbit-jay save "TITLE" "CONTENT"`} {
 		if strings.Contains(got, forbidden) {
 			t.Fatalf("dangerous project value must not appear in a copyable command template %q: %q", forbidden, got)
 		}
@@ -5165,7 +5165,7 @@ func TestSessionEndFailsClosedWhenRepositoryBindingUnavailable(t *testing.T) {
 		t.Fatalf("expected repository binding failure, got %q", callResultText(t, res))
 	}
 	body := callResultJSON(t, res)
-	if body["error_code"] != "repository_binding_unavailable" || !strings.Contains(body["message"].(string), project.ErrRepositoryBinding.Error()) || !strings.Contains(body["message"].(string), "Configure the repository's .engram/config.json with the intended canonical project.") {
+	if body["error_code"] != "repository_binding_unavailable" || !strings.Contains(body["message"].(string), project.ErrRepositoryBinding.Error()) || !strings.Contains(body["message"].(string), "Configure the repository's .qbit-jay/config.json with the intended canonical project.") {
 		t.Fatalf("expected repository binding error response, got %v", body)
 	}
 	if _, ok := body["recovery_token"]; ok {
@@ -8520,7 +8520,7 @@ func TestWriteProjectErrorResultClassifiesDetectionErrors(t *testing.T) {
 			name:     "repository binding",
 			err:      fmt.Errorf("%w: binding is invalid", project.ErrRepositoryBinding),
 			wantCode: "repository_binding_unavailable",
-			wantHint: "Configure the repository's .engram/config.json with the intended canonical project.",
+			wantHint: "Configure the repository's .qbit-jay/config.json with the intended canonical project.",
 		},
 	}
 

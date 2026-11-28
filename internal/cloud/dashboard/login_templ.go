@@ -10,7 +10,7 @@ import templruntime "github.com/a-h/templ/runtime"
 
 // LoginPage renders the standalone login page (no layout wrapper).
 // ADAPTED: added next string parameter for post-login redirect; token-only form
-// (integrated dashboard uses ENGRAM_CLOUD_TOKEN, not user/password credentials).
+// (integrated dashboard uses QBIT_JAY_CLOUD_TOKEN, not user/password credentials).
 // version is the optional, display-ready build identifier rendered verbatim
 // (e.g. "v1.20.3" for a semver build, "dev" for an un-versioned local build).
 // Empty version displays "version unknown", as in the dashboard layout.
@@ -35,66 +35,74 @@ func LoginPage(errorMsg string, next string, version string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" data-theme=\"dark\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Login — Engram Cloud</title><link rel=\"stylesheet\" href=\"/dashboard/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/styles.css\"></head><body class=\"shell-body\"><div class=\"shell-backdrop\"><main class=\"login-shell\"><section class=\"login-sidepanel\"><p class=\"section-kicker\">CLOUD ACTIVE</p><h1>Engram Cloud</h1><p class=\"login-lead\">Bring Engram memory into a shared browser workspace without losing the local-first model.</p><div class=\"hero-console login-console\"><p><span class=\"console-key\">mode</span> enterprise</p><p><span class=\"console-key\">sync</span> local-first / cloud policy aware</p><p><span class=\"console-key\">surface</span> shared memory for humans + agents</p></div></section><section class=\"login-container\"><p class=\"section-kicker\">SIGN IN</p><h2>Sign In</h2><p class=\"login-copy\">Use your cloud runtime token to open a signed dashboard session.</p>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><meta name=\"color-scheme\" content=\"light dark\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/dashboard/static/qbit-jay-isotype.svg\"><title>Login — qbit-jay Cloud</title><link rel=\"stylesheet\" href=\"/dashboard/static/pico.min.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/theme.css\"><link rel=\"stylesheet\" href=\"/dashboard/static/styles.css\"></head><body class=\"shell-body\"><div class=\"shell-backdrop\"><main class=\"login-shell\"><section class=\"login-sidepanel\"><p class=\"section-kicker\">CLOUD ACTIVE</p>")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = BrandMark("login-mark brand-mark-glow").Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<h1>qbit-jay Cloud</h1><p class=\"login-lead\">Bring qbit-jay memory into a shared browser workspace without losing the local-first model.</p><div class=\"hero-console login-console\"><p><span class=\"console-key\">mode</span> enterprise</p><p><span class=\"console-key\">sync</span> local-first / cloud policy aware</p><p><span class=\"console-key\">surface</span> shared memory for humans + agents</p></div></section><section class=\"login-container\"><p class=\"section-kicker\">SIGN IN</p><h2>Sign In</h2><p class=\"login-copy\">Use your cloud runtime token to open a signed dashboard session.</p>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if errorMsg != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"login-error\" role=\"alert\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"login-error\" role=\"alert\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(errorMsg)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 38, Col: 18}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 42, Col: 18}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<form method=\"post\" action=\"/dashboard/login\" class=\"login-form\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<form method=\"post\" action=\"/dashboard/login\" class=\"login-form\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if next != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<input type=\"hidden\" name=\"next\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<input type=\"hidden\" name=\"next\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(next)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 43, Col: 53}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 47, Col: 53}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "\"> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\"> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<label>Cloud token <input type=\"password\" name=\"token\" placeholder=\"token\" required autocomplete=\"off\"></label> <button type=\"submit\" class=\"shell-button\">Sign In</button></form></section></main><div class=\"login-footer\"><small>ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<label>Cloud token <input type=\"password\" name=\"token\" placeholder=\"token\" required autocomplete=\"off\"></label> <button type=\"submit\" class=\"shell-button\">Sign In</button></form></section></main><div class=\"login-footer\"><small>QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(versionMarker(version))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 60, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `login.templ`, Line: 64, Col: 90}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</small></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</small></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

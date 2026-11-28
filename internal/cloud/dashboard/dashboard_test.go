@@ -973,7 +973,7 @@ func TestStatusRibbonAndFooterPresent(t *testing.T) {
 		"status-ribbon",
 		"status-pill",
 		"CLOUD ACTIVE",
-		"ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
+		"QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
 	} {
 		if !strings.Contains(body, marker) {
 			t.Errorf("expected %q in body", marker)
@@ -1012,7 +1012,7 @@ func TestLoginPageTokenFormAndCopy(t *testing.T) {
 	body := rec.Body.String()
 	for _, marker := range []string{
 		`name="token"`,
-		"Engram Cloud",
+		"qbit-jay Cloud",
 		"CLOUD ACTIVE",
 		`name="next"`,
 	} {
@@ -1269,7 +1269,7 @@ func TestMountRouteParityAndHTTPFallbacks(t *testing.T) {
 		for _, token := range []string{
 			"shell-body",
 			"shell-main",
-			"Welcome to Engram Cloud",
+			"Welcome to qbit-jay Cloud",
 		} {
 			if !strings.Contains(body, token) {
 				t.Fatalf("expected mounted /dashboard route to include %q, body=%q", token, body)
@@ -1752,7 +1752,7 @@ func TestCopyParityStrings(t *testing.T) {
 		{"/dashboard/projects?auth=ok", "PROJECT ATLAS"},
 		{"/dashboard/contributors?auth=ok", "CONTRIBUTOR SIGNAL"},
 		{"/dashboard/admin?auth=ok", "ADMIN SURFACE"},
-		{"/dashboard/login", "Engram Cloud"},
+		{"/dashboard/login", "qbit-jay Cloud"},
 		{"/dashboard/login", "CLOUD ACTIVE"},
 	}
 
@@ -2605,7 +2605,7 @@ func TestDashboardStatsFullPageShowsStatusRibbon(t *testing.T) {
 	for _, marker := range []string{
 		"status-ribbon",
 		"CLOUD ACTIVE",
-		"ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
+		"QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
 	} {
 		if !strings.Contains(body, marker) {
 			t.Errorf("R5-1: expected %q in /dashboard/stats full-page body, got body=%q", marker, body[:min(len(body), 500)])
@@ -2654,7 +2654,7 @@ func TestDashboardActivityFullPageShowsStatusRibbon(t *testing.T) {
 	for _, marker := range []string{
 		"status-ribbon",
 		"CLOUD ACTIVE",
-		"ENGRAM CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
+		"QBIT-JAY CLOUD / SHARED MEMORY INDEX / LIVE SYNC READY",
 	} {
 		if !strings.Contains(body, marker) {
 			t.Errorf("R5-1: expected %q in /dashboard/activity full-page body, got body=%q", marker, body[:min(len(body), 500)])

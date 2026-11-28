@@ -1743,7 +1743,7 @@ func handleSave(s *store.Store, cfg MCPConfig, activity *SessionActivity) server
 			Content:           currentPrompt,
 			Project:           project,
 		}); promptErr != nil {
-			fmt.Fprintf(os.Stderr, "engram: auto prompt capture error (non-fatal): %v\n", promptErr)
+			fmt.Fprintf(os.Stderr, "qbit-jay: auto prompt capture error (non-fatal): %v\n", promptErr)
 		}
 
 		if activity != nil {
@@ -1784,7 +1784,7 @@ func handleSave(s *store.Store, cfg MCPConfig, activity *SessionActivity) server
 		}
 		candidates, candErr := s.FindCandidates(savedID, candOpts)
 		if candErr != nil {
-			fmt.Fprintf(os.Stderr, "engram: FindCandidates error (non-fatal): %v\n", candErr)
+			fmt.Fprintf(os.Stderr, "qbit-jay: FindCandidates error (non-fatal): %v\n", candErr)
 			extra["candidate_detection_status"] = "incomplete"
 			msg += "\nCONFLICT DETECTION INCOMPLETE — observation saved; pending relations may be partially persisted. Returned candidates include only confirmed pending judgments."
 		}
@@ -3723,7 +3723,7 @@ func writeProjectErrorResult(activity *SessionActivity, sessionID string, res pr
 	if errors.Is(err, projectpkg.ErrRepositoryBinding) {
 		return errorWithMeta(
 			"repository_binding_unavailable",
-			fmt.Sprintf("Cannot determine project: %s. Configure the repository's .engram/config.json with the intended canonical project.", err),
+			fmt.Sprintf("Cannot determine project: %s. Configure the repository's .qbit-jay/config.json with the intended canonical project.", err),
 			nil,
 		)
 	}
@@ -3793,7 +3793,7 @@ func writeProjectErrorResult(activity *SessionActivity, sessionID string, res pr
 	var unknownProjectErr *unknownProjectError
 	if errors.As(err, &unknownProjectErr) {
 		return errorWithMeta("unknown_project",
-			fmt.Sprintf("Project %q is not backed by known context. Use an existing project, a matching session, repo .engram/config.json, or ambiguous-project recovery.", unknownProjectErr.Name),
+			fmt.Sprintf("Project %q is not backed by known context. Use an existing project, a matching session, repo .qbit-jay/config.json, or ambiguous-project recovery.", unknownProjectErr.Name),
 			unknownProjectErr.AvailableProjects,
 		)
 	}
@@ -3832,7 +3832,7 @@ func readProjectErrorResult(activity *SessionActivity, res projectpkg.DetectionR
 		result = writeProjectErrorResult(activity, defaultSessionID(""), res, err)
 	}
 	if errors.Is(err, projectpkg.ErrAmbiguousProject) {
-		addErrorMetadata(result, map[string]any{"hint": "Ask the user to choose a project, then retry the same read tool with its project filter; alternatively cd into the target repo or configure repo .engram/config.json. Do not retry a write tool to recover this read."})
+		addErrorMetadata(result, map[string]any{"hint": "Ask the user to choose a project, then retry the same read tool with its project filter; alternatively cd into the target repo or configure repo .qbit-jay/config.json. Do not retry a write tool to recover this read."})
 	}
 	addErrorMetadata(result, map[string]any{
 		"project":        res.Project,
@@ -3881,13 +3881,13 @@ func errorWithMeta(code, msg string, availableProjects []string) *mcp.CallToolRe
 	}
 	switch code {
 	case "explicit_project_required":
-		envelope["hint"] = "Set ENGRAM_PROJECT or .engram/config.json project_name, or supply a supported explicit project; do not guess a folder name."
+		envelope["hint"] = "Set QBIT_JAY_PROJECT or .qbit-jay/config.json project_name (ENGRAM_PROJECT and .engram/config.json are still read), or supply a supported explicit project; do not guess a folder name."
 	case "ambiguous_project":
-		envelope["hint"] = "Ask the user to choose one of available_projects, then retry the same write tool (mem_save, mem_save_prompt, or mem_session_summary) with project and project_choice_reason=user_selected_after_ambiguous_project; alternatively cd into the target repo or add repo .engram/config.json."
+		envelope["hint"] = "Ask the user to choose one of available_projects, then retry the same write tool (mem_save, mem_save_prompt, or mem_session_summary) with project and project_choice_reason=user_selected_after_ambiguous_project; alternatively cd into the target repo or add repo .qbit-jay/config.json."
 	case "database_generation_changed":
-		envelope["hint"] = "Restart Engram and retry."
+		envelope["hint"] = "Restart qbit-jay and retry."
 	case "invalid_project_choice":
-		envelope["hint"] = "Use exactly one of available_projects after asking the user, or cd into the target repo, or add repo .engram/config.json."
+		envelope["hint"] = "Use exactly one of available_projects after asking the user, or cd into the target repo, or add repo .qbit-jay/config.json."
 	case "missing_recovery_token":
 		envelope["hint"] = "Retry with the recovery_token returned by the ambiguous_project error after the user selects one available_projects value."
 	case "invalid_recovery_token":
@@ -3895,9 +3895,9 @@ func errorWithMeta(code, msg string, availableProjects []string) *mcp.CallToolRe
 	case "unknown_project":
 		envelope["hint"] = "Use one of the available_projects values, or omit project to auto-detect."
 	case "invalid_project_config":
-		envelope["hint"] = "Fix .engram/config.json so project_name is a non-empty project name."
+		envelope["hint"] = "Fix .qbit-jay/config.json so project_name is a non-empty project name."
 	case "repository_binding_unavailable":
-		envelope["hint"] = "Configure the repository's .engram/config.json with the intended canonical project."
+		envelope["hint"] = "Configure the repository's .qbit-jay/config.json with the intended canonical project."
 	case "invalid_project":
 		envelope["hint"] = "Use a non-empty project name, not a path."
 	case "unknown_session":
@@ -3995,7 +3995,7 @@ func resolveFallbackSessionIDAtDirectory(s *store.Store, project, directory stri
 			case 1:
 				return ids[0], nil
 			default:
-				return "", fmt.Errorf("multiple active runtime sessions match the current project and directory; provide session_id, end other active matching sessions, or save independently with engram save. The resolved project is %q; pass that exact name as the --project value and never invent another. This writes to an independent project manual-save session and does not bind it to this MCP session", project)
+				return "", fmt.Errorf("multiple active runtime sessions match the current project and directory; provide session_id, end other active matching sessions, or save independently with qbit-jay save. The resolved project is %q; pass that exact name as the --project value and never invent another. This writes to an independent project manual-save session and does not bind it to this MCP session", project)
 			}
 		}
 	}

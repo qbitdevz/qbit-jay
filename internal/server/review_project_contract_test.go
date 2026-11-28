@@ -22,7 +22,7 @@ func TestReviewProjectContractUnresolvedHTTP(t *testing.T) {
 		t.Fatal(err)
 	}
 	got := homeSelectionHTTP(t, f.server, http.MethodPost, "/review/mark_reviewed?cwd="+url.QueryEscape(cwd), fmt.Sprintf(`{"id":%d}`, f.ids[0]), http.StatusConflict)
-	want := map[string]any{"code": "explicit_project_required", "error": "project resolution failed: explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name"}
+	want := map[string]any{"code": "explicit_project_required", "error": "project resolution failed: explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name"}
 	if !reflect.DeepEqual(got, want) {
 		t.Errorf("unresolved refusal: %v, want %v", got, want)
 	}

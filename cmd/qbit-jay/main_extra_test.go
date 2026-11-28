@@ -654,7 +654,7 @@ func TestCmdServeGenerationChangeStopsAutosyncAndReturnsTerminalError(t *testing
 	if _, err := opened.Stats(); err == nil {
 		t.Fatal("store not closed before return")
 	}
-	const message = "[qbit-jay] database generation changed; stopping server; restart Engram"
+	const message = "[qbit-jay] database generation changed; stopping server; restart qbit-jay"
 	if strings.Count(diagnostic.String(), message) != 1 || strings.Contains(diagnostic.String(), cfg.DataDir) {
 		t.Fatalf("unsafe or duplicate diagnostic: %q", diagnostic.String())
 	}
@@ -758,7 +758,7 @@ func TestCmdServeStickyGenerationWithoutNotification(t *testing.T) {
 				if reads != 1 || stopped != 1 {
 					t.Fatalf("accessor reads = %d, Stop calls = %d, want 1 each", reads, stopped)
 				}
-				const message = "[qbit-jay] database generation changed; stopping server; restart Engram"
+				const message = "[qbit-jay] database generation changed; stopping server; restart qbit-jay"
 				if strings.Count(diagnostic.String(), message) != count || strings.Contains(diagnostic.String(), "private") {
 					t.Fatalf("diagnostic = %q, want %d privacy-safe generation messages", diagnostic.String(), count)
 				}
@@ -834,7 +834,7 @@ func TestCmdServeResultShutdownGenerationPrecedence(t *testing.T) {
 			if !errors.Is(err, wantErr) {
 				t.Fatalf("terminal cause = %v, want %v", err, wantErr)
 			}
-			const message = "[qbit-jay] database generation changed; stopping server; restart Engram"
+			const message = "[qbit-jay] database generation changed; stopping server; restart qbit-jay"
 			if strings.Count(diagnostic.String(), message) != wantDiagnostics {
 				t.Fatalf("diagnostic = %q, want count %d", diagnostic.String(), wantDiagnostics)
 			}
@@ -912,7 +912,7 @@ func TestCmdServeSignalShutdownGenerationPrecedence(t *testing.T) {
 			if generation {
 				wantDiagnostics = 1
 			}
-			const message = "[qbit-jay] database generation changed; stopping server; restart Engram"
+			const message = "[qbit-jay] database generation changed; stopping server; restart qbit-jay"
 			if strings.Count(diagnostic.String(), message) != wantDiagnostics || strings.Contains(diagnostic.String(), cfg.DataDir) {
 				t.Fatalf("unsafe or duplicate diagnostic: %q", diagnostic.String())
 			}

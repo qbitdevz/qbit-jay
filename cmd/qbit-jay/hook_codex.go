@@ -173,7 +173,7 @@ func codexRegisterAt(ctx context.Context, client *http.Client, base, host, cwd s
 	return codexAcknowledgedID(fields, host, true)
 }
 
-const codexCoreUpgradeReason = "Engram core lacks runtime session resolution. Upgrade the core to match the CLI, then manually restart the running Engram server and start a new Codex session."
+const codexCoreUpgradeReason = "qbit-jay core lacks runtime session resolution. Upgrade the core to match the CLI, then manually restart the running qbit-jay server and start a new Codex session."
 const codexSessionNotRegisteredReason = "Codex host session is not registered; start a new Codex session to register it"
 
 func codexRuntimeAt(ctx context.Context, client *http.Client, base, host, cwd, project, operation string) string {
@@ -190,7 +190,7 @@ func codexRuntimeResult(ctx context.Context, client *http.Client, base, host, cw
 			Capabilities map[string]bool `json:"capabilities"`
 		}
 		if !codexJSON(ctx, client, http.MethodGet, base+"/health", nil, &health) || health.Status != "ok" || health.Service != "engram" {
-			return "", "Cannot confirm Engram core health response; check the server endpoint and connection"
+			return "", "Cannot confirm qbit-jay core health response; check the server endpoint and connection"
 		}
 		if !health.Capabilities["runtime_session_resolution"] {
 			return "", codexCoreUpgradeReason

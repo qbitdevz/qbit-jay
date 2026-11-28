@@ -89,6 +89,6 @@ func claudeReceiptSessionID(raw []byte, id string) string {
 
 func writeClaudeSessionContext(effective string) {
 	encoded, _ := json.Marshal(effective)
-	context := fmt.Sprintf("\n## Engram session binding\nConfirmed Engram session ID (JSON): %s\nUse this exact decoded value as session_id for Engram write/session tools that accept session_id, and as id for mem_session_start and mem_session_end. Do not add a session field to mem_review. Do not invent or reuse another session's ID. PreToolUse still confirms the current effective session before every mutation; this context can become stale. If binding changes or confirmation fails, the hook still corrects or denies the call. This does not grant permission or authorize retries.\n", encoded)
+	context := fmt.Sprintf("\n## qbit-jay session binding\nConfirmed qbit-jay session ID (JSON): %s\nUse this exact decoded value as session_id for qbit-jay write/session tools that accept session_id, and as id for mem_session_start and mem_session_end. Do not add a session field to mem_review. Do not invent or reuse another session's ID. PreToolUse still confirms the current effective session before every mutation; this context can become stale. If binding changes or confirmation fails, the hook still corrects or denies the call. This does not grant permission or authorize retries.\n", encoded)
 	_ = claudeHookOutput([]byte(context))
 }

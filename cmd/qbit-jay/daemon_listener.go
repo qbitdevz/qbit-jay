@@ -19,7 +19,7 @@ func listenerConflictForProbe(port int, probe daemon.ProbeResult) error {
 	}
 	kind := "unknown listener"
 	if probe.Status == daemon.StatusRunning && probe.Service == "engram" {
-		kind = "unmanaged Engram listener"
+		kind = "unmanaged qbit-jay listener"
 	}
 	owner := "owning PID unavailable"
 	if pid := daemon.ListenerOwnerPID(port); pid > 0 {

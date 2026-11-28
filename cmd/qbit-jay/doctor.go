@@ -104,9 +104,9 @@ func cmdDoctor(cfg store.Config) {
 			for _, item := range stale {
 				next := "qbit-jay setup " + item.Slug
 				evidence, _ := json.Marshal(item)
-				findings = append(findings, diagnostic.Finding{CheckID: "stale_mcp_command", Severity: "warning", ReasonCode: "stale_mcp_command", Message: item.Slug + " Engram MCP executable path is missing", Why: "The configured absolute command no longer exists.", Evidence: evidence, SafeNextStep: next, RequiresConfirmation: false})
+				findings = append(findings, diagnostic.Finding{CheckID: "stale_mcp_command", Severity: "warning", ReasonCode: "stale_mcp_command", Message: item.Slug + " qbit-jay MCP executable path is missing", Why: "The configured absolute command no longer exists.", Evidence: evidence, SafeNextStep: next, RequiresConfirmation: false})
 			}
-			report.Checks = append(report.Checks, diagnostic.CheckResult{CheckID: "stale_mcp_command", Result: "warning", Severity: "warning", ReasonCode: "stale_mcp_command", Message: "Generic MCP registrations reference missing Engram binaries.", Why: "A configured absolute command no longer exists.", SafeNextStep: "Run qbit-jay setup <slug> for each affected client.", Findings: findings})
+			report.Checks = append(report.Checks, diagnostic.CheckResult{CheckID: "stale_mcp_command", Result: "warning", Severity: "warning", ReasonCode: "stale_mcp_command", Message: "Generic MCP registrations reference missing qbit-jay binaries.", Why: "A configured absolute command no longer exists.", SafeNextStep: "Run qbit-jay setup <slug> for each affected client.", Findings: findings})
 			report.Summary.Total++
 			report.Summary.Warnings++
 			if report.Status == "ok" {
@@ -360,7 +360,7 @@ func writeDoctorJSON(report diagnostic.Report) {
 }
 
 func renderDoctorText(report diagnostic.Report) {
-	fmt.Printf("Engram Doctor: %s\n", report.Status)
+	fmt.Printf("qbit-jay Doctor: %s\n", report.Status)
 	if report.Project != "" {
 		fmt.Printf("Project: %s\n", report.Project)
 	}

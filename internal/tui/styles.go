@@ -1,23 +1,39 @@
 package tui
 
-import "github.com/charmbracelet/lipgloss"
+import (
+	"github.com/charmbracelet/lipgloss"
 
-// ─── Colors (Engram Elephant palette) ─────────────────────────────────────────
+	"github.com/qbitdevz/qbit-jay/internal/qbit/theme"
+)
+
+// ─── Colors (qbit-jay theme) ──────────────────────────────────────────────────
+//
+// Every colour comes from internal/qbit/theme (S14) as an adaptive pair: the
+// dark tokens on dark terminals, the light tokens on light ones. The variable
+// names are upstream's, kept so view.go and update.go stay close to upstream;
+// read each one by its role in the comment, not by its old hue.
 
 var (
-	colorBase     = lipgloss.Color("#191724") // Deep purple/black base
-	colorSurface  = lipgloss.Color("#1f1d2e") // Slightly lighter panel bg
-	colorOverlay  = lipgloss.Color("#6e6a86") // Muted purple borders
-	colorText     = lipgloss.Color("#e0def4") // Light lavender text
-	colorSubtext  = lipgloss.Color("#908caa") // Dim lavender
-	colorLavender = lipgloss.Color("#c4a7e7") // Primary brand purple
-	colorGreen    = lipgloss.Color("#9ccfd8") // Cyan/Teal for "success" (matches lightning)
-	colorPeach    = lipgloss.Color("#f6c177") // Warm accent
-	colorRed      = lipgloss.Color("#eb6f92") // Soft red
-	colorBlue     = lipgloss.Color("#31748f") // Deep cyan
-	colorMauve    = lipgloss.Color("#ebbcba") // Soft pink/mauve
-	colorYellow   = lipgloss.Color("#f1ca93") // Gold
-	colorTeal     = lipgloss.Color("#9ccfd8") // Bright Cyan (Lightning)
+	colorBase     = theme.Bg.Adaptive()         // App background
+	colorOverlay  = borderColor                 // Borders and connectors
+	colorText     = theme.Ink.Adaptive()        // Primary text
+	colorSubtext  = theme.Muted.Adaptive()      // Secondary text
+	colorLavender = theme.AccentText.Adaptive() // Primary accent: headers, selection, focus
+	colorGreen    = theme.Success.Adaptive()    // Success and stat numbers
+	colorPeach    = theme.Warn.Adaptive()       // Acorn: type badges
+	colorRed      = theme.Error.Adaptive()      // Errors
+	colorBlue     = theme.Sky.Adaptive()        // Identifiers
+	colorMauve    = sectionColor                // Section titles
+	colorYellow   = theme.Warn.Adaptive()       // Acorn: warnings, projects, update banner
+)
+
+var (
+	// Borders: --jay-beak-hi on dark (the brand line colour is 1.2:1 on the
+	// deep background, too faint for a terminal frame); the muted ink on light.
+	borderColor = lipgloss.AdaptiveColor{Dark: theme.JayBeakHi.Dark, Light: theme.Muted.Light}
+	// Section titles: teal on dark, the accent blue on light (teal is lines
+	// only there).
+	sectionColor = lipgloss.AdaptiveColor{Dark: theme.Teal.Dark, Light: theme.AccentText.Light}
 )
 
 // ─── Layout Styles ───────────────────────────────────────────────────────────
@@ -138,7 +154,7 @@ var (
 
 	// Project name
 	projectStyle = lipgloss.NewStyle().
-			Foreground(colorYellow)
+			Foreground(colorMauve)
 
 	// Content preview
 	contentPreviewStyle = lipgloss.NewStyle().
@@ -203,7 +219,7 @@ var (
 				MarginBottom(1)
 
 	searchHighlightStyle = lipgloss.NewStyle().
-				Foreground(colorTeal).
+				Foreground(colorPeach).
 				Bold(true)
 
 	noResultsStyle = lipgloss.NewStyle().

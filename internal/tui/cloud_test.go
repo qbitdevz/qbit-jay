@@ -114,7 +114,7 @@ func TestCloudConfigViewShowsReadOnlyTokenSource(t *testing.T) {
 	m.CloudConfigTokenSource = TokenSourceFile
 
 	view := m.viewCloudConfig()
-	for _, want := range []string{"Server URL:", "Token source:", "Set ENGRAM_CLOUD_TOKEN to override cloud.json.token"} {
+	for _, want := range []string{"Server URL:", "Token source:", "Set QBIT_JAY_CLOUD_TOKEN to override cloud.json.token"} {
 		if !strings.Contains(view, want) {
 			t.Fatalf("cloud config view missing %q: %q", want, view)
 		}

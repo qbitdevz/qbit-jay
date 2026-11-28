@@ -981,7 +981,7 @@ func TestCmdDoctorTextOutput(t *testing.T) {
 	if stderr != "" {
 		t.Fatalf("stderr=%q", stderr)
 	}
-	if !strings.Contains(stdout, "Engram Doctor: ok") || !strings.Contains(stdout, "manual_session_name_project_mismatch") {
+	if !strings.Contains(stdout, "qbit-jay Doctor: ok") || !strings.Contains(stdout, "manual_session_name_project_mismatch") {
 		t.Fatalf("stdout=%q", stdout)
 	}
 }
@@ -1737,7 +1737,7 @@ func TestCmdDoctorNonEnrolledPendingMutationsTextGuidance(t *testing.T) {
 	}
 
 	for _, want := range []string{
-		"Engram Doctor: blocked",
+		"qbit-jay Doctor: blocked",
 		"[blocked] sync_mutation_required_fields",
 		"next: Run `qbit-jay cloud enroll <project>`",
 		"- non_enrolled_pending_mutations:",

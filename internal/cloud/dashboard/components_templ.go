@@ -828,7 +828,7 @@ func DashboardHome(username string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</p><h2>Welcome to Engram Cloud</h2><p class=\"hero-lead\">Your shared memory workspace is ready. Local SQLite stays authoritative, while cloud turns it into an index your team and agents can actually use.</p></div><div class=\"data-frame\" id=\"dashboard-stats\" hx-get=\"/dashboard/stats\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><p class=\"htmx-indicator terminal-note\">Loading stats...</p></div></section>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 62, "</p><h2>Welcome to qbit-jay Cloud</h2><p class=\"hero-lead\">Your shared memory workspace is ready. Local SQLite stays authoritative, while cloud turns it into an index your team and agents can actually use.</p></div><div class=\"data-frame\" id=\"dashboard-stats\" hx-get=\"/dashboard/stats\" hx-trigger=\"load\" hx-swap=\"innerHTML\"><p class=\"htmx-indicator terminal-note\">Loading stats...</p></div></section>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -3544,7 +3544,7 @@ func ManagedUserDetailPage(user cloudstore.HumanUser, tokens []cloudstore.Princi
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 284, "\" class=\"managed-user-form\"><input type=\"text\" name=\"name\" placeholder=\"Token label (optional)\" autocomplete=\"off\"> <button type=\"submit\">Create Token</button></form><p class=\"muted\">Tokens are shown only once, immediately after creation. Engram Cloud cannot redisplay a raw token afterward — revoke it and create a new one if it is lost.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 284, "\" class=\"managed-user-form\"><input type=\"text\" name=\"name\" placeholder=\"Token label (optional)\" autocomplete=\"off\"> <button type=\"submit\">Create Token</button></form><p class=\"muted\">Tokens are shown only once, immediately after creation. qbit-jay Cloud cannot redisplay a raw token afterward — revoke it and create a new one if it is lost.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3841,7 +3841,7 @@ func ManagedUserAdministrationNotice() templ.Component {
 			templ_7745c5c3_Var178 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 316, "<div class=\"data-frame policy-note\"><p><strong>Managed-user administration requires a managed admin token.</strong> Sign in with a token issued by <code>engram cloud bootstrap admin --issue-token ...</code>. If the sole enabled managed admin has no token, use <code>engram cloud bootstrap recover-token</code>.</p></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 316, "<div class=\"data-frame policy-note\"><p><strong>Managed-user administration requires a managed admin token.</strong> Sign in with a token issued by <code>qbit-jay cloud bootstrap admin --issue-token ...</code>. If the sole enabled managed admin has no token, use <code>qbit-jay cloud bootstrap recover-token</code>.</p></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -3877,7 +3877,7 @@ func ManagedUserTokenCreatedPage(user cloudstore.HumanUser, rawToken string, tok
 			templ_7745c5c3_Var179 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 317, "<section class=\"frame-section\"><div class=\"section-header\"><div><p class=\"section-kicker\">TOKEN CREATED</p><h2>Save this token now</h2></div></div><div class=\"data-frame policy-note danger-note\"><p><strong>This raw token is shown only once.</strong> Engram Cloud never stores or displays it again — copy it now and store it securely.</p><pre class=\"token-reveal\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 317, "<section class=\"frame-section\"><div class=\"section-header\"><div><p class=\"section-kicker\">TOKEN CREATED</p><h2>Save this token now</h2></div></div><div class=\"data-frame policy-note danger-note\"><p><strong>This raw token is shown only once.</strong> qbit-jay Cloud never stores or displays it again — copy it now and store it securely.</p><pre class=\"token-reveal\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

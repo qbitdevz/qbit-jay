@@ -320,18 +320,21 @@ func TestCheckLatestUsesGitHubToken(t *testing.T) {
 
 func TestUpdateInstructions(t *testing.T) {
 	msg := updateInstructions()
-	if msg == "" {
-		t.Fatal("expected non-empty update instructions")
-	}
-	want := "  go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
-	switch runtime.GOOS {
-	case "darwin":
-		want = "  brew update && brew upgrade engram"
-	case "linux":
-		want = "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest"
-	}
+	want := "  go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest\n  or: https://github.com/qbitdevz/qbit-jay/releases/latest"
 	if msg != want {
 		t.Fatalf("update instructions on %s = %q, want %q", runtime.GOOS, msg, want)
+	}
+	for _, banned := range []string{"brew", "Gentleman-Programming", "engram"} {
+		if strings.Contains(msg, banned) {
+			t.Fatalf("update instructions mention %q: %q", banned, msg)
+		}
+	}
+}
+
+func TestLatestReleaseURLTargetsQbitJay(t *testing.T) {
+	want := "https://api.github.com/repos/qbitdevz/qbit-jay/releases/latest"
+	if githubLatestReleaseURL != want {
+		t.Fatalf("githubLatestReleaseURL = %q, want %q", githubLatestReleaseURL, want)
 	}
 }
 

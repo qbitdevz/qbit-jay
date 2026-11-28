@@ -81,13 +81,13 @@ func TestClaudeLifecycleConfirmedContext(t *testing.T) {
 				if got := registrations.Load(); got != 1 {
 					t.Fatalf("lifecycle made %d authenticated registration requests, want one: %q", got, diagnostic)
 				}
-				if !strings.Contains(output, `Confirmed Engram session ID (JSON): "context-resume-host:resume:2"`) {
+				if !strings.Contains(output, `Confirmed qbit-jay session ID (JSON): "context-resume-host:resume:2"`) {
 					t.Fatalf("missing effective continuation in %s context: %q", mode, output)
 				}
 				if !strings.Contains(output, "synthetic history") {
 					t.Fatalf("history missing: %q", output)
 				}
-				if strings.Index(output, "Confirmed Engram session ID") > strings.Index(output, "synthetic history") {
+				if strings.Index(output, "Confirmed qbit-jay session ID") > strings.Index(output, "synthetic history") {
 					t.Fatal("identity must precede optional history")
 				}
 				if strings.Contains(output, "ACTIVE PROTOCOL") != (mode == "full") {

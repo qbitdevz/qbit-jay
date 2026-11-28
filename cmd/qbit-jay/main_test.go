@@ -517,9 +517,9 @@ func TestPrintUsage(t *testing.T) {
 
 func TestPrintPostInstall(t *testing.T) {
 	const (
-		mcpConfiguredMessage = "Configuration written: the OpenCode plugin and Engram MCP registration."
-		mcpManualMessage     = "Plugin written, but Engram MCP registration needs the manual configuration shown above."
-		toolGuidance         = "confirm it can use an `engram_mem_*` tool before relying on Engram."
+		mcpConfiguredMessage = "Configuration written: the OpenCode plugin and qbit-jay MCP registration."
+		mcpManualMessage     = "Plugin written, but qbit-jay MCP registration needs the manual configuration shown above."
+		toolGuidance         = "confirm it can use a `qbit-jay_mem_*` tool before relying on qbit-jay."
 	)
 
 	tests := []struct {
@@ -1455,7 +1455,7 @@ func TestCmdContextAndStats(t *testing.T) {
 	if statsErr != "" {
 		t.Fatalf("expected no stderr from stats, got: %q", statsErr)
 	}
-	if !strings.Contains(statsOut, "Engram Memory Stats") || !strings.Contains(statsOut, "project-x") {
+	if !strings.Contains(statsOut, "qbit-jay Memory Stats") || !strings.Contains(statsOut, "project-x") {
 		t.Fatalf("unexpected stats output: %q", statsOut)
 	}
 }

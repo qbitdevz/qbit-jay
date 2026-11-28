@@ -497,7 +497,7 @@ func TestHandlerDashboardLoginFlowSetsCookieForBrowserUse(t *testing.T) {
 		t.Fatalf("expected /dashboard/login=200, got %d", loginPage.Code)
 	}
 	// UPDATED: new templ login page renders "Sign In" heading + "Engram Cloud" brand.
-	if !strings.Contains(loginPage.Body.String(), "Engram Cloud") || !strings.Contains(loginPage.Body.String(), "name=\"token\"") {
+	if !strings.Contains(loginPage.Body.String(), "qbit-jay Cloud") || !strings.Contains(loginPage.Body.String(), "name=\"token\"") {
 		t.Fatalf("expected dashboard login page html, body=%q", loginPage.Body.String())
 	}
 

@@ -5,55 +5,48 @@ import (
 	"strings"
 	"time"
 
+	"github.com/charmbracelet/lipgloss"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/theme"
 	"github.com/qbitdevz/qbit-jay/internal/setup"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 	"github.com/qbitdevz/qbit-jay/internal/timeutil"
 	"github.com/qbitdevz/qbit-jay/internal/version"
-	"github.com/charmbracelet/lipgloss"
 )
 
 // ─── Logo ────────────────────────────────────────────────────────────────────
 
+// renderLogo draws the dashboard header: the text-mode brand mark, the
+// lowercase wordmark, the version and one gradient rule (blue, cyan, green in
+// that order, the only decoration). It keeps upstream's double frame.
 func renderLogo(version string) string {
-	logoText := []string{
-		`███████ ███    ██  ██████  ██████   █████  ███    ███ `,
-		`██      ████   ██ ██       ██   ██ ██   ██ ████  ████ `,
-		`█████   ██ ██  ██ ██   ███ ██████  ███████ ██ ████ ██ `,
-		`██      ██  ██ ██ ██    ██ ██   ██ ██   ██ ██  ██  ██ `,
-		`███████ ██   ████  ██████  ██   ██ ██   ██ ██      ██ `,
-	}
-
 	frameStyle := lipgloss.NewStyle().
 		Border(lipgloss.DoubleBorder()).
 		BorderForeground(colorOverlay).
-		Padding(0, 1).
+		Padding(0, 2).
 		MarginBottom(1)
 
-	// Gradient colors for the rows
-	colors := []lipgloss.Color{
-		colorMauve,    // Top (Pinkish)
-		colorLavender, // Middle-top
-		colorBlue,     // Middle
-		colorTeal,     // Middle-bottom
-		colorGreen,    // Bottom (Cyan/Greenish)
-	}
-
-	accentStyle := lipgloss.NewStyle().Foreground(colorLavender).Bold(true)
+	markStyle := lipgloss.NewStyle().Foreground(theme.Cyan.Adaptive()).Bold(true)
+	wordStyle := lipgloss.NewStyle().Foreground(colorText).Bold(true)
+	versionStyle := lipgloss.NewStyle().Foreground(colorSubtext)
 	taglineStyle := lipgloss.NewStyle().Foreground(colorSubtext).Italic(true)
 
 	var b strings.Builder
 
-	// Header line inside box (Cyber-Elephant Terminal)
-	b.WriteString(accentStyle.Render(" 🐘 SYSTEM ONLINE ") + strings.Repeat(" ", 32) + accentStyle.Render(" MEM: OK 100% ") + "\n\n")
-
-	// Logo body with gradient (logoText and colors are always the same length)
-	for i, line := range logoText {
-		b.WriteString(" " + lipgloss.NewStyle().Foreground(colors[i]).Bold(true).Render(line) + "\n")
+	b.WriteString(markStyle.Render(theme.Mark) + " " + wordStyle.Render(theme.Name))
+	if version != "" {
+		b.WriteString("  " + versionStyle.Render(version))
 	}
 	b.WriteString("\n")
 
-	// Footer inside box
-	b.WriteString(taglineStyle.Render(" > engram " + version + " — An elephant never forgets"))
+	// One gradient rule under the wordmark: 3 segments, blue / cyan / green.
+	const segment = 8
+	rule := strings.Repeat("━", segment)
+	b.WriteString(lipgloss.NewStyle().Foreground(theme.Blue.Adaptive()).Render(rule))
+	b.WriteString(lipgloss.NewStyle().Foreground(theme.Cyan.Adaptive()).Render(rule))
+	b.WriteString(lipgloss.NewStyle().Foreground(theme.Success.Adaptive()).Render(rule))
+	b.WriteString("\n")
+
+	b.WriteString(taglineStyle.Render("persistent memory for coding agents · " + theme.Tagline))
 
 	return frameStyle.Render(b.String()) + "\n"
 }
@@ -199,7 +192,7 @@ func (m Model) viewCloudConfig() string {
 	b.WriteString(configLabelStyle.Render("  Token source: ") + detailValueStyle.Render(emptyCloudValue(m.CloudConfigTokenSource, TokenSourceNone)))
 	b.WriteString("\n")
 	if m.CloudConfigTokenSource != TokenSourceEnv {
-		b.WriteString(timestampStyle.Render("  Set ENGRAM_CLOUD_TOKEN to override cloud.json.token"))
+		b.WriteString(timestampStyle.Render("  Set QBIT_JAY_CLOUD_TOKEN to override cloud.json.token"))
 		b.WriteString("\n")
 	}
 	b.WriteString("\n\n")
@@ -540,7 +533,7 @@ func (m Model) viewSessions() string {
 		b.WriteString("\n\n")
 		b.WriteString(detailContentStyle.Render(fmt.Sprintf("  Delete session %q from project %q?", m.SessionDeleteID, m.SessionDeleteProject)))
 		b.WriteString("\n")
-		b.WriteString(timestampStyle.Render("  Sessions with observations cannot be deleted; Engram will refuse unsafe deletes."))
+		b.WriteString(timestampStyle.Render("  Sessions with observations cannot be deleted; qbit-jay will refuse unsafe deletes."))
 		b.WriteString("\n\n")
 		b.WriteString(helpStyle.Render("  [y] Delete  [n] Cancel  [esc] Cancel"))
 		return b.String()
@@ -696,7 +689,7 @@ func (m Model) viewSetup() string {
 
 		b.WriteString(sectionHeadingStyle.Render("  Permissions Allowlist"))
 		b.WriteString("\n\n")
-		b.WriteString(detailContentStyle.Render("  Add engram tools to " + setup.ClaudeCodeSettingsPath() + " allowlist?"))
+		b.WriteString(detailContentStyle.Render("  Add qbit-jay tools to " + setup.ClaudeCodeSettingsPath() + " allowlist?"))
 		b.WriteString("\n")
 		b.WriteString(timestampStyle.Render("  This prevents Claude Code from asking permission on every tool call."))
 		b.WriteString("\n\n")
@@ -730,7 +723,7 @@ func (m Model) viewSetup() string {
 				b.WriteString("\n")
 				b.WriteString(detailContentStyle.Render("2. Plugin is auto-loaded from ~/.config/opencode/plugins/"))
 				b.WriteString("\n")
-				b.WriteString(detailContentStyle.Render("3. Make sure 'engram' is in your MCP config (opencode.json)"))
+				b.WriteString(detailContentStyle.Render("3. Make sure 'qbit-jay' is in your MCP config (opencode.json)"))
 				b.WriteString("\n")
 			case "claude-code":
 				b.WriteString(sectionHeadingStyle.Render("  Next Steps"))
@@ -738,7 +731,7 @@ func (m Model) viewSetup() string {
 				if m.SetupAllowlistApplied {
 					b.WriteString(fmt.Sprintf("  %s %s\n",
 						lipgloss.NewStyle().Bold(true).Foreground(colorGreen).Render("✓"),
-						detailContentStyle.Render("Engram tools added to allowlist")))
+						detailContentStyle.Render("qbit-jay tools added to allowlist")))
 				} else if m.SetupAllowlistError != "" {
 					b.WriteString(fmt.Sprintf("  %s %s\n",
 						lipgloss.NewStyle().Bold(true).Foreground(colorRed).Render("✗"),

@@ -113,7 +113,7 @@ func TestHomeProjectSelectionCLI(t *testing.T) {
 			cfg := testConfig(t)
 			stdout, stderr, recovered := captureOutputAndRecover(t, func() { cmdSave(cfg) })
 			if reject {
-				wantError := "qbit-jay: cannot save without an unambiguous project identity: explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name; use --project <name>\n"
+				wantError := "qbit-jay: cannot save without an unambiguous project identity: explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name; use --project <name>\n"
 				if recovered != exitCode(1) || stdout != "" || stderr != wantError {
 					t.Errorf("exit=%v stdout=%q stderr=%q", recovered, stdout, stderr)
 				}
