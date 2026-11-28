@@ -857,7 +857,7 @@ If the binary is missing, Pi keeps running and memory degrades instead of crashi
 
 ## Environment variables
 
-Every `QBIT_JAY_*` variable also reads the upstream `QBIT_JAY_*` name as a fallback (gentle-ai and existing setups keep working); when both are set, the `QBIT_JAY_*` value wins and an empty one does not mask a set `QBIT_JAY_*` value.
+Every `QBIT_JAY_*` variable also reads the matching `ENGRAM_*` name as a fallback (gentle-ai and existing setups keep working); when both are set, the `QBIT_JAY_*` value wins and an empty `QBIT_JAY_*` value does not mask a set `ENGRAM_*` value. A variable whose only values are empty still counts as set: an empty `QBIT_JAY_HTTP_TOKEN`, `QBIT_JAY_SERVER_MODE`, `QBIT_JAY_STARTUP_POLICY` or `QBIT_JAY_STARTUP_NOTICE` is a value (the policy then fails closed), and in session-owned mode an empty `QBIT_JAY_URL`, `QBIT_JAY_PORT` or `QBIT_JAY_SOCKET` conflicts. Whitespace-only values are blank only for `URL`, `BIN` and `PORT` (below); for the other variables they are values.
 
 The Pi extension treats absent, empty, and whitespace-only `QBIT_JAY_URL`, `QBIT_JAY_BIN`, and `QBIT_JAY_PORT` values as unset. It detects blankness without trimming nonblank explicit values.
 

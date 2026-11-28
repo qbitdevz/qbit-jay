@@ -161,6 +161,8 @@ async function createRuntime(t, {
   engramBin,
   qbitJayBin,
   engramPort,
+  qbitJayURL,
+  qbitJayPort,
   healthOK = true,
   selectLegacyDefault = false,
    sessionGet = async ({ path }) => sdkResult(session(path.id)),
@@ -178,6 +180,8 @@ async function createRuntime(t, {
   const originalEngramBin = process.env.ENGRAM_BIN
   const originalQbitJayBin = process.env.QBIT_JAY_BIN
   const originalEngramPort = process.env.ENGRAM_PORT
+  const originalQbitJayURL = process.env.QBIT_JAY_URL
+  const originalQbitJayPort = process.env.QBIT_JAY_PORT
   const originalSpawnSync = childProcess.spawnSync
   const originalSpawn = childProcess.spawn
   const originalExistsSync = fs.existsSync
@@ -196,6 +200,10 @@ async function createRuntime(t, {
   else process.env.QBIT_JAY_BIN = qbitJayBin
   if (engramPort === undefined) delete process.env.ENGRAM_PORT
   else process.env.ENGRAM_PORT = engramPort
+  if (qbitJayURL === undefined) delete process.env.QBIT_JAY_URL
+  else process.env.QBIT_JAY_URL = qbitJayURL
+  if (qbitJayPort === undefined) delete process.env.QBIT_JAY_PORT
+  else process.env.QBIT_JAY_PORT = qbitJayPort
   if (installBun) {
     globalThis.Bun = {
       spawnSync(args) {
@@ -321,6 +329,10 @@ async function createRuntime(t, {
     else process.env.QBIT_JAY_BIN = originalQbitJayBin
     if (originalEngramPort === undefined) delete process.env.ENGRAM_PORT
     else process.env.ENGRAM_PORT = originalEngramPort
+    if (originalQbitJayURL === undefined) delete process.env.QBIT_JAY_URL
+    else process.env.QBIT_JAY_URL = originalQbitJayURL
+    if (originalQbitJayPort === undefined) delete process.env.QBIT_JAY_PORT
+    else process.env.QBIT_JAY_PORT = originalQbitJayPort
     childProcess.spawnSync = originalSpawnSync
     childProcess.spawn = originalSpawn
     fs.existsSync = originalExistsSync
@@ -712,6 +724,35 @@ test("QBIT_JAY_BIN wins over ENGRAM_BIN and ENGRAM_BIN remains the compatibility
     await t.test(scenario.name, async (t) => {
       const runtime = await createRuntime(t, { qbitJayBin: scenario.qbitJayBin, engramBin: scenario.engramBin, healthOK: false })
       assert.equal(runtime.spawns.find(({ args }) => args[1] === "run")?.args[0], scenario.want)
+    })
+  }
+})
+
+// Spec S5 (T5b): QBIT_JAY_URL and QBIT_JAY_PORT win over ENGRAM_URL and ENGRAM_PORT, an empty or blank
+// new value falls back to a set legacy one, and neither set keeps the default local endpoint.
+// OpenCode reads no nudge-cooldown variable: the debounce is fixed in the adapter.
+test("QBIT_JAY_URL and QBIT_JAY_PORT take precedence over their ENGRAM_ fallbacks", async (t) => {
+  const NEW_URL = "http://127.0.0.1:17001", LEGACY_URL = "http://127.0.0.1:17002"
+  for (const scenario of [
+    { name: "url: new only", env: { qbitJayURL: NEW_URL }, want: NEW_URL },
+    { name: "url: legacy only", env: { configuredEngramURL: LEGACY_URL }, want: LEGACY_URL },
+    { name: "url: both, new wins", env: { qbitJayURL: NEW_URL, configuredEngramURL: LEGACY_URL }, want: NEW_URL },
+    { name: "url: new empty, legacy set", env: { qbitJayURL: "", configuredEngramURL: LEGACY_URL }, want: LEGACY_URL },
+    { name: "url: new blank, legacy set", env: { qbitJayURL: " 	", configuredEngramURL: LEGACY_URL }, want: LEGACY_URL },
+    { name: "url: new set, legacy empty", env: { qbitJayURL: NEW_URL, configuredEngramURL: "" }, want: NEW_URL },
+    { name: "port: new only", env: { qbitJayPort: "17101" }, want: "http://127.0.0.1:17101" },
+    { name: "port: legacy only", env: { engramPort: "17102" }, want: "http://127.0.0.1:17102" },
+    { name: "port: both, new wins", env: { qbitJayPort: "17101", engramPort: "17102" }, want: "http://127.0.0.1:17101" },
+    { name: "port: new empty, legacy set", env: { qbitJayPort: "", engramPort: "17102" }, want: "http://127.0.0.1:17102" },
+    { name: "port: new blank, legacy set", env: { qbitJayPort: "  ", engramPort: "17102" }, want: "http://127.0.0.1:17102" },
+    { name: "port: new set, legacy empty", env: { qbitJayPort: "17101", engramPort: "" }, want: "http://127.0.0.1:17101" },
+    { name: "port: both empty", env: { qbitJayPort: "", engramPort: "" }, want: "http://127.0.0.1:7437" },
+    { name: "neither", env: {}, want: "http://127.0.0.1:7437" },
+    { name: "an explicit URL beats any port", env: { qbitJayURL: NEW_URL, qbitJayPort: "17101", engramPort: "17102" }, want: NEW_URL },
+  ]) {
+    await t.test(scenario.name, async (t) => {
+      const runtime = await createRuntime(t, { ...scenario.env, healthOK: false })
+      assert.equal(runtime.healthURLs[0], `${scenario.want}/health`)
     })
   }
 })
