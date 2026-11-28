@@ -13,7 +13,7 @@ const fixtures = ["go.mod", "internal/server/server.go", "internal/store/store.g
 function scenario(run) {
   const dir = mkdtempSync(join(tmpdir(), "engram-context-package-"));
   try {
-    const consumer = join(dir, "consumer"), pkg = join(consumer, "node_modules", "gentle-engram");
+    const consumer = join(dir, "consumer"), pkg = join(consumer, "node_modules", "qbit-jay");
     mkdirSync(pkg, { recursive: true });
     writeFileSync(join(consumer, "go.mod"), "module example.com/consumer\n");
     const metadata = JSON.parse(readFileSync(join(PLUGIN_ROOT, "package.json"), "utf8"));

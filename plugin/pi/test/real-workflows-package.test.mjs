@@ -12,7 +12,7 @@ const reason = "requires the Engram Go checkout or ENGRAM_PI_TEST_SERVER_BINARY"
 function scenario(run) {
   const dir = mkdtempSync(join(tmpdir(), "engram-workflows-package-"));
   try {
-    const consumer = join(dir, "consumer"), pkg = join(consumer, "node_modules", "gentle-engram");
+    const consumer = join(dir, "consumer"), pkg = join(consumer, "node_modules", "qbit-jay");
     mkdirSync(pkg, { recursive: true });
     // Model a consumer that has its own unrelated Go module, not the Engram checkout.
     writeFileSync(join(consumer, "go.mod"), "module example.com/consumer\n");

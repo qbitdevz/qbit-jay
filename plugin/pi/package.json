@@ -4,15 +4,15 @@
   "description": "Persistent memory for Pi agents — one local-or-cloud brain shared across sessions, compactions, and MCP agents",
   "type": "module",
   "license": "MIT",
-  "author": "Gentleman Programming",
-  "homepage": "https://github.com/Gentleman-Programming/engram",
+  "author": "qbitdevz (based on Engram by Gentleman Programming)",
+  "homepage": "https://github.com/qbitdevz/qbit-jay",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Gentleman-Programming/engram.git",
+    "url": "git+https://github.com/qbitdevz/qbit-jay.git",
     "directory": "plugin/pi"
   },
   "bin": {
-    "pi-engram": "cli.js"
+    "pi-qbit-jay": "cli.js"
   },
   "scripts": {
     "test": "node --test --test-concurrency=1 test/*.test.mjs"
@@ -20,14 +20,14 @@
   "keywords": [
     "pi-package",
     "pi",
-    "engram",
+    "qbit-jay",
     "memory",
     "persistent-memory",
     "project-memory",
     "compaction-recovery",
     "agent-memory",
     "ai-memory",
-    "engram-cloud",
+    "qbit-jay-cloud",
     "token-saving",
     "mcp",
     "coding-agent",
@@ -38,7 +38,7 @@
     "sessionOwned": 1
   },
   "pi": {
-    "image": "https://raw.githubusercontent.com/Gentleman-Programming/engram/main/plugin/pi/assets/engram-logo-only.png",
+    "image": "https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/assets/branding/qbit-jay-banner.gif",
     "extensions": [
       "./index.ts"
     ]

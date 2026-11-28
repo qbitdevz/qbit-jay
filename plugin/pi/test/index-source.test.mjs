@@ -187,7 +187,7 @@ function buildEngramFetchForTest({
       return error instanceof Error && error.message === "connection refused";
     }
     function unreachableMessage() {
-      return "gentle-engram could not reach the Engram HTTP server";
+      return "qbit-jay could not reach the Engram HTTP server";
     }
     const ensureRuntimeQualification = async () => {}; // Isolated transport-policy test; public tests qualify metadata.
     const engramFetchResult = async function engramFetchResult(path, opts = {}, allowGuardedRecovery = true) {
@@ -339,7 +339,7 @@ function buildInstanceIDFailureMessageForTest() {
       ${body}
     };
   `);
-  return factory("engram");
+  return factory("qbit-jay");
 }
 
 function buildLegacyEngramServerMessageForTest({ engramUrl = "http://127.0.0.1:7437", serverVersion = "unknown", localEngramVersion = () => "unknown" }) {
@@ -610,7 +610,7 @@ test("optional Engram environment values treat blank strings as unset without re
 
   for (const value of [undefined, "", " \t\n "]) {
     assert.equal(optionalEnvironmentValue(value), undefined);
-    assert.equal(optionalEnvironmentValue(value) ?? "engram", "engram", "blank ENGRAM_BIN uses the default executable");
+    assert.equal(optionalEnvironmentValue(value) ?? "qbit-jay", "qbit-jay", "blank QBIT_JAY_BIN/ENGRAM_BIN uses the default executable");
     assert.equal(Number.parseInt(optionalEnvironmentValue(value) ?? "7437", 10), 7437, "blank ENGRAM_PORT uses the default port");
     assert.equal(optionalEnvironmentValue(value), undefined, "blank ENGRAM_URL keeps its existing unset behavior");
   }
@@ -620,9 +620,9 @@ test("optional Engram environment values treat blank strings as unset without re
   assert.equal(Number.parseInt(optionalEnvironmentValue("17437") ?? "7437", 10), 17437);
   assert.equal(optionalEnvironmentValue(" http://127.0.0.1:17437"), " http://127.0.0.1:17437", "an explicit ENGRAM_URL is preserved exactly");
 
-  assert.match(source, /const ENGRAM_PORT = Number\.parseInt\(optionalEnvironmentValue\(process\.env\.ENGRAM_PORT\) \?\? "7437", 10\)/);
-  assert.match(source, /const CONFIGURED_ENGRAM_URL = optionalEnvironmentValue\(process\.env\.ENGRAM_URL\);/);
-  assert.match(source, /const ENGRAM_BIN = optionalEnvironmentValue\(process\.env\.ENGRAM_BIN\) \?\? "engram"/);
+  assert.match(source, /const ENGRAM_PORT = Number\.parseInt\(pluginOptionalEnv\("PORT"\) \?\? "7437", 10\)/);
+  assert.match(source, /const CONFIGURED_ENGRAM_URL = pluginOptionalEnv\("URL"\);/);
+  assert.match(source, /const ENGRAM_BIN = pluginOptionalEnv\("BIN"\) \?\? "qbit-jay"/);
 });
 
 test("mem_session_summary accepts explicit project fallback", () => {
@@ -705,8 +705,8 @@ test("ambiguous_project error maps to actionable status label, not generic 'erro
   assert.doesNotMatch(source, /setStatus\?\.\("engram",\s*`🧠 \$\{project\} · error`\)/);
 });
 
-test("memory protocol declares gentle-engram as the Pi-native provider", () => {
-  assert.match(source, /These instructions are injected by gentle-engram, the Pi-native memory provider/);
+test("memory protocol declares qbit-jay as the Pi-native provider", () => {
+  assert.match(source, /These instructions are injected by qbit-jay, the Pi-native memory provider/);
   assert.match(source, /Use the memory tools named in this section as the authoritative Pi memory contract/);
   assert.match(source, /Do not infer alternative Engram tool names from other integrations/);
 });
@@ -822,11 +822,11 @@ test("instance-id resolution failure wording distinguishes an old binary from a 
 
   assert.equal(
     instanceIDFailureMessage({ status: 1, stdout: "", stderr: "Error: unknown command \"instance-id\" for \"engram\"" }),
-    `The Engram binary "engram" does not support "instance-id" and predates v2.0.0-rc.11. Upgrade the binary, or point ENGRAM_BIN at the current one.`,
+    `The qbit-jay binary "qbit-jay" does not support "instance-id" and predates v2.0.0-rc.11. Upgrade the binary, or point QBIT_JAY_BIN at the current one.`,
   );
   assert.equal(
     instanceIDFailureMessage({ status: null, stdout: "", error: Object.assign(new Error("spawn engram ENOENT"), { code: "ENOENT" }) }),
-    `The Engram binary "engram" could not be found. Install Engram, or point ENGRAM_BIN at the current binary.`,
+    `The qbit-jay binary "qbit-jay" could not be found. Install qbit-jay, or point QBIT_JAY_BIN at the current binary.`,
   );
 
   const etimedout = { status: null, stdout: "", stderr: "", signal: "SIGTERM", error: Object.assign(new Error("spawn engram ETIMEDOUT"), { code: "ETIMEDOUT" }) };
@@ -948,7 +948,7 @@ test("normalization preserves typed ownership evidence without text classificati
   assert.ok(normalized instanceof ForeignOwnershipError);
   assert.strictEqual(normalized.evidence, evidence, "normalization retains the same evidence object");
   assert.match(normalized.message, /could not initialize/);
-  assert.match(normalized.message, /ENGRAM_URL\/ENGRAM_PORT\/ENGRAM_BIN/);
+  assert.match(normalized.message, /QBIT_JAY_URL\/QBIT_JAY_PORT\/QBIT_JAY_BIN/);
   assert.ok(!(normalize(new Error("ownership mismatch")) instanceof ForeignOwnershipError), "prose alone cannot authorize fallback");
 });
 
@@ -2475,7 +2475,7 @@ test("native tool fetch preserves HTTP error status", async () => {
 });
 
 test("native tool unavailable error names the Pi-native HTTP path", () => {
-  assert.match(source, /gentle-engram could not reach the Engram HTTP server/);
+  assert.match(source, /qbit-jay could not reach the Engram HTTP server/);
   assert.match(source, /Pi-native mem_\* tools are registered/);
   assert.match(source, /Run mem_doctor or restart Engram/);
 });

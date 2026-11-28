@@ -22,10 +22,23 @@ function optionalEnvironmentValue(value: string | undefined): string | undefined
   return value?.trim() ? value : undefined;
 }
 
-const ENGRAM_PORT = Number.parseInt(optionalEnvironmentValue(process.env.ENGRAM_PORT) ?? "7437", 10);
-const CONFIGURED_ENGRAM_URL = optionalEnvironmentValue(process.env.ENGRAM_URL);
-const CONFIGURED_HTTP_TOKEN = process.env.ENGRAM_HTTP_TOKEN || "";
-const SERVER_MODE = process.env.ENGRAM_SERVER_MODE;
+// Same lookup for values where a blank string means "not configured" (binary, URL, port).
+function pluginOptionalEnv(name: string): string | undefined {
+  return optionalEnvironmentValue(process.env[`QBIT_JAY_${name}`]) ?? optionalEnvironmentValue(process.env[`ENGRAM_${name}`]);
+}
+
+// qbit-jay variables: QBIT_JAY_<NAME> wins, ENGRAM_<NAME> is the compatibility fallback
+// (gentle-ai and existing setups). An empty qbit-jay value does not mask a set legacy one.
+function pluginEnv(name: string): string | undefined {
+  const preferred = process.env[`QBIT_JAY_${name}`];
+  if (preferred !== undefined && preferred !== "") return preferred;
+  return process.env[`ENGRAM_${name}`] ?? preferred;
+}
+
+const ENGRAM_PORT = Number.parseInt(pluginOptionalEnv("PORT") ?? "7437", 10);
+const CONFIGURED_ENGRAM_URL = pluginOptionalEnv("URL");
+const CONFIGURED_HTTP_TOKEN = pluginEnv("HTTP_TOKEN") || "";
+const SERVER_MODE = pluginEnv("SERVER_MODE");
 const SESSION_OWNED = SERVER_MODE === "session-owned";
 let ENGRAM_URL = SESSION_OWNED ? "" : CONFIGURED_ENGRAM_URL || `http://127.0.0.1:${ENGRAM_PORT}`;
 let ownedToken = "";
@@ -34,7 +47,7 @@ let ownedStop: Promise<void> | undefined;
 const ownedRoots = new Set<object>();
 
 function transportHeaders(json = false): Record<string, string> | undefined {
-  if (SERVER_MODE !== undefined && !SESSION_OWNED) throw new DeterministicStartupError("Invalid ENGRAM_SERVER_MODE; unset it for shared mode or use literal session-owned.");
+  if (SERVER_MODE !== undefined && !SESSION_OWNED) throw new DeterministicStartupError("Invalid QBIT_JAY_SERVER_MODE (or ENGRAM_SERVER_MODE); unset it for shared mode or use literal session-owned.");
   if (SESSION_OWNED && (!ownedToken || !ENGRAM_URL)) throw new EngramUnavailableError();
   if (!SESSION_OWNED) {
     if (!CONFIGURED_HTTP_TOKEN) return json ? { "Content-Type": "application/json" } : undefined;
@@ -42,13 +55,13 @@ function transportHeaders(json = false): Record<string, string> | undefined {
   }
   return { ...(json ? { "Content-Type": "application/json" } : {}), Authorization: `Bearer ${ownedToken}` };
 }
-const ENGRAM_BIN = optionalEnvironmentValue(process.env.ENGRAM_BIN) ?? "engram";
+const ENGRAM_BIN = pluginOptionalEnv("BIN") ?? "qbit-jay";
 // Only absence preserves standalone behavior; every supplied value except literal
 // "allow" fails closed, including empty or whitespace values. Never execute notice text.
-const ENGRAM_STARTUP_ALLOWED = process.env.ENGRAM_STARTUP_POLICY === undefined
-  || process.env.ENGRAM_STARTUP_POLICY === "allow";
+const ENGRAM_STARTUP_ALLOWED = pluginEnv("STARTUP_POLICY") === undefined
+  || pluginEnv("STARTUP_POLICY") === "allow";
 const ENGRAM_DISABLED_NOTICE = "Engram memory is disabled by startup policy. Back up your existing Engram data, update Engram, restart its server and Pi, then recheck memory safety."
-  + (process.env.ENGRAM_STARTUP_NOTICE ? ` ${process.env.ENGRAM_STARTUP_NOTICE}` : "");
+  + (pluginEnv("STARTUP_NOTICE") ? ` ${pluginEnv("STARTUP_NOTICE")}` : "");
 
 // Only allowlisted metadata is logged; never pass request bodies, identities, or errors.
 type SessionTraceEvent =
@@ -60,7 +73,7 @@ type SessionTraceEvent =
   | { stage: "rejection"; http_status: number | null; reason: "session_already_ended" | "other" };
 
 function traceSessionRegistration(event: SessionTraceEvent): void {
-  if (process.env.ENGRAM_PI_SESSION_TRACE !== "1") return;
+  if (pluginEnv("PI_SESSION_TRACE") !== "1") return;
   // Descriptor writes surface pipe failures synchronously, without host-wide stream handlers.
   try { writeSync(2, `[engram:session-trace] ${JSON.stringify(event)}\n`); }
   catch { /* Diagnostic output must not change registration or write behavior. */ }
@@ -131,13 +144,13 @@ const ENGRAM_DEFERRED_TOOLS = new Set<string>([
 
 // Headless/bench runs may suppress the injected protocol text without removing the mem_*
 // tools themselves; only literal "1" defers, so any other value keeps today's injection.
-const ENGRAM_DEFER_MEMORY = process.env.ENGRAM_DEFER_MEMORY === "1";
+const ENGRAM_DEFER_MEMORY = pluginEnv("DEFER_MEMORY") === "1";
 
 const MEMORY_INSTRUCTIONS = `## Engram Persistent Memory — Protocol
 
 You have access to Engram, a persistent memory system that survives across sessions and compactions.
 The agent MUST follow this protocol without waiting for activation.
-These instructions are injected by gentle-engram, the Pi-native memory provider. Use the memory tools named in this section as the authoritative Pi memory contract. Do not infer alternative Engram tool names from other integrations unless the user explicitly asks you to use them.
+These instructions are injected by qbit-jay, the Pi-native memory provider. Use the memory tools named in this section as the authoritative Pi memory contract. Do not infer alternative Engram tool names from other integrations unless the user explicitly asks you to use them.
 
 ### CANONICAL TOPIC WORKFLOW (mandatory — not optional)
 
@@ -179,7 +192,7 @@ Format for \`mem_update\`:
 
 Native \`mem_save\`, \`mem_save_prompt\`, \`mem_session_summary\`, and \`mem_capture_passive\`
 derive attribution from the current Pi host session and confirmed Engram registration.
-Do not invent or override \`session_id\`; gentle-engram owns the effective persisted
+Do not invent or override \`session_id\`; qbit-jay owns the effective persisted
 identity, including resumed continuations and explicit cross-project targets.
 \`mem_session_end\` accepts only the current Pi host session ID; the extension
 resolves the effective persisted ID. Ordinary task completion does not end it.
@@ -766,7 +779,7 @@ function detectLocalConfigProject(cwd: string): CurrentProjectResponse | undefin
 function projectCurrentUnsupportedError(cwd: string): CurrentProjectResponse {
   return {
     cwd,
-    error_hint: `Engram server at ${ENGRAM_URL} does not support /project/current. Upgrade or restart the running Engram server, verify ENGRAM_URL/ENGRAM_BIN, or pass project explicitly to project-capable memory tools.`,
+    error_hint: `Engram server at ${ENGRAM_URL} does not support /project/current. Upgrade or restart the running Engram server, verify QBIT_JAY_URL/QBIT_JAY_BIN, or pass project explicitly to project-capable memory tools.`,
   };
 }
 
@@ -793,7 +806,7 @@ let runtimeQualificationFlight: { endpoint: string; token: string; promise: Prom
 const effectiveTransportToken = () => SESSION_OWNED ? ownedToken : CONFIGURED_HTTP_TOKEN;
 
 function runtimeContractFailure(reason: string): RuntimeContractError {
-  return new RuntimeContractError(`gentle-engram rejected the Engram runtime contract: ${reason}. Expected ${runtimeContractID}. Upgrade Engram and restart its server and Pi; verify ENGRAM_URL/ENGRAM_BIN. Memory dispatch was blocked.`);
+  return new RuntimeContractError(`qbit-jay rejected the Engram runtime contract: ${reason}. Expected ${runtimeContractID}. Upgrade Engram and restart its server and Pi; verify QBIT_JAY_URL/QBIT_JAY_BIN. Memory dispatch was blocked.`);
 }
 
 async function ensureRuntimeQualification(signal?: AbortSignal, startupDeadline?: number): Promise<void> {
@@ -861,7 +874,7 @@ async function ensureRuntimeQualification(signal?: AbortSignal, startupDeadline?
         if (error instanceof RuntimeContractError) throw error;
         if (error instanceof RuntimeContractMismatchError) throw runtimeContractFailure(error.message);
         if (error instanceof EngramUnavailableError || isConnectionRefusedError(error)) {
-          throw new EngramUnavailableError("gentle-engram could not reach the Engram HTTP server. Run mem_doctor or restart Engram.");
+          throw new EngramUnavailableError("qbit-jay could not reach the Engram HTTP server. Run mem_doctor or restart Engram.");
         }
         // Never echo fetch errors, raw metadata, URL credentials or private bindings.
         throw runtimeContractFailure(error instanceof SyntaxError ? "malformed JSON contract" : "unreadable or invalid contract");
@@ -956,18 +969,18 @@ function localInstanceID(timeoutMs = ENGRAM_STARTUP_TIMEOUT_MS): string {
 function instanceIDFailureMessage(result: SpawnSyncReturns<string>): string {
   const code = (result.error as NodeJS.ErrnoException | undefined)?.code;
   if (code === "ENOENT") {
-    return `The Engram binary "${ENGRAM_BIN}" could not be found. Install Engram, or point ENGRAM_BIN at the current binary.`;
+    return `The qbit-jay binary "${ENGRAM_BIN}" could not be found. Install qbit-jay, or point QBIT_JAY_BIN at the current binary.`;
   }
   if (code === "ETIMEDOUT") {
-    return `The Engram binary "${ENGRAM_BIN}" did not answer "instance-id" within the startup timeout. Check for a hung or very slow binary, then retry.`;
+    return `The qbit-jay binary "${ENGRAM_BIN}" did not answer "instance-id" within the startup timeout. Check for a hung or very slow binary, then retry.`;
   }
   if (code !== undefined) {
-    return `The Engram binary "${ENGRAM_BIN}" could not be started (spawn error ${code}). Check the binary's path and permissions, then retry.`;
+    return `The qbit-jay binary "${ENGRAM_BIN}" could not be started (spawn error ${code}). Check the binary's path and permissions, then retry.`;
   }
   if (result.status !== 0 && /unknown command/i.test(result.stderr) && /instance-id/i.test(result.stderr)) {
-    return `The Engram binary "${ENGRAM_BIN}" does not support "instance-id" and predates v2.0.0-rc.11. Upgrade the binary, or point ENGRAM_BIN at the current one.`;
+    return `The qbit-jay binary "${ENGRAM_BIN}" does not support "instance-id" and predates v2.0.0-rc.11. Upgrade the binary, or point QBIT_JAY_BIN at the current one.`;
   }
-  return `The Engram binary "${ENGRAM_BIN}" failed to resolve its instance id (exit ${result.status}). Run "${ENGRAM_BIN} instance-id" directly to see the underlying error.`;
+  return `The qbit-jay binary "${ENGRAM_BIN}" failed to resolve its instance id (exit ${result.status}). Run "${ENGRAM_BIN} instance-id" directly to see the underlying error.`;
 }
 
 // The CLI version is context for the legacy-server guidance message, never a gate: a binary
@@ -1244,7 +1257,7 @@ const SESSION_SCRATCH_NAME = /^(?:gp|ga)[A-Za-z0-9]{6}$/;
 export function detachedServeEnv(env: NodeJS.ProcessEnv): NodeJS.ProcessEnv {
   // Opt into cloud autosync like the Claude Code and Codex launchers; the
   // server skips it on its own when no cloud server or token is configured.
-  const result = { ...env, ENGRAM_CLOUD_AUTOSYNC: "1" };
+  const result = { ...env, QBIT_JAY_CLOUD_AUTOSYNC: "1", ENGRAM_CLOUD_AUTOSYNC: "1" };
   for (const key of ["TMPDIR", "TMP", "TEMP"]) {
     const value = result[key];
     if (typeof value === "string" && SESSION_SCRATCH_NAME.test(basename(value))) delete result[key];
@@ -1363,10 +1376,10 @@ function spawnAndWaitForLegacyEngram(deadline: number, expectedID = ""): Promise
 }
 
 function ownedModeConfiguration(): void {
-  if (SERVER_MODE !== undefined && !SESSION_OWNED) throw new DeterministicStartupError("Invalid ENGRAM_SERVER_MODE; unset it for shared mode or use literal session-owned.");
+  if (SERVER_MODE !== undefined && !SESSION_OWNED) throw new DeterministicStartupError("Invalid QBIT_JAY_SERVER_MODE (or ENGRAM_SERVER_MODE); unset it for shared mode or use literal session-owned.");
   if (!SESSION_OWNED) return;
-  for (const key of ["ENGRAM_URL", "ENGRAM_PORT", "ENGRAM_SOCKET"]) {
-    if (process.env[key] !== undefined) throw new DeterministicStartupError(`Session-owned Engram conflicts with ${key}; unset it before restarting Pi.`);
+  for (const key of ["URL", "PORT", "SOCKET"]) {
+    if (pluginEnv(key) !== undefined) throw new DeterministicStartupError(`Session-owned qbit-jay conflicts with QBIT_JAY_${key} / ENGRAM_${key}; unset it before restarting Pi.`);
   }
 }
 
@@ -1422,7 +1435,7 @@ async function startOwnedTransportOnce(): Promise<void> {
   if (ownedChild && ownedChild.exitCode === null && ownedChild.signalCode === null && ENGRAM_URL) return;
   const token = randomBytes(32).toString("hex");
   const child = spawn(ENGRAM_BIN, ["serve", "--session-owned"], {
-    env: { ...process.env, ENGRAM_TOKEN: token, ENGRAM_CLOUD_AUTOSYNC: "1" },
+    env: { ...process.env, QBIT_JAY_TOKEN: token, ENGRAM_TOKEN: token, QBIT_JAY_CLOUD_AUTOSYNC: "1", ENGRAM_CLOUD_AUTOSYNC: "1" },
     windowsHide: true, detached: false, stdio: ["pipe", "pipe", "ignore"],
   });
   ownedChild = child;
@@ -1732,7 +1745,7 @@ function supportsRootSessionResume(health: unknown): boolean {
 function rootResumeCompatibilityError(health: unknown): Error {
   const version = health && typeof health === "object" && typeof (health as { version?: unknown }).version === "string"
     ? (health as { version: string }).version : "unknown";
-  return new Error(`gentle-engram 0.5.1 cannot resume this Pi session with Engram core ${version}. Requires capabilities.root_session_resume: true or a supported release >= 3.0.0 without an explicit negative or malformed capability. Upgrade the Engram core and restart its server, then retry. No resumed identity was adopted.`);
+  return new Error(`qbit-jay 0.5.1 cannot resume this Pi session with Engram core ${version}. Requires capabilities.root_session_resume: true or a supported release >= 3.0.0 without an explicit negative or malformed capability. Upgrade the Engram core and restart its server, then retry. No resumed identity was adopted.`);
 }
 
 async function registerEffectiveSession(ctx: SessionContext, sessionProject: string, appendEntry: ExtensionAPI["appendEntry"] | undefined, fetch: EngramFetcher = engramFetch): Promise<string> {
@@ -1800,7 +1813,7 @@ async function registerEffectiveSession(ctx: SessionContext, sessionProject: str
         traceSessionRegistration({ stage: "acknowledgement", effective: acknowledgement?.status === "created" && effectiveID === runtimeID ? "root" : acknowledgement?.status === "created" && typeof effectiveID === "string" && effectiveID.startsWith(`${runtimeID}:resume:`) ? "continuation" : "invalid" });
         if (acknowledgement?.status !== "created" || typeof effectiveID !== "string"
           || !(effectiveID === runtimeID || effectiveID.startsWith(`${runtimeID}:resume:`))) {
-          throw new Error(`gentle-engram could not confirm session registration for Pi runtime session ${runtimeID}: invalid acknowledgement`);
+          throw new Error(`qbit-jay could not confirm session registration for Pi runtime session ${runtimeID}: invalid acknowledgement`);
         }
         if (effectiveID !== persistedID && !canPersist) {
           throw new Error("Cannot persist the acknowledged resumed Pi session identity");
@@ -1912,7 +1925,7 @@ async function registerSatelliteSession(ctx: SessionContext, targetProject: stri
       if (acknowledgement?.status !== "created" || typeof effectiveID !== "string"
         || !(effectiveID === rootID || (effectiveID.startsWith(`${rootID}:resume:`)
           && /^[0-9]+$/.test(effectiveID.slice(`${rootID}:resume:`.length))))) {
-        throw new Error(`gentle-engram could not confirm satellite session registration ${rootID} for project ${targetProject}: invalid acknowledgement`);
+        throw new Error(`qbit-jay could not confirm satellite session registration ${rootID} for project ${targetProject}: invalid acknowledgement`);
       }
       registeredSessionProjects.set(effectiveID, targetProject);
       knownSessions.add(`${targetProject}:${effectiveID}`);
@@ -1967,7 +1980,7 @@ async function ensureSession(sessionId: string, sessionProject = project, fetch:
       throw sessionProjectConflictFromResponse(error, sessionId, sessionProject) || error;
     }
     if (acknowledgement === null) {
-      throw new Error(`gentle-engram could not confirm session registration for Pi runtime session ${sessionId}`);
+      throw new Error(`qbit-jay could not confirm session registration for Pi runtime session ${sessionId}`);
     }
     registeredSessionProjects.set(sessionId, sessionProject);
     knownSessions.add(key);
@@ -2154,7 +2167,7 @@ async function initialize(cwd: string): Promise<void> {
 function normalizeInitializationError(error: unknown): Error {
   const message = error instanceof Error ? error.message : String(error);
   if (error instanceof RuntimeContractError || error instanceof EngramUnavailableError) return error;
-  const normalized = `gentle-engram could not initialize the Engram memory provider at ${ENGRAM_URL}: ${message}. Run mem_doctor or start Engram manually, and verify ENGRAM_URL/ENGRAM_PORT/ENGRAM_BIN.`;
+  const normalized = `qbit-jay could not initialize the Engram memory provider at ${ENGRAM_URL}: ${message}. Run mem_doctor or start Engram manually, and verify QBIT_JAY_URL/QBIT_JAY_PORT/QBIT_JAY_BIN.`;
   return error instanceof ForeignOwnershipError
     ? new ForeignOwnershipError(error.evidence, normalized)
     : new Error(normalized);
@@ -2902,16 +2915,16 @@ async function callMemoryTool(toolName: string, params: Record<string, unknown>,
 
 function unreachableMessage(failure: EngramTransportFailure | undefined): string {
   if (failure?.operation === "session-registration" && failure.outcome === "unknown") {
-    return `gentle-engram could not confirm session registration after ${failure.timeoutMs}ms. Registration is idempotent and was retried within its bounded policy, but its final outcome is unknown. No memory write was sent; retrying the memory operation is safe.`;
+    return `qbit-jay could not confirm session registration after ${failure.timeoutMs}ms. Registration is idempotent and was retried within its bounded policy, but its final outcome is unknown. No memory write was sent; retrying the memory operation is safe.`;
   }
   if (failure?.operation === "write" && failure.outcome === "unknown") {
-    if (failure.operationID) return `gentle-engram could not confirm the observation save. Its outcome is unknown — do NOT blindly retry with a new operation. Operation ID: ${failure.operationID}. Read-only recovery: GET /observations/save-result?operation_id=${failure.operationID} on the original Engram server.`;
-    return `gentle-engram could not confirm the write after ${failure.timeoutMs}ms. Its outcome is unknown because the server may already have applied it — do NOT blindly retry it, or you may duplicate the write. Verify with mem_search or mem_doctor first.`;
+    if (failure.operationID) return `qbit-jay could not confirm the observation save. Its outcome is unknown — do NOT blindly retry with a new operation. Operation ID: ${failure.operationID}. Read-only recovery: GET /observations/save-result?operation_id=${failure.operationID} on the original Engram server.`;
+    return `qbit-jay could not confirm the write after ${failure.timeoutMs}ms. Its outcome is unknown because the server may already have applied it — do NOT blindly retry it, or you may duplicate the write. Verify with mem_search or mem_doctor first.`;
   }
   if (failure?.outcome === "timed_out") {
-    return `gentle-engram ${failure.operation} timed out after ${failure.timeoutMs}ms waiting for the Engram HTTP server at ${ENGRAM_URL}. The bounded read policy was exhausted; run mem_doctor or retry the read when the server is healthy.`;
+    return `qbit-jay ${failure.operation} timed out after ${failure.timeoutMs}ms waiting for the Engram HTTP server at ${ENGRAM_URL}. The bounded read policy was exhausted; run mem_doctor or retry the read when the server is healthy.`;
   }
-  return `gentle-engram could not reach the Engram HTTP server at ${ENGRAM_URL}. The Pi-native mem_* tools are registered, but the native memory provider is not currently responding. Run mem_doctor or restart Engram.`;
+  return `qbit-jay could not reach the Engram HTTP server at ${ENGRAM_URL}. The Pi-native mem_* tools are registered, but the native memory provider is not currently responding. Run mem_doctor or restart Engram.`;
 }
 
 async function executeMemoryTool(toolName: string, params: Record<string, unknown>, ctx: MemoryToolContext, signal?: AbortSignal, appendEntry?: ExtensionAPI["appendEntry"]) {
@@ -2974,7 +2987,7 @@ function registerMemoryTools(pi: ExtensionAPI): () => void {
     pi.registerTool({
       name: toolName,
       label: `Engram: ${humanToolName(toolName)}`,
-      description: `Engram memory tool: ${humanToolName(toolName)}. Compact UI is provided by gentle-engram; persistence is handled by Engram when installed and running.`,
+      description: `Engram memory tool: ${humanToolName(toolName)}. Compact UI is provided by qbit-jay; persistence is handled by Engram when installed and running.`,
       promptSnippet: `Engram memory: ${humanToolName(toolName)}`,
       parameters: MEMORY_TOOL_SCHEMAS[toolName],
       ...(deferred ? { exposure: "deferred" as const } : {}),
@@ -3103,7 +3116,7 @@ export default function registerEngram(pi: ExtensionAPI) {
   // Trace-only comparison is local to this factory, never persistence or ownership state.
   let previousTraceIdentity: string | undefined;
   const traceLifecycle = (event: "session_start" | "session_shutdown", id: string | undefined | (() => string), reason?: unknown) => {
-    if (process.env.ENGRAM_PI_SESSION_TRACE !== "1") {
+    if (pluginEnv("PI_SESSION_TRACE") !== "1") {
       previousTraceIdentity = undefined;
       return;
     }

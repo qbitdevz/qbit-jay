@@ -1006,7 +1006,7 @@ test("registered Pi-native mem_search reports native provider transport failure"
       );
 
       assert.equal(result.isError, true);
-      assert.match(result.content[0].text, /gentle-engram could not reach the Engram HTTP server/);
+      assert.match(result.content[0].text, /qbit-jay could not reach the Engram HTTP server/);
       assert.match(result.content[0].text, /Pi-native mem_\* tools are registered/);
       assert.match(result.details.error, /native memory provider is not currently responding/);
     });
@@ -2071,7 +2071,7 @@ test("root resume compatibility negotiates support and fails closed", async () =
           const result = await registeredTools.get("mem_save").execute("compat", { title: "compat", content: "compat" }, undefined, undefined, ctx);
           assert.equal(!!result.isError, !supported && !fresh && !activeMapping, JSON.stringify({ health, mode, result }));
           if (!supported && !fresh && !activeMapping) {
-            assert.match(JSON.stringify(result), /gentle-engram 0\.5\.1/);
+            assert.match(JSON.stringify(result), /qbit-jay 0\.5\.1/);
             assert.match(JSON.stringify(result), /core .*root_session_resume.*3\.0\.0.*[Uu]pgrade/);
             assert.equal(calls.filter(({ path }) => path === "/observations").length, 0);
             assert.ok(calls.filter(({ path }) => path === "/sessions").every(({ body }) => !body.resume));
@@ -4141,7 +4141,7 @@ test("shutdown stops passive capture after registration", async () => {
       assert.ok(nextTurn.message, "owner recovery must return a custom message, not a system-prompt notice");
       assert.deepEqual(nextTurn.message, {
         customType: "engram-compaction-recovery",
-        content: "exact-session context\n\nCompaction recovery summary was already saved to Engram (pi) by gentle-engram. No manual mem_session_summary call is needed for this compaction. Call mem_context if you need additional recent project memory.",
+        content: "exact-session context\n\nCompaction recovery summary was already saved to Engram (pi) by qbit-jay. No manual mem_session_summary call is needed for this compaction. Call mem_context if you need additional recent project memory.",
         display: false,
       });
       for (const turn of [otherTurn, nextTurn, consumedTurn]) {
@@ -4208,7 +4208,7 @@ test("structured system prompt options receive memory instructions and the one-s
       assert.deepEqual(recovered, {
         message: {
           customType: "engram-compaction-recovery",
-          content: "exact-session context\n\nCompaction recovery summary was already saved to Engram (pi) by gentle-engram. No manual mem_session_summary call is needed for this compaction. Call mem_context if you need additional recent project memory.",
+          content: "exact-session context\n\nCompaction recovery summary was already saved to Engram (pi) by qbit-jay. No manual mem_session_summary call is needed for this compaction. Call mem_context if you need additional recent project memory.",
           display: false,
         },
       });
