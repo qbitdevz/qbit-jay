@@ -54,6 +54,9 @@ esac
 
 if [ -n "${QBIT_JAY_INSTALL_BASE_URL:-}" ]; then
 	base="${QBIT_JAY_INSTALL_BASE_URL%/}"
+	if [ "$version" != "latest" ]; then
+		say "QBIT_JAY_INSTALL_BASE_URL is set: installing whatever $base serves, not version $version"
+	fi
 elif [ "$version" = "latest" ]; then
 	base="https://github.com/$REPO/releases/latest/download"
 else
@@ -84,7 +87,14 @@ else
 fi
 
 tmp="$(mktemp -d 2>/dev/null || mktemp -d -t qbit-jay)" || fail "cannot create a temporary directory"
-trap 'rm -rf "$tmp"' EXIT HUP INT TERM
+staged=""
+cleanup() {
+	rm -rf "$tmp"
+	if [ -n "$staged" ]; then rm -f "$staged"; fi
+}
+trap cleanup EXIT
+# A signal must stop the script, not resume it against a deleted temp dir.
+trap 'exit 130' HUP INT TERM
 
 say "Downloading checksums.txt ($base)"
 download "$base/checksums.txt" "$tmp/checksums.txt" || fail "cannot download $base/checksums.txt"
@@ -117,10 +127,8 @@ mkdir -p "$install_dir" || fail "cannot create $install_dir; set QBIT_JAY_INSTAL
 staged="$install_dir/.$BIN.new.$$"
 cp "$tmp/x/$BIN" "$staged" || fail "cannot write to $install_dir; set QBIT_JAY_INSTALL_DIR to a writable directory (this script never uses sudo)"
 chmod 0755 "$staged"
-mv -f "$staged" "$install_dir/$BIN" || {
-	rm -f "$staged"
-	fail "cannot install into $install_dir"
-}
+mv -f "$staged" "$install_dir/$BIN" || fail "cannot install into $install_dir"
+staged=""
 
 say "Installed $install_dir/$BIN"
 "$install_dir/$BIN" version || true
