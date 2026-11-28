@@ -107,7 +107,7 @@ func TestClaudeUserPromptSubmitPowerShellEnvironmentPrecedencePort(t *testing.T)
 
 func TestCodexSubagentStopPowerShellEnvironmentPrecedencePort(t *testing.T) {
 	if runtime.GOOS != "windows" {
-		t.Skip("requires native Windows PowerShell")
+		t.Skip("requires Windows PowerShell")
 	}
 	adapterPath := filepath.Join(repoRoot(t), "plugin", "codex", "scripts", "subagent-stop.ps1")
 	runPortPrecedence(t, func(t *testing.T, env map[string]string) {
