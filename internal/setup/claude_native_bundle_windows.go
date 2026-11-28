@@ -128,7 +128,7 @@ func (b claudeBundle) stageWithGuardBudget(root, pin string, extendedGuard bool)
 				return bundle, err
 			}
 			var name, version string
-			if json.Unmarshal(manifest["name"], &name) != nil || name != "engram" ||
+			if json.Unmarshal(manifest["name"], &name) != nil || name != "qbit-jay" ||
 				json.Unmarshal(manifest["version"], &version) != nil || version == "" {
 				return bundle, errors.New("invalid bundled Engram Claude plugin identity")
 			}
@@ -225,7 +225,7 @@ func extendClaudePreToolUse(events map[string]json.RawMessage, pin string) error
 	var kind, command, failure string
 	var args []string
 	if json.Unmarshal(hook["type"], &kind) != nil || kind != "command" ||
-		json.Unmarshal(hook["command"], &command) != nil || command != "engram" ||
+		json.Unmarshal(hook["command"], &command) != nil || command != "qbit-jay" ||
 		json.Unmarshal(hook["args"], &args) != nil || len(args) != 2 ||
 		args[0] != "hook" || args[1] != "claude-pre-tool-use" ||
 		json.Unmarshal(hook["onFailure"], &failure) != nil || failure != "block" {
@@ -257,9 +257,9 @@ func (b stagedClaudeBundle) publish(root string) error {
 		return err
 	}
 	raw, err := json.MarshalIndent(map[string]any{
-		"name":    "engram",
-		"owner":   map[string]string{"name": "Gentleman Programming", "email": "gentlemanprogramming.dev@gmail.com"},
-		"plugins": []map[string]string{{"name": "engram", "version": b.version, "source": b.source}},
+		"name":    "qbit-jay",
+		"owner":   map[string]string{"name": "qbitdevz"},
+		"plugins": []map[string]string{{"name": "qbit-jay", "version": b.version, "source": b.source}},
 	}, "", "  ")
 	if err != nil {
 		return err
@@ -306,7 +306,7 @@ func pinClaudePromptCore(root string) (string, error) {
 	if err := ensureClaudeManagedDirectory(dir); err != nil {
 		return "", err
 	}
-	pin := filepath.Join(dir, "engram.exe")
+	pin := filepath.Join(dir, "qbit-jay.exe")
 	if err := rejectClaudeReparsePoint(pin); err != nil {
 		return "", err
 	}
@@ -314,7 +314,7 @@ func pinClaudePromptCore(root string) (string, error) {
 		if _, err := source.Seek(0, 0); err != nil {
 			return "", err
 		}
-		staged, err := os.CreateTemp(dir, ".engram-*.exe")
+		staged, err := os.CreateTemp(dir, ".qbit-jay-*.exe")
 		if err != nil {
 			return "", err
 		}

@@ -17,7 +17,7 @@ func TestOpenCodeMCPSetupPreservesJSONC(t *testing.T) {
 		"// user settings\r\n{\r\n\t\"z\": 9007199254740993, // number\r\n\t\"a\": [1, 2,],\r\n}\r\n",
 		`{/* root */ "z":true,"mcp":{/* servers */"other":{"command":["https://example.com/* literal */",],},},"a":false,}`,
 		`{ "mcp": { // empty servers` + "\n" + `}, "opaque": "escaped \" // literal" }`,
-		`{ "mcp": {"engram":{"command":["custom"],"enabled":false},}, }`,
+		`{ "mcp": {"qbit-jay":{"command":["custom"],"enabled":false},}, }`,
 	} {
 		t.Run(original, func(t *testing.T) {
 			resetSetupSeams(t)
@@ -55,14 +55,14 @@ func TestOpenCodeMCPSetupPreservesJSONC(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			insertion := []byte(`"mcp":{"engram":` + string(entry) + `},`)
+			insertion := []byte(`"mcp":{"qbit-jay":` + string(entry) + `},`)
 			if strings.Contains(original, `"mcp"`) {
-				insertion = []byte(`"engram":` + string(entry))
+				insertion = []byte(`"qbit-jay":` + string(entry))
 				if strings.Contains(original, `"other"`) {
 					insertion = append(insertion, ',')
 				}
 			}
-			if strings.Contains(original, `"engram"`) {
+			if strings.Contains(original, `"qbit-jay"`) {
 				if string(after) != original || writes != 0 {
 					t.Fatalf("existing entry changed: %s, writes=%d", after, writes)
 				}
@@ -99,7 +99,7 @@ func TestOpenCodeMCPRefreshesExistingLocalCommand(t *testing.T) {
 			original: `{
   // preserve V1 comments and formatting
   "mcp": {
-    "engram": {"type":"local","command":["/removed/engram","mcp","--tools=agent","--custom"],"enabled":false,"environment":{"DEBUG":"1"}},
+    "qbit-jay": {"type":"local","command":["/removed/engram","mcp","--tools=agent","--custom"],"enabled":false,"environment":{"DEBUG":"1"}},
     "other": {"type":"local","command":["other"]}
   }
 }`,
@@ -111,7 +111,7 @@ func TestOpenCodeMCPRefreshesExistingLocalCommand(t *testing.T) {
     "timeout": {"request": 5000},
     "servers": {
       // preserve V2 comments and formatting
-      "engram": {"type":"local","command":["/removed/engram","mcp","--tools=agent","--custom"],"disabled":true,"environment":{"DEBUG":"1"}},
+      "qbit-jay": {"type":"local","command":["/removed/engram","mcp","--tools=agent","--custom"],"disabled":true,"environment":{"DEBUG":"1"}},
       "other": {"type":"local","command":["other"]}
     }
   }
@@ -122,7 +122,7 @@ func TestOpenCodeMCPRefreshesExistingLocalCommand(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			resetSetupSeams(t)
 			useIsolatedProfile(t)
-			canonical := filepath.Join(t.TempDir(), "current", "engram")
+			canonical := filepath.Join(t.TempDir(), "current", "qbit-jay")
 			osExecutable = func() (string, error) { return canonical, nil }
 			path := filepath.Join(openCodeConfigDir(), "opencode.jsonc")
 			if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
@@ -158,12 +158,12 @@ func TestOpenCodeMCPRefreshesExistingLocalCommand(t *testing.T) {
 				t.Fatal(err)
 			}
 			mcp := config["mcp"].(map[string]any)
-			entry := mcp["engram"]
+			entry := mcp["qbit-jay"]
 			if tc.v2 {
-				if _, legacy := mcp["engram"]; legacy {
-					t.Fatalf("V2 configuration gained a legacy mcp.engram entry: %#v", mcp)
+				if _, legacy := mcp["qbit-jay"]; legacy {
+					t.Fatalf("V2 configuration gained a legacy mcp.qbit-jay entry: %#v", mcp)
 				}
-				entry = mcp["servers"].(map[string]any)["engram"]
+				entry = mcp["servers"].(map[string]any)["qbit-jay"]
 			}
 			engram := entry.(map[string]any)
 			if command := engram["command"].([]any); !reflect.DeepEqual(command, []any{canonical, "mcp", "--tools=agent", "--custom"}) {
@@ -185,7 +185,7 @@ func TestOpenCodeMCPRefreshesExistingLocalCommand(t *testing.T) {
 }
 
 func TestReconcileOpenCodeMCPCommandGuardsAndFailures(t *testing.T) {
-	canonical := filepath.Join(t.TempDir(), "current", "engram")
+	canonical := filepath.Join(t.TempDir(), "current", "qbit-jay")
 	for _, tc := range []struct {
 		name           string
 		layout         string
@@ -200,7 +200,7 @@ func TestReconcileOpenCodeMCPCommandGuardsAndFailures(t *testing.T) {
 			layout:     "V1",
 			entry:      `{"type":"local","command":["/removed/engram"]}`,
 			marshalErr: errors.New("marshal failed"),
-			wantErr:    "marshal engram command: marshal failed",
+			wantErr:    "marshal qbit-jay command: marshal failed",
 		},
 		{
 			name:           "returns write config error",
@@ -235,17 +235,17 @@ func TestReconcileOpenCodeMCPCommandGuardsAndFailures(t *testing.T) {
 			resetSetupSeams(t)
 			osExecutable = func() (string, error) { return canonical, nil }
 
-			original := []byte(`{"mcp":{"engram":` + tc.entry + `}}`)
+			original := []byte(`{"mcp":{"qbit-jay":` + tc.entry + `}}`)
 			if tc.layout == "V2" {
-				original = []byte(`{"mcp":{"servers":{"engram":` + tc.entry + `}}}`)
+				original = []byte(`{"mcp":{"servers":{"qbit-jay":` + tc.entry + `}}}`)
 			}
 			config, err := parseOpenCodeJSONC(original)
 			if err != nil {
 				t.Fatal(err)
 			}
-			engram := config.members["mcp"].members["engram"]
+			engram := config.members["mcp"].members["qbit-jay"]
 			if tc.layout == "V2" {
-				engram = config.members["mcp"].members["servers"].members["engram"]
+				engram = config.members["mcp"].members["servers"].members["qbit-jay"]
 			}
 
 			path := filepath.Join(t.TempDir(), "opencode.jsonc")
@@ -294,7 +294,7 @@ func TestOpenCodeMCPV2PreservesRemoteEntryAndAddsNoLegacyDuplicate(t *testing.T)
 	if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 		t.Fatal(err)
 	}
-	original := `{"mcp":{"servers":{"engram":{"type":"remote","url":"https://example.com/mcp"},"other":{"type":"local","command":["other"]}}}}`
+	original := `{"mcp":{"servers":{"qbit-jay":{"type":"remote","url":"https://example.com/mcp"},"other":{"type":"local","command":["other"]}}}}`
 	if err := os.WriteFile(path, []byte(original), 0644); err != nil {
 		t.Fatal(err)
 	}
@@ -332,12 +332,12 @@ func TestOpenCodeMCPV2AddsMissingServerWithoutLegacyDuplicate(t *testing.T) {
 		t.Fatal(err)
 	}
 	mcp := config["mcp"].(map[string]any)
-	if _, legacy := mcp["engram"]; legacy {
-		t.Fatalf("V2 configuration gained a legacy mcp.engram entry: %#v", mcp)
+	if _, legacy := mcp["qbit-jay"]; legacy {
+		t.Fatalf("V2 configuration gained a legacy mcp.qbit-jay entry: %#v", mcp)
 	}
 	servers := mcp["servers"].(map[string]any)
-	if _, registered := servers["engram"]; !registered {
-		t.Fatalf("missing V2 mcp.servers.engram: %#v", servers)
+	if _, registered := servers["qbit-jay"]; !registered {
+		t.Fatalf("missing V2 mcp.servers.qbit-jay: %#v", servers)
 	}
 	if _, preserved := servers["other"]; !preserved {
 		t.Fatalf("other V2 server was not preserved: %#v", servers)

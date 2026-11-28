@@ -44,7 +44,7 @@ func agentAdapters() []agentAdapter {
 			installDir:  geminiConfigPath,
 			postInstall: []string{
 				"Restart Gemini CLI so MCP config is reloaded",
-				"Verify ~/.gemini/settings.json includes mcpServers.engram",
+				"Verify ~/.gemini/settings.json includes mcpServers.qbit-jay",
 				"Verify ~/.gemini/system.md + ~/.gemini/.env exist for compaction recovery",
 			},
 		},
@@ -55,7 +55,7 @@ func agentAdapters() []agentAdapter {
 			installDir:  codexConfigPath,
 			postInstall: []string{
 				"Restart Codex so MCP config and plugin are reloaded",
-				"Verify ~/.codex/config.toml has [mcp_servers.engram]",
+				"Verify ~/.codex/config.toml has [mcp_servers.qbit-jay]",
 				"Verify ~/.codex/config.toml does NOT set model_instructions_file or experimental_compact_prompt_file (they replace Codex's built-in prompt)",
 				"Verify plugin is installed with: codex plugin list",
 				"If codex CLI was absent during setup, install manually: codex plugin marketplace add Gentleman-Programming/engram --ref main && codex plugin add engram@engram",
@@ -71,7 +71,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Antigravity so the shared MCP config is reloaded",
-				"Verify ~/.gemini/config/mcp_config.json includes mcpServers.engram",
+				"Verify ~/.gemini/config/mcp_config.json includes mcpServers.qbit-jay",
 				"Verify ~/.gemini/GEMINI.md has the Engram Memory Protocol block",
 			},
 		},
@@ -85,7 +85,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Windsurf so Cascade reloads MCP config",
-				"Verify ~/.codeium/windsurf/mcp_config.json includes mcpServers.engram",
+				"Verify ~/.codeium/windsurf/mcp_config.json includes mcpServers.qbit-jay",
 				"Verify ~/.codeium/windsurf/memories/global_rules.md has the Memory Protocol block",
 			},
 		},
@@ -99,7 +99,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Qwen Code so MCP config is reloaded",
-				"Verify ~/.qwen/settings.json includes mcpServers.engram",
+				"Verify ~/.qwen/settings.json includes mcpServers.qbit-jay",
 				"Verify ~/.qwen/QWEN.md has the Engram Memory Protocol block",
 			},
 		},
@@ -113,7 +113,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Kiro so MCP config is reloaded",
-				"Verify ~/.kiro/settings/mcp.json includes mcpServers.engram",
+				"Verify ~/.kiro/settings/mcp.json includes mcpServers.qbit-jay",
 				"Verify ~/.kiro/steering/engram.md has the Memory Protocol block",
 			},
 		},
@@ -127,7 +127,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Cursor so MCP config is reloaded",
-				"Verify ~/.cursor/mcp.json includes mcpServers.engram",
+				"Verify ~/.cursor/mcp.json includes mcpServers.qbit-jay",
 				"NOTE: Cursor does NOT read global rule files from the filesystem — .mdc files outside a project are silently ignored",
 				"Open ~/.cursor/engram-memory-protocol.md and copy its contents",
 				"In Cursor, open Settings → Rules → User Rules and paste the copied contents",
@@ -143,7 +143,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart VS Code so Copilot reloads MCP config",
-				"Verify <VS Code User>/mcp.json includes servers.engram",
+				"Verify <VS Code User>/mcp.json includes servers.qbit-jay",
 				"Verify <VS Code User>/prompts/engram.instructions.md exists",
 			},
 		},
@@ -157,7 +157,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart Kilo Code so MCP config is reloaded",
-				"Verify ~/.config/kilo/opencode.json includes mcp.engram",
+				"Verify ~/.config/kilo/opencode.json includes mcp.qbit-jay",
 				"Verify ~/.config/kilo/AGENTS.md has the Memory Protocol block",
 			},
 		},
@@ -171,7 +171,7 @@ func agentAdapters() []agentAdapter {
 			},
 			postInstall: []string{
 				"Restart the CommandCode session so MCP config is reloaded",
-				"Verify ~/.commandcode/mcp.json includes mcpServers.engram",
+				"Verify ~/.commandcode/mcp.json includes mcpServers.qbit-jay",
 				"Verify ~/.commandcode/AGENTS.md has the Memory Protocol block",
 			},
 		},
@@ -188,7 +188,7 @@ func agentAdapters() []agentAdapter {
 			// ~/.kimi-code would send the user to files setup never wrote.
 			postInstall: []string{
 				"Restart Kimi Code so MCP config is reloaded",
-				fmt.Sprintf("Verify %s includes mcpServers.engram", kimiMCPPath()),
+				fmt.Sprintf("Verify %s includes mcpServers.qbit-jay", kimiMCPPath()),
 				fmt.Sprintf("Verify %s has the Memory Protocol block", kimiAgentsPath()),
 			},
 		},

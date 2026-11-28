@@ -241,7 +241,7 @@ func upsertCodexEngramBlock(content, command string) (string, error) {
 				return "", err
 			}
 			table = keys
-			removing = len(keys) == 2 && keys[0] == "mcp_servers" && keys[1] == "engram"
+			removing = len(keys) == 2 && keys[0] == "mcp_servers" && keys[1] == mcpServerName
 			if strings.HasPrefix(code, "[[") && (removing || len(keys) == 1 && keys[0] == "mcp_servers") {
 				return "", fmt.Errorf("unsupported MCP array table")
 			}
@@ -251,10 +251,10 @@ func upsertCodexEngramBlock(content, command string) (string, error) {
 				return "", err
 			}
 			path := append(append([]string(nil), table...), keys...)
-			if path[0] == "mcp_servers" && (len(path) == 1 || path[1] == "engram") {
+			if path[0] == "mcp_servers" && (len(path) == 1 || path[1] == mcpServerName) {
 				// Dotted keys and inline tables can already define this table.
 				// Do not append a conflicting header or convert user syntax.
-				return "", fmt.Errorf("unsupported dotted/inline MCP registration; use [mcp_servers.engram]")
+				return "", fmt.Errorf("unsupported dotted/inline MCP registration; use [mcp_servers.qbit-jay]")
 			}
 		}
 		if !removing {

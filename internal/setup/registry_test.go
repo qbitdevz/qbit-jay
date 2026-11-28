@@ -63,7 +63,7 @@ func TestStaleMCPCommands(t *testing.T) {
 			if agent.mcpFormat == opencodeObject {
 				command = []string{missing, "mcp", "--tools=agent"}
 			}
-			raw, _ := json.Marshal(map[string]any{agent.topKey: map[string]any{"other": map[string]any{"command": missing}, "engram": staleTestEntry(agent.mcpFormat, command)}})
+			raw, _ := json.Marshal(map[string]any{agent.topKey: map[string]any{"other": map[string]any{"command": missing}, "qbit-jay": staleTestEntry(agent.mcpFormat, command)}})
 			if err := os.WriteFile(path, raw, 0644); err != nil {
 				t.Fatal(err)
 			}
@@ -80,7 +80,7 @@ func TestStaleMCPCommands(t *testing.T) {
 			if !seen {
 				t.Fatalf("missing finding for %s: %+v", agent.slug, found)
 			}
-			raw, _ = json.Marshal(map[string]any{agent.topKey: map[string]any{"other": map[string]any{"command": missing}, "engram": map[string]any{"command": "engram"}}})
+			raw, _ = json.Marshal(map[string]any{agent.topKey: map[string]any{"other": map[string]any{"command": missing}, "qbit-jay": map[string]any{"command": "qbit-jay"}}})
 			if err := os.WriteFile(path, raw, 0644); err != nil {
 				t.Fatal(err)
 			}
@@ -167,7 +167,7 @@ func TestStaleMCPCommandsRejectsCustomEntries(t *testing.T) {
 					if err := os.MkdirAll(filepath.Dir(path), 0755); err != nil {
 						t.Fatal(err)
 					}
-					raw, err := json.Marshal(map[string]any{agent.topKey: map[string]any{"engram": copyEntry}})
+					raw, err := json.Marshal(map[string]any{agent.topKey: map[string]any{"qbit-jay": copyEntry}})
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -238,11 +238,11 @@ func TestStaleMCPCommandsIgnoreUnconfiguredAndCustom(t *testing.T) {
 	if err := os.WriteFile(existing, []byte("test"), 0644); err != nil {
 		t.Fatal(err)
 	}
-	write(map[string]any{"engram": map[string]any{"command": existing}})
+	write(map[string]any{"qbit-jay": map[string]any{"command": existing}})
 	checkNone() // path exists
-	write(map[string]any{"engram": map[string]any{"command": "custom-engram"}})
+	write(map[string]any{"qbit-jay": map[string]any{"command": "custom-engram"}})
 	checkNone() // bare command
-	write(map[string]any{"engram": map[string]any{"command": []string{"custom"}}})
+	write(map[string]any{"qbit-jay": map[string]any{"command": []string{"custom"}}})
 	checkNone() // custom shape, not the adapter format
 }
 
@@ -285,9 +285,9 @@ func readEngramEntry(t *testing.T, path, topKey string) map[string]any {
 	if !ok {
 		t.Fatalf("expected %q object in %s, got %#v", topKey, path, cfg[topKey])
 	}
-	entry, ok := block["engram"].(map[string]any)
+	entry, ok := block["qbit-jay"].(map[string]any)
 	if !ok {
-		t.Fatalf("expected %s.engram object in %s", topKey, path)
+		t.Fatalf("expected %s.qbit-jay object in %s", topKey, path)
 	}
 	return entry
 }
@@ -481,7 +481,7 @@ func TestInjectMCPPreservesExistingServersAndKeys(t *testing.T) {
 	if _, ok := servers["other"]; !ok {
 		t.Errorf("expected existing 'other' server preserved")
 	}
-	if _, ok := servers["engram"]; !ok {
+	if _, ok := servers["qbit-jay"]; !ok {
 		t.Errorf("expected engram server added")
 	}
 }

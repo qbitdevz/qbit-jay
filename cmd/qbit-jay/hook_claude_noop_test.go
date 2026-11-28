@@ -308,3 +308,21 @@ func TestClaudeReviewPassthroughRetainsMCPProjectGuard(t *testing.T) {
 		t.Fatalf("foreign review changed:%+v err%v", other, err)
 	}
 }
+
+func TestClaudeGuardRecognizesQbitJayAndLegacyEngramToolNames(t *testing.T) {
+	for _, name := range []string{
+		"mcp__qbit-jay__mem_save",
+		"mcp__plugin_qbit-jay_qbit-jay__mem_session_end",
+		"mcp__engram__mem_save",
+		"mcp__plugin_engram_engram__mem_update",
+	} {
+		if !isClaudeEngramWriteOrSessionTool(name) {
+			t.Errorf("%s must be guarded as a write or session tool", name)
+		}
+	}
+	for _, name := range []string{"mcp__qbit-jay__mem_search", "mcp__other__mem_save", "mem_save"} {
+		if isClaudeEngramWriteOrSessionTool(name) {
+			t.Errorf("%s must not be guarded", name)
+		}
+	}
+}

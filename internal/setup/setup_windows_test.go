@@ -77,7 +77,7 @@ func TestInstallCodexPinsAndRefreshesWindowsExecutable(t *testing.T) {
 	if strings.Contains(string(secondConfig), strconv.Quote(first)) || !strings.Contains(string(secondConfig), "command = "+strconv.Quote(second)) {
 		t.Fatalf("Codex config did not replace the executable pin:\n%s", secondConfig)
 	}
-	if strings.Count(string(secondConfig), "[mcp_servers.engram]") != 1 {
+	if strings.Count(string(secondConfig), "[mcp_servers.qbit-jay]") != 1 {
 		t.Fatalf("expected one Codex MCP block after rerun:\n%s", secondConfig)
 	}
 }

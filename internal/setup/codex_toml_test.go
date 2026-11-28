@@ -16,7 +16,7 @@ func TestInstallCodexTOMLPreservation(t *testing.T) {
 		{"quoted keys", "\"model_instructions_file\" = 'old'\n'experimental_compact_prompt_file' = \"old2\"\nkeep = true\n", "keep = true\n", "old"},
 		{"escaped key", "\"model_instructions_\\u0066ile\" = 'old'\nkeep = true\n", "keep = true\n", "old"},
 		{"table entries", "model_instructions_file_extra = 'keep'\n[profile]\nmodel_instructions_file = 'table'\n", "model_instructions_file_extra = 'keep'\n[profile]\nmodel_instructions_file = 'table'\n", ""},
-		{"existing setup", "model = 'gpt-5'\n[mcp_servers.engram]\ncommand = 'old'\nargs = ['old']\n[mcp_servers.other]\ncommand = 'other'\n", "[mcp_servers.other]\ncommand = 'other'\n", "'old'"},
+		{"existing setup", "model = 'gpt-5'\n[mcp_servers.qbit-jay]\ncommand = 'old'\nargs = ['old']\n[mcp_servers.other]\ncommand = 'other'\n", "[mcp_servers.other]\ncommand = 'other'\n", "'old'"},
 		{"CRLF and BOM", "\ufeff# keep\r\nmodel_instructions_file = '''old'''\r\nnotes = '''a\r\nb'''\r\n", "# keep\r\nnotes = '''a\r\nb'''\r\n", "old"},
 	} {
 		t.Run(tt.name, func(t *testing.T) {
@@ -96,10 +96,10 @@ func TestInstallCodexTOMLRejectedUnchanged(t *testing.T) {
 		"model_instructions_file = [\"old\",\n",
 		"notes = 'unfinished\n",
 		"model_instructions_file = { path = 'old' }\n",
-		"mcp_servers.engram.command = \"old\"\n",
+		"mcp_servers.qbit-jay.command = \"old\"\n",
 		"mcp_servers = { engram = { command = 'old' } }\n",
-		"[mcp_servers]\nengram.command = 'old'\n",
-		"[mcp_servers]\nengram = { command = 'old' }\n",
+		"[mcp_servers]\nqbit-jay.command = 'old'\n",
+		"[mcp_servers]\nqbit-jay = { command = 'old' }\n",
 		"[[mcp_servers]]\ncommand = 'old'\n",
 		"model_instructions_file = 'old' junk\n",
 		"notes = \"\"\"a\"\"\"\"\"\"\n",

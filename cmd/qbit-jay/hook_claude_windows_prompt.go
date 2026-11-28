@@ -95,8 +95,8 @@ func claudeWindowsPromptBootstrap() string {
 		"mem_get_observation", "mem_suggest_topic_key", "mem_capture_passive", "mem_save_prompt", "mem_update",
 		"mem_current_project", "mem_judge", "mem_doctor", "mem_review", "mem_pin", "mem_unpin",
 	}
-	names := make([]string, 0, len(tools)*len(claudeEngramToolPrefixes))
-	for _, prefix := range slices.Backward(claudeEngramToolPrefixes) {
+	names := make([]string, 0, len(tools)*len(claudeQbitJayToolPrefixes))
+	for _, prefix := range slices.Backward(claudeQbitJayToolPrefixes) {
 		for _, tool := range tools {
 			names = append(names, prefix+tool)
 		}

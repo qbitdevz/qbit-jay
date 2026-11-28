@@ -55,7 +55,7 @@ func TestDoctorBlankMCPConfig(t *testing.T) {
 				missingBinary := filepath.Join(home, "missing-engram")
 				if laterStale {
 					raw, err := json.Marshal(map[string]any{"mcpServers": map[string]any{
-						"engram": map[string]any{"command": missingBinary, "args": []string{"mcp", "--tools=agent"}},
+						"qbit-jay": map[string]any{"command": missingBinary, "args": []string{"mcp", "--tools=agent"}},
 					}})
 					if err != nil {
 						t.Fatal(err)

@@ -37,7 +37,7 @@ func TestClaudeOrdinarySetupFallbackRequiresStartupRejection(t *testing.T) {
 				calls++
 				return []byte("legacy"), nil
 			}
-			out, err := claudeOrdinarySetupRunner(tc.managed)("claude.exe", "plugin", "install", "engram")
+			out, err := claudeOrdinarySetupRunner(tc.managed)("claude.exe", "plugin", "install", "qbit-jay")
 			if tc.retry {
 				if calls != 1 || err != nil || string(out) != "legacy" {
 					t.Fatalf("legacy fallback calls %d, error %v, output %q", calls, err, out)
