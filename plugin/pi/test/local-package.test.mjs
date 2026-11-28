@@ -37,7 +37,6 @@ function fixture(t, modify = () => {}) {
   for (const name of runtime) writeFileSync(join(pkg, name), `fixture ${name}\n`);
   writeFileSync(join(pkg, "assets/logo.txt"), "asset\n");
   writeFileSync(join(pkg, "test/example.test.mjs"), "fixture test, never executed\n");
-  writeFileSync(join(dir, "internal/setup/setup.go"), 'package setup\nconst piGentleEngramPackage = "npm:qbit-jay-pi@1.2.3"\n');
   return dir;
 }
 

@@ -5,7 +5,6 @@
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/qbit-jay-pi"><img alt="npm" src="https://img.shields.io/npm/v/qbit-jay-pi?color=blue" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay"><img alt="GitHub stars" src="https://img.shields.io/github/stars/qbitdevz/qbit-jay?style=flat&color=yellow" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay/graphs/contributors"><img alt="Contributors" src="https://img.shields.io/github/contributors/qbitdevz/qbit-jay?color=brightgreen" /></a>
   <a href="https://github.com/qbitdevz/qbit-jay/actions"><img alt="CI" src="https://img.shields.io/github/actions/workflow/status/qbitdevz/qbit-jay/ci.yml?label=CI" /></a>
@@ -255,7 +254,7 @@ Pi with `gentle-engram` 0.4.0 (the former package name) or a local source checko
 does not include this instrumentation. When using a local extension, do not load
 an installed npm copy at the same time.
 
-If your Pi `settings.json` lists an installed `npm:qbit-jay-pi` (or the former `npm:gentle-engram`) version under `packages`,
+If your Pi `settings.json` lists an installed copy of this package (for example a former `npm:gentle-engram` entry) under `packages`,
 temporarily remove only that entry before launching the local extension, then
 restore it after collecting the trace. Keep other packages enabled: `-e` adds
 an extension; it does not replace the installed package.
@@ -305,28 +304,13 @@ it. No trace file is created automatically.
 
 ## Quick start
 
-**Unreleased release preparation:** this source prepares companion `0.8.0`
-from the current reviewed Pi source.
-The commands below apply only after that candidate and its matching core artifacts
-are published and validated. The [release policy](../../docs/RELEASE-POLICY.md)
-describes the publication guards; the [earlier pair plan](../../docs/SESSION-OWNED-RELEASE-PAIR.md)
-retains the session-owned validation requirements and historical preparation versions.
+The qbit-jay Pi plugin is not distributed through npm: nothing named `qbit-jay-pi` is published, and neither `qbit-jay setup pi` nor `pi-qbit-jay init` installs or pins an `npm:` source for it (an unregistered name could be claimed by anyone). Both exit with an error without reading or changing Pi settings, and existing user entries, including `npm:gentle-engram` ones, are left untouched. Install it from a local checkout:
 
 ```bash
-pi install npm:qbit-jay-pi@0.8.0
-pi-qbit-jay init
+pi install <repo>/plugin/pi
 ```
 
-This source version of Go's `qbit-jay setup pi` pins `0.8.0` and migrates the known `0.7.1`, `0.7.0` and `0.6.0` pins along with older managed pins. Already-published core binaries retain their original installer pins; installing a newer companion does not change them. Use the validated core/companion pair rather than changing installed metadata. Earlier `0.1.16` still registers qbit-jay MCP during `pi-qbit-jay init`, so do not use it for native-only setup.
-
-Go's `qbit-jay setup pi` preserves a custom same-name npm entry across `pi install` only when Pi's
-change matches its known source replacement. Unexpected settings changes stop
-setup and retain an `.engram-pi-settings-*` recovery copy at the reported path;
-inspect it before retrying. This does not lock settings against concurrent edits.
-
-The direct `pi install` command above does not provide this protection. Pi 0.99.0
-can replace the first custom same-name npm source before `pi-qbit-jay init` runs.
-To preserve that source, use the matching core's `qbit-jay setup pi` instead.
+T0.9 replaces this with a plugin embedded in the qbit-jay binary.
 
 Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
 
@@ -873,12 +857,9 @@ The Pi extension treats absent, empty, and whitespace-only `QBIT_JAY_URL`, `QBIT
 
 ## Install command details
 
-With this Pi package version, `pi-qbit-jay init` updates Pi-owned config in the Pi agent directory:
+`pi-qbit-jay init` does not update any Pi-owned config: it prints the local install instruction and exits non-zero without touching `settings.json` or `mcp.json`.
 
-- `settings.json`: with the prepared matching core, ensures `npm:qbit-jay-pi@0.8.0` is declared, replacing the historical (pre-rename) `npm:gentle-engram@0.8.0` pin and affected `npm:gentle-engram@0.1.5`, `npm:gentle-engram@0.1.6`, `npm:gentle-engram@0.1.7`, `npm:gentle-engram@0.1.8`, `npm:gentle-engram@0.1.11`, `npm:gentle-engram@0.1.12`, `npm:gentle-engram@0.1.13`, `npm:gentle-engram@0.1.14`, `npm:gentle-engram@0.1.15`, `npm:gentle-engram@0.1.16`, `npm:gentle-engram@0.2.0`, `npm:gentle-engram@0.3.0`, `npm:gentle-engram@0.4.0`, `npm:gentle-engram@0.4.1`, `npm:gentle-engram@0.4.2`, `npm:gentle-engram@0.5.0`, `npm:gentle-engram@0.5.1`, `npm:gentle-engram@0.6.0`, `npm:gentle-engram@0.7.0`, and `npm:gentle-engram@0.7.1` pins when present. It does not add `npm:pi-mcp-adapter` and leaves an existing adapter entry untouched.
-- `mcp.json`: never created or changed by init. Existing `mcpServers.qbit-jay` (or the upstream `mcpServers.qbit-jay`) triggers a warning with its exact config path. Manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
-
-`qbit-jay setup pi` also auto-pins `npmCommand` in Pi's `settings.json` when [mise](https://mise.jdx.dev/) is detected in `PATH`. It sets `npmCommand` to `["mise", "exec", "node@<version>", "--", "npm"]` so Pi always uses the mise-managed Node version. Existing `npmCommand` values are never overwritten; if mise is not found, this step is a no-op.
+- `mcp.json`: never created or changed. If it has `mcpServers.qbit-jay` (or the upstream `mcpServers.engram`), manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
 
 Existing `mcpServers.qbit-jay` entries are preserved even with `--force`; the flag does not bypass native-only safety guidance. The published `mcp-template.json` is a legacy **Pi MCP configuration shape** for explicit, optional Pi MCP clients; it is not a generic standalone MCP template and neither `pi-qbit-jay init` nor `qbit-jay setup pi` uses it.
 
@@ -940,7 +921,7 @@ There is no automatic inference: editing files in another repository never chang
 
 | Symptom                                                      | Fix                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mem_*` tools are missing                                    | After the candidate pair is published and validated, install/verify `npm:qbit-jay-pi@0.8.0` with its matching core, run `pi-qbit-jay init`, then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
+| `mem_*` tools are missing                                    | Install the plugin from a local checkout with `pi install <repo>/plugin/pi` (it is not distributed through npm), then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
 | Pi cannot find `qbit-jay`                                      | Set `QBIT_JAY_BIN=/absolute/path/to/qbit-jay`.                                                                                                                                                                                                                              |
 | Session capture should use another server                    | Set `QBIT_JAY_URL=http://host:7437`.                                                                                                                                                                                                                                      |
 | Pi shows `error MCP: 0/N servers` but `mem_*` works          | That status covers Pi's MCP servers, not qbit-jay's Pi-native HTTP tools. Check `~/.pi/agent/mcp.json` for stale/unreachable servers such as remote OAuth services. |

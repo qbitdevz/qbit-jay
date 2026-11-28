@@ -42,7 +42,6 @@ func TestPiSourceEvidence(t *testing.T) {
 	candidateWrite(t, repo, ".gitignore", "plugin/pi/node_modules/\n")
 	candidateWrite(t, repo, "go.mod", "module example.invalid/pievidence\n\ngo 1.25.0\n")
 	candidateWrite(t, repo, "docs/contracts/agent-contract-v1.json", "{\"status\":\"mcp-foundation\"}\n")
-	candidateWrite(t, repo, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@0.5.0\"\n")
 	owner := `package main
 import("encoding/json";"os")
 func main(){

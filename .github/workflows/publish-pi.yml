@@ -1,9 +1,8 @@
 name: Publish qbit-jay-pi
 
+# The qbit-jay Pi plugin is not published to npm (it will be embedded in the
+# binary, T0.9). The pi-v* tag trigger is removed so a tag cannot publish it.
 on:
-  push:
-    tags:
-      - "pi-v*"
   workflow_dispatch:
 
 jobs:

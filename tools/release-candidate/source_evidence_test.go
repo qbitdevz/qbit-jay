@@ -51,7 +51,6 @@ func TestSourceEvidence(t *testing.T) {
 	candidateWrite(t, repo, "docs/contracts/agent-contract-v1.json", "{\"status\":\"mcp-foundation\"}\n")
 	candidateWrite(t, repo, "go.mod", "module example.invalid/evidencefixture\n\ngo 1.25.0\n")
 	candidateWrite(t, repo, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"0.4.0"}`)
-	candidateWrite(t, repo, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@0.5.0\"\n")
 	candidateWrite(t, repo, "tools/agent-contract/main.go", "package main\nimport \"os\"\nfunc main(){if os.WriteFile(os.Getenv(\"EVIDENCE_FIXTURE_MARKER\"),[]byte(\"selected-core\"),0600)!=nil{os.Exit(8)}}\n")
 	git("add", ".")
 	git("commit", "--quiet", "-m", "fixture core")

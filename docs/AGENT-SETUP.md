@@ -62,7 +62,7 @@ Install qbit-jay's Pi-native package:
 qbit-jay setup pi
 ```
 
-This version of `qbit-jay setup pi` installs `npm:qbit-jay-pi@0.8.0`, replaces recognized historical npm pin strings, and preserves custom package entries. The Pi package was renamed from `gentle-engram` to `qbit-jay-pi`; `qbit-jay-pi` is not published to npm yet, so `qbit-jay setup pi` cannot install it from the registry until a package is available (the planned route is a local package embedded in the binary, tracked in T0.9). Until then install from a checkout with `pi install ./plugin/pi`.
+`qbit-jay setup pi` currently fails without reading or changing Pi settings: the qbit-jay Pi plugin is not distributed through npm (an unregistered npm name could be claimed by anyone), so setup never installs or pins an `npm:` source for it, and existing `npm:gentle-engram` entries are left untouched. Install the plugin from a local checkout with `pi install <repo>/plugin/pi`. T0.9 replaces this with a plugin embedded in the binary.
 
 Pi agent writes use native `mem_*` tools. If Pi already has a qbit-jay MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.qbit-jay` key from that file and restart Pi. Keep the entries for your other MCP servers.
 
@@ -70,15 +70,8 @@ Pi 0.99.0 and later ship built-in MCP (`mcp.json`, `/mcp`, `pi mcp add`); an ins
 
 For versioned mise installations, setup selects the shim directory from an absolute `MISE_SHIMS_DIR`, the effective absolute `shims_dir` reported by `mise settings get shims_dir` (including global config), or the mise data directory's default `shims` folder, in that order. Invalid settings output or an unavailable mise CLI leaves the default directory as the fallback. If the shim is missing from the selected directory, the caller uses its existing executable/PATH fallback policy; setup never writes mise warnings as the qbit-jay MCP command.
 
-When [mise](https://mise.jdx.dev/) is detected in `PATH`, `qbit-jay setup pi` also auto-pins `npmCommand` in Pi's `settings.json` to `["mise", "exec", "node@<version>", "--", "npm"]`, preventing Node version drift from silently changing which npm root Pi uses. If `npmCommand` already exists in `settings.json`, the existing value is preserved. This step is a no-op when mise is not installed.
 
-For a manual upgrade of the personal Pi package on qbit-jay 3.7.2, run the following command. Use it when an older native `mem_update` tool is still active and its schema lacks `expected_project`.
-
-```bash
-pi install npm:qbit-jay-pi@0.8.0
-```
-
-An active `qbit-jay-pi` pin in a trusted project's `.pi/settings.json` can override the personal package. If that project has a plain npm pin, run `pi install --local npm:qbit-jay-pi@0.8.0` from the project directory. For a package entry with custom settings, update its `source` pin and keep the other fields. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
+To update the plugin, run `pi install <repo>/plugin/pi` again from an updated checkout. A pin for the plugin in a trusted project's `.pi/settings.json` can override the personal package. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
 
 Restart Pi and check that the native `mem_update` tool exposes `expected_project`. Set it to the observation's existing project when updating.
 

@@ -32,7 +32,6 @@ func main(){c,e:=net.Dial("tcp4",%q);if e!=nil{os.Exit(9)};defer c.Close();if _,
 		"tools/agent-contract/main.go":          checker,
 		"docs/contracts/agent-contract-v1.json": "{}\n",
 		"plugin/pi/package.json":                `{"name":"qbit-jay-pi","version":"0.5.0"}`,
-		"internal/setup/setup.go":               "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@0.5.0\"\n",
 	} {
 		path := filepath.Join(repo, filepath.FromSlash(name))
 		if err := os.MkdirAll(filepath.Dir(path), 0700); err != nil {

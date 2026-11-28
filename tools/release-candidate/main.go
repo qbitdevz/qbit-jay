@@ -7,14 +7,10 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"go/ast"
-	"go/parser"
-	"go/token"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/qbitdevz/qbit-jay/internal/mcp"
@@ -259,7 +255,7 @@ func validateMetadata(root, version string) error {
 	return validatePairMetadata(root, root, version)
 }
 
-func validatePairMetadata(coreRoot, piRoot, version string) error {
+func validatePairMetadata(_, piRoot, version string) error {
 	data, err := os.ReadFile(filepath.Join(piRoot, "plugin", "pi", "package.json"))
 	if err != nil {
 		return &metadataUnavailable{message: "cannot read plugin/pi/package.json"}
@@ -277,43 +273,7 @@ func validatePairMetadata(coreRoot, piRoot, version string) error {
 	if manifest.Version != version {
 		return errors.New("package version must match candidate version")
 	}
-	data, err = os.ReadFile(filepath.Join(coreRoot, "internal", "setup", "setup.go"))
-	if err != nil {
-		return &metadataUnavailable{message: "cannot read internal/setup/setup.go"}
-	}
-	file, err := parser.ParseFile(token.NewFileSet(), "setup.go", data, 0)
-	if err != nil {
-		return errors.New("invalid internal/setup/setup.go")
-	}
-	// Inspect real constant declarations rather than matching comments, legacy
-	// pins, or arbitrary strings that happen to contain the current pin name.
-	count, pin := 0, ""
-	for _, declaration := range file.Decls {
-		group, ok := declaration.(*ast.GenDecl)
-		if !ok || group.Tok != token.CONST {
-			continue
-		}
-		for _, spec := range group.Specs {
-			value := spec.(*ast.ValueSpec)
-			for index, name := range value.Names {
-				if name.Name != "piGentleEngramPackage" {
-					continue
-				}
-				count++
-				if index < len(value.Values) {
-					literal, ok := value.Values[index].(*ast.BasicLit)
-					if ok && literal.Kind == token.STRING {
-						pin, _ = strconv.Unquote(literal.Value)
-					}
-				}
-			}
-		}
-	}
-	if count != 1 {
-		return errors.New("expected exactly one piGentleEngramPackage pin")
-	}
-	if pin != "npm:qbit-jay-pi@"+version {
-		return errors.New("installer pin must match candidate version exactly")
-	}
+	// No installer pin is validated: the Pi plugin is not distributed through
+	// npm, so internal/setup carries no registry pin to match (see T0.9).
 	return nil
 }

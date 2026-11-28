@@ -18,7 +18,6 @@ func candidateFixture(t *testing.T, version string) string {
 	t.Helper()
 	root := t.TempDir()
 	candidateWrite(t, root, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"`+version+`"}`)
-	candidateWrite(t, root, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@"+version+"\"\n")
 	return root
 }
 
@@ -156,12 +155,6 @@ func TestReleaseCandidateIndependentPair(t *testing.T) {
 			if code != 0 || diagnostic != "" || out != string(want)+"\n" {
 				t.Fatalf("exit=%d stdout=%q stderr=%q want=%s", code, out, diagnostic, want)
 			}
-			// Matching core metadata is insufficient: the installer must select Pi.
-			candidateWrite(t, root, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@"+pair[0]+"\"\n")
-			out, diagnostic, code = candidateRun(t, root, args...)
-			if code != 1 || out != "" || diagnostic != "installer pin must match candidate version exactly\nexit status 1\n" {
-				t.Fatalf("wrong companion: exit=%d stdout=%q stderr=%q", code, out, diagnostic)
-			}
 		})
 	}
 }
@@ -215,11 +208,6 @@ func TestReleaseCandidateRejectsInvalidInputs(t *testing.T) {
 		{name: "package version", file: "plugin/pi/package.json", content: `{"name":"qbit-jay-pi","version":"1.2.4"}`, diagnostic: "package version must match candidate version"},
 		{name: "malformed package", file: "plugin/pi/package.json", content: `{`, diagnostic: "invalid plugin/pi/package.json"},
 		{name: "missing package", file: "missing-package", diagnostic: "cannot read plugin/pi/package.json"},
-		{name: "missing installer", file: "missing-installer", diagnostic: "cannot read internal/setup/setup.go"},
-		{name: "wrong pin", file: "internal/setup/setup.go", content: "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@1.2.4\"\n", diagnostic: "installer pin must match candidate version exactly"},
-		{name: "range pin", file: "internal/setup/setup.go", content: "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@^1.2.3\"\n", diagnostic: "installer pin must match candidate version exactly"},
-		{name: "missing pin", file: "internal/setup/setup.go", content: "package setup\n", diagnostic: "expected exactly one piGentleEngramPackage pin"},
-		{name: "duplicate pin", file: "internal/setup/setup.go", content: "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@1.2.3\"\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@1.2.3\"\n", diagnostic: "expected exactly one piGentleEngramPackage pin"},
 	}
 	for _, version := range []string{"", "1", "1.2", "01.2.3", "1.02.3", "1.2.03", "1.2.3-01", "1.2.3-alpha.01", "1.2.3-", "1.2.3+", "1.2.3-a..b", "1.2.3+a..b", "1.2.3-a_b", "1.2.3\n", " 1.2.3", "1.2.3.4"} {
 		cases = append(cases, rejection{name: "invalid semver/" + version, args: candidateRefs(version), diagnostic: "invalid core-ref: expected refs/tags/v<strict-semver>"})
@@ -235,9 +223,6 @@ func TestReleaseCandidateRejectsInvalidInputs(t *testing.T) {
 			root := t.TempDir()
 			if tc.file != "missing-package" {
 				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"1.2.3"}`)
-			}
-			if tc.file != "missing-installer" {
-				candidateWrite(t, root, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@1.2.3\"\n")
 			}
 			if tc.content != "" {
 				candidateWrite(t, root, tc.file, tc.content)

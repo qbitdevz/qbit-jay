@@ -23,7 +23,7 @@ func agentAdapters() []agentAdapter {
 		},
 		{
 			slug:        "pi",
-			description: "Pi — qbit-jay-pi package with Pi-native memory tools",
+			description: "Pi — not installable from npm yet (embedded plugin planned, T0.9)",
 			custom:      installPi,
 			installDir:  piAgentDir,
 			postInstall: []string{
