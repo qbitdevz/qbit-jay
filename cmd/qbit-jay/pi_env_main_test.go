@@ -28,6 +28,7 @@ func TestMain(m *testing.M) {
 	// Doctor reports must not depend on what listens on this machine's port
 	// 7437 (a developer may run Engram there); the port tests opt back in.
 	doctorEngramPortCheck = func(int) *diagnostic.CheckResult { return nil }
+	serveEngramPortCheck = func(int) error { return nil }
 	// Test subprocesses must never recover a developer's drive-root database.
 	// Migration dispatch assertions install their own seam.
 	migrateOrphanedDatabase = func(string) {}

@@ -32,6 +32,10 @@ func engramPortError(port int) error {
 	return nil
 }
 
+// serveEngramPortCheck is the seam cmdServe calls; the package tests stub it so a
+// real Engram on the machine's port 7437 cannot stop them from serving.
+var serveEngramPortCheck = engramPortError
+
 // doctorEngramPortCheck is the seam doctor calls; tests that compare whole
 // doctor reports stub it so a real Engram on the machine's port 7437 cannot
 // change their output.

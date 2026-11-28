@@ -1002,7 +1002,7 @@ func serveWith(cfg store.Config, options serveOptions) error {
 	// Engram uses the same default port and health protocol. Say so before
 	// opening the store instead of failing later or serving next to it.
 	if !options.sessionOwned && ownedListener == nil && options.socketPath == "" && options.port > 0 {
-		if err := engramPortError(options.port); err != nil {
+		if err := serveEngramPortCheck(options.port); err != nil {
 			return err
 		}
 	}
