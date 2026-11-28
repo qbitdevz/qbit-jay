@@ -125,6 +125,11 @@ func fileURL(dir string) string {
 
 func installedFile(dir, name string) string { return filepath.Join(dir, name) }
 
+func dirExists(dir string) bool {
+	info, err := os.Stat(dir)
+	return err == nil && info.IsDir()
+}
+
 func unixArchiveName(t *testing.T) string {
 	t.Helper()
 	if runtime.GOARCH != "amd64" && runtime.GOARCH != "arm64" {
@@ -298,6 +303,32 @@ func runInstallPs1(t *testing.T, shell string, env ...string) (string, error) {
 	cmd.Env = append(base, append([]string{"QBIT_JAY_NO_MODIFY_PATH=1", "QBIT_JAY_VERSION="}, env...)...)
 	out, err := cmd.CombinedOutput()
 	return string(out), err
+}
+
+// Users who start `irm ... | iex` from a host whose PSModulePath points at the
+// other PowerShell edition (Windows Terminal profiles, Git Bash, editors) do
+// not get Get-FileHash; the installer must still verify the checksum.
+func TestInstallPs1VerifiesChecksumWithoutUtilityModule(t *testing.T) {
+	archive := zipFile(t, map[string][]byte{"qbit-jay.exe": buildFakeBinary(t)})
+	release := writeRelease(t, windowsArchiveName(t), archive, "")
+	for _, shell := range powerShellExecutables(t) {
+		t.Run(filepath.Base(shell), func(t *testing.T) {
+			target := filepath.Join(t.TempDir(), "bin")
+			// PowerShell 7's modules first, as a pwsh-launched host passes them on:
+			// Windows PowerShell 5.1 then cannot load Microsoft.PowerShell.Utility.
+			polluted := t.TempDir()
+			if pwsh7 := filepath.Join(os.Getenv("ProgramFiles"), "PowerShell", "7", "Modules"); dirExists(pwsh7) {
+				polluted = pwsh7
+			}
+			out, err := runInstallPs1(t, shell, "PSModulePath="+polluted, "QBIT_JAY_INSTALL_BASE_URL="+fileURL(release), "QBIT_JAY_INSTALL_DIR="+target)
+			if err != nil {
+				t.Fatalf("install failed without the utility module: %v\n%s", err, out)
+			}
+			if !strings.Contains(out, "Checksum verified") {
+				t.Errorf("output missing checksum confirmation:\n%s", out)
+			}
+		})
+	}
 }
 
 func TestInstallPs1InstallsAfterVerifyingChecksum(t *testing.T) {

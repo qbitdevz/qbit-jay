@@ -71,7 +71,7 @@ If the tap or bucket is not updated, `go install` and the install scripts still 
 | Channel | Command | Verification |
 | --- | --- | --- |
 | Linux, macOS, WSL | `curl -fsSL https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.sh \| sh` | `scripts/install.sh` downloads `checksums.txt` and the archive, compares sha256, then installs to `~/.local/bin` (`QBIT_JAY_INSTALL_DIR`). Never uses `sudo`. |
-| Windows | `irm https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.ps1 \| iex` | `scripts/install.ps1` verifies with `Get-FileHash`, installs to `%LOCALAPPDATA%\Programs\qbit-jay`, adds it to the user PATH. No administrator rights. |
+| Windows | `irm https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.ps1 \| iex` | `scripts/install.ps1` verifies the sha256 with .NET (works even when `Get-FileHash` is unavailable), installs to `%LOCALAPPDATA%\Programs\qbit-jay`, adds it to the user PATH. No administrator rights. |
 | Go | `go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest` | Go module checksum database. Prints `dev` as version. |
 | Homebrew | `brew install qbitdevz/tap/qbit-jay` | sha256 inside the formula. |
 | Scoop | `scoop bucket add qbitdevz https://github.com/qbitdevz/scoop-bucket; scoop install qbit-jay` | `hash` inside the manifest. |
