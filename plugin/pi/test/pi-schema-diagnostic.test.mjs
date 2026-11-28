@@ -87,7 +87,7 @@ test("CI installs test dependencies safely before Pi tests and retains candidate
       assert.match(text, /id-token: write/);
       assert.match(text, /run: node test\/release-contract.mjs "\$RELEASE_REF"/);
       assert.doesNotMatch(text, /pi-v\*"/, "qbit-jay-pi is never published: no tag may trigger publication");
-      assert.match(text, /^on:\n  workflow_dispatch:\n/m);
+      assert.match(text, /^on:\r?\n  workflow_dispatch:\r?\n/m);
     }
   }
 });
