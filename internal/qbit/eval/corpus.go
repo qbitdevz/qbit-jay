@@ -196,7 +196,7 @@ func (m Memory) Revision(rev int) string {
 func (c *Corpus) Fingerprint(n int) string {
 	h := sha256.New()
 	for _, m := range c.Memories[:min(n, len(c.Memories))] {
-		fmt.Fprintf(h, "%s\x00%s\x00%s\x00%s\x00%s\x00%s\x00", m.Key, m.Project, m.Type, m.TopicKey, m.Title, m.Content)
+		_, _ = fmt.Fprintf(h, "%s\x00%s\x00%s\x00%s\x00%s\x00%s\x00", m.Key, m.Project, m.Type, m.TopicKey, m.Title, m.Content)
 	}
 	return hex.EncodeToString(h.Sum(nil))
 }
