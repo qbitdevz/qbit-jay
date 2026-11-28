@@ -1,0 +1,2707 @@
+{
+  "seed": 20261128,
+  "memories": 150,
+  "corpus_fingerprint": "ad2cd9a46deaa5614e78b2f3c450f4f34c67edd8a4adfd1924a99ef003f92ff2",
+  "queries": [
+    {
+      "mem": "m00000",
+      "lang": "en",
+      "kind": "same",
+      "query": "what did we find about dead letter handling in the metrics exporter"
+    },
+    {
+      "mem": "m00000",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dead letter metrics exporter"
+    },
+    {
+      "mem": "m00000",
+      "lang": "es",
+      "kind": "cross",
+      "query": "hallazgo sobre gestión de mensajes fallidos en el exportador de métricas"
+    },
+    {
+      "mem": "m00001",
+      "lang": "en",
+      "kind": "same",
+      "query": "bug fix for dead letter handling in the file uploader"
+    },
+    {
+      "mem": "m00001",
+      "lang": "en",
+      "kind": "kw",
+      "query": "file uploader dead letter Prometheus"
+    },
+    {
+      "mem": "m00001",
+      "lang": "es",
+      "kind": "cross",
+      "query": "corrección de gestión de mensajes fallidos en el cargador de archivos"
+    },
+    {
+      "mem": "m00002",
+      "lang": "es",
+      "kind": "same",
+      "query": "cómo se corrigió el problema de reintentos con espera exponencial en el índice de búsqueda"
+    },
+    {
+      "mem": "m00002",
+      "lang": "es",
+      "kind": "kw",
+      "query": "índice búsqueda reintentos espera exponencial"
+    },
+    {
+      "mem": "m00002",
+      "lang": "en",
+      "kind": "cross",
+      "query": "fix for retry with exponential backoff in the search index PostgreSQL"
+    },
+    {
+      "mem": "m00003",
+      "lang": "en",
+      "kind": "same",
+      "query": "gRPC settings the shopping cart reads at startup"
+    },
+    {
+      "mem": "m00003",
+      "lang": "en",
+      "kind": "kw",
+      "query": "gRPC shopping cart configuration"
+    },
+    {
+      "mem": "m00003",
+      "lang": "es",
+      "kind": "cross",
+      "query": "configuración de gRPC para el carrito de compras"
+    },
+    {
+      "mem": "m00004",
+      "lang": "es",
+      "kind": "same",
+      "query": "patrón para ajustar el tamaño de lote en la página de perfil de usuario"
+    },
+    {
+      "mem": "m00004",
+      "lang": "es",
+      "kind": "kw",
+      "query": "tamaño de lote perfil de usuario"
+    },
+    {
+      "mem": "m00004",
+      "lang": "en",
+      "kind": "cross",
+      "query": "pattern for batch size tuning in the user profile page with Redis"
+    },
+    {
+      "mem": "m00005",
+      "lang": "es",
+      "kind": "same",
+      "query": "arreglo del cursor de paginación en el panel de administración"
+    },
+    {
+      "mem": "m00005",
+      "lang": "es",
+      "kind": "kw",
+      "query": "cursor paginación panel administración"
+    },
+    {
+      "mem": "m00005",
+      "lang": "en",
+      "kind": "cross",
+      "query": "pagination cursor bug fixed in the admin dashboard"
+    },
+    {
+      "mem": "m00006",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for the dark mode contrast problem in the geolocation lookup"
+    },
+    {
+      "mem": "m00006",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast geolocation"
+    },
+    {
+      "mem": "m00006",
+      "lang": "es",
+      "kind": "cross",
+      "query": "corrección del contraste en modo oscuro en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00007",
+      "lang": "en",
+      "kind": "same",
+      "query": "how was the timezone offset error in content moderation fixed"
+    },
+    {
+      "mem": "m00007",
+      "lang": "en",
+      "kind": "kw",
+      "query": "timezone offset content moderation"
+    },
+    {
+      "mem": "m00007",
+      "lang": "es",
+      "kind": "cross",
+      "query": "error de desfase de zona horaria en moderación de contenido"
+    },
+    {
+      "mem": "m00008",
+      "lang": "es",
+      "kind": "same",
+      "query": "patrón de clave de idempotencia para el servicio de notificaciones"
+    },
+    {
+      "mem": "m00008",
+      "lang": "es",
+      "kind": "kw",
+      "query": "idempotencia notificaciones Elasticsearch"
+    },
+    {
+      "mem": "m00008",
+      "lang": "en",
+      "kind": "cross",
+      "query": "idempotency key pattern for the notification service"
+    },
+    {
+      "mem": "m00009",
+      "lang": "en",
+      "kind": "same",
+      "query": "bug where connection pool exhaustion hit the calendar sync"
+    },
+    {
+      "mem": "m00009",
+      "lang": "en",
+      "kind": "kw",
+      "query": "connection pool calendar sync"
+    },
+    {
+      "mem": "m00009",
+      "lang": "es",
+      "kind": "cross",
+      "query": "agotamiento del pool de conexiones en la sincronización de calendario"
+    },
+    {
+      "mem": "m00010",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD del seguimiento de pedidos"
+    },
+    {
+      "mem": "m00010",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD seguimiento pedidos"
+    },
+    {
+      "mem": "m00010",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for order tracking"
+    },
+    {
+      "mem": "m00011",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo de una consulta lenta sin índice en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00011",
+      "lang": "es",
+      "kind": "kw",
+      "query": "consulta lenta geolocalización"
+    },
+    {
+      "mem": "m00011",
+      "lang": "en",
+      "kind": "cross",
+      "query": "slow query without an index found in the geolocation lookup"
+    },
+    {
+      "mem": "m00012",
+      "lang": "es",
+      "kind": "same",
+      "query": "descubrimos un problema de rotación de secretos en la sincronización de calendario"
+    },
+    {
+      "mem": "m00012",
+      "lang": "es",
+      "kind": "kw",
+      "query": "rotación secretos sincronización calendario"
+    },
+    {
+      "mem": "m00012",
+      "lang": "en",
+      "kind": "cross",
+      "query": "secret rotation issue discovered in calendar sync RabbitMQ"
+    },
+    {
+      "mem": "m00013",
+      "lang": "en",
+      "kind": "same",
+      "query": "what we decided about feature rollout by percentage for the data import job"
+    },
+    {
+      "mem": "m00013",
+      "lang": "en",
+      "kind": "kw",
+      "query": "rollout percentage data import"
+    },
+    {
+      "mem": "m00013",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre el despliegue gradual por porcentaje de la tarea de importación de datos"
+    },
+    {
+      "mem": "m00014",
+      "lang": "en",
+      "kind": "same",
+      "query": "my preference for the api gateway stack"
+    },
+    {
+      "mem": "m00014",
+      "lang": "en",
+      "kind": "kw",
+      "query": "api gateway FastAPI preference"
+    },
+    {
+      "mem": "m00014",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de FastAPI para la puerta de enlace de la API"
+    },
+    {
+      "mem": "m00015",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for duplicate events after a timeout in the cron runner"
+    },
+    {
+      "mem": "m00015",
+      "lang": "en",
+      "kind": "kw",
+      "query": "cron runner duplicate events"
+    },
+    {
+      "mem": "m00015",
+      "lang": "es",
+      "kind": "cross",
+      "query": "eventos duplicados tras un timeout en el ejecutor de tareas programadas"
+    },
+    {
+      "mem": "m00016",
+      "lang": "es",
+      "kind": "same",
+      "query": "qué decidimos sobre la rotación de secretos en el webhook de pagos"
+    },
+    {
+      "mem": "m00016",
+      "lang": "es",
+      "kind": "kw",
+      "query": "webhook pagos rotación secretos"
+    },
+    {
+      "mem": "m00016",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision about secret rotation in the payment webhook"
+    },
+    {
+      "mem": "m00017",
+      "lang": "es",
+      "kind": "same",
+      "query": "documento ODD de las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00017",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD banderas funcionalidad"
+    },
+    {
+      "mem": "m00017",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task about feature flags Cloudflare"
+    },
+    {
+      "mem": "m00018",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo sobre ocultación de datos en los logs del registro de auditoría"
+    },
+    {
+      "mem": "m00018",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ocultación logs registro auditoría"
+    },
+    {
+      "mem": "m00018",
+      "lang": "en",
+      "kind": "cross",
+      "query": "log redaction finding in the audit log"
+    },
+    {
+      "mem": "m00019",
+      "lang": "en",
+      "kind": "same",
+      "query": "how the session cache is built on Django"
+    },
+    {
+      "mem": "m00019",
+      "lang": "en",
+      "kind": "kw",
+      "query": "session cache architecture Django"
+    },
+    {
+      "mem": "m00019",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la caché de sesiones con Django"
+    },
+    {
+      "mem": "m00020",
+      "lang": "en",
+      "kind": "same",
+      "query": "the ODD task document for the report scheduler"
+    },
+    {
+      "mem": "m00020",
+      "lang": "en",
+      "kind": "kw",
+      "query": "ODD report scheduler"
+    },
+    {
+      "mem": "m00020",
+      "lang": "es",
+      "kind": "cross",
+      "query": "tarea ODD del planificador de informes"
+    },
+    {
+      "mem": "m00021",
+      "lang": "en",
+      "kind": "same",
+      "query": "architecture of the content moderation behind gRPC"
+    },
+    {
+      "mem": "m00021",
+      "lang": "en",
+      "kind": "kw",
+      "query": "content moderation gRPC architecture"
+    },
+    {
+      "mem": "m00021",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la moderación de contenido con gRPC"
+    },
+    {
+      "mem": "m00022",
+      "lang": "en",
+      "kind": "same",
+      "query": "bug with graceful shutdown in the invoice export"
+    },
+    {
+      "mem": "m00022",
+      "lang": "en",
+      "kind": "kw",
+      "query": "graceful shutdown invoice export"
+    },
+    {
+      "mem": "m00022",
+      "lang": "es",
+      "kind": "cross",
+      "query": "corrección del apagado ordenado en la exportación de facturas"
+    },
+    {
+      "mem": "m00023",
+      "lang": "es",
+      "kind": "same",
+      "query": "patrón reutilizable para la rotación de secretos en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00023",
+      "lang": "es",
+      "kind": "kw",
+      "query": "patrón rotación secretos geolocalización"
+    },
+    {
+      "mem": "m00023",
+      "lang": "en",
+      "kind": "cross",
+      "query": "reusable pattern for secret rotation in the geolocation lookup"
+    },
+    {
+      "mem": "m00024",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la diferencia de normalización unicode en el registro de auditoría"
+    },
+    {
+      "mem": "m00024",
+      "lang": "es",
+      "kind": "kw",
+      "query": "normalización unicode registro auditoría"
+    },
+    {
+      "mem": "m00024",
+      "lang": "en",
+      "kind": "cross",
+      "query": "fix for the unicode normalization mismatch in the audit log"
+    },
+    {
+      "mem": "m00025",
+      "lang": "es",
+      "kind": "same",
+      "query": "error de expiración de tokens en el asistente de bienvenida ya resuelto"
+    },
+    {
+      "mem": "m00025",
+      "lang": "es",
+      "kind": "kw",
+      "query": "expiración tokens asistente bienvenida"
+    },
+    {
+      "mem": "m00025",
+      "lang": "en",
+      "kind": "cross",
+      "query": "token expiry bug fixed in the onboarding wizard"
+    },
+    {
+      "mem": "m00026",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision on clock skew between servers for the inventory sync"
+    },
+    {
+      "mem": "m00026",
+      "lang": "en",
+      "kind": "kw",
+      "query": "clock skew inventory sync"
+    },
+    {
+      "mem": "m00026",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre el desfase de reloj entre servidores en la sincronización de inventario"
+    },
+    {
+      "mem": "m00027",
+      "lang": "es",
+      "kind": "same",
+      "query": "arquitectura del canal de websocket sobre RabbitMQ"
+    },
+    {
+      "mem": "m00027",
+      "lang": "es",
+      "kind": "kw",
+      "query": "canal websocket RabbitMQ arquitectura"
+    },
+    {
+      "mem": "m00027",
+      "lang": "en",
+      "kind": "cross",
+      "query": "websocket channel architecture with RabbitMQ"
+    },
+    {
+      "mem": "m00028",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de ocultación de datos en los logs del generador de PDF"
+    },
+    {
+      "mem": "m00028",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ocultación logs generador PDF"
+    },
+    {
+      "mem": "m00028",
+      "lang": "en",
+      "kind": "cross",
+      "query": "log redaction fix in the pdf renderer"
+    },
+    {
+      "mem": "m00029",
+      "lang": "es",
+      "kind": "same",
+      "query": "patrón para el apagado ordenado de la tarea de importación de datos"
+    },
+    {
+      "mem": "m00029",
+      "lang": "es",
+      "kind": "kw",
+      "query": "apagado ordenado importación datos"
+    },
+    {
+      "mem": "m00029",
+      "lang": "en",
+      "kind": "cross",
+      "query": "graceful shutdown pattern for the data import job"
+    },
+    {
+      "mem": "m00030",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD sobre el restablecimiento de contraseña"
+    },
+    {
+      "mem": "m00030",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD restablecimiento contraseña"
+    },
+    {
+      "mem": "m00030",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for password reset Docker"
+    },
+    {
+      "mem": "m00031",
+      "lang": "es",
+      "kind": "same",
+      "query": "patrón de despliegue gradual por porcentaje en el servicio de notificaciones"
+    },
+    {
+      "mem": "m00031",
+      "lang": "es",
+      "kind": "kw",
+      "query": "despliegue gradual notificaciones"
+    },
+    {
+      "mem": "m00031",
+      "lang": "en",
+      "kind": "cross",
+      "query": "feature rollout by percentage pattern in the notification service"
+    },
+    {
+      "mem": "m00032",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about webhook signature verification in the data import job"
+    },
+    {
+      "mem": "m00032",
+      "lang": "en",
+      "kind": "kw",
+      "query": "webhook signature verification data import"
+    },
+    {
+      "mem": "m00032",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre la verificación de firma del webhook en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00033",
+      "lang": "en",
+      "kind": "same",
+      "query": "how the cron runner is structured around Stripe"
+    },
+    {
+      "mem": "m00033",
+      "lang": "en",
+      "kind": "kw",
+      "query": "cron runner Stripe architecture"
+    },
+    {
+      "mem": "m00033",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura del ejecutor de tareas programadas con Stripe"
+    },
+    {
+      "mem": "m00034",
+      "lang": "en",
+      "kind": "same",
+      "query": "we found a CORS preflight failure in the geolocation lookup"
+    },
+    {
+      "mem": "m00034",
+      "lang": "en",
+      "kind": "kw",
+      "query": "CORS preflight geolocation"
+    },
+    {
+      "mem": "m00034",
+      "lang": "es",
+      "kind": "cross",
+      "query": "fallo de preflight CORS encontrado en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00035",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD de la página de perfil de usuario"
+    },
+    {
+      "mem": "m00035",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD perfil usuario"
+    },
+    {
+      "mem": "m00035",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for the user profile page Stripe"
+    },
+    {
+      "mem": "m00036",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del ajuste del tamaño de lote en la cola de correos"
+    },
+    {
+      "mem": "m00036",
+      "lang": "es",
+      "kind": "kw",
+      "query": "tamaño lote cola correos"
+    },
+    {
+      "mem": "m00036",
+      "lang": "en",
+      "kind": "cross",
+      "query": "batch size tuning fix in the email queue"
+    },
+    {
+      "mem": "m00037",
+      "lang": "es",
+      "kind": "same",
+      "query": "error de rotación de secretos en el ciclo de facturación corregido"
+    },
+    {
+      "mem": "m00037",
+      "lang": "es",
+      "kind": "kw",
+      "query": "rotación secretos ciclo facturación"
+    },
+    {
+      "mem": "m00037",
+      "lang": "en",
+      "kind": "cross",
+      "query": "secret rotation bug fixed in the billing cycle"
+    },
+    {
+      "mem": "m00038",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la rotación de secretos en el ciclo de facturación"
+    },
+    {
+      "mem": "m00038",
+      "lang": "es",
+      "kind": "kw",
+      "query": "decisión rotación secretos facturación"
+    },
+    {
+      "mem": "m00038",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on secret rotation in the billing cycle Prometheus"
+    },
+    {
+      "mem": "m00039",
+      "lang": "en",
+      "kind": "same",
+      "query": "style preference for the websocket channel"
+    },
+    {
+      "mem": "m00039",
+      "lang": "en",
+      "kind": "kw",
+      "query": "websocket channel Kubernetes preference"
+    },
+    {
+      "mem": "m00039",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de estilo para el canal de websocket con Kubernetes"
+    },
+    {
+      "mem": "m00040",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del apagado ordenado en el retorno de OAuth"
+    },
+    {
+      "mem": "m00040",
+      "lang": "es",
+      "kind": "kw",
+      "query": "apagado ordenado retorno OAuth"
+    },
+    {
+      "mem": "m00040",
+      "lang": "en",
+      "kind": "cross",
+      "query": "graceful shutdown fix in the oauth callback"
+    },
+    {
+      "mem": "m00041",
+      "lang": "es",
+      "kind": "same",
+      "query": "arreglo del contraste en modo oscuro en la matriz de permisos"
+    },
+    {
+      "mem": "m00041",
+      "lang": "es",
+      "kind": "kw",
+      "query": "contraste modo oscuro matriz permisos"
+    },
+    {
+      "mem": "m00041",
+      "lang": "en",
+      "kind": "cross",
+      "query": "dark mode contrast fix in the permissions matrix"
+    },
+    {
+      "mem": "m00042",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de eventos duplicados tras un timeout en el carrito de compras"
+    },
+    {
+      "mem": "m00042",
+      "lang": "es",
+      "kind": "kw",
+      "query": "eventos duplicados carrito compras"
+    },
+    {
+      "mem": "m00042",
+      "lang": "en",
+      "kind": "cross",
+      "query": "duplicate events after a timeout fixed in the shopping cart"
+    },
+    {
+      "mem": "m00043",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la gestión de mensajes fallidos en el carrito de compras"
+    },
+    {
+      "mem": "m00043",
+      "lang": "es",
+      "kind": "kw",
+      "query": "mensajes fallidos carrito Nginx"
+    },
+    {
+      "mem": "m00043",
+      "lang": "en",
+      "kind": "cross",
+      "query": "dead letter handling bug in the shopping cart Nginx"
+    },
+    {
+      "mem": "m00044",
+      "lang": "es",
+      "kind": "same",
+      "query": "problema de desfase de reloj entre servidores en el carrito de compras"
+    },
+    {
+      "mem": "m00044",
+      "lang": "es",
+      "kind": "kw",
+      "query": "desfase reloj servidores carrito"
+    },
+    {
+      "mem": "m00044",
+      "lang": "en",
+      "kind": "cross",
+      "query": "clock skew between servers bug in the shopping cart"
+    },
+    {
+      "mem": "m00045",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del desfase de reloj entre servidores en el exportador de métricas"
+    },
+    {
+      "mem": "m00045",
+      "lang": "es",
+      "kind": "kw",
+      "query": "desfase reloj exportador métricas"
+    },
+    {
+      "mem": "m00045",
+      "lang": "en",
+      "kind": "cross",
+      "query": "clock skew fix in the metrics exporter"
+    },
+    {
+      "mem": "m00046",
+      "lang": "en",
+      "kind": "same",
+      "query": "ODD task document for the calendar sync"
+    },
+    {
+      "mem": "m00046",
+      "lang": "en",
+      "kind": "kw",
+      "query": "ODD calendar sync"
+    },
+    {
+      "mem": "m00046",
+      "lang": "es",
+      "kind": "cross",
+      "query": "tarea ODD de la sincronización de calendario"
+    },
+    {
+      "mem": "m00047",
+      "lang": "es",
+      "kind": "same",
+      "query": "preferencia sobre el catálogo de traducciones y Elasticsearch"
+    },
+    {
+      "mem": "m00047",
+      "lang": "es",
+      "kind": "kw",
+      "query": "catálogo traducciones Elasticsearch preferencia"
+    },
+    {
+      "mem": "m00047",
+      "lang": "en",
+      "kind": "cross",
+      "query": "preference to use Elasticsearch for the translation catalog"
+    },
+    {
+      "mem": "m00048",
+      "lang": "en",
+      "kind": "same",
+      "query": "finding about webhook signature verification in the backup routine"
+    },
+    {
+      "mem": "m00048",
+      "lang": "en",
+      "kind": "kw",
+      "query": "webhook signature backup routine"
+    },
+    {
+      "mem": "m00048",
+      "lang": "es",
+      "kind": "cross",
+      "query": "hallazgo sobre la verificación de firma del webhook en la rutina de respaldo"
+    },
+    {
+      "mem": "m00049",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for stale data after a deploy in the login form"
+    },
+    {
+      "mem": "m00049",
+      "lang": "en",
+      "kind": "kw",
+      "query": "stale data deploy login form"
+    },
+    {
+      "mem": "m00049",
+      "lang": "es",
+      "kind": "cross",
+      "query": "datos obsoletos tras el despliegue en el formulario de inicio de sesión"
+    },
+    {
+      "mem": "m00050",
+      "lang": "en",
+      "kind": "same",
+      "query": "bug about schema migration rollback in the onboarding wizard"
+    },
+    {
+      "mem": "m00050",
+      "lang": "en",
+      "kind": "kw",
+      "query": "schema migration rollback onboarding"
+    },
+    {
+      "mem": "m00050",
+      "lang": "es",
+      "kind": "cross",
+      "query": "reversión de migración de esquema en el asistente de bienvenida"
+    },
+    {
+      "mem": "m00051",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre el manejo de expiración de tokens en la página de perfil de usuario"
+    },
+    {
+      "mem": "m00051",
+      "lang": "es",
+      "kind": "kw",
+      "query": "expiración tokens perfil usuario decisión"
+    },
+    {
+      "mem": "m00051",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision about token expiry handling in the user profile page"
+    },
+    {
+      "mem": "m00052",
+      "lang": "en",
+      "kind": "same",
+      "query": "style preference for the notification service"
+    },
+    {
+      "mem": "m00052",
+      "lang": "en",
+      "kind": "kw",
+      "query": "notification service Django preference"
+    },
+    {
+      "mem": "m00052",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de estilo para el servicio de notificaciones con Django"
+    },
+    {
+      "mem": "m00053",
+      "lang": "en",
+      "kind": "same",
+      "query": "we found dark mode contrast trouble in the data import job"
+    },
+    {
+      "mem": "m00053",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast data import"
+    },
+    {
+      "mem": "m00053",
+      "lang": "es",
+      "kind": "cross",
+      "query": "hallazgo de contraste en modo oscuro en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00054",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo sobre el despliegue gradual por porcentaje en el endpoint de salud"
+    },
+    {
+      "mem": "m00054",
+      "lang": "es",
+      "kind": "kw",
+      "query": "despliegue gradual endpoint salud"
+    },
+    {
+      "mem": "m00054",
+      "lang": "en",
+      "kind": "cross",
+      "query": "finding about feature rollout by percentage in the health endpoint"
+    },
+    {
+      "mem": "m00055",
+      "lang": "en",
+      "kind": "same",
+      "query": "Stripe options the coupon engine reads at startup"
+    },
+    {
+      "mem": "m00055",
+      "lang": "en",
+      "kind": "kw",
+      "query": "coupon engine Stripe configuration"
+    },
+    {
+      "mem": "m00055",
+      "lang": "es",
+      "kind": "cross",
+      "query": "configuración de Stripe del motor de cupones"
+    },
+    {
+      "mem": "m00056",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD del widget de chat"
+    },
+    {
+      "mem": "m00056",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD widget chat"
+    },
+    {
+      "mem": "m00056",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for the chat widget SQLite"
+    },
+    {
+      "mem": "m00057",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la latencia de arranque en frío del widget de chat"
+    },
+    {
+      "mem": "m00057",
+      "lang": "es",
+      "kind": "kw",
+      "query": "latencia arranque frío widget chat"
+    },
+    {
+      "mem": "m00057",
+      "lang": "en",
+      "kind": "cross",
+      "query": "cold start latency decision for the chat widget gRPC"
+    },
+    {
+      "mem": "m00058",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for cold start latency in the data import job"
+    },
+    {
+      "mem": "m00058",
+      "lang": "en",
+      "kind": "kw",
+      "query": "cold start latency data import"
+    },
+    {
+      "mem": "m00058",
+      "lang": "es",
+      "kind": "cross",
+      "query": "corrección de la latencia de arranque en frío en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00059",
+      "lang": "en",
+      "kind": "same",
+      "query": "architecture of the feature flags service on FastAPI"
+    },
+    {
+      "mem": "m00059",
+      "lang": "en",
+      "kind": "kw",
+      "query": "feature flags FastAPI architecture"
+    },
+    {
+      "mem": "m00059",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de las banderas de funcionalidad con FastAPI"
+    },
+    {
+      "mem": "m00060",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for connection pool exhaustion in the report scheduler"
+    },
+    {
+      "mem": "m00060",
+      "lang": "en",
+      "kind": "kw",
+      "query": "connection pool report scheduler"
+    },
+    {
+      "mem": "m00060",
+      "lang": "es",
+      "kind": "cross",
+      "query": "agotamiento del pool de conexiones en el planificador de informes"
+    },
+    {
+      "mem": "m00061",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre el límite de concurrencia por inquilino en el panel de administración"
+    },
+    {
+      "mem": "m00061",
+      "lang": "es",
+      "kind": "kw",
+      "query": "límite concurrencia inquilino panel administración"
+    },
+    {
+      "mem": "m00061",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on the concurrency limit per tenant in the admin dashboard"
+    },
+    {
+      "mem": "m00062",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about the race condition on concurrent writes in the admin dashboard"
+    },
+    {
+      "mem": "m00062",
+      "lang": "en",
+      "kind": "kw",
+      "query": "race condition concurrent writes admin dashboard"
+    },
+    {
+      "mem": "m00062",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre la condición de carrera en escrituras concurrentes del panel de administración"
+    },
+    {
+      "mem": "m00063",
+      "lang": "en",
+      "kind": "same",
+      "query": "how the inventory sync is built on PostgreSQL"
+    },
+    {
+      "mem": "m00063",
+      "lang": "en",
+      "kind": "kw",
+      "query": "inventory sync PostgreSQL architecture"
+    },
+    {
+      "mem": "m00063",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la sincronización de inventario con PostgreSQL"
+    },
+    {
+      "mem": "m00064",
+      "lang": "en",
+      "kind": "same",
+      "query": "architecture of the content moderation on Django"
+    },
+    {
+      "mem": "m00064",
+      "lang": "en",
+      "kind": "kw",
+      "query": "content moderation Django locale fallback"
+    },
+    {
+      "mem": "m00064",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la moderación de contenido con Django"
+    },
+    {
+      "mem": "m00065",
+      "lang": "en",
+      "kind": "same",
+      "query": "Vue settings used by the inventory sync"
+    },
+    {
+      "mem": "m00065",
+      "lang": "en",
+      "kind": "kw",
+      "query": "inventory sync Vue configuration"
+    },
+    {
+      "mem": "m00065",
+      "lang": "es",
+      "kind": "cross",
+      "query": "configuración de Vue para la sincronización de inventario"
+    },
+    {
+      "mem": "m00066",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for the concurrency limit per tenant in the websocket channel"
+    },
+    {
+      "mem": "m00066",
+      "lang": "en",
+      "kind": "kw",
+      "query": "websocket channel concurrency limit tenant"
+    },
+    {
+      "mem": "m00066",
+      "lang": "es",
+      "kind": "cross",
+      "query": "límite de concurrencia por inquilino en el canal de websocket"
+    },
+    {
+      "mem": "m00067",
+      "lang": "es",
+      "kind": "same",
+      "query": "opciones de Prometheus que lee el servicio de notificaciones al arrancar"
+    },
+    {
+      "mem": "m00067",
+      "lang": "es",
+      "kind": "kw",
+      "query": "servicio notificaciones Prometheus configuración"
+    },
+    {
+      "mem": "m00067",
+      "lang": "en",
+      "kind": "cross",
+      "query": "Prometheus configuration for the notification service"
+    },
+    {
+      "mem": "m00068",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for backpressure on the queue in the backup routine"
+    },
+    {
+      "mem": "m00068",
+      "lang": "en",
+      "kind": "kw",
+      "query": "backpressure queue backup routine"
+    },
+    {
+      "mem": "m00068",
+      "lang": "es",
+      "kind": "cross",
+      "query": "contrapresión en la cola en la rutina de respaldo"
+    },
+    {
+      "mem": "m00069",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for webhook signature verification in the health endpoint"
+    },
+    {
+      "mem": "m00069",
+      "lang": "en",
+      "kind": "kw",
+      "query": "webhook signature health endpoint pattern"
+    },
+    {
+      "mem": "m00069",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón de verificación de firma del webhook en el endpoint de salud"
+    },
+    {
+      "mem": "m00070",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la clave de idempotencia en el registro de auditoría"
+    },
+    {
+      "mem": "m00070",
+      "lang": "es",
+      "kind": "kw",
+      "query": "clave idempotencia registro auditoría decisión"
+    },
+    {
+      "mem": "m00070",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision about the idempotency key in the audit log"
+    },
+    {
+      "mem": "m00071",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo sobre cambios constantes en los tests de snapshot del planificador de informes"
+    },
+    {
+      "mem": "m00071",
+      "lang": "es",
+      "kind": "kw",
+      "query": "tests snapshot planificador informes"
+    },
+    {
+      "mem": "m00071",
+      "lang": "en",
+      "kind": "cross",
+      "query": "snapshot test churn found in the report scheduler"
+    },
+    {
+      "mem": "m00072",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about the race condition on concurrent writes in the billing cycle"
+    },
+    {
+      "mem": "m00072",
+      "lang": "en",
+      "kind": "kw",
+      "query": "race condition billing cycle decision"
+    },
+    {
+      "mem": "m00072",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre la condición de carrera en el ciclo de facturación"
+    },
+    {
+      "mem": "m00073",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about dead letter handling for the permissions matrix"
+    },
+    {
+      "mem": "m00073",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dead letter permissions matrix decision"
+    },
+    {
+      "mem": "m00073",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre la gestión de mensajes fallidos en la matriz de permisos"
+    },
+    {
+      "mem": "m00074",
+      "lang": "es",
+      "kind": "same",
+      "query": "ajustes de Elasticsearch de la pasarela de notificaciones push"
+    },
+    {
+      "mem": "m00074",
+      "lang": "es",
+      "kind": "kw",
+      "query": "pasarela push Elasticsearch configuración"
+    },
+    {
+      "mem": "m00074",
+      "lang": "en",
+      "kind": "cross",
+      "query": "Elasticsearch settings for the mobile push gateway"
+    },
+    {
+      "mem": "m00075",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de datos obsoletos tras el despliegue en el asistente de bienvenida"
+    },
+    {
+      "mem": "m00075",
+      "lang": "es",
+      "kind": "kw",
+      "query": "datos obsoletos despliegue asistente bienvenida"
+    },
+    {
+      "mem": "m00075",
+      "lang": "en",
+      "kind": "cross",
+      "query": "stale data after a deploy fixed in the onboarding wizard"
+    },
+    {
+      "mem": "m00076",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de los reintentos con espera exponencial en el generador de miniaturas"
+    },
+    {
+      "mem": "m00076",
+      "lang": "es",
+      "kind": "kw",
+      "query": "reintentos espera exponencial miniaturas"
+    },
+    {
+      "mem": "m00076",
+      "lang": "en",
+      "kind": "cross",
+      "query": "retry with exponential backoff fix in the image thumbnailer"
+    },
+    {
+      "mem": "m00077",
+      "lang": "es",
+      "kind": "same",
+      "query": "arreglo del cursor de paginación en el endpoint de salud"
+    },
+    {
+      "mem": "m00077",
+      "lang": "es",
+      "kind": "kw",
+      "query": "cursor paginación endpoint salud"
+    },
+    {
+      "mem": "m00077",
+      "lang": "en",
+      "kind": "cross",
+      "query": "pagination cursor fix in the health endpoint"
+    },
+    {
+      "mem": "m00078",
+      "lang": "es",
+      "kind": "same",
+      "query": "configuración de Kafka del servicio de notificaciones"
+    },
+    {
+      "mem": "m00078",
+      "lang": "es",
+      "kind": "kw",
+      "query": "Kafka notificaciones configuración"
+    },
+    {
+      "mem": "m00078",
+      "lang": "en",
+      "kind": "cross",
+      "query": "Kafka configuration for the notification service"
+    },
+    {
+      "mem": "m00079",
+      "lang": "en",
+      "kind": "same",
+      "query": "FastAPI options the data import job reads at startup"
+    },
+    {
+      "mem": "m00079",
+      "lang": "en",
+      "kind": "kw",
+      "query": "data import job FastAPI configuration"
+    },
+    {
+      "mem": "m00079",
+      "lang": "es",
+      "kind": "cross",
+      "query": "configuración de FastAPI para la tarea de importación de datos"
+    },
+    {
+      "mem": "m00080",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for schema migration rollback in the inventory sync"
+    },
+    {
+      "mem": "m00080",
+      "lang": "en",
+      "kind": "kw",
+      "query": "schema migration rollback inventory sync"
+    },
+    {
+      "mem": "m00080",
+      "lang": "es",
+      "kind": "cross",
+      "query": "reversión de migración de esquema en la sincronización de inventario"
+    },
+    {
+      "mem": "m00081",
+      "lang": "es",
+      "kind": "same",
+      "query": "arquitectura del webhook de pagos sobre PostgreSQL"
+    },
+    {
+      "mem": "m00081",
+      "lang": "es",
+      "kind": "kw",
+      "query": "webhook pagos PostgreSQL arquitectura"
+    },
+    {
+      "mem": "m00081",
+      "lang": "en",
+      "kind": "cross",
+      "query": "payment webhook architecture with PostgreSQL"
+    },
+    {
+      "mem": "m00082",
+      "lang": "en",
+      "kind": "same",
+      "query": "GraphQL settings for the payment webhook"
+    },
+    {
+      "mem": "m00082",
+      "lang": "en",
+      "kind": "kw",
+      "query": "payment webhook GraphQL configuration"
+    },
+    {
+      "mem": "m00082",
+      "lang": "es",
+      "kind": "cross",
+      "query": "ajustes de GraphQL para el webhook de pagos"
+    },
+    {
+      "mem": "m00083",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la gestión de mensajes fallidos en la exportación de facturas"
+    },
+    {
+      "mem": "m00083",
+      "lang": "es",
+      "kind": "kw",
+      "query": "mensajes fallidos exportación facturas"
+    },
+    {
+      "mem": "m00083",
+      "lang": "en",
+      "kind": "cross",
+      "query": "dead letter handling fix in the invoice export"
+    },
+    {
+      "mem": "m00084",
+      "lang": "es",
+      "kind": "same",
+      "query": "ajustes de GraphQL del índice de búsqueda"
+    },
+    {
+      "mem": "m00084",
+      "lang": "es",
+      "kind": "kw",
+      "query": "índice búsqueda GraphQL configuración"
+    },
+    {
+      "mem": "m00084",
+      "lang": "en",
+      "kind": "cross",
+      "query": "GraphQL configuration for the search index"
+    },
+    {
+      "mem": "m00085",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de eventos duplicados tras un timeout en el enrutador de inquilinos"
+    },
+    {
+      "mem": "m00085",
+      "lang": "es",
+      "kind": "kw",
+      "query": "eventos duplicados enrutador inquilinos"
+    },
+    {
+      "mem": "m00085",
+      "lang": "en",
+      "kind": "cross",
+      "query": "duplicate events after a timeout in the tenant router"
+    },
+    {
+      "mem": "m00086",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la clave de idempotencia en el planificador de informes"
+    },
+    {
+      "mem": "m00086",
+      "lang": "es",
+      "kind": "kw",
+      "query": "idempotencia planificador informes decisión"
+    },
+    {
+      "mem": "m00086",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision about the idempotency key in the report scheduler"
+    },
+    {
+      "mem": "m00087",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD del ejecutor de tareas programadas"
+    },
+    {
+      "mem": "m00087",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD ejecutor tareas programadas"
+    },
+    {
+      "mem": "m00087",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for the cron runner Rust"
+    },
+    {
+      "mem": "m00088",
+      "lang": "en",
+      "kind": "same",
+      "query": "how the billing cycle is built on Elasticsearch"
+    },
+    {
+      "mem": "m00088",
+      "lang": "en",
+      "kind": "kw",
+      "query": "billing cycle Elasticsearch architecture"
+    },
+    {
+      "mem": "m00088",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura del ciclo de facturación con Elasticsearch"
+    },
+    {
+      "mem": "m00089",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la clave de idempotencia en el widget de chat"
+    },
+    {
+      "mem": "m00089",
+      "lang": "es",
+      "kind": "kw",
+      "query": "clave idempotencia widget chat"
+    },
+    {
+      "mem": "m00089",
+      "lang": "en",
+      "kind": "cross",
+      "query": "idempotency key bug fixed in the chat widget"
+    },
+    {
+      "mem": "m00090",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del cortacircuitos en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00090",
+      "lang": "es",
+      "kind": "kw",
+      "query": "cortacircuitos búsqueda geolocalización"
+    },
+    {
+      "mem": "m00090",
+      "lang": "en",
+      "kind": "cross",
+      "query": "circuit breaker fix in the geolocation lookup"
+    },
+    {
+      "mem": "m00091",
+      "lang": "en",
+      "kind": "same",
+      "query": "dark mode contrast bug in the chat widget"
+    },
+    {
+      "mem": "m00091",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast chat widget"
+    },
+    {
+      "mem": "m00091",
+      "lang": "es",
+      "kind": "cross",
+      "query": "contraste en modo oscuro en el widget de chat"
+    },
+    {
+      "mem": "m00092",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del cursor de paginación en el generador de miniaturas"
+    },
+    {
+      "mem": "m00092",
+      "lang": "es",
+      "kind": "kw",
+      "query": "cursor paginación generador miniaturas"
+    },
+    {
+      "mem": "m00092",
+      "lang": "en",
+      "kind": "cross",
+      "query": "pagination cursor fix in the image thumbnailer"
+    },
+    {
+      "mem": "m00093",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for secret rotation in the email queue"
+    },
+    {
+      "mem": "m00093",
+      "lang": "en",
+      "kind": "kw",
+      "query": "secret rotation email queue pattern"
+    },
+    {
+      "mem": "m00093",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón de rotación de secretos en la cola de correos"
+    },
+    {
+      "mem": "m00094",
+      "lang": "es",
+      "kind": "same",
+      "query": "arquitectura del índice de búsqueda sobre gRPC"
+    },
+    {
+      "mem": "m00094",
+      "lang": "es",
+      "kind": "kw",
+      "query": "índice búsqueda gRPC arquitectura"
+    },
+    {
+      "mem": "m00094",
+      "lang": "en",
+      "kind": "cross",
+      "query": "search index architecture built on gRPC"
+    },
+    {
+      "mem": "m00095",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la gestión de mensajes fallidos en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00095",
+      "lang": "es",
+      "kind": "kw",
+      "query": "mensajes fallidos importación datos decisión"
+    },
+    {
+      "mem": "m00095",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on dead letter handling in the data import job"
+    },
+    {
+      "mem": "m00096",
+      "lang": "en",
+      "kind": "same",
+      "query": "how we deal with the N+1 query problem around order tracking"
+    },
+    {
+      "mem": "m00096",
+      "lang": "en",
+      "kind": "kw",
+      "query": "N+1 query order tracking pattern"
+    },
+    {
+      "mem": "m00096",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón para el problema de consultas N+1 en el seguimiento de pedidos"
+    },
+    {
+      "mem": "m00097",
+      "lang": "en",
+      "kind": "same",
+      "query": "ODD task document for the analytics pipeline"
+    },
+    {
+      "mem": "m00097",
+      "lang": "en",
+      "kind": "kw",
+      "query": "ODD analytics pipeline"
+    },
+    {
+      "mem": "m00097",
+      "lang": "es",
+      "kind": "cross",
+      "query": "tarea ODD de la canalización de analítica"
+    },
+    {
+      "mem": "m00098",
+      "lang": "en",
+      "kind": "same",
+      "query": "finding about a flaky integration test in the coupon engine"
+    },
+    {
+      "mem": "m00098",
+      "lang": "en",
+      "kind": "kw",
+      "query": "flaky integration test coupon engine"
+    },
+    {
+      "mem": "m00098",
+      "lang": "es",
+      "kind": "cross",
+      "query": "test de integración inestable en el motor de cupones"
+    },
+    {
+      "mem": "m00099",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la contrapresión en la cola del enrutador de inquilinos"
+    },
+    {
+      "mem": "m00099",
+      "lang": "es",
+      "kind": "kw",
+      "query": "contrapresión cola enrutador inquilinos"
+    },
+    {
+      "mem": "m00099",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on backpressure on the queue in the tenant router"
+    },
+    {
+      "mem": "m00100",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de los cambios constantes en tests de snapshot del retorno de OAuth"
+    },
+    {
+      "mem": "m00100",
+      "lang": "es",
+      "kind": "kw",
+      "query": "tests snapshot retorno OAuth"
+    },
+    {
+      "mem": "m00100",
+      "lang": "en",
+      "kind": "cross",
+      "query": "snapshot test churn fix in the oauth callback"
+    },
+    {
+      "mem": "m00101",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about retry with exponential backoff for password reset"
+    },
+    {
+      "mem": "m00101",
+      "lang": "en",
+      "kind": "kw",
+      "query": "retry exponential backoff password reset"
+    },
+    {
+      "mem": "m00101",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre reintentos con espera exponencial en el restablecimiento de contraseña"
+    },
+    {
+      "mem": "m00102",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la normalización unicode en la búsqueda de geolocalización"
+    },
+    {
+      "mem": "m00102",
+      "lang": "es",
+      "kind": "kw",
+      "query": "normalización unicode geolocalización decisión"
+    },
+    {
+      "mem": "m00102",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on the unicode normalization mismatch in the geolocation lookup"
+    },
+    {
+      "mem": "m00103",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision on batch size tuning for the image thumbnailer"
+    },
+    {
+      "mem": "m00103",
+      "lang": "en",
+      "kind": "kw",
+      "query": "batch size tuning thumbnailer"
+    },
+    {
+      "mem": "m00103",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre el ajuste del tamaño de lote en el generador de miniaturas"
+    },
+    {
+      "mem": "m00104",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del redondeo de importes monetarios en el planificador de informes"
+    },
+    {
+      "mem": "m00104",
+      "lang": "es",
+      "kind": "kw",
+      "query": "redondeo importes planificador informes"
+    },
+    {
+      "mem": "m00104",
+      "lang": "en",
+      "kind": "cross",
+      "query": "currency rounding fix in the report scheduler"
+    },
+    {
+      "mem": "m00105",
+      "lang": "es",
+      "kind": "same",
+      "query": "arquitectura de la tarea de importación de datos sobre gRPC"
+    },
+    {
+      "mem": "m00105",
+      "lang": "es",
+      "kind": "kw",
+      "query": "tarea importación datos gRPC arquitectura"
+    },
+    {
+      "mem": "m00105",
+      "lang": "en",
+      "kind": "cross",
+      "query": "data import job architecture on gRPC"
+    },
+    {
+      "mem": "m00106",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD de la moderación de contenido"
+    },
+    {
+      "mem": "m00106",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD moderación contenido"
+    },
+    {
+      "mem": "m00106",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for content moderation Cloudflare"
+    },
+    {
+      "mem": "m00107",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la reversión de migración de esquema en el índice de búsqueda"
+    },
+    {
+      "mem": "m00107",
+      "lang": "es",
+      "kind": "kw",
+      "query": "reversión migración esquema índice búsqueda"
+    },
+    {
+      "mem": "m00107",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on schema migration rollback in the search index"
+    },
+    {
+      "mem": "m00108",
+      "lang": "en",
+      "kind": "same",
+      "query": "we found a dark mode contrast issue in the onboarding wizard"
+    },
+    {
+      "mem": "m00108",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast onboarding wizard"
+    },
+    {
+      "mem": "m00108",
+      "lang": "es",
+      "kind": "cross",
+      "query": "hallazgo de contraste en modo oscuro en el asistente de bienvenida"
+    },
+    {
+      "mem": "m00109",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for webhook signature verification in the permissions matrix"
+    },
+    {
+      "mem": "m00109",
+      "lang": "en",
+      "kind": "kw",
+      "query": "webhook signature permissions matrix"
+    },
+    {
+      "mem": "m00109",
+      "lang": "es",
+      "kind": "cross",
+      "query": "verificación de firma del webhook en la matriz de permisos"
+    },
+    {
+      "mem": "m00110",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la trampa de foco de teclado en el webhook de pagos"
+    },
+    {
+      "mem": "m00110",
+      "lang": "es",
+      "kind": "kw",
+      "query": "trampa foco teclado webhook pagos"
+    },
+    {
+      "mem": "m00110",
+      "lang": "en",
+      "kind": "cross",
+      "query": "keyboard focus trap fix in the payment webhook"
+    },
+    {
+      "mem": "m00111",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de los reintentos con espera exponencial en el motor de cupones"
+    },
+    {
+      "mem": "m00111",
+      "lang": "es",
+      "kind": "kw",
+      "query": "reintentos espera exponencial motor cupones"
+    },
+    {
+      "mem": "m00111",
+      "lang": "en",
+      "kind": "cross",
+      "query": "retry with exponential backoff fix in the coupon engine"
+    },
+    {
+      "mem": "m00112",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la ocultación de datos en los logs de las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00112",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ocultación datos logs banderas decisión"
+    },
+    {
+      "mem": "m00112",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on log redaction for the feature flags"
+    },
+    {
+      "mem": "m00113",
+      "lang": "es",
+      "kind": "same",
+      "query": "arquitectura de la página de perfil de usuario sobre Python"
+    },
+    {
+      "mem": "m00113",
+      "lang": "es",
+      "kind": "kw",
+      "query": "página perfil usuario Python arquitectura"
+    },
+    {
+      "mem": "m00113",
+      "lang": "en",
+      "kind": "cross",
+      "query": "user profile page architecture on Python"
+    },
+    {
+      "mem": "m00114",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de eventos duplicados tras un timeout en el servicio de notificaciones"
+    },
+    {
+      "mem": "m00114",
+      "lang": "es",
+      "kind": "kw",
+      "query": "eventos duplicados servicio notificaciones"
+    },
+    {
+      "mem": "m00114",
+      "lang": "en",
+      "kind": "cross",
+      "query": "duplicate events fix in the notification service"
+    },
+    {
+      "mem": "m00115",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre la invalidación de caché en el carrito de compras"
+    },
+    {
+      "mem": "m00115",
+      "lang": "es",
+      "kind": "kw",
+      "query": "invalidación caché carrito compras"
+    },
+    {
+      "mem": "m00115",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on cache invalidation in the shopping cart"
+    },
+    {
+      "mem": "m00116",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for dark mode contrast in the search index"
+    },
+    {
+      "mem": "m00116",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast search index pattern"
+    },
+    {
+      "mem": "m00116",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón para el contraste en modo oscuro en el índice de búsqueda"
+    },
+    {
+      "mem": "m00117",
+      "lang": "en",
+      "kind": "same",
+      "query": "ODD task document for the metrics exporter"
+    },
+    {
+      "mem": "m00117",
+      "lang": "en",
+      "kind": "kw",
+      "query": "ODD metrics exporter"
+    },
+    {
+      "mem": "m00117",
+      "lang": "es",
+      "kind": "cross",
+      "query": "tarea ODD del exportador de métricas"
+    },
+    {
+      "mem": "m00118",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la contrapresión en la cola de las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00118",
+      "lang": "es",
+      "kind": "kw",
+      "query": "contrapresión cola banderas funcionalidad"
+    },
+    {
+      "mem": "m00118",
+      "lang": "en",
+      "kind": "cross",
+      "query": "backpressure on the queue fix in the feature flags"
+    },
+    {
+      "mem": "m00119",
+      "lang": "en",
+      "kind": "same",
+      "query": "Stripe configuration for the content moderation"
+    },
+    {
+      "mem": "m00119",
+      "lang": "en",
+      "kind": "kw",
+      "query": "content moderation Stripe configuration"
+    },
+    {
+      "mem": "m00119",
+      "lang": "es",
+      "kind": "cross",
+      "query": "configuración de Stripe para la moderación de contenido"
+    },
+    {
+      "mem": "m00120",
+      "lang": "es",
+      "kind": "same",
+      "query": "documento ODD de la página de perfil de usuario en billing-api"
+    },
+    {
+      "mem": "m00120",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD página perfil usuario"
+    },
+    {
+      "mem": "m00120",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for the user profile page SQLite"
+    },
+    {
+      "mem": "m00121",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del idioma alternativo por defecto en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00121",
+      "lang": "es",
+      "kind": "kw",
+      "query": "idioma alternativo importación datos"
+    },
+    {
+      "mem": "m00121",
+      "lang": "en",
+      "kind": "cross",
+      "query": "locale fallback fix in the data import job"
+    },
+    {
+      "mem": "m00122",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for the keyboard focus trap in the permissions matrix"
+    },
+    {
+      "mem": "m00122",
+      "lang": "en",
+      "kind": "kw",
+      "query": "keyboard focus trap permissions matrix"
+    },
+    {
+      "mem": "m00122",
+      "lang": "es",
+      "kind": "cross",
+      "query": "trampa de foco de teclado en la matriz de permisos"
+    },
+    {
+      "mem": "m00123",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre el test de integración inestable en el seguimiento de pedidos"
+    },
+    {
+      "mem": "m00123",
+      "lang": "es",
+      "kind": "kw",
+      "query": "test integración inestable seguimiento pedidos"
+    },
+    {
+      "mem": "m00123",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on the flaky integration test in order tracking"
+    },
+    {
+      "mem": "m00124",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo sobre el apagado ordenado en el formulario de inicio de sesión"
+    },
+    {
+      "mem": "m00124",
+      "lang": "es",
+      "kind": "kw",
+      "query": "apagado ordenado formulario inicio sesión"
+    },
+    {
+      "mem": "m00124",
+      "lang": "en",
+      "kind": "cross",
+      "query": "graceful shutdown finding in the login form"
+    },
+    {
+      "mem": "m00125",
+      "lang": "en",
+      "kind": "same",
+      "query": "architecture of the user profile page behind Prometheus"
+    },
+    {
+      "mem": "m00125",
+      "lang": "en",
+      "kind": "kw",
+      "query": "user profile page Prometheus architecture"
+    },
+    {
+      "mem": "m00125",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la página de perfil de usuario con Prometheus"
+    },
+    {
+      "mem": "m00126",
+      "lang": "en",
+      "kind": "same",
+      "query": "finding about CORS preflight failure in the feature flags"
+    },
+    {
+      "mem": "m00126",
+      "lang": "en",
+      "kind": "kw",
+      "query": "CORS preflight feature flags"
+    },
+    {
+      "mem": "m00126",
+      "lang": "es",
+      "kind": "cross",
+      "query": "fallo de preflight CORS en las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00127",
+      "lang": "en",
+      "kind": "same",
+      "query": "preference for the audit log implementation"
+    },
+    {
+      "mem": "m00127",
+      "lang": "en",
+      "kind": "kw",
+      "query": "audit log FastAPI preference"
+    },
+    {
+      "mem": "m00127",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de FastAPI para el registro de auditoría"
+    },
+    {
+      "mem": "m00128",
+      "lang": "en",
+      "kind": "same",
+      "query": "which stack I prefer for the content moderation"
+    },
+    {
+      "mem": "m00128",
+      "lang": "en",
+      "kind": "kw",
+      "query": "content moderation Django preference"
+    },
+    {
+      "mem": "m00128",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de Django para la moderación de contenido"
+    },
+    {
+      "mem": "m00129",
+      "lang": "es",
+      "kind": "same",
+      "query": "tarea ODD del ciclo de facturación"
+    },
+    {
+      "mem": "m00129",
+      "lang": "es",
+      "kind": "kw",
+      "query": "ODD ciclo facturación"
+    },
+    {
+      "mem": "m00129",
+      "lang": "en",
+      "kind": "cross",
+      "query": "ODD task for the billing cycle Cloudflare"
+    },
+    {
+      "mem": "m00130",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about the flaky integration test in the billing cycle"
+    },
+    {
+      "mem": "m00130",
+      "lang": "en",
+      "kind": "kw",
+      "query": "flaky integration test billing cycle decision"
+    },
+    {
+      "mem": "m00130",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre el test de integración inestable en el ciclo de facturación"
+    },
+    {
+      "mem": "m00131",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo de un fallo de preflight CORS en el generador de PDF"
+    },
+    {
+      "mem": "m00131",
+      "lang": "es",
+      "kind": "kw",
+      "query": "preflight CORS generador PDF"
+    },
+    {
+      "mem": "m00131",
+      "lang": "en",
+      "kind": "cross",
+      "query": "CORS preflight failure found in the pdf renderer"
+    },
+    {
+      "mem": "m00132",
+      "lang": "en",
+      "kind": "same",
+      "query": "finding about the concurrency limit per tenant in the coupon engine"
+    },
+    {
+      "mem": "m00132",
+      "lang": "en",
+      "kind": "kw",
+      "query": "concurrency limit tenant coupon engine"
+    },
+    {
+      "mem": "m00132",
+      "lang": "es",
+      "kind": "cross",
+      "query": "límite de concurrencia por inquilino en el motor de cupones"
+    },
+    {
+      "mem": "m00133",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la política de borrado lógico en la pasarela de notificaciones push"
+    },
+    {
+      "mem": "m00133",
+      "lang": "es",
+      "kind": "kw",
+      "query": "borrado lógico pasarela notificaciones push"
+    },
+    {
+      "mem": "m00133",
+      "lang": "en",
+      "kind": "cross",
+      "query": "soft delete policy fix in the mobile push gateway"
+    },
+    {
+      "mem": "m00134",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre el despliegue gradual por porcentaje en la tarea de importación de datos"
+    },
+    {
+      "mem": "m00134",
+      "lang": "es",
+      "kind": "kw",
+      "query": "despliegue gradual tarea importación decisión"
+    },
+    {
+      "mem": "m00134",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on feature rollout by percentage in the data import job"
+    },
+    {
+      "mem": "m00135",
+      "lang": "es",
+      "kind": "same",
+      "query": "decisión sobre el test de integración inestable en el restablecimiento de contraseña"
+    },
+    {
+      "mem": "m00135",
+      "lang": "es",
+      "kind": "kw",
+      "query": "test inestable restablecimiento contraseña"
+    },
+    {
+      "mem": "m00135",
+      "lang": "en",
+      "kind": "cross",
+      "query": "decision on the flaky integration test in password reset"
+    },
+    {
+      "mem": "m00136",
+      "lang": "en",
+      "kind": "same",
+      "query": "decision about dark mode contrast for the search index"
+    },
+    {
+      "mem": "m00136",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast search index decision"
+    },
+    {
+      "mem": "m00136",
+      "lang": "es",
+      "kind": "cross",
+      "query": "decisión sobre el contraste en modo oscuro del índice de búsqueda"
+    },
+    {
+      "mem": "m00137",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la fuga de memoria en un proceso de larga duración en el índice de búsqueda"
+    },
+    {
+      "mem": "m00137",
+      "lang": "es",
+      "kind": "kw",
+      "query": "fuga memoria índice búsqueda"
+    },
+    {
+      "mem": "m00137",
+      "lang": "en",
+      "kind": "cross",
+      "query": "memory leak fix in the search index long running worker"
+    },
+    {
+      "mem": "m00138",
+      "lang": "es",
+      "kind": "same",
+      "query": "hallazgo de eventos duplicados tras un timeout en las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00138",
+      "lang": "es",
+      "kind": "kw",
+      "query": "eventos duplicados banderas funcionalidad"
+    },
+    {
+      "mem": "m00138",
+      "lang": "en",
+      "kind": "cross",
+      "query": "duplicate events after a timeout found in the feature flags"
+    },
+    {
+      "mem": "m00139",
+      "lang": "en",
+      "kind": "same",
+      "query": "how the permissions matrix is built on RabbitMQ"
+    },
+    {
+      "mem": "m00139",
+      "lang": "en",
+      "kind": "kw",
+      "query": "permissions matrix RabbitMQ architecture"
+    },
+    {
+      "mem": "m00139",
+      "lang": "es",
+      "kind": "cross",
+      "query": "arquitectura de la matriz de permisos con RabbitMQ"
+    },
+    {
+      "mem": "m00140",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for log redaction in the translation catalog"
+    },
+    {
+      "mem": "m00140",
+      "lang": "en",
+      "kind": "kw",
+      "query": "log redaction translation catalog"
+    },
+    {
+      "mem": "m00140",
+      "lang": "es",
+      "kind": "cross",
+      "query": "ocultación de datos en los logs del catálogo de traducciones"
+    },
+    {
+      "mem": "m00141",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección del idioma alternativo por defecto en las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00141",
+      "lang": "es",
+      "kind": "kw",
+      "query": "idioma alternativo banderas funcionalidad"
+    },
+    {
+      "mem": "m00141",
+      "lang": "en",
+      "kind": "cross",
+      "query": "locale fallback fix in the feature flags"
+    },
+    {
+      "mem": "m00142",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for dark mode contrast in the audit log"
+    },
+    {
+      "mem": "m00142",
+      "lang": "en",
+      "kind": "kw",
+      "query": "dark mode contrast audit log pattern"
+    },
+    {
+      "mem": "m00142",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón para el contraste en modo oscuro en el registro de auditoría"
+    },
+    {
+      "mem": "m00143",
+      "lang": "es",
+      "kind": "same",
+      "query": "preferencia de estilo para la matriz de permisos"
+    },
+    {
+      "mem": "m00143",
+      "lang": "es",
+      "kind": "kw",
+      "query": "matriz permisos React preferencia"
+    },
+    {
+      "mem": "m00143",
+      "lang": "en",
+      "kind": "cross",
+      "query": "style preference for the permissions matrix with React"
+    },
+    {
+      "mem": "m00144",
+      "lang": "en",
+      "kind": "same",
+      "query": "finding about a timezone offset error in the notification service"
+    },
+    {
+      "mem": "m00144",
+      "lang": "en",
+      "kind": "kw",
+      "query": "timezone offset notification service"
+    },
+    {
+      "mem": "m00144",
+      "lang": "es",
+      "kind": "cross",
+      "query": "error de desfase de zona horaria en el servicio de notificaciones"
+    },
+    {
+      "mem": "m00145",
+      "lang": "es",
+      "kind": "same",
+      "query": "corrección de la fuga de memoria en las banderas de funcionalidad"
+    },
+    {
+      "mem": "m00145",
+      "lang": "es",
+      "kind": "kw",
+      "query": "fuga memoria banderas funcionalidad"
+    },
+    {
+      "mem": "m00145",
+      "lang": "en",
+      "kind": "cross",
+      "query": "memory leak fix in the feature flags long running worker"
+    },
+    {
+      "mem": "m00146",
+      "lang": "en",
+      "kind": "same",
+      "query": "which stack I prefer for the report scheduler"
+    },
+    {
+      "mem": "m00146",
+      "lang": "en",
+      "kind": "kw",
+      "query": "report scheduler Django preference"
+    },
+    {
+      "mem": "m00146",
+      "lang": "es",
+      "kind": "cross",
+      "query": "preferencia de Django para el planificador de informes"
+    },
+    {
+      "mem": "m00147",
+      "lang": "en",
+      "kind": "same",
+      "query": "fix for the idempotency key in the backup routine"
+    },
+    {
+      "mem": "m00147",
+      "lang": "en",
+      "kind": "kw",
+      "query": "idempotency key backup routine"
+    },
+    {
+      "mem": "m00147",
+      "lang": "es",
+      "kind": "cross",
+      "query": "clave de idempotencia en la rutina de respaldo"
+    },
+    {
+      "mem": "m00148",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for the keyboard focus trap around the login form"
+    },
+    {
+      "mem": "m00148",
+      "lang": "en",
+      "kind": "kw",
+      "query": "keyboard focus trap login form pattern"
+    },
+    {
+      "mem": "m00148",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón para la trampa de foco de teclado en el formulario de inicio de sesión"
+    },
+    {
+      "mem": "m00149",
+      "lang": "en",
+      "kind": "same",
+      "query": "pattern for the slow query without an index around the email queue"
+    },
+    {
+      "mem": "m00149",
+      "lang": "en",
+      "kind": "kw",
+      "query": "slow query email queue pattern"
+    },
+    {
+      "mem": "m00149",
+      "lang": "es",
+      "kind": "cross",
+      "query": "patrón para la consulta lenta sin índice en la cola de correos"
+    }
+  ]
+}
