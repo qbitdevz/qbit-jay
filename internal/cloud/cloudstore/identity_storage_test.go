@@ -11,8 +11,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/qbitdevz/qbit-jay/internal/cloud"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 func openIsolatedCloudStore(t *testing.T) *CloudStore {
@@ -1088,7 +1088,7 @@ func TestFindPrincipalTokenByHashResolvesActiveTokenAndRejectsUnknownOrRevoked(t
 
 // TestNormalizeProjectGrantMatchesInternalNormalization is a pure (non-DSN)
 // RED-first test proving the exported NormalizeProjectGrant helper — added
-// so the cmd/engram runtime PrincipalProjectAuthorizer adapter can normalize
+// so the cmd/qbit-jay runtime PrincipalProjectAuthorizer adapter can normalize
 // a request project exactly like CreateProjectGrant does before storing —
 // stays byte-for-byte identical to the package's own internal normalization.
 func TestNormalizeProjectGrantMatchesInternalNormalization(t *testing.T) {
@@ -1302,7 +1302,7 @@ func TestCloudstoreIdentityPureHelpers(t *testing.T) {
 	// Regression: the bootstrap completion audit metadata (created by
 	// cloudBootstrapCompletionMetadata) carries the boolean flag "issued_token".
 	// It is not a secret and must be accepted, otherwise
-	// `engram cloud bootstrap admin --issue-token` fails atomically and no admin
+	// `qbit-jay cloud bootstrap admin --issue-token` fails atomically and no admin
 	// token is ever minted.
 	if err := rejectSensitiveAuthAuditMetadata(map[string]any{"issued_token": true, "username": "admin", "created_admin": true}); err != nil {
 		t.Fatalf("bootstrap completion metadata must be accepted, got %v", err)

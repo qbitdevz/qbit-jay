@@ -602,7 +602,7 @@ func buildCodexFixtureCLI(t *testing.T) string {
 			return
 		}
 		codexFixturePath = filepath.ToSlash(filepath.Join(codexFixtureDir, "engram.exe"))
-		cmd := exec.Command("go", "build", "-o", codexFixturePath, "./cmd/engram")
+		cmd := exec.Command("go", "build", "-o", codexFixturePath, "./cmd/qbit-jay")
 		cmd.Dir = root
 		if output, err := cmd.CombinedOutput(); err != nil {
 			codexFixtureErr = fmt.Errorf("build fixture CLI: %w: %s", err, output)

@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const (
@@ -117,7 +119,7 @@ func CheckLatest(current string) CheckResult {
 }
 
 func updateCheckDisabled() bool {
-	v := strings.TrimSpace(strings.ToLower(os.Getenv(EnvNoUpdateCheck)))
+	v := strings.TrimSpace(strings.ToLower(env.Get(EnvNoUpdateCheck)))
 	return v == "1" || v == "true" || v == "yes" || v == "on"
 }
 
@@ -191,9 +193,9 @@ func updateInstructions() string {
 	case "darwin":
 		return "  brew update && brew upgrade engram"
 	case "linux":
-		return "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/engram@latest"
+		return "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest"
 	default:
-		return "  go install github.com/qbitdevz/qbit-jay/cmd/engram@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
+		return "  go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
 	}
 }
 

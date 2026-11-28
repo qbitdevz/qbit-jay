@@ -668,7 +668,7 @@ func (m *Manager) push(ctx context.Context) error {
 		}
 		m.quarantineAfterSeq = nextSeq
 		if len(report.Actions) > 0 {
-			log.Printf("[autosync] quarantined %d irreparable pending mutation(s); inspect with `engram doctor --check sync_mutation_required_fields`", len(report.Actions))
+			log.Printf("[autosync] quarantined %d irreparable pending mutation(s); inspect with `qbit-jay doctor --check sync_mutation_required_fields`", len(report.Actions))
 		}
 	}
 
@@ -735,7 +735,7 @@ func (m *Manager) pushPage(ctx context.Context, pending []store.SyncMutation) []
 	for _, mut := range pending {
 		project := mut.Project
 		if strings.TrimSpace(project) != project || project == "" {
-			failures = append(failures, fmt.Errorf("pending mutation seq %d (%s/%s) has an empty or padded project and was not sent; repair local project metadata or inspect `engram doctor --check sync_mutation_required_fields`", mut.Seq, mut.Entity, mut.EntityKey))
+			failures = append(failures, fmt.Errorf("pending mutation seq %d (%s/%s) has an empty or padded project and was not sent; repair local project metadata or inspect `qbit-jay doctor --check sync_mutation_required_fields`", mut.Seq, mut.Entity, mut.EntityKey))
 			continue
 		}
 		if _, ok := groups[project]; !ok {
@@ -1039,7 +1039,7 @@ func nonEnrolledPendingMessage(counts []store.PendingSyncMutationProjectCount) s
 	for _, count := range counts {
 		parts = append(parts, fmt.Sprintf("%s=%d", count.Project, count.Count))
 	}
-	return fmt.Sprintf("pending cloud sync mutations are blocked because project(s) are not enrolled: %s. Run `engram cloud enroll <project>` for each intended project or review enrollment.", strings.Join(parts, ", "))
+	return fmt.Sprintf("pending cloud sync mutations are blocked because project(s) are not enrolled: %s. Run `qbit-jay cloud enroll <project>` for each intended project or review enrollment.", strings.Join(parts, ", "))
 }
 
 // computeBackoff returns exponential backoff with ±25% jitter.

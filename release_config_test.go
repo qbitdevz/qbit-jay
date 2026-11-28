@@ -60,7 +60,7 @@ func TestReleaseChecksModuleMetadataWithoutMutatingTaggedSources(t *testing.T) {
 }
 
 // modulePath must carry the major-version suffix of the release line so that
-// `go install <modulePath>/cmd/engram@latest` resolves the tagged release.
+// `go install <modulePath>/cmd/qbit-jay@latest` resolves the tagged release.
 const modulePath = "github.com/qbitdevz/qbit-jay"
 
 func TestModulePathMatchesReleaseMajorVersion(t *testing.T) {
@@ -71,6 +71,7 @@ func TestModulePathMatchesReleaseMajorVersion(t *testing.T) {
 		t.Fatalf("go.mod module line = %q, want %q", firstLine, want)
 	}
 
+	// docs/INSTALLATION.md still names cmd/engram until the docs task (T7) rewrites it.
 	install := "go install " + modulePath + "/cmd/engram@latest"
 	installation := releaseConfigFile(t, filepath.Join(root, "docs", "INSTALLATION.md"))
 	if strings.Count(installation, install) < 2 {

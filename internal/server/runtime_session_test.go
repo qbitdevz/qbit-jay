@@ -129,7 +129,7 @@ func TestRuntimeSessionResolveReadsWhileWriterIsReserved(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	other, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	other, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -1,9 +1,10 @@
 package cloud
 
 import (
-	"os"
 	"strconv"
 	"strings"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 type Config struct {
@@ -47,33 +48,33 @@ func IsDefaultJWTSecret(secret string) bool {
 
 func ConfigFromEnv() Config {
 	cfg := DefaultConfig()
-	cfg.StartupReceiptDir = strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_STARTUP_RECEIPT_DIR"))
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_DATABASE_URL")); v != "" {
+	cfg.StartupReceiptDir = strings.TrimSpace(env.Get("CLOUD_STARTUP_RECEIPT_DIR"))
+	if v := strings.TrimSpace(env.Get("DATABASE_URL")); v != "" {
 		cfg.DSN = v
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_JWT_SECRET")); v != "" {
+	if v := strings.TrimSpace(env.Get("JWT_SECRET")); v != "" {
 		cfg.JWTSecret = v
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_ADMIN")); v != "" {
+	if v := strings.TrimSpace(env.Get("CLOUD_ADMIN")); v != "" {
 		cfg.AdminToken = v
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_TOKEN_PEPPER")); v != "" {
+	if v := strings.TrimSpace(env.Get("CLOUD_TOKEN_PEPPER")); v != "" {
 		cfg.TokenPepper = v
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_PORT")); v != "" {
+	if v := strings.TrimSpace(env.Get("PORT")); v != "" {
 		if n, err := strconv.Atoi(v); err == nil && n > 0 {
 			cfg.Port = n
 		}
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_HOST")); v != "" {
+	if v := strings.TrimSpace(env.Get("CLOUD_HOST")); v != "" {
 		cfg.BindHost = v
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_MAX_PUSH_BYTES")); v != "" {
+	if v := strings.TrimSpace(env.Get("CLOUD_MAX_PUSH_BYTES")); v != "" {
 		if n, err := strconv.ParseInt(v, 10, 64); err == nil && n > 0 {
 			cfg.MaxPushBodyBytes = n
 		}
 	}
-	if v := strings.TrimSpace(os.Getenv("ENGRAM_CLOUD_ALLOWED_PROJECTS")); v != "" {
+	if v := strings.TrimSpace(env.Get("CLOUD_ALLOWED_PROJECTS")); v != "" {
 		parts := strings.Split(v, ",")
 		projects := make([]string, 0, len(parts))
 		seen := make(map[string]struct{})

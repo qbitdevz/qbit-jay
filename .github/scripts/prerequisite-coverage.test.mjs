@@ -16,7 +16,7 @@ const profiles = {
     ...[1, 10, 100].map(n => ['internal/cloud/cloudserver', `TestMutationPausePostgresQueryCount/B100/D${n}`]),
   ],
   'windows-recovery': [
-    ['cmd/engram', 'TestHookManagedLocalPublicRecovery'],
+    ['cmd/qbit-jay', 'TestHookManagedLocalPublicRecovery'],
     ...['handback', 'ascii', 'unicode', 'stdout-fallback'].map(name =>
       ['plugin', `TestSubagentStopPreservesUnicodeTransport/${name}`]),
   ],
@@ -93,7 +93,7 @@ test('measurement lane preserves PG16 and wires owned PG18.6 fixtures', () => {
   assert.ok(/run: bash \.github\/scripts\/postgres-measurements\.sh/.test(ci), 'owned measurement lane');
   assert.match(ci, /node --test \.github\/scripts\/prerequisite-coverage\.test\.mjs/);
   assert.match(ci, /image: postgres:16-alpine/);
-  assert.match(ci, /go test -json -count=1 -timeout=10m \.\/internal\/cloud\/cloudstore \.\/internal\/cloud\/cloudserver \.\/cmd\/engram/);
+  assert.match(ci, /go test -json -count=1 -timeout=10m \.\/internal\/cloud\/cloudstore \.\/internal\/cloud\/cloudserver \.\/cmd\/qbit-jay/);
   const script = readFileSync(new URL('./postgres-measurements.sh', import.meta.url), 'utf8');
   for (const token of ['--publish "127.0.0.1:$port:5432"', 'start engram1832 15432', 'start engram1831 15431',
     'shared_preload_libraries=pg_stat_statements', 'compute_query_id=on',

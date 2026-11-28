@@ -24,7 +24,7 @@ var ErrInvalidRunnerName = errors.New("invalid runner name")
 //
 // Typical usage (reading from the environment):
 //
-//	runner, err := llm.NewRunner(os.Getenv("ENGRAM_AGENT_CLI"))
+//	runner, err := llm.NewRunner(env.Get("AGENT_CLI"))
 func NewRunner(name string) (AgentRunner, error) {
 	switch name {
 	case "claude":

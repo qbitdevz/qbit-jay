@@ -73,7 +73,7 @@ func (out *cancelOnAdvisoryRetry) Write(line []byte) (int, error) {
 func TestStartupTraceClassifiesTypedSQLiteLocks(t *testing.T) {
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
-	path := filepath.Join(t.TempDir(), "engram.db")
+	path := filepath.Join(t.TempDir(), "qbit-jay.db")
 	db, err := sql.Open("sqlite", path)
 	if err != nil {
 		t.Fatal(err)
@@ -144,7 +144,7 @@ func TestStartupTraceClassifiesTypedSQLiteLocks(t *testing.T) {
 func TestStartupTraceDoesNotClassifySQLiteErrorsByPath(t *testing.T) {
 	var out bytes.Buffer
 	trace := NewStartupTrace(&out, time.Now())
-	err := &os.PathError{Op: "open", Path: "sqlite_busy/engram.db", Err: fs.ErrNotExist}
+	err := &os.PathError{Op: "open", Path: "sqlite_busy/qbit-jay.db", Err: fs.ErrNotExist}
 	trace.markSQLiteLock("sqlite-prime-lock-result", err)
 	if out.Len() != 0 {
 		t.Fatalf("filesystem error emitted a SQLite lock result: %s", out.String())

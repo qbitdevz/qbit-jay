@@ -328,7 +328,7 @@ func TestLegacyEmptyPromptDiscardBackupErrors(t *testing.T) {
 					t.Fatal(err)
 				}
 			case "source", "wal", "shm":
-				path = filepath.Join(s.cfg.DataDir, "engram.db")
+				path = filepath.Join(s.cfg.DataDir, "qbit-jay.db")
 				if scenario != "source" {
 					path += "-" + scenario
 				}
@@ -343,7 +343,7 @@ func TestLegacyEmptyPromptDiscardBackupErrors(t *testing.T) {
 					return original(db, query, args...)
 				}
 			case "hardlink":
-				if err := os.Link(filepath.Join(s.cfg.DataDir, "engram.db"), path); err != nil {
+				if err := os.Link(filepath.Join(s.cfg.DataDir, "qbit-jay.db"), path); err != nil {
 					t.Fatal(err)
 				}
 			case "parent alias":
@@ -351,9 +351,9 @@ func TestLegacyEmptyPromptDiscardBackupErrors(t *testing.T) {
 				if err := os.Symlink(s.cfg.DataDir, alias); err != nil {
 					t.Skipf("directory symlink unavailable: %v", err)
 				}
-				path = filepath.Join(alias, "engram.db")
+				path = filepath.Join(alias, "qbit-jay.db")
 			case "symlink":
-				if err := os.Symlink(filepath.Join(s.cfg.DataDir, "engram.db"), path); err != nil {
+				if err := os.Symlink(filepath.Join(s.cfg.DataDir, "qbit-jay.db"), path); err != nil {
 					t.Skipf("symlink unavailable: %v", err)
 				}
 			}
@@ -546,7 +546,7 @@ func TestLegacyEmptyPromptDiscardSuccess(t *testing.T) {
 	if err != nil || !reflect.DeepEqual(files, afterFiles) {
 		t.Fatalf("planning changed filesystem: %v", err)
 	}
-	wal, err := os.Stat(filepath.Join(s.cfg.DataDir, "engram.db-wal"))
+	wal, err := os.Stat(filepath.Join(s.cfg.DataDir, "qbit-jay.db-wal"))
 	if err != nil || wal.Size() == 0 {
 		t.Fatalf("fixture lacks WAL writes: %v", err)
 	}

@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -24,7 +25,7 @@ type httpWriteTiming struct {
 }
 
 func beginHTTPWriteTiming(r *http.Request) *httpWriteTiming {
-	if os.Getenv(httpWriteTimingEnvironment) != "1" {
+	if env.Get(httpWriteTimingEnvironment) != "1" {
 		return nil
 	}
 	operation := ""

@@ -22,7 +22,7 @@ func (r DetectionResult) ImplicitGitProjectCollisionWarning(dataDir string) stri
 	if !r.FirstImplicitGitProjectCollision(dataDir) {
 		return ""
 	}
-	return fmt.Sprintf("Warning: project %q is also selected automatically in another Git checkout. Run engram init <distinct-name> to separate future captures.", r.Project)
+	return fmt.Sprintf("Warning: project %q is also selected automatically in another Git checkout. Run qbit-jay init <distinct-name> to separate future captures.", r.Project)
 }
 
 // FirstImplicitGitProjectCollision records a local implicit capture attempt and

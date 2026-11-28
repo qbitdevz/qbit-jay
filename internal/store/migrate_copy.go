@@ -83,8 +83,8 @@ func migrateCopy(source, output string, confirmed, diagnoseV340 bool) (result *M
 	if err != nil {
 		return nil, err
 	}
-	if _, ok := before["engram.db"]; !ok {
-		return nil, fmt.Errorf("source has no engram.db")
+	if _, ok := before[DatabaseFile]; !ok {
+		return nil, fmt.Errorf("source has no %s", DatabaseFile)
 	}
 	identity, err := os.ReadFile(filepath.Join(source, ".instance-id"))
 	if err != nil {
@@ -105,7 +105,7 @@ func migrateCopy(source, output string, confirmed, diagnoseV340 bool) (result *M
 	if err = copyDirectory(source, output, before); err != nil {
 		return nil, err
 	}
-	header, err := os.Open(filepath.Join(output, "engram.db"))
+	header, err := os.Open(filepath.Join(output, DatabaseFile))
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func migrateCopy(source, output string, confirmed, diagnoseV340 bool) (result *M
 	}
 	// Read-only database access occurs ONLY on the copy. Without immutable=1,
 	// SQLite reads the copied WAL and rebuilds SHM in the destination.
-	db, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(output, "engram.db"), filepath.Separator))
+	db, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(output, DatabaseFile), filepath.Separator))
 	if err != nil {
 		return nil, err
 	}
@@ -288,7 +288,7 @@ func copyDirectory(source, output string, manifest map[string]copyEntry) error {
 		if !info.Mode().IsRegular() {
 			return fmt.Errorf("unsafe source entry: %s", r)
 		}
-		if r == "engram.db-shm" {
+		if r == DatabaseFile+"-shm" {
 			return nil
 		}
 		in, e := os.Open(p)

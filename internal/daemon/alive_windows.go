@@ -10,7 +10,7 @@ import (
 
 // waitTimeout is the Win32 WAIT_TIMEOUT status (258). Declared locally
 // because x/sys/windows exports it only as a syscall.Errno (same pattern as
-// mcpJobParentIsRunning in cmd/engram).
+// mcpJobParentIsRunning in cmd/qbit-jay).
 const waitTimeout = 0x00000102
 
 // ProcessAlive reports whether a pid belongs to a live process. Liveness is

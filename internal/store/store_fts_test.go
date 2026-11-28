@@ -10,7 +10,7 @@ import (
 )
 
 func TestFreshMigrationCreatesFTSTablesOnce(t *testing.T) {
-	db, err := sql.Open("sqlite", filepath.Join(t.TempDir(), "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(t.TempDir(), "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -298,7 +298,7 @@ func newStoreAfterFTSChange(t *testing.T, change func(t *testing.T, db *sql.DB))
 	if err := s.Close(); err != nil {
 		t.Fatalf("close initial store: %v", err)
 	}
-	db, err := sql.Open("sqlite", filepath.Join(dir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(dir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open raw database: %v", err)
 	}

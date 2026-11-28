@@ -77,7 +77,7 @@ func buildEngramBinary(t *testing.T) string {
 		name += ".exe"
 	}
 	bin := filepath.Join(t.TempDir(), name)
-	cmd := exec.Command("go", "build", "-o", bin, "./cmd/engram")
+	cmd := exec.Command("go", "build", "-o", bin, "./cmd/qbit-jay")
 	cmd.Dir = repoRoot(t)
 	if out, err := cmd.CombinedOutput(); err != nil {
 		t.Fatalf("build engram: %v\n%s", err, out)

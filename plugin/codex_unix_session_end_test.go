@@ -337,7 +337,7 @@ func assertNoCodexUnixRequest(t *testing.T, requests <-chan string) {
 
 func codexFixtureEndpoint(t *testing.T, port *string) string {
 	t.Helper()
-	data, err := os.ReadFile(filepath.Join(repoRoot(t), "cmd", "engram", "hook_codex.go"))
+	data, err := os.ReadFile(filepath.Join(repoRoot(t), "cmd", "qbit-jay", "hook_codex.go"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -347,7 +347,11 @@ func codexFixtureEndpoint(t *testing.T, port *string) string {
 		t.Fatal("endpoint selector boundary changed")
 	}
 	dir := t.TempDir()
-	source := "package main\nimport (\"fmt\";\"os\";\"strconv\";\"strings\")\nfunc codexHookURL() string {" + body + "\n}\nfunc main(){fmt.Print(codexHookURL())}\n"
+	// The extracted function reads its environment through internal/qbit/env,
+	// which a standalone probe cannot import; this shim has the same lookup
+	// (QBIT_JAY_<NAME>, then ENGRAM_<NAME>).
+	shim := "type envShim struct{}\nfunc (envShim) Get(n string) string {\n\tif v, ok := os.LookupEnv(\"QBIT_JAY_\" + n); ok {\n\t\treturn v\n\t}\n\treturn os.Getenv(\"ENGRAM_\" + n)\n}\nvar env envShim\n"
+	source := "package main\nimport (\"fmt\";\"os\";\"strconv\";\"strings\")\n" + shim + "func codexHookURL() string {" + body + "\n}\nfunc main(){fmt.Print(codexHookURL())}\n"
 	if err := os.WriteFile(filepath.Join(dir, "main.go"), []byte(source), 0o600); err != nil {
 		t.Fatal(err)
 	}

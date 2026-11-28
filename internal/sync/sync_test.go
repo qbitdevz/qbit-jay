@@ -1749,7 +1749,7 @@ func TestBootstrapAndRollbackAcceptMigratedLegacyCheckpoints(t *testing.T) {
 		t.Fatalf("close store before legacy seed: %v", err)
 	}
 
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open legacy store: %v", err)
 	}

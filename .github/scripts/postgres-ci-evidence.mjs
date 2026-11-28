@@ -5,7 +5,7 @@ const prefix = 'github.com/qbitdevz/qbit-jay/';
 const required = new Map([
   ['internal/cloud/cloudstore', 'TestProjectSyncControlPersists'],
   ['internal/cloud/cloudserver', 'TestSessionAuthorityRegistrationPersistsOverHTTP'],
-  ['cmd/engram', 'TestCloudRuntimeWiresManagedTokenAuthEndToEnd'],
+  ['cmd/qbit-jay', 'TestCloudRuntimeWiresManagedTokenAuthEndToEnd'],
 ].map(([pkg, name]) => [prefix + pkg, name]));
 try {
   if (process.argv.length !== 3) throw new Error('Usage: node .github/scripts/postgres-ci-evidence.mjs EVENTS.json');

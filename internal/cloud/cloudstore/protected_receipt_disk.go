@@ -38,7 +38,7 @@ func NewProtectedStartupReceiptVerifier(directory string) *StartupReceiptVerifie
 	return &StartupReceiptVerifier{verify: func(ctx context.Context, db *sql.DB, projects []string) (bool, error) {
 		root, err := openPrivateReceiptDirectory(directory)
 		if err != nil {
-			fmt.Fprintln(os.Stderr, "engram cloud startup: protected receipt directory unavailable")
+			fmt.Fprintln(os.Stderr, "qbit-jay cloud startup: protected receipt directory unavailable")
 			return false, err
 		}
 		defer func() { _ = root.Close() }()
@@ -51,7 +51,7 @@ func NewProtectedStartupReceiptVerifier(directory string) *StartupReceiptVerifie
 		}
 		if deltaErr != nil {
 			if deltaErr == context.DeadlineExceeded {
-				fmt.Fprintln(os.Stderr, "engram cloud startup: protected receipt delta timed out")
+				fmt.Fprintln(os.Stderr, "qbit-jay cloud startup: protected receipt delta timed out")
 			}
 			return false, deltaErr
 		}
@@ -85,7 +85,7 @@ func PrepareProtectedStartupReceipt(ctx context.Context, cfg cloud.Config, proje
 	if err := writeProtectedDiskReceipt(root, protectedReceiptName, receipt); err != nil {
 		return fmt.Errorf("cloud startup receipt could not store the verified receipt in the configured directory")
 	}
-	fmt.Fprintln(os.Stderr, "engram cloud startup: stored protected no-op receipt")
+	fmt.Fprintln(os.Stderr, "qbit-jay cloud startup: stored protected no-op receipt")
 	return nil
 }
 
@@ -113,12 +113,12 @@ func reuseProtectedDiskReceipt(ctx context.Context, db *sql.DB, projects []strin
 		return false
 	}
 	if !slices.Equal(prior.projects, projects) {
-		fmt.Fprintln(os.Stderr, "engram cloud startup: protected receipt scope changed")
+		fmt.Fprintln(os.Stderr, "qbit-jay cloud startup: protected receipt scope changed")
 		return false
 	}
 	current, events, err := tryProtectedDelta(ctx, db, prior)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "engram cloud startup: protected delta refused (events=%d)\n", len(events))
+		fmt.Fprintf(os.Stderr, "qbit-jay cloud startup: protected delta refused (events=%d)\n", len(events))
 		return false
 	}
 	if current.witness != prior.witness {
@@ -126,7 +126,7 @@ func reuseProtectedDiskReceipt(ctx context.Context, db *sql.DB, projects []strin
 			return false
 		}
 	}
-	fmt.Fprintf(os.Stderr, "engram cloud startup: protected receipt reused (events=%d)\n", len(events))
+	fmt.Fprintf(os.Stderr, "qbit-jay cloud startup: protected receipt reused (events=%d)\n", len(events))
 	return true
 }
 

@@ -20,7 +20,7 @@ func copyQuotedChunks(t *testing.T, historical bool, space string, mutation func
 		src, db = copyV360Fixture(t)
 	} else {
 		src = copyFixture(t)
-		db, err = sql.Open("sqlite", filepath.Join(src, "engram.db"))
+		db, err = sql.Open("sqlite", filepath.Join(src, "qbit-jay.db"))
 	}
 	if err != nil {
 		t.Fatal(err)
@@ -76,7 +76,7 @@ func TestMigrateCopySQLiteQuotedHeader(t *testing.T) {
 					if _, err := db.Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
 						t.Fatal(err)
 					}
-					base, err := os.ReadFile(filepath.Join(src, "engram.db"))
+					base, err := os.ReadFile(filepath.Join(src, "qbit-jay.db"))
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -90,10 +90,10 @@ func TestMigrateCopySQLiteQuotedHeader(t *testing.T) {
 						t.Fatal(err)
 					}
 					if wal {
-						if err = os.WriteFile(filepath.Join(src, "engram.db"), base, 0600); err != nil {
+						if err = os.WriteFile(filepath.Join(src, "qbit-jay.db"), base, 0600); err != nil {
 							t.Fatal(err)
 						}
-						info, e := os.Stat(filepath.Join(src, "engram.db-wal"))
+						info, e := os.Stat(filepath.Join(src, "qbit-jay.db-wal"))
 						if e != nil || info.Size() <= 32 {
 							t.Fatalf("missing committed WAL: %v", e)
 						}
@@ -117,7 +117,7 @@ func TestMigrateCopySQLiteQuotedHeader(t *testing.T) {
 							t.Fatalf("%s changed: %v", name, e)
 						}
 					}
-					copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+					copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 					if err != nil {
 						t.Fatal(err)
 					}
@@ -181,7 +181,7 @@ func TestMigrateCopyQuotedRejectsNearMisses(t *testing.T) {
 			if !reflect.DeepEqual(before, copySnapshot(t, src)) {
 				t.Fatal("source changed")
 			}
-			copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+			copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 			if err != nil {
 				t.Fatal(err)
 			}

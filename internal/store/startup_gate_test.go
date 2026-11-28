@@ -128,7 +128,7 @@ func TestPersistentWALSurvivesClose(t *testing.T) {
 		t.Fatalf("CreateSession: %v", err)
 	}
 
-	walPath := filepath.Join(cfg.DataDir, "engram.db-wal")
+	walPath := filepath.Join(cfg.DataDir, "qbit-jay.db-wal")
 	if _, err := os.Stat(walPath); err != nil {
 		t.Fatalf("-wal file missing while store is open: %v", err)
 	}
@@ -149,9 +149,9 @@ func TestNewRejectsRemoteFilesystemBeforeSQLiteMutation(t *testing.T) {
 	}
 
 	triplet := map[string][]byte{
-		"engram.db":     []byte("database bytes"),
-		"engram.db-wal": []byte("wal bytes"),
-		"engram.db-shm": []byte("shm bytes"),
+		"qbit-jay.db":     []byte("database bytes"),
+		"qbit-jay.db-wal": []byte("wal bytes"),
+		"qbit-jay.db-shm": []byte("shm bytes"),
 	}
 	for name, contents := range triplet {
 		if err := os.WriteFile(filepath.Join(dataDir, name), contents, 0o600); err != nil {
@@ -230,7 +230,7 @@ func TestNewWithQuestionMarkInDataDirectory(t *testing.T) {
 		t.Fatalf("Close: %v", err)
 	}
 
-	raw, err := sql.Open("sqlite", (&url.URL{Scheme: "file", Path: filepath.Join(cfg.DataDir, "engram.db")}).String())
+	raw, err := sql.Open("sqlite", (&url.URL{Scheme: "file", Path: filepath.Join(cfg.DataDir, "qbit-jay.db")}).String())
 	if err != nil {
 		t.Fatalf("open configured database: %v", err)
 	}
@@ -334,11 +334,11 @@ func TestStartupMigrationBatchAvoidsRedundantGenerationProbes(t *testing.T) {
 	t.Run("rejects generation change after migration lock", func(t *testing.T) {
 		originalLock := acquireStartupMigrationLock
 		t.Cleanup(func() { acquireStartupMigrationLock = originalLock })
-		replacement := filepath.Join(t.TempDir(), "engram.db")
+		replacement := filepath.Join(t.TempDir(), "qbit-jay.db")
 		writeTestFile(t, replacement)
 		changed := false
 		statFile = func(path string) (os.FileInfo, error) {
-			if changed && path == filepath.Join(cfg.DataDir, "engram.db") {
+			if changed && path == filepath.Join(cfg.DataDir, "qbit-jay.db") {
 				return originalStatFile(replacement)
 			}
 			return originalStatFile(path)
@@ -417,7 +417,7 @@ func TestNewerSchemaVersionIsLeftUntouched(t *testing.T) {
 
 	// Simulate a database already migrated by a NEWER engram.
 	future := schemaVersion + 7
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("raw open: %v", err)
 	}
@@ -461,7 +461,7 @@ func TestNewerSchemaVersionSkipsSchemaRepair(t *testing.T) {
 		t.Fatalf("Close: %v", err)
 	}
 
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("raw open: %v", err)
 	}
@@ -780,7 +780,7 @@ func TestConnectionReplacementKeepsConfiguration(t *testing.T) {
 	if err := s.Close(); err != nil {
 		t.Fatalf("Close: %v", err)
 	}
-	walPath := filepath.Join(cfg.DataDir, "engram.db-wal")
+	walPath := filepath.Join(cfg.DataDir, "qbit-jay.db-wal")
 	if _, err := os.Stat(walPath); err != nil {
 		t.Fatalf("-wal file was unlinked on close after connection replacement — persist-WAL was lost: %v", err)
 	}

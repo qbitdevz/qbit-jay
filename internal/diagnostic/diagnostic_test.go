@@ -41,7 +41,7 @@ func newDiagnosticTestStoreWithConfig(t *testing.T) (*store.Store, store.Config)
 
 func seedDiagnosticPendingMutation(t *testing.T, dataDir, project, entity, entityKey, op, payload string) {
 	t.Helper()
-	db, err := sql.Open("sqlite", filepath.Join(dataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(dataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("sql.Open: %v", err)
 	}
@@ -455,7 +455,7 @@ func TestOrphanedPendingRelationsCheckWarnsWithCountsAndBoundedSample(t *testing
 	if len(evidence.Sample) != 1 || evidence.Sample[0].SyncID != "rel-orphan" {
 		t.Fatalf("sample=%+v, want the both-endpoints-missing relation", evidence.Sample)
 	}
-	for _, want := range []string{"engram doctor repair --check orphaned_pending_relations", "--dry-run", "orphaned"} {
+	for _, want := range []string{"qbit-jay doctor repair --check orphaned_pending_relations", "--dry-run", "orphaned"} {
 		if !strings.Contains(finding.SafeNextStep, want) {
 			t.Fatalf("SafeNextStep=%q, want %q", finding.SafeNextStep, want)
 		}
@@ -639,7 +639,7 @@ func TestSessionProjectDirectoryMismatchDefersToKnownManualTarget(t *testing.T) 
 func TestSyncMutationRequiredFieldsSurfacesNonEnrolledCountFailure(t *testing.T) {
 	s, cfg := newDiagnosticTestStoreWithConfig(t)
 
-	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("sql.Open: %v", err)
 	}
@@ -751,7 +751,7 @@ func TestSyncMutationRequiredFieldsCheckSuggestsLocalRepair(t *testing.T) {
 		t.Fatalf("report=%+v", report)
 	}
 	next := report.Checks[0].Findings[0].SafeNextStep
-	if !strings.Contains(next, "engram doctor repair --project engram --check sync_mutation_required_fields --dry-run") || !strings.Contains(next, "cloud-upgrade tooling requires configured cloud sync") {
+	if !strings.Contains(next, "qbit-jay doctor repair --project engram --check sync_mutation_required_fields --dry-run") || !strings.Contains(next, "cloud-upgrade tooling requires configured cloud sync") {
 		t.Fatalf("local repair guidance=%q", next)
 	}
 }
@@ -783,7 +783,7 @@ func TestSyncMutationRequiredFieldsBlocksNonEnrolledBacklogWhenCloudSyncInUse(t 
 	if !strings.Contains(string(finding.Evidence), `"project":"local"`) {
 		t.Fatalf("expected the non-enrolled project in evidence, got %s", finding.Evidence)
 	}
-	if !strings.Contains(finding.SafeNextStep, "engram cloud enroll <project>") {
+	if !strings.Contains(finding.SafeNextStep, "qbit-jay cloud enroll <project>") {
 		t.Fatalf("expected enrollment guidance, got %q", finding.SafeNextStep)
 	}
 }
@@ -831,7 +831,7 @@ func TestInvalidSessionIdentityCheckReportsSourceReferencesAndJournal(t *testing
 	}
 	t.Cleanup(func() { _ = s.Close() })
 
-	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open raw database: %v", err)
 	}
@@ -1300,7 +1300,7 @@ func TestSyncMutationRequiredFieldsReportsQuarantinedEvidenceWithoutCloudEnrollm
 	}
 	// The local-only gate must not answer a quarantined row with cloud
 	// enrollment guidance: there is nothing to enroll for.
-	if strings.Contains(check.Findings[0].SafeNextStep, "engram cloud enroll") {
+	if strings.Contains(check.Findings[0].SafeNextStep, "qbit-jay cloud enroll") {
 		t.Fatalf("local-only quarantine must not suggest cloud enrollment: %+v", check.Findings[0])
 	}
 }
@@ -1315,7 +1315,7 @@ func newDiagnosticTestStoreWithLegacyNullableSessions(t *testing.T, sessions ...
 		t.Fatalf("DefaultConfig: %v", err)
 	}
 	cfg.DataDir = t.TempDir()
-	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "engram.db"))
+	raw, err := sql.Open("sqlite", filepath.Join(cfg.DataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open legacy database: %v", err)
 	}

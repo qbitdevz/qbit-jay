@@ -246,7 +246,7 @@ func TestCompactContextGenerationInvalidation(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
-				dbPath := filepath.Join(s.DataDir(), "engram.db")
+				dbPath := filepath.Join(s.DataDir(), "qbit-jay.db")
 				statFile = func(path string) (os.FileInfo, error) {
 					if path == dbPath {
 						return info, nil

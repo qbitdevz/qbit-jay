@@ -24,7 +24,7 @@ func TestPersistentWALReclaimsSpaceWhenLastStoreCloses(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	dbPath := filepath.Join(dir, "engram.db")
+	dbPath := filepath.Join(dir, "qbit-jay.db")
 	reader, err := sql.Open("sqlite", dbPath)
 	if err != nil {
 		t.Fatal(err)

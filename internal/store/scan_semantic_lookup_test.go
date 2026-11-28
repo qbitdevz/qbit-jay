@@ -101,7 +101,7 @@ func TestScanProject_SemanticSnippetLookupFailure(t *testing.T) {
 					}
 
 					originalDB := s.db
-					fault := &snippetFaultConnector{driver: originalDB.Driver(), dsn: filepath.Join(s.DataDir(), "engram.db"), badID: snippets[badIndex].SyncID, failure: failure}
+					fault := &snippetFaultConnector{driver: originalDB.Driver(), dsn: filepath.Join(s.DataDir(), "qbit-jay.db"), badID: snippets[badIndex].SyncID, failure: failure}
 					wrapped := sql.OpenDB(fault)
 					wrapped.SetMaxOpenConns(1)
 					s.db = wrapped

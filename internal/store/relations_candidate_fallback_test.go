@@ -142,7 +142,7 @@ func TestScanProject_BatchFailurePreservesLegacyCandidates(t *testing.T) {
 				t.Fatal(err)
 			}
 			beforeObs[sourceID] = obs
-			fault := &candidateFallbackConnector{driver: s.db.Driver(), dsn: storeDSN(filepath.Join(s.cfg.DataDir, "engram.db")), injected: errors.New("test-only batch query failure")}
+			fault := &candidateFallbackConnector{driver: s.db.Driver(), dsn: storeDSN(filepath.Join(s.cfg.DataDir, "qbit-jay.db")), injected: errors.New("test-only batch query failure")}
 			replacement := sql.OpenDB(fault)
 			replacement.SetMaxOpenConns(1)
 			if err := replacement.Ping(); err != nil {

@@ -37,7 +37,7 @@ type ProjectTransitionError struct {
 }
 
 func (e *ProjectTransitionError) Error() string {
-	return fmt.Sprintf("Git would select project %q, but this directory has history under %s; choose explicitly or run engram init <project> to set future scope (existing memories are not moved)", e.Candidate, strings.Join(e.HistoricalProjects, ", "))
+	return fmt.Sprintf("Git would select project %q, but this directory has history under %s; choose explicitly or run qbit-jay init <project> to set future scope (existing memories are not moved)", e.Candidate, strings.Join(e.HistoricalProjects, ", "))
 }
 
 type repositoryBinding struct {

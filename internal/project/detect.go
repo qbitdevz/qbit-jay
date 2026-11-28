@@ -19,6 +19,8 @@ import (
 	"time"
 
 	"github.com/qbitdevz/qbit-jay/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/paths"
 )
 
 // ErrAmbiguousProject is returned when the working directory is a parent of
@@ -78,7 +80,7 @@ func ProcessOverride(explicit string) (string, bool) {
 	if trimmed := strings.TrimSpace(explicit); trimmed != "" {
 		return trimmed, true
 	}
-	if trimmed := strings.TrimSpace(os.Getenv(EnvProjectOverride)); trimmed != "" {
+	if trimmed := strings.TrimSpace(env.Get(EnvProjectOverride)); trimmed != "" {
 		return trimmed, true
 	}
 	return "", false
@@ -471,13 +473,15 @@ func readConfigAt(projectDir string) (DetectionResult, bool) {
 }
 
 func readConfigAtWithReader(projectDir string, readFile func(string) ([]byte, error)) (DetectionResult, bool) {
-	configPath := filepath.Join(projectDir, ".engram", "config.json")
+	// .qbit-jay/ for new projects; a repo with only the upstream .engram/ keeps it.
+	folder := paths.ProjectFolderName(projectDir)
+	configPath := filepath.Join(projectDir, folder, "config.json")
 	data, err := readFile(configPath)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
 			return DetectionResult{}, false
 		}
-		return DetectionResult{Source: SourceConfig, Path: projectDir, Error: &configReadError{cause: err}}, true
+		return DetectionResult{Source: SourceConfig, Path: projectDir, Error: &configReadError{folder: folder, cause: err}}, true
 	}
 
 	var cfg configFile
@@ -494,11 +498,12 @@ func readConfigAtWithReader(projectDir string, readFile func(string) ([]byte, er
 // configReadError distinguishes unreadable configuration from invalid content
 // while retaining the write-lock identity consumed by existing callers.
 type configReadError struct {
-	cause error
+	folder string
+	cause  error
 }
 
 func (e *configReadError) Error() string {
-	return "cannot read .engram/config.json: " + e.cause.Error()
+	return "cannot read " + e.folder + "/config.json: " + e.cause.Error()
 }
 
 func (e *configReadError) Is(target error) bool { return target == ErrInvalidConfig }

@@ -27,7 +27,7 @@ func TestFreshSyncColumnBatches(t *testing.T) {
 	for _, route := range []string{"fresh", "legacy", "partial"} {
 		t.Run(route, func(t *testing.T) {
 			cfg := FallbackConfig(t.TempDir())
-			db, err := sql.Open("sqlite", storeDSN(filepath.Join(cfg.DataDir, "engram.db")))
+			db, err := sql.Open("sqlite", storeDSN(filepath.Join(cfg.DataDir, "qbit-jay.db")))
 			if err != nil {
 				t.Fatal(err)
 			}

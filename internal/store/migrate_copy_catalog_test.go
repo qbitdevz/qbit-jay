@@ -38,7 +38,7 @@ func copyHistoricalCatalogFixture(t *testing.T, path, digest string) (string, *s
 	if err = os.Mkdir(dir, 0700); err != nil {
 		t.Fatal(err)
 	}
-	db, err := sql.Open("sqlite", filepath.Join(dir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(dir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -243,7 +243,7 @@ func TestMigrateCopyV360CompleteCatalog(t *testing.T) {
 			if _, err := db.Exec("PRAGMA wal_checkpoint(TRUNCATE)"); err != nil {
 				t.Fatal(err)
 			}
-			base, err := os.ReadFile(filepath.Join(src, "engram.db"))
+			base, err := os.ReadFile(filepath.Join(src, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -257,7 +257,7 @@ func TestMigrateCopyV360CompleteCatalog(t *testing.T) {
 				t.Fatal(err)
 			}
 			if wal {
-				if err = os.WriteFile(filepath.Join(src, "engram.db"), base, 0600); err != nil {
+				if err = os.WriteFile(filepath.Join(src, "qbit-jay.db"), base, 0600); err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -277,7 +277,7 @@ func TestMigrateCopyV360CompleteCatalog(t *testing.T) {
 			if err != nil || string(config) != `{"historical":"preserve"}` {
 				t.Fatalf("configuration changed: %s %v", config, err)
 			}
-			migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+			migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 			if err != nil {
 				t.Fatal(err)
 			}

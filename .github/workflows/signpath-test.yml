@@ -12,7 +12,7 @@ on:
       - docs/signpath-test.md
       - go.mod
       - go.sum
-      - cmd/engram/**
+      - cmd/qbit-jay/**
       - internal/**
 
 permissions:
@@ -48,7 +48,7 @@ jobs:
           foreach ($arch in @('amd64', 'arm64')) {
             $env:GOARCH = $arch
             $file = Join-Path $dir "engram-windows-$arch.exe"
-            go build -mod=readonly -trimpath -buildvcs=true -ldflags='-s -w -X main.version=signpath-test' -o $file ./cmd/engram
+            go build -mod=readonly -trimpath -buildvcs=true -ldflags='-s -w -X main.version=signpath-test' -o $file ./cmd/qbit-jay
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             $info = @(go version -m $file)
             if ($LASTEXITCODE -ne 0 -or $info -cnotcontains "`tbuild`tvcs.revision=$env:GITHUB_SHA" -or $info -cnotcontains "`tbuild`tvcs.modified=false") { throw 'Invalid build provenance' }
@@ -94,7 +94,7 @@ jobs:
           foreach ($arch in @('amd64', 'arm64')) {
             $env:GOARCH = $arch
             $file = Join-Path $dir "engram-windows-$arch.exe"
-            go build -mod=readonly -trimpath -buildvcs=true -ldflags='-s -w -X main.version=signpath-test' -o $file ./cmd/engram
+            go build -mod=readonly -trimpath -buildvcs=true -ldflags='-s -w -X main.version=signpath-test' -o $file ./cmd/qbit-jay
             if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
             $info = @(go version -m $file)
             if ($LASTEXITCODE -ne 0 -or $info -cnotcontains "`tbuild`tvcs.revision=$env:GITHUB_SHA" -or $info -cnotcontains "`tbuild`tvcs.modified=false") { throw 'Invalid build provenance' }

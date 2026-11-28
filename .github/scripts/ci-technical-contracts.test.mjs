@@ -191,7 +191,7 @@ function verification(text) {
     "untracked_templ_outputs=$(git ls-files --others --exclude-standard -- 'internal/cloud/dashboard/*_templ.go')\n",
     'if [[ -n "${untracked_templ_outputs}" ]]; then\n', 'exit 1\n',
     'run: make deadcode-check\n', 'run: go test ./...\n',
-    'run: go build -o engram-selftest ./cmd/engram && ./engram-selftest test --quick\n'];
+    'run: go build -o engram-selftest ./cmd/qbit-jay && ./engram-selftest test --quick\n'];
   let previous = -1;
   for (const command of ordered) {
     const position = unit.indexOf(command);
@@ -267,7 +267,7 @@ const mutations = {
   verification: [
     ['run: go mod tidy -diff', 'run: go mod tidy'], ['make templ\n', 'true\n'],
     ['make deadcode-check\n', 'true\n'], ['run: go test ./...\n', 'run: go test -short ./...\n'],
-    ['go build -o engram-selftest ./cmd/engram &&', 'go build -o engram-selftest ./cmd/engram ;'],
+    ['go build -o engram-selftest ./cmd/qbit-jay &&', 'go build -o engram-selftest ./cmd/qbit-jay ;'],
     ['./engram-selftest test --quick', 'true'], ['exit 1\n', 'exit 0\n'],
     ['run: make deadcode-check', 'run: make deadcode-check || true'],
     ['    name: Unit Tests', '    if: false\n    name: Unit Tests'],
@@ -304,7 +304,7 @@ test('verification rejects missing setup and reordered preflight/build stages', 
   assert.ok(unit.includes(setup));
   assert.throws(() => verification(source.replace(unit, () => unit.replace(setup, ''))));
   for (const [first, second] of [['go mod tidy -diff', 'make templ'], ['make templ', 'make deadcode-check'],
-    ['make deadcode-check', 'go test ./...'], ['go test ./...', 'go build -o engram-selftest ./cmd/engram && ./engram-selftest test --quick']]) {
+    ['make deadcode-check', 'go test ./...'], ['go test ./...', 'go build -o engram-selftest ./cmd/qbit-jay && ./engram-selftest test --quick']]) {
     const changed = unit.replace(first, '__SWAP__').replace(second, () => first).replace('__SWAP__', () => second);
     assert.throws(() => verification(source.replace(unit, () => changed)), undefined, `${first} before ${second}`);
   }

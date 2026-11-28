@@ -114,7 +114,7 @@ func TestCheckReadinessGenerationFence(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			path := filepath.Join(s.DataDir(), "engram.db")
+			path := filepath.Join(s.DataDir(), "qbit-jay.db")
 			if kind == "missing-wal" {
 				path += "-wal"
 			}

@@ -23,7 +23,7 @@ func TestMigrateCopyDowngradedFTSCatalog(t *testing.T) {
 				PRAGMA wal_checkpoint(TRUNCATE);`); err != nil {
 				t.Fatal(err)
 			}
-			checkpoint, err := os.ReadFile(filepath.Join(src, "engram.db"))
+			checkpoint, err := os.ReadFile(filepath.Join(src, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -37,10 +37,10 @@ func TestMigrateCopyDowngradedFTSCatalog(t *testing.T) {
 				t.Fatal(err)
 			}
 			if name == "committed WAL" {
-				if err := os.WriteFile(filepath.Join(src, "engram.db"), checkpoint, 0600); err != nil {
+				if err := os.WriteFile(filepath.Join(src, "qbit-jay.db"), checkpoint, 0600); err != nil {
 					t.Fatal(err)
 				}
-				wal, err := os.Stat(filepath.Join(src, "engram.db-wal"))
+				wal, err := os.Stat(filepath.Join(src, "qbit-jay.db-wal"))
 				if err != nil || wal.Size() <= 32 {
 					t.Fatalf("missing committed WAL: %v", err)
 				}
@@ -63,7 +63,7 @@ func TestMigrateCopyDowngradedFTSCatalog(t *testing.T) {
 				t.Fatalf("copied config = %q, error %v", config, err)
 			}
 
-			migrated, err := sql.Open("sqlite", filepath.Join(out, "engram.db"))
+			migrated, err := sql.Open("sqlite", filepath.Join(out, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}

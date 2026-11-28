@@ -69,7 +69,7 @@ INSERT INTO sync_delete_tombstone_remote_floors(target_key,entity,entity_key,las
 PRAGMA wal_checkpoint(TRUNCATE);`); err != nil {
 				t.Fatal(err)
 			}
-			base, err := os.ReadFile(filepath.Join(src, "engram.db"))
+			base, err := os.ReadFile(filepath.Join(src, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -83,10 +83,10 @@ PRAGMA wal_checkpoint(TRUNCATE);`); err != nil {
 				t.Fatal(err)
 			}
 			if wal {
-				if err = os.WriteFile(filepath.Join(src, "engram.db"), base, 0600); err != nil {
+				if err = os.WriteFile(filepath.Join(src, "qbit-jay.db"), base, 0600); err != nil {
 					t.Fatal(err)
 				}
-				info, err := os.Stat(filepath.Join(src, "engram.db-wal"))
+				info, err := os.Stat(filepath.Join(src, "qbit-jay.db-wal"))
 				if err != nil || info.Size() <= 32 {
 					t.Fatalf("missing committed WAL: %v", err)
 				}
@@ -107,7 +107,7 @@ PRAGMA wal_checkpoint(TRUNCATE);`); err != nil {
 			if err != nil || string(config) != `{"historical":"preserve"}` {
 				t.Fatalf("configuration changed: %s %v", config, err)
 			}
-			migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+			migrated, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -227,7 +227,7 @@ func TestMigrateCopyV310RejectsNearMisses(t *testing.T) {
 				t.Fatal("rejected source changed")
 			}
 			if rejectedCatalog != nil {
-				copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "engram.db"), filepath.Separator))
+				copied, err := sql.Open("sqlite", migrateCopyReadOnlyDSN(filepath.Join(dst, "qbit-jay.db"), filepath.Separator))
 				if err != nil {
 					t.Fatal(err)
 				}

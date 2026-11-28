@@ -4652,7 +4652,7 @@ func TestHandleSaveNoSimilarWarningWhenProjectExists(t *testing.T) {
 
 func TestHandleMergeProjectsExplicitSeparatorAndNoop(t *testing.T) {
 	s, dataDir := newMCPTestStoreWithDataDir(t)
-	db, err := sql.Open("sqlite", filepath.Join(dataDir, "engram.db"))
+	db, err := sql.Open("sqlite", filepath.Join(dataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -4698,7 +4698,7 @@ func TestHandleMergeProjectsExplicitSeparatorAndNoop(t *testing.T) {
 
 func TestHandleMergeProjects(t *testing.T) {
 	s, dataDir := newMCPTestStoreWithDataDir(t)
-	rawDB, err := sql.Open("sqlite", filepath.Join(dataDir, "engram.db"))
+	rawDB, err := sql.Open("sqlite", filepath.Join(dataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open test database: %v", err)
 	}
@@ -9579,7 +9579,7 @@ func newAmbiguousMCPSetup(t *testing.T) (string, *store.Store, string) {
 // rows that predate project enforcement can only be created this way.
 func addNilProjectObservation(t *testing.T, s *store.Store, dataDir, sessionID string) int64 {
 	t.Helper()
-	rawDB, err := sql.Open("sqlite", filepath.Join(dataDir, "engram.db"))
+	rawDB, err := sql.Open("sqlite", filepath.Join(dataDir, "qbit-jay.db"))
 	if err != nil {
 		t.Fatalf("open test database: %v", err)
 	}
@@ -11631,7 +11631,7 @@ func TestMemListProjects_Registered(t *testing.T) {
 }
 
 // TestMemListProjects_ReturnsProjectsWithStats: the MCP view must list every
-// known project from the same store query as `engram projects list`, with the
+// known project from the same store query as `qbit-jay projects list`, with the
 // full per-project contract — observation, session, and prompt counts plus
 // known directories — ordered by observation count descending (engram#675).
 func TestMemListProjects_ReturnsProjectsWithStats(t *testing.T) {
@@ -11726,7 +11726,7 @@ func TestMemListProjects_ReturnsProjectsWithStats(t *testing.T) {
 			}
 		}
 	}
-	// Same ordering contract as `engram projects list`: observations desc.
+	// Same ordering contract as `qbit-jay projects list`: observations desc.
 	if envelope.Projects[0].Name != "alpha-project" {
 		t.Fatalf("expected observation-count-descending order, got %q first",
 			envelope.Projects[0].Name)
@@ -11734,7 +11734,7 @@ func TestMemListProjects_ReturnsProjectsWithStats(t *testing.T) {
 }
 
 // TestMemListProjects_FiltersByOrg: mem_list_projects must honor an optional
-// "org" argument the same way `engram projects list --org` does, scoping the
+// "org" argument the same way `qbit-jay projects list --org` does, scoping the
 // listing to projects with at least one observation tagged with that org
 // (engram#776).
 func TestMemListProjects_FiltersByOrg(t *testing.T) {

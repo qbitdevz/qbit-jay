@@ -429,7 +429,7 @@ func TestCodexWindowsBashHookDispatcherBackground(t *testing.T) {
 	root := repoRoot(t)
 	dir := t.TempDir()
 	binary := filepath.Join(dir, "engram.exe")
-	build := exec.Command("go", "build", "-o", binary, "./cmd/engram")
+	build := exec.Command("go", "build", "-o", binary, "./cmd/qbit-jay")
 	build.Dir = root
 	if output, err := build.CombinedOutput(); err != nil {
 		t.Fatalf("build isolated CLI: %v: %s", err, output)

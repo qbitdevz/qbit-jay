@@ -19,8 +19,8 @@ func TestCheckDataDirectoryFilesystemRejectsKnownRemote(t *testing.T) {
 	if rejection.Filesystem != "NFS" {
 		t.Errorf("rejection filesystem = %q, want NFS", rejection.Filesystem)
 	}
-	if !strings.Contains(err.Error(), "ENGRAM_DATA_DIR") {
-		t.Errorf("rejection does not require ENGRAM_DATA_DIR: %v", err)
+	if !strings.Contains(err.Error(), "QBIT_JAY_DATA_DIR") {
+		t.Errorf("rejection does not require QBIT_JAY_DATA_DIR: %v", err)
 	}
 }
 

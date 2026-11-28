@@ -83,7 +83,7 @@ func TestSignPathWorkflowProvenanceAndGates(t *testing.T) {
 	if job.Steps[0].With["persist-credentials"] != "false" {
 		t.Error("checkout persists credentials")
 	}
-	for _, want := range []string{"./cmd/engram", "main.version=signpath-test", "-mod=readonly", "-trimpath", "-buildvcs=true", "CGO_ENABLED", "GOOS", "GOARCH", "amd64", "arm64", "RUNNER_TEMP", "LASTEXITCODE", "vcs.modified=false", "vcs.revision="} {
+	for _, want := range []string{"./cmd/qbit-jay", "main.version=signpath-test", "-mod=readonly", "-trimpath", "-buildvcs=true", "CGO_ENABLED", "GOOS", "GOARCH", "amd64", "arm64", "RUNNER_TEMP", "LASTEXITCODE", "vcs.modified=false", "vcs.revision="} {
 		if !strings.Contains(job.Steps[3].Run, want) {
 			t.Errorf("build missing %q", want)
 		}
@@ -117,7 +117,7 @@ func TestSignPathPremergeFixturesAreSecretFree(t *testing.T) {
 	if !ok || len(pr.Paths) == 0 {
 		t.Fatal("missing PR paths")
 	}
-	for _, p := range []string{".github/workflows/signpath-test.yml", ".github/signpath/github-test-zip.xml", "scripts/verify-signpath-test.ps1", "scripts/verify-signpath-test.tests.ps1", "signpath_test.go", "docs/signpath-test.md", "go.mod", "go.sum", "cmd/engram/**", "internal/**"} {
+	for _, p := range []string{".github/workflows/signpath-test.yml", ".github/signpath/github-test-zip.xml", "scripts/verify-signpath-test.ps1", "scripts/verify-signpath-test.tests.ps1", "signpath_test.go", "docs/signpath-test.md", "go.mod", "go.sum", "cmd/qbit-jay/**", "internal/**"} {
 		found := false
 		for _, got := range pr.Paths {
 			if got == p {
@@ -148,7 +148,7 @@ func TestSignPathPremergeFixturesAreSecretFree(t *testing.T) {
 	if job.Steps[0].With["persist-credentials"] != "false" || !strings.Contains(job.Steps[3].Run, "verify-signpath-test.tests.ps1") {
 		t.Error("missing safe checkout or fixtures")
 	}
-	for _, want := range []string{"./cmd/engram", "main.version=signpath-test", "-mod=readonly", "-trimpath", "-buildvcs=true", "CGO_ENABLED", "GOOS", "GOARCH", "amd64", "arm64", "RUNNER_TEMP", "LASTEXITCODE"} {
+	for _, want := range []string{"./cmd/qbit-jay", "main.version=signpath-test", "-mod=readonly", "-trimpath", "-buildvcs=true", "CGO_ENABLED", "GOOS", "GOARCH", "amd64", "arm64", "RUNNER_TEMP", "LASTEXITCODE"} {
 		if !strings.Contains(job.Steps[2].Run, want) {
 			t.Errorf("PR build missing %q", want)
 		}
@@ -205,7 +205,7 @@ func TestSignPathPreservesReleaseStaging(t *testing.T) {
 			}
 		})
 	}
-	for _, want := range []string{"persist-credentials: false", "-mod=readonly -trimpath -buildvcs=true", "./cmd/engram", "vcs.modified=false"} {
+	for _, want := range []string{"persist-credentials: false", "-mod=readonly -trimpath -buildvcs=true", "./cmd/qbit-jay", "vcs.modified=false"} {
 		if !strings.Contains(staging, want) {
 			t.Errorf("staging behavior missing %q", want)
 		}

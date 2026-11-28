@@ -11,6 +11,8 @@ import (
 	"strings"
 
 	"golang.org/x/sys/windows"
+
+	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 )
 
 const managedClaudePlugin = "engram@engram"
@@ -44,7 +46,7 @@ func SetClaudeWindowsNativePromptWithExtendedGuard() error {
 }
 
 func setClaudeWindowsNativePrompt(enable, extendedGuard bool) error {
-	if enable && os.Getenv("ENGRAM_CLAUDE_WINDOWS_BASH_SAFE_MODE") == "0" {
+	if enable && env.Get("CLAUDE_WINDOWS_BASH_SAFE_MODE") == "0" {
 		return errors.New("ENGRAM_CLAUDE_WINDOWS_BASH_SAFE_MODE=0 requires Bash; disable the managed native hook to select Bash")
 	}
 	claude, err := lookPathFn("claude")

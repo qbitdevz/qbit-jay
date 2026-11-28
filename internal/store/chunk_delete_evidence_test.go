@@ -58,7 +58,7 @@ func TestChunkDeleteEvidencePreIndexCopy(t *testing.T) {
 	for _, nearMiss := range []bool{false, true} {
 		t.Run(fmt.Sprint(nearMiss), func(t *testing.T) {
 			source := copyFixture(t)
-			db, err := sql.Open("sqlite", filepath.Join(source, "engram.db"))
+			db, err := sql.Open("sqlite", filepath.Join(source, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}

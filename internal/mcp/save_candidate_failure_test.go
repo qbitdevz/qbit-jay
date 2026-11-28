@@ -43,7 +43,7 @@ func TestHandleSave_CandidatePersistenceFailure(t *testing.T) {
 				return envelope
 			}
 			first := save("Redis cache policy", "Use Redis caching for application reads")
-			db, err := sql.Open("sqlite", filepath.Join(dir, "engram.db"))
+			db, err := sql.Open("sqlite", filepath.Join(dir, "qbit-jay.db"))
 			if err != nil {
 				t.Fatal(err)
 			}

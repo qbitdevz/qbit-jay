@@ -111,7 +111,7 @@ func benchmarkJudgeRelationExternalSQLiteLock(b *testing.B) {
 	originalBackoffs := sqliteWriteRetryBackoffs
 	sqliteWriteRetryBackoffs = make([]time.Duration, len(originalBackoffs))
 	b.Cleanup(func() { sqliteWriteRetryBackoffs = originalBackoffs })
-	external, err := sql.Open("sqlite", filepath.Join(fixture.store.DataDir(), "engram.db"))
+	external, err := sql.Open("sqlite", filepath.Join(fixture.store.DataDir(), "qbit-jay.db"))
 	if err != nil {
 		b.Fatalf("open external SQLite handle: %v", err)
 	}
