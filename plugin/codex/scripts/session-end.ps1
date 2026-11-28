@@ -8,7 +8,7 @@ try {
     [Console]::OutputEncoding = $utf8
     $OutputEncoding = $utf8
     $rawInput = [Console]::In.ReadToEnd()
-    $rawInput | & engram hook codex-session-end *> $null
+    $rawInput | & qbit-jay hook codex-session-end *> $null
 } catch {
 }
 exit 0

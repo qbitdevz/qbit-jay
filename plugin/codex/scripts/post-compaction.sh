@@ -4,6 +4,17 @@
 # When compaction happens, inject Memory Protocol + context and instruct
 # the agent to persist the compacted summary via mem_session_summary.
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only.
+for _qbit_jay_name in PORT SOCKET URL DATA_DIR NUDGE_COOLDOWN_SECS; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
+
 ENGRAM_PORT="${ENGRAM_PORT:-7437}"
 ENGRAM_EXTERNAL_URL="${ENGRAM_URL:-}"
 ENGRAM_EXTERNAL_URL="${ENGRAM_EXTERNAL_URL#"${ENGRAM_EXTERNAL_URL%%[![:space:]]*}"}"
@@ -26,7 +37,7 @@ if [ -z "$ENGRAM_EXTERNAL_URL" ] && [ -z "${ENGRAM_SOCKET:-}" ]; then
   if RESOLUTION=$(printf '%s' "$INPUT" | engram_native_hook codex-resolve --local-compaction 2>&1); then
     LEGACY=0
     NATIVE_COMPLETED=1
-  elif [ "$?" -ne 1 ] || [[ "$RESOLUTION" != 'usage: engram hook '* || "$RESOLUTION" == *$'\n'* ]]; then
+  elif [ "$?" -ne 1 ] || [[ "$RESOLUTION" != 'usage: qbit-jay hook '* || "$RESOLUTION" == *$'\n'* ]]; then
     LEGACY=0
     RESOLUTION=""
   fi
@@ -73,7 +84,7 @@ You have Engram memory tools. The agent MUST follow this protocol without waitin
 
 ### AVAILABLE TOOLS
 Use the Engram tools actually exposed by Codex, with their registered MCP names
-(`mcp__engram__mem_*` or `mcp__plugin_engram_engram__mem_*`). The names below are
+(`mcp__qbit-jay__mem_*` or `mcp__plugin_qbit-jay_qbit-jay__mem_*`). The names below are
 logical names; availability and discovery follow Codex's host-specific interface.
 
 mem_save, mem_search, mem_context, mem_session_summary, mem_get_observation, mem_save_prompt, mem_current_project, mem_judge, mem_compare
@@ -116,8 +127,8 @@ Use `mem_save` as the primary path for significant, verified knowledge. Explicit
 `mem_capture_passive(content)` extraction is a safety net, not a replacement for `mem_save`.
 
 ### SESSION BINDING
-Codex's PreToolUse command `engram hook codex-pre-tool-use` matches
-`mcp__engram__mem_*` and `mcp__plugin_engram_engram__mem_*`. Supported mutating
+Codex's PreToolUse command `qbit-jay hook codex-pre-tool-use` matches
+`mcp__qbit-jay__mem_*` and `mcp__plugin_qbit-jay_qbit-jay__mem_*`. Supported mutating
 Engram calls resolve the authoritative host session before binding `session_id`
 for writes and `id` for session start/end. Never invent or override this identity.
 Read-only tools are unchanged; malformed input or unconfirmed host resolution denies mutating calls.

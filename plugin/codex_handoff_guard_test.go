@@ -12,7 +12,7 @@ import (
 )
 
 func TestCodexHandoffToolGuard(t *testing.T) {
-	tools := []string{"engram", "curl", "cat", "dirname", "jq", "date", "touch", "bash"}
+	tools := []string{"qbit-jay", "curl", "cat", "dirname", "jq", "date", "touch", "bash"}
 	cases := []struct{ name, remove, inject string }{
 		{name: "owned files use one validation subprocess"},
 		{name: "function shadow", inject: "jq() { :; }\n"},

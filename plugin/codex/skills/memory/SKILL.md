@@ -94,8 +94,8 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 
 ## Codex session binding
 
-Codex registers the native PreToolUse command `engram hook codex-pre-tool-use`
-for `mcp__engram__mem_*` and `mcp__plugin_engram_engram__mem_*`. For supported
+Codex registers the native PreToolUse command `qbit-jay hook codex-pre-tool-use`
+for `mcp__qbit-jay__mem_*` and `mcp__plugin_qbit-jay_qbit-jay__mem_*`. For supported
 Engram write/session tools, it resolves the authoritative Codex host session to
 the server-confirmed Engram identity before binding arguments: `session_id` for
 writes and `id` for session start/end. `mem_session_end` uses `id`, not `session_id`.
@@ -108,6 +108,6 @@ renewal. For direct/nonintercepted clients, reuse this exact identity as
 `mem_session_summary`, `mem_capture_passive`), and as `id` for `mem_session_end`.
 Never reconstruct a resume suffix or guess an ID when confirmation is missing.
 
-**Fallback**: If tools are unexpectedly unavailable, run `engram setup codex`
-and restart Codex. Setup repairs Codex's authoritative `[mcp_servers.engram]`
+**Fallback**: If tools are unexpectedly unavailable, run `qbit-jay setup codex`
+and restart Codex. Setup repairs Codex's authoritative `[mcp_servers.qbit-jay]`
 registration; use the actual tool names exposed by Codex.

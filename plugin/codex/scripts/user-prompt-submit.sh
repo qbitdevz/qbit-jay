@@ -13,12 +13,23 @@
 #
 # MUST exit 0 always and output valid JSON — otherwise Codex blocks the message.
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only.
+for _qbit_jay_name in PORT SOCKET URL DATA_DIR NUDGE_COOLDOWN_SECS; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
+
 ENGRAM_NATIVE_URL="${ENGRAM_URL:-}"
 ENGRAM_PORT="${ENGRAM_PORT:-7437}"
 ENGRAM_URL="${ENGRAM_URL:-http://127.0.0.1:${ENGRAM_PORT}}"
 
 print_toolsearch_message() {
-  printf '%s\n' '{"systemMessage":"CRITICAL FIRST ACTION — Execute this ToolSearch NOW before responding to the user:\nselect:mcp__engram__mem_save,mcp__engram__mem_search,mcp__engram__mem_context,mcp__engram__mem_session_summary,mcp__engram__mem_session_start,mcp__engram__mem_session_end,mcp__engram__mem_get_observation,mcp__engram__mem_suggest_topic_key,mcp__engram__mem_capture_passive,mcp__engram__mem_save_prompt,mcp__engram__mem_update,mcp__engram__mem_current_project,mcp__engram__mem_judge\n\nAfter loading tools, call mem_context to check for prior session history before responding."}'
+  printf '%s\n' '{"systemMessage":"CRITICAL FIRST ACTION — Execute this ToolSearch NOW before responding to the user:\nselect:mcp__qbit-jay__mem_save,mcp__qbit-jay__mem_search,mcp__qbit-jay__mem_context,mcp__qbit-jay__mem_session_summary,mcp__qbit-jay__mem_session_start,mcp__qbit-jay__mem_session_end,mcp__qbit-jay__mem_get_observation,mcp__qbit-jay__mem_suggest_topic_key,mcp__qbit-jay__mem_capture_passive,mcp__qbit-jay__mem_save_prompt,mcp__qbit-jay__mem_update,mcp__qbit-jay__mem_current_project,mcp__qbit-jay__mem_judge\n\nAfter loading tools, call mem_context to check for prior session history before responding."}'
 }
 
 # Load shared helpers
