@@ -4,7 +4,7 @@ import { checkPluginVersion } from './claude-plugin-version.mjs';
 
 const plugin = 'plugin/claude-code/.claude-plugin/plugin.json';
 const market = '.claude-plugin/marketplace.json';
-const data = (version) => ({ [plugin]: JSON.stringify({ version }), [market]: JSON.stringify({ plugins: [{ name: 'engram', version }] }) });
+const data = (version, name = 'qbit-jay') => ({ [plugin]: JSON.stringify({ version }), [market]: JSON.stringify({ plugins: [{ name, version }] }) });
 const run = (changes, base = data('0.1.3'), head = data('0.1.4')) => checkPluginVersion({ changes, base, head });
 
 test('rejects plugin changes without both bumps', () => {
@@ -28,6 +28,11 @@ test('rejects mismatches, downgrades, invalid and absent metadata', () => {
   }
   assert.throws(() => run(['M\tplugin/claude-code/foo'], data('bad')));
   assert.throws(() => run(['M\tplugin/claude-code/foo'], data('0.1.3'), { ...data('0.1.4'), [market]: JSON.stringify({ plugins: [{ name: 'engram', version: '0.1.5' }] }) }));
+});
+
+test('reads the upstream engram entry on the base and the qbit-jay entry on the head', () => {
+  assert.doesNotThrow(() => run(['M	plugin/claude-code/foo'], data('0.1.28', 'engram'), data('0.1.29', 'qbit-jay')));
+  assert.throws(() => run(['M	plugin/claude-code/foo'], data('0.1.28', 'engram'), data('0.1.28', 'qbit-jay')), /advance/);
 });
 
 test('rejects malformed change records', () => {

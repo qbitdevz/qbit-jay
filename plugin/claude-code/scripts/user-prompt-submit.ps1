@@ -29,12 +29,12 @@ function Write-EmptyHookResponse {
 # context. A systemMessage payload is rendered to the terminal as
 # "UserPromptSubmit says: ..." (issue #145) and never reaches the model.
 #
-# The select list carries BOTH tool-name prefixes: mcp__plugin_engram_engram__*
-# for plugin/marketplace installs and mcp__engram__* for direct MCP-server
+# The select list carries BOTH tool-name prefixes: mcp__plugin_qbit-jay_qbit-jay__*
+# for plugin/marketplace installs and mcp__qbit-jay__* for direct MCP-server
 # installs. ToolSearch select: returns whichever names exist and silently
 # ignores the rest, so one list covers both install modes (issue #534).
 function Write-ToolSearchMessage {
-  $message = "CRITICAL FIRST ACTION - Execute this ToolSearch NOW before responding to the user:`nselect:mcp__plugin_engram_engram__mem_save,mcp__plugin_engram_engram__mem_search,mcp__plugin_engram_engram__mem_context,mcp__plugin_engram_engram__mem_session_summary,mcp__plugin_engram_engram__mem_session_start,mcp__plugin_engram_engram__mem_session_end,mcp__plugin_engram_engram__mem_get_observation,mcp__plugin_engram_engram__mem_suggest_topic_key,mcp__plugin_engram_engram__mem_capture_passive,mcp__plugin_engram_engram__mem_save_prompt,mcp__plugin_engram_engram__mem_update,mcp__plugin_engram_engram__mem_current_project,mcp__plugin_engram_engram__mem_judge,mcp__plugin_engram_engram__mem_doctor,mcp__plugin_engram_engram__mem_review,mcp__plugin_engram_engram__mem_pin,mcp__plugin_engram_engram__mem_unpin,mcp__engram__mem_save,mcp__engram__mem_search,mcp__engram__mem_context,mcp__engram__mem_session_summary,mcp__engram__mem_session_start,mcp__engram__mem_session_end,mcp__engram__mem_get_observation,mcp__engram__mem_suggest_topic_key,mcp__engram__mem_capture_passive,mcp__engram__mem_save_prompt,mcp__engram__mem_update,mcp__engram__mem_current_project,mcp__engram__mem_judge,mcp__engram__mem_doctor,mcp__engram__mem_review,mcp__engram__mem_pin,mcp__engram__mem_unpin`n`nAfter loading tools, use usable prior-session context already provided by SessionStart. Only call mem_context before responding if no prior-session context was provided or it is not useful."
+  $message = "CRITICAL FIRST ACTION - Execute this ToolSearch NOW before responding to the user:`nselect:mcp__plugin_qbit-jay_qbit-jay__mem_save,mcp__plugin_qbit-jay_qbit-jay__mem_search,mcp__plugin_qbit-jay_qbit-jay__mem_context,mcp__plugin_qbit-jay_qbit-jay__mem_session_summary,mcp__plugin_qbit-jay_qbit-jay__mem_session_start,mcp__plugin_qbit-jay_qbit-jay__mem_session_end,mcp__plugin_qbit-jay_qbit-jay__mem_get_observation,mcp__plugin_qbit-jay_qbit-jay__mem_suggest_topic_key,mcp__plugin_qbit-jay_qbit-jay__mem_capture_passive,mcp__plugin_qbit-jay_qbit-jay__mem_save_prompt,mcp__plugin_qbit-jay_qbit-jay__mem_update,mcp__plugin_qbit-jay_qbit-jay__mem_current_project,mcp__plugin_qbit-jay_qbit-jay__mem_judge,mcp__plugin_qbit-jay_qbit-jay__mem_doctor,mcp__plugin_qbit-jay_qbit-jay__mem_review,mcp__plugin_qbit-jay_qbit-jay__mem_pin,mcp__plugin_qbit-jay_qbit-jay__mem_unpin,mcp__qbit-jay__mem_save,mcp__qbit-jay__mem_search,mcp__qbit-jay__mem_context,mcp__qbit-jay__mem_session_summary,mcp__qbit-jay__mem_session_start,mcp__qbit-jay__mem_session_end,mcp__qbit-jay__mem_get_observation,mcp__qbit-jay__mem_suggest_topic_key,mcp__qbit-jay__mem_capture_passive,mcp__qbit-jay__mem_save_prompt,mcp__qbit-jay__mem_update,mcp__qbit-jay__mem_current_project,mcp__qbit-jay__mem_judge,mcp__qbit-jay__mem_doctor,mcp__qbit-jay__mem_review,mcp__qbit-jay__mem_pin,mcp__qbit-jay__mem_unpin`n`nAfter loading tools, use usable prior-session context already provided by SessionStart. Only call mem_context before responding if no prior-session context was provided or it is not useful."
   [PSCustomObject]@{
     hookSpecificOutput = [PSCustomObject]@{
       hookEventName     = 'UserPromptSubmit'
@@ -96,7 +96,7 @@ function Invoke-EngramPromptPersist {
 }
 
 try {
-  $engramPort = if ($env:ENGRAM_PORT) { $env:ENGRAM_PORT } else { '7437' }
+  $engramPort = if ($env:QBIT_JAY_PORT) { $env:QBIT_JAY_PORT } elseif ($env:ENGRAM_PORT) { $env:ENGRAM_PORT } else { '7437' }
   $engramUrl  = "http://127.0.0.1:$engramPort"
 
   $inputJson = [Console]::In.ReadToEnd()

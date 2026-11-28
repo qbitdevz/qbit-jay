@@ -65,7 +65,7 @@ func TestClaudeLifecycleConfirmedContext(t *testing.T) {
 				defer endpoint.Close()
 				stubDir := t.TempDir()
 				wrapper := "#!/bin/bash\nif [ \"$*\" = \"protocol-mode claude-code\" ]; then printf '%s\\n' '" + mode + "'; exit 0; fi\nexec " + codexIntentQuote(binary) + " \"$@\"\n"
-				if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte(wrapper), 0700); err != nil {
+				if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte(wrapper), 0700); err != nil {
 					t.Fatal(err)
 				}
 				for _, name := range []string{".curlrc", "_curlrc"} {

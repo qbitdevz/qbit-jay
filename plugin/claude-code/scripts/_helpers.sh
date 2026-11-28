@@ -73,6 +73,16 @@ is_valid_hook_max_time() {
   return 0
 }
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only: this also runs on the Windows fast path.
+for _qbit_jay_name in HOOK_MAX_TIME CLAUDE_WINDOWS_BASH_SAFE_MODE NUDGE_COOLDOWN_SECS PORT SOCKET URL DATA_DIR; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
 case "${1:-}" in
   __engram_hook_default_max_time=*) ENGRAM_HOOK_CALLER_DEFAULT_MAX_TIME="${1#*=}" ;;
   *) ENGRAM_HOOK_CALLER_DEFAULT_MAX_TIME=3 ;;
@@ -174,7 +184,7 @@ engram_register_claude_session() {
   registration=$(jq -cn --arg id "$id" --arg project "$project" --arg dir "$dir" --arg mode "$mode" --arg source "$source" \
     '{id: $id, project: $project, directory: $dir, ownership_mode: $mode, resume: true}
      + (if $source != "" then {registration_project_source: $source} else {} end)') || return 0
-  if [ "$(engram hook claude-session-context --check 2>/dev/null)" = "claude-register-context-v1" ]; then
+  if [ "$(qbit-jay hook claude-session-context --check 2>/dev/null)" = "claude-register-context-v1" ]; then
     CLAUDE_LIFECYCLE_CONTEXT_HANDLED=1
     # Stream curl through the bounded parser and emit only its successful
     # context. Pipefail also rejects a failed or incomplete curl transfer.
@@ -183,8 +193,8 @@ engram_register_claude_session() {
       {
         printf '%s\n' "$registration"
         engram_curl -sf "${ENGRAM_URL}/sessions" -X POST -H "Content-Type: application/json" -d "$registration" -w '\n%{http_code}'
-      } 2>/dev/null | ENGRAM_URL="$ENGRAM_EXTERNAL_URL" ENGRAM_PORT="$ENGRAM_PORT" ENGRAM_SOCKET="$ENGRAM_SOCKET" \
-        engram hook claude-session-context --receipt 2>/dev/null
+      } 2>/dev/null | QBIT_JAY_URL="$ENGRAM_EXTERNAL_URL" ENGRAM_URL="$ENGRAM_EXTERNAL_URL" QBIT_JAY_PORT="$ENGRAM_PORT" ENGRAM_PORT="$ENGRAM_PORT" QBIT_JAY_SOCKET="$ENGRAM_SOCKET" ENGRAM_SOCKET="$ENGRAM_SOCKET" \
+        qbit-jay hook claude-session-context --receipt 2>/dev/null
     ); then
       [ -z "$context" ] || printf '%s\n' "$context"
     else
@@ -217,7 +227,7 @@ engram_claude_lifecycle_context() {
   engram_resolve_and_register_claude_session "$id" "$dir"
   # Older cores can still run their independent context hook after registration.
   if [ "$CLAUDE_LIFECYCLE_CONTEXT_HANDLED" = 0 ]; then
-    printf '%s' "$input" | ENGRAM_URL="$ENGRAM_EXTERNAL_URL" ENGRAM_PORT="$ENGRAM_PORT" ENGRAM_SOCKET="$ENGRAM_SOCKET" engram hook claude-session-context 2>/dev/null || true
+    printf '%s' "$input" | QBIT_JAY_URL="$ENGRAM_EXTERNAL_URL" ENGRAM_URL="$ENGRAM_EXTERNAL_URL" QBIT_JAY_PORT="$ENGRAM_PORT" ENGRAM_PORT="$ENGRAM_PORT" QBIT_JAY_SOCKET="$ENGRAM_SOCKET" ENGRAM_SOCKET="$ENGRAM_SOCKET" qbit-jay hook claude-session-context 2>/dev/null || true
   fi
 }
 

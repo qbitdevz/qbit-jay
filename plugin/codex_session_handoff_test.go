@@ -697,26 +697,32 @@ func codexHandoffEnv(t *testing.T, cwd, serverURL string, binary ...string) []st
 		writeTool(name, "exec "+resolve(name)+` "$@"`)
 	}
 	reject := "printf '%s\\n' rejected >> " + quote(posix[filepath.ToSlash(filepath.Join(cwd, "guard-rejected"))]) + "; exit 97"
-	writeTool("engram", reject)
+	// The Claude Code scripts call qbit-jay; the Codex scripts still call engram until T5.
+	writeBinary := func(body string) {
+		t.Helper()
+		writeTool("engram", body)
+		writeTool("qbit-jay", body)
+	}
+	writeBinary(reject)
 	if len(binary) >= 1 {
-		writeTool("engram", `if [ "${FIXTURE_LOCAL:-}" = 1 ] && [ "$ENGRAM_PORT" = `+quote(target.Port())+` ] && [ "$#" = 1 ] && [ "$1" = instance-id ]; then
+		writeBinary(`if [ "${FIXTURE_LOCAL:-}" = 1 ] && [ "$ENGRAM_PORT" = ` + quote(target.Port()) + ` ] && [ "$#" = 1 ] && [ "$1" = instance-id ]; then
   printf 'fixture-instance\n'
   exit 0
 fi
 if [ "${FIXTURE_LOCAL:-}" = 1 ] && [ "$#" = 2 ] && [ "$1" = protocol-mode ] && [ "$2" = claude-code ]; then
-  [ "$ENGRAM_PORT" = `+quote(target.Port())+` ] && [ "$ENGRAM_URL" = `+quote(strings.TrimSpace(serverURL))+` ] || { `+reject+`; }
-  exec `+quote(posix[binary[0]])+` "$@"
+  [ "$ENGRAM_PORT" = ` + quote(target.Port()) + ` ] && [ "$ENGRAM_URL" = ` + quote(strings.TrimSpace(serverURL)) + ` ] || { ` + reject + `; }
+  exec ` + quote(posix[binary[0]]) + ` "$@"
 fi
-[ "$ENGRAM_PORT" = `+quote(target.Port())+` ] && [ "$1" = hook ] && [ "${ENGRAM_URL:-http://127.0.0.1:$ENGRAM_PORT}" = `+quote(strings.TrimSpace(serverURL))+` ] || { `+reject+`; }
+[ "$ENGRAM_PORT" = ` + quote(target.Port()) + ` ] && [ "$1" = hook ] && [ "${ENGRAM_URL:-http://127.0.0.1:$ENGRAM_PORT}" = ` + quote(strings.TrimSpace(serverURL)) + ` ] || { ` + reject + `; }
 if [ "$#" -ne 2 ]; then
-  [ "$#" -eq 3 ] && [ "$2" = codex-resolve ] && [ "$3" = --local-compaction ] && [ "${FIXTURE_LOCAL:-}" = 1 ] || { `+reject+`; }
+  [ "$#" -eq 3 ] && [ "$2" = codex-resolve ] && [ "$3" = --local-compaction ] && [ "${FIXTURE_LOCAL:-}" = 1 ] || { ` + reject + `; }
 fi
 case "$2" in
-  codex-register|codex-resolve) [ "$ENGRAM_HOOK_OUTPUT" = json ] || { `+reject+`; } ;;
+  codex-register|codex-resolve) [ "$ENGRAM_HOOK_OUTPUT" = json ] || { ` + reject + `; } ;;
   codex-session-end) ;;
-  *) `+reject+` ;;
+  *) ` + reject + ` ;;
 esac
-exec `+quote(posix[binary[0]])+` "$@"`)
+exec ` + quote(posix[binary[0]]) + ` "$@"`)
 	}
 	writeTool("curl", "origin="+quote(target.Scheme+"://"+target.Host)+"\n"+`validate_request() {
   urls=0

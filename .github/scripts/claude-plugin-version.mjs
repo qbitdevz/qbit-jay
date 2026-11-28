@@ -10,7 +10,7 @@ function version(text, path) {
   if (typeof text !== 'string') throw new Error(`missing ${path}`);
   let parsed;
   try { parsed = JSON.parse(text); } catch { throw new Error(`malformed ${path}`); }
-  const value = path === plugin ? parsed?.version : parsed?.plugins?.find((entry) => entry?.name === 'engram')?.version;
+  const value = path === plugin ? parsed?.version : parsed?.plugins?.find((entry) => entry?.name === 'qbit-jay' || entry?.name === 'engram')?.version;
   if (typeof value !== 'string' || !/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/.test(value)) {
     throw new Error(`invalid version in ${path}`);
   }

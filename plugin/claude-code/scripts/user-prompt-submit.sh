@@ -22,6 +22,16 @@ if [ -n "${PI_CODING_AGENT:-}" ]; then
   exit 0
 fi
 
+# qbit-jay reads QBIT_JAY_* first and ENGRAM_* as a fallback (an empty value falls
+# back). Builtins only: this also runs on the Windows fast path.
+for _qbit_jay_name in HOOK_MAX_TIME CLAUDE_WINDOWS_BASH_SAFE_MODE NUDGE_COOLDOWN_SECS PORT SOCKET URL DATA_DIR; do
+  _qbit_jay_var="QBIT_JAY_${_qbit_jay_name}"
+  if [ -n "${!_qbit_jay_var:-}" ]; then
+    printf -v "ENGRAM_${_qbit_jay_name}" '%s' "${!_qbit_jay_var}"
+  fi
+done
+unset _qbit_jay_name _qbit_jay_var
+
 ENGRAM_HOOK_MAX_TIME="${ENGRAM_HOOK_MAX_TIME:-0.2}"
 
 # Windows Git Bash/MSYS2 can fail while forking helper processes under
@@ -79,12 +89,12 @@ session_state_key_part() {
 # "UserPromptSubmit says: ..." (issue #145) and never reaches the model, so the
 # bootstrap silently no-ops. session-start.sh already uses additionalContext.
 #
-# The select list carries BOTH tool-name prefixes: mcp__plugin_engram_engram__*
-# for plugin/marketplace installs and mcp__engram__* for direct MCP-server
+# The select list carries BOTH tool-name prefixes: mcp__plugin_qbit-jay_qbit-jay__*
+# for plugin/marketplace installs and mcp__qbit-jay__* for direct MCP-server
 # installs. ToolSearch select: returns whichever names exist and silently
 # ignores the rest, so one list covers both install modes (issue #534).
 print_toolsearch_message() {
-  printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"CRITICAL FIRST ACTION - Execute this ToolSearch NOW before responding to the user:\nselect:mcp__plugin_engram_engram__mem_save,mcp__plugin_engram_engram__mem_search,mcp__plugin_engram_engram__mem_context,mcp__plugin_engram_engram__mem_session_summary,mcp__plugin_engram_engram__mem_session_start,mcp__plugin_engram_engram__mem_session_end,mcp__plugin_engram_engram__mem_get_observation,mcp__plugin_engram_engram__mem_suggest_topic_key,mcp__plugin_engram_engram__mem_capture_passive,mcp__plugin_engram_engram__mem_save_prompt,mcp__plugin_engram_engram__mem_update,mcp__plugin_engram_engram__mem_current_project,mcp__plugin_engram_engram__mem_judge,mcp__plugin_engram_engram__mem_doctor,mcp__plugin_engram_engram__mem_review,mcp__plugin_engram_engram__mem_pin,mcp__plugin_engram_engram__mem_unpin,mcp__engram__mem_save,mcp__engram__mem_search,mcp__engram__mem_context,mcp__engram__mem_session_summary,mcp__engram__mem_session_start,mcp__engram__mem_session_end,mcp__engram__mem_get_observation,mcp__engram__mem_suggest_topic_key,mcp__engram__mem_capture_passive,mcp__engram__mem_save_prompt,mcp__engram__mem_update,mcp__engram__mem_current_project,mcp__engram__mem_judge,mcp__engram__mem_doctor,mcp__engram__mem_review,mcp__engram__mem_pin,mcp__engram__mem_unpin\n\nAfter loading tools, use usable prior-session context already provided by SessionStart. Only call mem_context before responding if no prior-session context was provided or it is not useful."}}'
+  printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"UserPromptSubmit","additionalContext":"CRITICAL FIRST ACTION - Execute this ToolSearch NOW before responding to the user:\nselect:mcp__plugin_qbit-jay_qbit-jay__mem_save,mcp__plugin_qbit-jay_qbit-jay__mem_search,mcp__plugin_qbit-jay_qbit-jay__mem_context,mcp__plugin_qbit-jay_qbit-jay__mem_session_summary,mcp__plugin_qbit-jay_qbit-jay__mem_session_start,mcp__plugin_qbit-jay_qbit-jay__mem_session_end,mcp__plugin_qbit-jay_qbit-jay__mem_get_observation,mcp__plugin_qbit-jay_qbit-jay__mem_suggest_topic_key,mcp__plugin_qbit-jay_qbit-jay__mem_capture_passive,mcp__plugin_qbit-jay_qbit-jay__mem_save_prompt,mcp__plugin_qbit-jay_qbit-jay__mem_update,mcp__plugin_qbit-jay_qbit-jay__mem_current_project,mcp__plugin_qbit-jay_qbit-jay__mem_judge,mcp__plugin_qbit-jay_qbit-jay__mem_doctor,mcp__plugin_qbit-jay_qbit-jay__mem_review,mcp__plugin_qbit-jay_qbit-jay__mem_pin,mcp__plugin_qbit-jay_qbit-jay__mem_unpin,mcp__qbit-jay__mem_save,mcp__qbit-jay__mem_search,mcp__qbit-jay__mem_context,mcp__qbit-jay__mem_session_summary,mcp__qbit-jay__mem_session_start,mcp__qbit-jay__mem_session_end,mcp__qbit-jay__mem_get_observation,mcp__qbit-jay__mem_suggest_topic_key,mcp__qbit-jay__mem_capture_passive,mcp__qbit-jay__mem_save_prompt,mcp__qbit-jay__mem_update,mcp__qbit-jay__mem_current_project,mcp__qbit-jay__mem_judge,mcp__qbit-jay__mem_doctor,mcp__qbit-jay__mem_review,mcp__qbit-jay__mem_pin,mcp__qbit-jay__mem_unpin\n\nAfter loading tools, use usable prior-session context already provided by SessionStart. Only call mem_context before responding if no prior-session context was provided or it is not useful."}}'
 }
 
 json_string_value_without_jq() {

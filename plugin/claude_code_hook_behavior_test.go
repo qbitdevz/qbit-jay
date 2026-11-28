@@ -172,7 +172,8 @@ func runHookWithStderrInDir(t *testing.T, scriptName, stdin string, env map[stri
 	cmd.Env = make([]string, 0, len(os.Environ())+len(env)+1)
 	for _, entry := range os.Environ() {
 		upper := strings.ToUpper(entry)
-		if strings.HasPrefix(upper, "ENGRAM_URL=") || strings.HasPrefix(upper, "ENGRAM_PORT=") || strings.HasPrefix(upper, "ENGRAM_SOCKET=") {
+		if strings.HasPrefix(upper, "ENGRAM_URL=") || strings.HasPrefix(upper, "ENGRAM_PORT=") || strings.HasPrefix(upper, "ENGRAM_SOCKET=") ||
+			strings.HasPrefix(upper, "QBIT_JAY_URL=") || strings.HasPrefix(upper, "QBIT_JAY_PORT=") || strings.HasPrefix(upper, "QBIT_JAY_SOCKET=") {
 			continue
 		}
 		// Skip any other entry the caller's env map overrides, so the
@@ -212,7 +213,8 @@ func resolveClaudeHookURL(t *testing.T, env map[string]string) string {
 	cmd.Env = make([]string, 0, len(os.Environ())+len(env))
 	for _, entry := range os.Environ() {
 		upper := strings.ToUpper(entry)
-		if strings.HasPrefix(upper, "ENGRAM_URL=") || strings.HasPrefix(upper, "ENGRAM_PORT=") || strings.HasPrefix(upper, "ENGRAM_SOCKET=") {
+		if strings.HasPrefix(upper, "ENGRAM_URL=") || strings.HasPrefix(upper, "ENGRAM_PORT=") || strings.HasPrefix(upper, "ENGRAM_SOCKET=") ||
+			strings.HasPrefix(upper, "QBIT_JAY_URL=") || strings.HasPrefix(upper, "QBIT_JAY_PORT=") || strings.HasPrefix(upper, "QBIT_JAY_SOCKET=") {
 			continue
 		}
 		cmd.Env = append(cmd.Env, entry)
@@ -380,7 +382,7 @@ var claudeCodeBootstrapTools = []string{
 func assertToolSearchNames(t *testing.T, listed []string) {
 	t.Helper()
 	want := make([]string, 0, len(claudeCodeBootstrapTools)*2)
-	for _, prefix := range []string{"mcp__plugin_engram_engram__", "mcp__engram__"} {
+	for _, prefix := range []string{"mcp__plugin_qbit-jay_qbit-jay__", "mcp__qbit-jay__"} {
 		for _, tool := range claudeCodeBootstrapTools {
 			want = append(want, prefix+tool)
 		}
@@ -812,6 +814,29 @@ func TestClaudeHookWhitespacePortFallsBackToDefault(t *testing.T) {
 	}
 }
 
+// Spec S5: the hook scripts read QBIT_JAY_* first and ENGRAM_* as a fallback;
+// the qbit-jay name wins when both are set and an empty one falls back.
+func TestClaudeHookEnvironmentPrefersQbitJayOverEngram(t *testing.T) {
+	for _, tt := range []struct {
+		name string
+		env  map[string]string
+		want string
+	}{
+		{"qbit-jay port alone", map[string]string{"QBIT_JAY_PORT": "8123"}, "http://127.0.0.1:8123"},
+		{"engram port fallback", map[string]string{"ENGRAM_PORT": "8124"}, "http://127.0.0.1:8124"},
+		{"qbit-jay port wins", map[string]string{"QBIT_JAY_PORT": "8125", "ENGRAM_PORT": "8126"}, "http://127.0.0.1:8125"},
+		{"empty qbit-jay port falls back", map[string]string{"QBIT_JAY_PORT": "", "ENGRAM_PORT": "8127"}, "http://127.0.0.1:8127"},
+		{"qbit-jay url wins", map[string]string{"QBIT_JAY_URL": "http://127.0.0.1:9001", "ENGRAM_URL": "http://127.0.0.1:9002"}, "http://127.0.0.1:9001"},
+		{"qbit-jay socket selects socket mode", map[string]string{"QBIT_JAY_SOCKET": "/tmp/qj.sock"}, "http://localhost"},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := resolveClaudeHookURL(t, tt.env); got != tt.want {
+				t.Fatalf("URL = %q, want %q", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestClaudeHookEnvironmentFiltersInheritedEngramURL(t *testing.T) {
 	t.Setenv("ENGRAM_URL", "http://127.0.0.1:1")
 	if got, want := resolveClaudeHookURL(t, map[string]string{"ENGRAM_PORT": "8123"}), "http://127.0.0.1:8123"; got != want {
@@ -917,10 +942,12 @@ func equalStrings(got, want []string) bool {
 func writeRecordingEngramStub(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	path := filepath.Join(dir, "engram")
 	content := "#!/bin/bash\nprintf '%s\\n' \"$*\" >> \"$ENGRAM_TEST_ENGRAM_LOG\"\nif [ \"$*\" = \"instance-id\" ]; then printf '00000000000000000000000000000000\\n'; fi\nexit 0\n"
-	if err := os.WriteFile(path, []byte(content), 0o755); err != nil {
-		t.Fatalf("write recording engram stub: %v", err)
+	// Claude scripts call qbit-jay; the Codex scripts still call engram until T5.
+	for _, name := range []string{"qbit-jay", "engram"} {
+		if err := os.WriteFile(filepath.Join(dir, name), []byte(content), 0o755); err != nil {
+			t.Fatalf("write recording stub %s: %v", name, err)
+		}
 	}
 	return dir
 }
@@ -928,7 +955,7 @@ func writeRecordingEngramStub(t *testing.T) string {
 func writeMigratingEngramStub(t *testing.T) string {
 	t.Helper()
 	dir := t.TempDir()
-	path := filepath.Join(dir, "engram")
+	path := filepath.Join(dir, "qbit-jay")
 	content := "#!/bin/bash\nprintf '%s\\n' \"$*\" >> \"$ENGRAM_TEST_ENGRAM_LOG\"\nif [ \"$*\" = \"instance-id\" ]; then printf '00000000000000000000000000000000\\n'; fi\nif [ \"$*\" = \"setup claude-code --mcp-only\" ]; then\n  mkdir -p \"$(dirname \"$ENGRAM_TEST_MCP_CONFIG\")\"\n  printf '{}' > \"$ENGRAM_TEST_MCP_CONFIG\"\nfi\nexit 0\n"
 	if err := os.WriteFile(path, []byte(content), 0o755); err != nil {
 		t.Fatalf("write migrating engram stub: %v", err)
@@ -996,7 +1023,7 @@ func TestSessionStartRegistersProjectOwnedClaudeSession(t *testing.T) {
 	t.Cleanup(srv.Close)
 
 	stubDir := t.TempDir()
-	stub := filepath.Join(stubDir, "engram")
+	stub := filepath.Join(stubDir, "qbit-jay")
 	if err := os.WriteFile(stub, []byte("#!/bin/bash\nif [ \"$*\" = \"protocol-mode claude-code\" ]; then printf 'slim\\n'; fi\nexit 0\n"), 0o755); err != nil {
 		t.Fatalf("write engram stub: %v", err)
 	}
@@ -1048,7 +1075,7 @@ func TestSessionStartSkipsClaudeMCPRegistration(t *testing.T) {
 		t.Cleanup(srv.Close)
 		stubDir := t.TempDir()
 		logPath := filepath.Join(t.TempDir(), "engram-invocations.log")
-		stub := filepath.Join(stubDir, "engram")
+		stub := filepath.Join(stubDir, "qbit-jay")
 		script := "#!/bin/bash\nprintf '%s\\n' \"$*\" >> \"$ENGRAM_TEST_ENGRAM_LOG\"\nif [ \"$*\" = \"instance-id\" ]; then printf '00000000000000000000000000000000\\n'; fi\n"
 		if setupFails {
 			script += "if [ \"$*\" = \"setup claude-code --mcp-only\" ]; then exit 1; fi\n"
@@ -1147,7 +1174,7 @@ func TestSessionStartResumeKeepsLegacySharedOwnership(t *testing.T) {
 			t.Cleanup(srv.Close)
 
 			stubDir := t.TempDir()
-			if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte("#!/bin/bash\nexit 0\n"), 0o755); err != nil {
+			if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte("#!/bin/bash\nexit 0\n"), 0o755); err != nil {
 				t.Fatalf("write engram stub: %v", err)
 			}
 			runHook(t, "session-start.sh", `{"session_id":"claude-resumed","cwd":`+strconv.Quote(t.TempDir())+`,"source":"resume"}`,
@@ -1209,7 +1236,7 @@ func TestPostCompactionRegistersResumableClaudeSession(t *testing.T) {
 			t.Cleanup(srv.Close)
 
 			stubDir := t.TempDir()
-			if err := os.WriteFile(filepath.Join(stubDir, "engram"), []byte("#!/bin/bash\nexit 0\n"), 0o755); err != nil {
+			if err := os.WriteFile(filepath.Join(stubDir, "qbit-jay"), []byte("#!/bin/bash\nexit 0\n"), 0o755); err != nil {
 				t.Fatalf("write engram stub: %v", err)
 			}
 			cwd := t.TempDir()
