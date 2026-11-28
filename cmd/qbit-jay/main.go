@@ -892,6 +892,8 @@ func main() {
 		cmdContext(cfg)
 	case "stats":
 		cmdStats(cfg)
+	case "telemetry":
+		cmdTelemetry(cfg)
 	case "export":
 		if _, err := cmdExport(cfg); err != nil {
 			fatal(err)
@@ -1362,6 +1364,10 @@ func cmdMCP(cfg store.Config) {
 	defer stopAutosync()
 
 	mcpCfg := mcp.MCPConfig{DefaultProject: projectOverride, Version: version}
+	if rec := newTelemetryRecorder(cfg); rec != nil { // nil when QBIT_JAY_TELEMETRY=off
+		mcpCfg.Observer = rec
+		defer rec.Close()
+	}
 	allowlist := resolveMCPTools(toolsFilter)
 	mcpSrv := newMCPServerWithConfig(s, mcpCfg, allowlist)
 
@@ -2202,8 +2208,11 @@ func cmdContext(cfg store.Config) {
 func cmdStats(cfg store.Config) {
 	projectName := ""
 	allProjects := false
+	wantTelemetry := false
 	for i := 2; i < len(os.Args); i++ {
 		switch os.Args[i] {
+		case "--telemetry":
+			wantTelemetry = true
 		case "--project":
 			value, err := requiredProjectValue(os.Args, i)
 			if err != nil {
@@ -2215,6 +2224,10 @@ func cmdStats(cfg store.Config) {
 		case "--all":
 			allProjects = true
 		}
+	}
+	if wantTelemetry {
+		cmdStatsTelemetry(cfg, projectName, allProjects)
+		return
 	}
 	s, err := storeNew(cfg)
 	if err != nil {
@@ -4274,6 +4287,9 @@ Commands:
                      Show recent context from previous sessions
   stats [--project PROJECT|--all]
                      Show memory system statistics
+  stats --telemetry  Summarize local usage telemetry (telemetry.db, never leaves this machine)
+  telemetry clear [--yes]
+                     Delete the local telemetry file; off with QBIT_JAY_TELEMETRY=off
   export [file] [--project PROJECT|--all]
                      Export memories to JSON (default: engram-export.json)
   import <file>      Import memories from a JSON export file
@@ -4330,6 +4346,7 @@ Environment:
   QBIT_JAY_DATA_DIR  qbit-jay data directory. Empty or whitespace-only values use the
                      platform default; nonblank values are used as provided (default: ~/.qbit-jay)
   QBIT_JAY_PORT    Override HTTP server port (default: 7437)
+  QBIT_JAY_TELEMETRY  Local-only usage telemetry in <data dir>/telemetry.db; off, 0 or false disables it (default: on)
   QBIT_JAY_PROJECT Process-level default project override, applied by every entry point
                      with one precedence rule: explicit request project (qbit-jay save --project,
                      an MCP tool project argument) > process override (qbit-jay mcp --project,
