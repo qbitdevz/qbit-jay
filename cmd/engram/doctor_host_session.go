@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const doctorHostSessionUsage = "usage: engram doctor host-session --pid PID [--json]"

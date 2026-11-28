@@ -6,7 +6,7 @@ import (
 	"errors"
 	"strings"
 
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func startupSnapshot(ctx context.Context, db *sql.DB, readOnly bool) (*sql.Tx, error) {

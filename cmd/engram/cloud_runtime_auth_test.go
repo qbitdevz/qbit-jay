@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 )
 
 // fakeManagedTokenHashStore is an in-memory stand-in for the narrow storage

@@ -7,9 +7,9 @@ import (
 	"os"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	cloudauth "github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	cloudauth "github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 )
 
 // cloudBootstrapAuditAction is the audit action recorded for every CLI

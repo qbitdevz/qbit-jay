@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // ─── delete strict trailing-argument validation (issue #1084) ─────────────────

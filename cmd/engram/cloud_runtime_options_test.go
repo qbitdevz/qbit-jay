@@ -6,11 +6,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	cloudauth "github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudserver"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	cloudauth "github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudserver"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 type runtimeOptionTestStore struct{}

@@ -9,9 +9,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func TestDoctorProjectAliasPublic(t *testing.T) { testDoctorProjectAliasPublic(t, "root-key") }

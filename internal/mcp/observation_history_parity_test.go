@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	httpserver "github.com/Gentleman-Programming/engram/v3/internal/server"
+	httpserver "github.com/qbitdevz/qbit-jay/internal/server"
 	mcpserver "github.com/mark3labs/mcp-go/server"
 )
 

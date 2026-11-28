@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 type dashboardFoldFixtureChunk struct {

@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 )
 
 func TestCloudRuntimePersistsUnknownTokenRequestAuthAudit(t *testing.T) {

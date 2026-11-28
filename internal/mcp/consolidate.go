@@ -5,9 +5,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/agentops"
+	"github.com/qbitdevz/qbit-jay/internal/agentops"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	"github.com/mark3labs/mcp-go/mcp"
 	"github.com/mark3labs/mcp-go/server"
 )

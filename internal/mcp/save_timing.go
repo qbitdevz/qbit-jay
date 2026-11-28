@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // saveTiming is invocation-local; diagnostic records contain no memory data or

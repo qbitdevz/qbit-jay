@@ -52,7 +52,7 @@ Go's [Semantic Import Versioning](https://go.dev/ref/mod#major-version-suffixes)
 
 ```powershell
 # Current line (v3.x)
-go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest
+go install github.com/qbitdevz/qbit-jay/cmd/engram@latest
 
 # Previous lines, only if you must stay on an older major version
 go install github.com/Gentleman-Programming/engram/v2/cmd/engram@latest
@@ -182,7 +182,7 @@ Pick the line that matches the major version you want — the `/vN` suffix exist
 
 ```bash
 # Current line (v3.x)
-go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest
+go install github.com/qbitdevz/qbit-jay/cmd/engram@latest
 
 # Previous lines, only if you must stay on an older major version
 go install github.com/Gentleman-Programming/engram/v2/cmd/engram@latest

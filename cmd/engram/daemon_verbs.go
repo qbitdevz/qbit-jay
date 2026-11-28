@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // The docker-style daemon control verbs (issue #2228): `engram ps`, `stop`,

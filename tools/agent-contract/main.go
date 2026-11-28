@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	engrammcp "github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	engrammcp "github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 const help = "Usage: agent-contract [-output path] [-check]\n\nGenerate the Go-owned MCP agent-contract foundation without opening a store.\n  -output path  Artifact path (default docs/contracts/agent-contract-v1.json).\n  -check        Compare without writing; exit 1 for a missing or stale artifact.\n\nVerify Pi model-input projections without writing:\n  agent-contract -verify-pi capture.json\n  Cannot combine with explicitly supplied -output or -check.\n  Exit 0: scope match; 1: refusal; 2: usage or capture unavailable.\n  Not semantic parity, installed-host compatibility or release approval.\n"

@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
 )
 
 // handleCallerBinding is a read-only POST: caller identities stay out of URLs.

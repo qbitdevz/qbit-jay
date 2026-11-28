@@ -5,11 +5,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/remote"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/syncguidance"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/remote"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/syncguidance"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func TestCloudStatusPolicyFailureAddsGuidanceWithoutMutatingState(t *testing.T) {

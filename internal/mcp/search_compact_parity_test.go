@@ -9,8 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	httpserver "github.com/Gentleman-Programming/engram/v3/internal/server"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	httpserver "github.com/qbitdevz/qbit-jay/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Compare equivalent explicit selectors through public HTTP and JSON-RPC dispatch.

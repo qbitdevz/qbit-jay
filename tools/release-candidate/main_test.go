@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 // These tests intentionally invoke the public command: an absent command is a

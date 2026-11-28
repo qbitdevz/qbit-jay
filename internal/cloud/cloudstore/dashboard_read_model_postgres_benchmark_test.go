@@ -15,7 +15,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 const dashboardPGDSN = "postgres://engram1832@127.0.0.1:15432/engram1832_measurement?sslmode=disable"

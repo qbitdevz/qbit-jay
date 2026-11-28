@@ -12,8 +12,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // ─── Fakes ───────────────────────────────────────────────────────────────────

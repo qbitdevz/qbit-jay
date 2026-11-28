@@ -29,8 +29,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/command"
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/command"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 // ClaudeWindowsExtendedGuardArg selects the confirmation budget paired with the

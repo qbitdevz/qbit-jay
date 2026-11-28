@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 func TestPlanDetectedProjectConsolidation(t *testing.T) {

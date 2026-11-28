@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
 )
 
 func TestSetupMemoryWritesRealSettings(t *testing.T) {

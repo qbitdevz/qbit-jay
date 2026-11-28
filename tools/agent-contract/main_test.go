@@ -12,7 +12,7 @@ import (
 	"testing"
 	"time"
 
-	engrammcp "github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	engrammcp "github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 func TestMain(m *testing.M) {

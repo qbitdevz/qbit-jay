@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	versioncheck "github.com/Gentleman-Programming/engram/v3/internal/version"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	versioncheck "github.com/qbitdevz/qbit-jay/internal/version"
 )
 
 func TestObsidianLimitPreflightBeforeStartup(t *testing.T) {

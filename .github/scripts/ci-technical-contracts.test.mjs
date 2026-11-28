@@ -712,8 +712,8 @@ test('native summary rejects absent, malformed, empty and prerequisite-skipped e
 test('native summary distinguishes actual filesystem capability and optional Pi capture', () => {
   const result = summarize([...passed,
     event('output', 'TestCase', 'filesystem cannot represent case-distinct candidate paths\n'), event('skip', 'TestCase'),
-    { ...event('output', 'TestPiInputRealCapture', 'Pi schema prerequisites absent: TypeBox\n'), Package: 'github.com/Gentleman-Programming/engram/v3/internal/mcp' },
-    { ...event('skip', 'TestPiInputRealCapture'), Package: 'github.com/Gentleman-Programming/engram/v3/internal/mcp' }]);
+    { ...event('output', 'TestPiInputRealCapture', 'Pi schema prerequisites absent: TypeBox\n'), Package: 'github.com/qbitdevz/qbit-jay/internal/mcp' },
+    { ...event('skip', 'TestPiInputRealCapture'), Package: 'github.com/qbitdevz/qbit-jay/internal/mcp' }]);
   assert.equal(result.status, 0, result.stdout + result.stderr);
   assert.match(result.stdout, /filesystem-capability/);
   assert.match(result.stdout, /optional-pi-capture/);
@@ -763,7 +763,7 @@ test('native summary classifies only the Windows published-Core execution exclus
   for (const name of ['TestPublishedCoreAdmission', 'TestPublishedCoreContextMutation', 'TestUnexpectedSkip']) {
     for (const pkg of ['tools/release-candidate', 'internal/store']) {
       const events = [...passed, ...[event('output', name, reason), event('skip', name)]
-        .map(e => ({ ...e, Package: `github.com/Gentleman-Programming/engram/v3/${pkg}` }))];
+        .map(e => ({ ...e, Package: `github.com/qbitdevz/qbit-jay/${pkg}` }))];
       const result = summarize(events);
       assert.equal(result.status, pkg === 'tools/release-candidate' && name === 'TestPublishedCoreContextMutation' ? 0 : 1, result.stdout);
     }

@@ -17,7 +17,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 const helpText = `Usage: release-candidate -core-ref refs/tags/vSEMVER -pi-ref refs/tags/pi-vSEMVER [-root directory]

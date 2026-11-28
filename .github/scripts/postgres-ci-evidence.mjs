@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 
 // These existing tests enter the ordinary DSN-gated helpers in each package.
-const prefix = 'github.com/Gentleman-Programming/engram/v3/';
+const prefix = 'github.com/qbitdevz/qbit-jay/';
 const required = new Map([
   ['internal/cloud/cloudstore', 'TestProjectSyncControlPersists'],
   ['internal/cloud/cloudserver', 'TestSessionAuthorityRegistrationPersistsOverHTTP'],

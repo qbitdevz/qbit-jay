@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 const (

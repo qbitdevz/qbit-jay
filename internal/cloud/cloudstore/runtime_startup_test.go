@@ -9,7 +9,7 @@ import (
 	"slices"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 func TestRuntimeStartupReceiptBoundaryPostgres(t *testing.T) {

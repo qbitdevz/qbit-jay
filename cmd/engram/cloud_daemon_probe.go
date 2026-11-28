@@ -8,7 +8,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
 )
 
 const (

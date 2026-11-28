@@ -10,7 +10,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/hostbind"
+	"github.com/qbitdevz/qbit-jay/internal/hostbind"
 )
 
 func isolatedHostBindingDir(t *testing.T) string {

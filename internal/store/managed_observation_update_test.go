@@ -4,7 +4,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/project"
 )
 
 func TestManagedRuntimeUpdateSurvivesLostResponse(t *testing.T) {

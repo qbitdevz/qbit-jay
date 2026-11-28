@@ -16,7 +16,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/plugin"
+	"github.com/qbitdevz/qbit-jay/plugin"
 	"golang.org/x/sys/windows"
 )
 

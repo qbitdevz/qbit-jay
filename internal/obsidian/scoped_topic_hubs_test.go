@@ -10,8 +10,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/identityfile"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/identityfile"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Shared topic paths are global even when Export selects only one project.

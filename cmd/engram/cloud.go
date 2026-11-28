@@ -13,16 +13,16 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/auth"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudserver"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/dashboard"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/remote"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloudconfig"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/auth"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudserver"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/dashboard"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/remote"
+	"github.com/qbitdevz/qbit-jay/internal/cloudconfig"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 type cloudManifestReader interface {

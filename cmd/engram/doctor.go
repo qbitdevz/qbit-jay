@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"encoding/json"
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func cmdDoctor(cfg store.Config) {

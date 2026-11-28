@@ -16,8 +16,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/cloudstore"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/cloudstore"
 )
 
 // Opt-in characterization of baseline 7404e0b7, not an optimization target.

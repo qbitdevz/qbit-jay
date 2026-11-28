@@ -249,7 +249,7 @@ jobs:
               const reason = outputs.get(key) ?? '';
               let classification = 'incomplete';
               if (!e.Test && reason.includes('[no test files]')) classification = 'no-test-files';
-              else if (e.Package === 'github.com/Gentleman-Programming/engram/v3/tools/release-candidate'
+              else if (e.Package === 'github.com/qbitdevz/qbit-jay/tools/release-candidate'
                 && e.Test === 'TestPublishedCoreContextMutation'
                 && reason.includes('published observation supports Windows amd64 only')) classification = 'foreign-os';
               else if (foreign.some(x => reason.includes(x))) classification = 'foreign-os';
@@ -599,7 +599,11 @@ jobs:
         uses: golangci/golangci-lint-action@ba0d7d2ec06a0ea1cb5fa41b2e4a3ab91d21278a # v9.3.0
         with:
           version: v2.13.2
-          only-new-issues: true
+          # qbit-jay: on pull requests, compare against the merge base with git
+          # instead of the GitHub diff API, which stops working past 300 files
+          # (module path rewrites) and then reports every pre-existing issue.
+          only-new-issues: ${{ github.event_name != 'pull_request' }}
+          args: ${{ github.event_name == 'pull_request' && format('--new-from-merge-base=origin/{0}', github.base_ref) || '' }}
 
   policy-helper-tests:
     name: Policy Helper Tests

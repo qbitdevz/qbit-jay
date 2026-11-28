@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func openProvenanceStore(t *testing.T, dir string) *store.Store {

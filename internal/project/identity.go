@@ -11,7 +11,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/identityfile"
+	"github.com/qbitdevz/qbit-jay/internal/identityfile"
 	"golang.org/x/text/unicode/norm"
 )
 

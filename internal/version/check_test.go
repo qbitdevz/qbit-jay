@@ -323,12 +323,12 @@ func TestUpdateInstructions(t *testing.T) {
 	if msg == "" {
 		t.Fatal("expected non-empty update instructions")
 	}
-	want := "  go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
+	want := "  go install github.com/qbitdevz/qbit-jay/cmd/engram@latest\n  or: https://github.com/Gentleman-Programming/engram/releases/latest"
 	switch runtime.GOOS {
 	case "darwin":
 		want = "  brew update && brew upgrade engram"
 	case "linux":
-		want = "  brew update && brew upgrade engram\n  or: go install github.com/Gentleman-Programming/engram/v3/cmd/engram@latest"
+		want = "  brew update && brew upgrade engram\n  or: go install github.com/qbitdevz/qbit-jay/cmd/engram@latest"
 	}
 	if msg != want {
 		t.Fatalf("update instructions on %s = %q, want %q", runtime.GOOS, msg, want)

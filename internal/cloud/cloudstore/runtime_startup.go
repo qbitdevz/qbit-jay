@@ -5,7 +5,7 @@ import (
 	"database/sql"
 	"slices"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 // StartupReceiptVerifier is constructed by cloudstore. A successful check

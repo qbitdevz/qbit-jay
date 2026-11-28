@@ -12,7 +12,7 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/server"
 )
 
 func runClaudeSessionContext(t *testing.T, input string) string {

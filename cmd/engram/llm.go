@@ -5,8 +5,8 @@ import (
 	"errors"
 	"os"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/llm"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // ─── agentRunnerFactory default ───────────────────────────────────────────────

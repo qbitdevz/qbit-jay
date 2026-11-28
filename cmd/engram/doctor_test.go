@@ -12,9 +12,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/diagnostic"
-	engrammcp "github.com/Gentleman-Programming/engram/v3/internal/mcp"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/diagnostic"
+	engrammcp "github.com/qbitdevz/qbit-jay/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	mcppkg "github.com/mark3labs/mcp-go/mcp"
 	_ "modernc.org/sqlite"
 )

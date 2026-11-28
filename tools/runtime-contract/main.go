@@ -9,7 +9,7 @@ import (
 	"io"
 	"os"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/server"
 )
 
 func run(args []string, stdout, stderr io.Writer) int {

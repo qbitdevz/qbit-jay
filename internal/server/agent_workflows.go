@@ -8,8 +8,8 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/agentops"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/agentops"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Workflow requests are bounded independently of the Store's content policy.

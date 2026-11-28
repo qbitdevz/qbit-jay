@@ -5,10 +5,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/setup"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
-	"github.com/Gentleman-Programming/engram/v3/internal/timeutil"
-	"github.com/Gentleman-Programming/engram/v3/internal/version"
+	"github.com/qbitdevz/qbit-jay/internal/setup"
+	"github.com/qbitdevz/qbit-jay/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/timeutil"
+	"github.com/qbitdevz/qbit-jay/internal/version"
 	"github.com/charmbracelet/lipgloss"
 )
 

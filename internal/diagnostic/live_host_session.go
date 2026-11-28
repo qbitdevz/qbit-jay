@@ -3,8 +3,8 @@ package diagnostic
 import (
 	"context"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/hostbind"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/hostbind"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // LiveHostSessionReport observes a local host binding. Its result carries

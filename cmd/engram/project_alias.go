@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const projectAliasUsage = "usage: engram projects alias set (--key <key>|--cwd <directory>) --project <project>\n       engram projects alias list\n       engram projects alias remove (--key <key>|--cwd <directory>)\n       engram projects alias resolve [--designation <name>] [--cwd <directory>]\n"

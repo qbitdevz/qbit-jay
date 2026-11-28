@@ -12,9 +12,9 @@ import (
 	"testing"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/constants"
-	projectpkg "github.com/Gentleman-Programming/engram/v3/internal/project"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/constants"
+	projectpkg "github.com/qbitdevz/qbit-jay/internal/project"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 	_ "modernc.org/sqlite"
 )
 

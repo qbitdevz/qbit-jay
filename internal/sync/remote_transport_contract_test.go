@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud/remote"
-	engramsync "github.com/Gentleman-Programming/engram/v3/internal/sync"
+	"github.com/qbitdevz/qbit-jay/internal/cloud/remote"
+	engramsync "github.com/qbitdevz/qbit-jay/internal/sync"
 )
 
 func TestRemoteTransportImplementsTransportContract(t *testing.T) {

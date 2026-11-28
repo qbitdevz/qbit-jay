@@ -2,13 +2,13 @@ package main
 
 import (
 	"bytes"
-	versioncheck "github.com/Gentleman-Programming/engram/v3/internal/version"
+	versioncheck "github.com/qbitdevz/qbit-jay/internal/version"
 	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 func TestCmdSyncPromptPrivacyMainEntrypoint(t *testing.T) {

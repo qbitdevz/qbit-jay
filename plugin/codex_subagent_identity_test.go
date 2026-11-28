@@ -14,8 +14,8 @@ import (
 	"sync/atomic"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/server"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Exercise registration, closure, continuation and capture through production HTTP

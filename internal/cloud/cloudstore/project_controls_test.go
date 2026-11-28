@@ -11,7 +11,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/cloud"
+	"github.com/qbitdevz/qbit-jay/internal/cloud"
 )
 
 // openTestCloudStore opens a CloudStore using CLOUDSTORE_TEST_DSN env var.

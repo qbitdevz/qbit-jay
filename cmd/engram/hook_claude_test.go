@@ -17,9 +17,9 @@ import (
 	"testing/synctest"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
-	"github.com/Gentleman-Programming/engram/v3/internal/server"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/server"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // Legacy confirmation fixtures deliberately ask the server to interpret a

@@ -3,7 +3,7 @@ package llm_test
 import (
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/llm"
 )
 
 // ─── A.5 tests ────────────────────────────────────────────────────────────────

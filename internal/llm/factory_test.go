@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/llm"
+	"github.com/qbitdevz/qbit-jay/internal/llm"
 )
 
 // TestNewRunner_Claude verifies that "claude" returns a *ClaudeRunner without error.

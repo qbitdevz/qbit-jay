@@ -13,8 +13,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/daemon"
-	"github.com/Gentleman-Programming/engram/v3/internal/store"
+	"github.com/qbitdevz/qbit-jay/internal/daemon"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 // runReadyName is the readiness handshake file the detached child writes

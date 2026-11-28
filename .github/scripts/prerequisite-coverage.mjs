@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 
-const prefix = 'github.com/Gentleman-Programming/engram/v3/';
+const prefix = 'github.com/qbitdevz/qbit-jay/';
 const profiles = {
   'postgres-measurements': [
     ...['chunks', 'mutations'].flatMap(axis => [10, 100, 1000].map(n =>

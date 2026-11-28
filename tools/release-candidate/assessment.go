@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	"github.com/Gentleman-Programming/engram/v3/internal/mcp"
+	"github.com/qbitdevz/qbit-jay/internal/mcp"
 )
 
 // A failed read is unavailable evidence, not an observed metadata violation.
