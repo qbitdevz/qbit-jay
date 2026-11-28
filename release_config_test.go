@@ -9,6 +9,8 @@ import (
 )
 
 const expectedGoreleaserJob = `  goreleaser:
+    # Forks never publish: the release belongs to qbitdevz/qbit-jay.
+    if: github.repository == 'qbitdevz/qbit-jay'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -24,14 +26,6 @@ const expectedGoreleaserJob = `  goreleaser:
       - name: Verify module metadata is tidy
         run: go mod tidy -diff
 
-      - name: Set up Node for companion preflight
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: "24"
-
-      - name: Verify published Pi companion
-        run: node .github/scripts/release-companion.mjs
-
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@f06c13b6b1a9625abc9e6e439d9c05a8f2190e94 # v7
         with:
@@ -39,7 +33,15 @@ const expectedGoreleaserJob = `  goreleaser:
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+
+      # The workflow token cannot push to the tap and bucket repositories, so
+      # GoReleaser only writes the files (skip_upload) and they ship as release
+      # assets. The maintainer commits them (docs/qbit/RELEASING.md).
+      - name: Attach Homebrew formula and Scoop manifest
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release upload "$TAG" dist/homebrew/Formula/qbit-jay.rb dist/scoop/qbit-jay.json --clobber
 `
 
 func TestReleaseChecksModuleMetadataWithoutMutatingTaggedSources(t *testing.T) {
@@ -55,7 +57,7 @@ func TestReleaseChecksModuleMetadataWithoutMutatingTaggedSources(t *testing.T) {
 		t.Fatal("release workflow must contain exactly one top-level goreleaser job")
 	}
 	if job != expectedGoreleaserJob {
-		t.Errorf("unexpected goreleaser job; it must set up Go, run blocking `go mod tidy -diff`, then run the blocking companion preflight before GoReleaser\nwant:\n%s\ngot:\n%s", expectedGoreleaserJob, job)
+		t.Errorf("unexpected goreleaser job; it must set up Go, run blocking `go mod tidy -diff`, run GoReleaser with the workflow token only, then attach the formula and manifest\nwant:\n%s\ngot:\n%s", expectedGoreleaserJob, job)
 	}
 }
 
@@ -120,6 +122,50 @@ func releaseConfigFile(t *testing.T, path string) string {
 		t.Fatalf("read %s: %v", path, err)
 	}
 	return string(content)
+}
+
+// TestReleaseNeedsNoPersonalAccessToken pins the credentials rule (T0.9): the
+// workflow GITHUB_TOKEN cannot push to other repositories and no PAT exists, so
+// GoReleaser writes the Homebrew formula and the Scoop manifest without
+// uploading them and the workflow attaches both to the release.
+func TestReleaseNeedsNoPersonalAccessToken(t *testing.T) {
+	root := releaseConfigRepoRoot(t)
+	goreleaser := strings.ReplaceAll(releaseConfigFile(t, filepath.Join(root, ".goreleaser.yaml")), "\r\n", "\n")
+	for _, want := range []string{
+		"project_name: qbit-jay",
+		"owner: qbitdevz\n    name: qbit-jay",
+		"binary: qbit-jay",
+		"main: ./cmd/qbit-jay",
+		"-X main.version={{.Version}}",
+		"owner: qbitdevz\n      name: homebrew-tap\n    skip_upload: true",
+		"owner: qbitdevz\n      name: scoop-bucket\n    skip_upload: true",
+		`name_template: "checksums.txt"`,
+	} {
+		if !strings.Contains(goreleaser, want) {
+			t.Errorf(".goreleaser.yaml must contain %q", want)
+		}
+	}
+	// No token of any kind may be read from the environment by the config.
+	for _, forbidden := range []string{"HOMEBREW_TAP_TOKEN", "SCOOP_BUCKET_TOKEN", "{{ ." + "Env", "skip_upload: auto", "Gentleman-Programming", "project_name: engram"} {
+		if strings.Contains(goreleaser, forbidden) {
+			t.Errorf(".goreleaser.yaml must not contain %q", forbidden)
+		}
+	}
+
+	workflow := strings.ReplaceAll(releaseConfigFile(t, filepath.Join(root, ".github", "workflows", "release.yml")), "\r\n", "\n")
+	for _, want := range []string{"permissions:\n  contents: write", "dist/homebrew/Formula/qbit-jay.rb", "dist/scoop/qbit-jay.json", "if: github.repository == 'qbitdevz/qbit-jay'"} {
+		if !strings.Contains(workflow, want) {
+			t.Errorf("release.yml must contain %q", want)
+		}
+	}
+	if got := strings.Count(workflow, "secrets."); got != strings.Count(workflow, "secrets.GITHUB_TOKEN") {
+		t.Errorf("release.yml may use only secrets.GITHUB_TOKEN (%d secret references in total)", got)
+	}
+	for _, forbidden := range []string{"npm ", "registry.npmjs.org", "signpath", "SignPath", "id-token:", "HOMEBREW_TAP_TOKEN"} {
+		if strings.Contains(workflow, forbidden) {
+			t.Errorf("release.yml must not contain %q", forbidden)
+		}
+	}
 }
 
 // TestNoUpstreamBrandAssetsAreShipped pins spec S6 and S12: Engram's logos and

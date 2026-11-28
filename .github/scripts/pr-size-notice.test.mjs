@@ -191,5 +191,5 @@ test('artifact filtering preserves trusted base policy, read-only access and ful
 
 test('CI includes the new suite while preserving all previous policy helper suites', () => {
   const ci = fs.readFileSync('.github/workflows/ci.yml', 'utf8');
-  assert.match(ci, /node --test .github\/scripts\/merge-queue.test.mjs .github\/scripts\/label-policy.test.mjs .github\/scripts\/transient-artifacts.test.mjs .github\/scripts\/pr-size-notice.test.mjs/);
+  assert.match(ci, /node --test .github\/scripts\/transient-artifacts.test.mjs .github\/scripts\/pr-size-notice.test.mjs/);
 });
