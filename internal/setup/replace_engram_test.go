@@ -83,24 +83,6 @@ func replaceCases() []replaceCase {
 			gone: func() map[string]string { return map[string]string{codexConfigPath(): "[mcp_servers.engram"} },
 		},
 		replaceCase{
-			slug: "pi",
-			prepare: func(t *testing.T) map[string]string {
-				resetSetupSeams(t)
-				useTestHome(t)
-				dir := t.TempDir()
-				t.Setenv("PI_CODING_AGENT_DIR", dir)
-				lookPathFn = func(string) (string, error) { return "", os.ErrNotExist }
-				runCommand = func(string, ...string) ([]byte, error) { return nil, nil }
-				return map[string]string{
-					filepath.Join(dir, "mcp.json"):      `{"mcpServers":{"engram":` + engramJSONServer + `,"other":{"command":"keep"}}}`,
-					filepath.Join(dir, "settings.json"): `{"packages":["npm:gentle-engram@0.7.1"],"theme":"dark"}`,
-				}
-			},
-			gone: func() map[string]string {
-				return map[string]string{filepath.Join(os.Getenv("PI_CODING_AGENT_DIR"), "mcp.json"): `"engram":`}
-			},
-		},
-		replaceCase{
 			slug: "claude-code",
 			prepare: func(t *testing.T) map[string]string {
 				resetSetupSeams(t)
@@ -304,5 +286,31 @@ func TestRestoreRefusesCorruptBackupAndUnknownAgent(t *testing.T) {
 	}
 	if _, err := RestoreAgentBackup("windsurf"); err == nil || !strings.Contains(err.Error(), "no backup") {
 		t.Fatalf("expected no backup error, got %v", err)
+	}
+}
+
+func TestInstallReplacingEngramPiRefusesAndTouchesNothing(t *testing.T) {
+	resetSetupSeams(t)
+	useTestHome(t)
+	dir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", dir)
+	seed := map[string]string{
+		filepath.Join(dir, "mcp.json"):      `{"mcpServers":{"engram":{"command":"engram"}}}`,
+		filepath.Join(dir, "settings.json"): `{"packages":["npm:gentle-engram@0.7.1"]}`,
+	}
+	seedFiles(t, seed)
+	if _, err := InstallReplacingEngram("pi"); err == nil {
+		t.Fatal("setup pi must refuse")
+	}
+	for p, want := range seed {
+		got, err := os.ReadFile(p)
+		if err != nil || string(got) != want {
+			t.Fatalf("%s changed: %q %v", p, got, err)
+		}
+	}
+	if root, err := BackupRoot(); err == nil {
+		if _, err := os.Stat(root); err == nil {
+			t.Fatalf("no backup expected for Pi, found %s", root)
+		}
 	}
 }

@@ -421,10 +421,10 @@ func replaceTargets(slug string) []replaceTarget {
 			{path: filepath.Join(openCodePluginDir(), "qbit-jay.ts")},
 		}
 	case "pi":
-		return []replaceTarget{
-			jsonServer(filepath.Join(piAgentDir(), "mcp.json"), mcpServersObject),
-			{path: filepath.Join(piAgentDir(), "settings.json"), strip: stripPiEngramPackages},
-		}
+		// No targets: `setup pi` refuses before reading or writing any Pi
+		// setting, so replacement never touches Pi (an existing
+		// npm:gentle-engram package stays as it is).
+		return nil
 	case "claude-code":
 		return []replaceTarget{
 			{path: ClaudeCodeUserMCPPath(), strip: stripJSONServers(false, "mcpServers"), apply: removeClaudeUserEngramServer, commands: jsonServerCommands(false, "mcpServers")},
@@ -598,27 +598,6 @@ func stripClaudeEngramSettings(data []byte) ([]byte, []string, error) {
 	}
 	out, err := renderObject(cfg)
 	return out, removed, err
-}
-
-// stripPiEngramPackages only reports: Install itself repoints an older
-// gentle-engram package to the current one. The report lets setup back up
-// settings.json first.
-func stripPiEngramPackages(data []byte) ([]byte, []string, error) {
-	cfg, err := parseObject(data, false)
-	if err != nil {
-		return nil, nil, err
-	}
-	var pkgs []string
-	if raw, ok := cfg["packages"]; ok {
-		_ = json.Unmarshal(raw, &pkgs)
-	}
-	var msgs []string
-	for _, p := range pkgs {
-		if p != piGentleEngramPackage && isPiManagedPackage(p) {
-			msgs = append(msgs, fmt.Sprintf("replaced Pi package %q with %q", p, piGentleEngramPackage))
-		}
-	}
-	return data, msgs, nil
 }
 
 // stripCodexEngram removes the [mcp_servers.engram] table (and its subtables)
