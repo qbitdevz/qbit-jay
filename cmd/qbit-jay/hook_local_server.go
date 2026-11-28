@@ -17,6 +17,7 @@ import (
 
 	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/qbit/paths"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/product"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
@@ -186,12 +187,16 @@ func hookLocalServerReady(ctx context.Context, client *http.Client, base, expect
 type hookLocalHealth struct {
 	Status     string          `json:"status"`
 	Service    string          `json:"service"`
+	Product    string          `json:"product"`
 	InstanceID string          `json:"instance_id"`
 	Version    json.RawMessage `json:"version"`
 }
 
 func hookLocalIdentityMismatch(health hookLocalHealth) error {
 	const denial = "managed local server identity unconfirmed: expected current data directory instance"
+	if health.Service == "engram" && health.Product != product.ID {
+		return &hookDenialError{message: denial + ". The listener is an Engram server, not qbit-jay: stop Engram, or set QBIT_JAY_PORT to a free port for qbit-jay (run qbit-jay doctor)"}
+	}
 	return &hookDenialError{message: denial + health.releaseSkewGuidance(version)}
 }
 

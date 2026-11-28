@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -51,6 +52,17 @@ func runMigrateCopy(args []string, stdout, stderr io.Writer) int {
 			return fail(2, fmt.Errorf("required flag %s", flag))
 		}
 	}
+	// An Engram source (engram.db, no qbit-jay.db) is copied with the SQLite
+	// backup API into a staging directory first; the Engram files are only read.
+	originalSource := source
+	staging, e := stageEngramSource(source)
+	if e != nil {
+		return fail(1, e)
+	}
+	if staging != "" {
+		defer func() { _ = os.RemoveAll(staging) }()
+		source = staging
+	}
 	migrate := store.MigrateCopy
 	if seen["--catalog-diagnostics=v3.4.0"] {
 		migrate = store.MigrateCopyWithV340Diagnostics
@@ -58,6 +70,9 @@ func runMigrateCopy(args []string, stdout, stderr io.Writer) int {
 	result, e := migrate(source, output, true)
 	if e != nil {
 		return fail(1, e)
+	}
+	if staging != "" {
+		result.SourceDir = originalSource
 	}
 	if e = json.NewEncoder(stdout).Encode(result); e != nil {
 		return fail(1, e)

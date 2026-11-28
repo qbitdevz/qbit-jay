@@ -62,7 +62,7 @@ Install qbit-jay's Pi-native package:
 qbit-jay setup pi
 ```
 
-`qbit-jay setup pi` currently fails without reading or changing Pi settings: the qbit-jay Pi plugin is not distributed through npm (an unregistered npm name could be claimed by anyone), so setup never installs or pins an `npm:` source for it, and existing `npm:gentle-engram` entries are left untouched. Install the plugin from a local checkout with `pi install <repo>/plugin/pi`. T0.9 replaces this with a plugin embedded in the binary.
+`qbit-jay setup pi` currently fails without reading or changing Pi settings: the qbit-jay Pi plugin is not distributed through npm (an unregistered npm name could be claimed by anyone), so setup never installs or pins an `npm:` source for it, and existing `npm:gentle-engram` entries are left untouched (the Engram replacement with backup and `--restore` skips Pi; see [INTEGRATION.md](INTEGRATION.md)). Install the plugin from a local checkout with `pi install <repo>/plugin/pi`. T0.9 replaces this with a plugin embedded in the binary.
 
 Pi agent writes use native `mem_*` tools. If Pi already has a qbit-jay MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.qbit-jay` key from that file and restart Pi. Keep the entries for your other MCP servers.
 

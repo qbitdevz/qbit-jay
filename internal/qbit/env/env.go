@@ -49,3 +49,10 @@ func Get(name string) string {
 	v, _ := Lookup(name)
 	return v
 }
+
+// LookupLegacy reads only the upstream ENGRAM_<NAME> variable, never the
+// qbit-jay name. Migration code uses it to find where Engram keeps its own
+// data, which a QBIT_JAY_* variable must not redirect.
+func LookupLegacy(name string) (string, bool) {
+	return os.LookupEnv(LegacyName(name))
+}
