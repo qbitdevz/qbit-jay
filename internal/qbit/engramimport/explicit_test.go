@@ -1,6 +1,7 @@
 package engramimport
 
 import (
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -62,5 +63,75 @@ func TestExplicitImportAcceptsDirectoryAndEmptyExistingDatabase(t *testing.T) {
 	}
 	if n := countObservations(t, filepath.Join(dataDir, store.DatabaseFile)); n != 1 {
 		t.Fatalf("got %d observations", n)
+	}
+}
+
+func TestForceImportFromCorruptSourceKeepsExistingDatabase(t *testing.T) {
+	good := makeEngramDir(t, 2)
+	dataDir := filepath.Join(t.TempDir(), "d")
+	if _, err := Explicit(filepath.Join(good, "engram.db"), dataDir, false, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	target := filepath.Join(dataDir, store.DatabaseFile)
+	before := fileHash(t, target)
+
+	corrupt := filepath.Join(t.TempDir(), "engram.db")
+	if err := os.WriteFile(corrupt, []byte("this is not a sqlite database, just text padding padding padding padding"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	_, err := Explicit(corrupt, dataDir, true, Options{})
+	if err == nil {
+		t.Fatal("a corrupt source must fail")
+	}
+	if !strings.Contains(err.Error(), target) {
+		t.Fatalf("the error must name the existing database %s: %v", target, err)
+	}
+	if fileHash(t, target) != before {
+		t.Fatal("the existing database changed")
+	}
+	entries, _ := os.ReadDir(dataDir)
+	for _, e := range entries {
+		if e.Name() != store.DatabaseFile {
+			t.Fatalf("unexpected leftover %s after a failed import", e.Name())
+		}
+	}
+}
+
+func TestAutoImportFailureWritesMarkerAndSkipsNextTime(t *testing.T) {
+	t.Setenv("ENGRAM_DATA_DIR", "")
+	t.Setenv("QBIT_JAY_NO_IMPORT", "")
+	home := t.TempDir()
+	srcDir := filepath.Join(home, ".engram")
+	if err := os.MkdirAll(srcDir, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(srcDir, "engram.db"), []byte("not a database, padding padding padding padding padding"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	dataDir := filepath.Join(home, ".qbit-jay")
+	if ok, err := AutoImport(dataDir, Options{Home: home}); ok || err == nil {
+		t.Fatalf("first attempt must fail, got %v %v", ok, err)
+	}
+	marker := filepath.Join(dataDir, FailedMarkerFile)
+	raw, err := os.ReadFile(marker)
+	if err != nil || !strings.Contains(string(raw), filepath.Join(srcDir, "engram.db")) {
+		t.Fatalf("the marker must name the source: %q %v", raw, err)
+	}
+	var stderr strings.Builder
+	ok, err := AutoImport(dataDir, Options{Home: home, Stderr: &stderr})
+	if ok || err != nil {
+		t.Fatalf("the second attempt must be skipped silently, got %v %v", ok, err)
+	}
+	if !strings.Contains(stderr.String(), "import --from-engram") || strings.Contains(stderr.String(), "--force") || strings.Count(stderr.String(), "\n") != 1 {
+		t.Fatalf("one short warning pointing to the explicit import expected: %q", stderr.String())
+	}
+
+	// A successful explicit import clears the marker.
+	good := makeEngramDir(t, 1)
+	if _, err := Explicit(good, dataDir, false, Options{}); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := os.Stat(marker); !os.IsNotExist(err) {
+		t.Fatalf("the marker must be removed after a successful import: %v", err)
 	}
 }

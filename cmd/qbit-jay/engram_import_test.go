@@ -215,3 +215,53 @@ func TestMigrateCopyAcceptsEngramDatabaseSource(t *testing.T) {
 		t.Fatal("source database changed")
 	}
 }
+
+func TestImportFromEngramForceWithCorruptSourceKeepsDatabase(t *testing.T) {
+	t.Setenv("ENGRAM_DATA_DIR", "")
+	dataDir := filepath.Join(t.TempDir(), "qbit")
+	var stdout, stderr bytes.Buffer
+	if code := runImportFromEngram([]string{engramFixture(t, 2)}, dataDir, &stdout, &stderr); code != 0 {
+		t.Fatalf("seed import exit %d: %s", code, stderr.String())
+	}
+	db := filepath.Join(dataDir, store.DatabaseFile)
+	before := hashFile(t, db)
+	corrupt := filepath.Join(t.TempDir(), "engram.db")
+	if err := os.WriteFile(corrupt, []byte("not a database, padding padding padding padding padding"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	stderr.Reset()
+	if code := runImportFromEngram([]string{corrupt, "--force"}, dataDir, &stdout, &stderr); code == 0 {
+		t.Fatal("a corrupt source must exit non-zero")
+	}
+	if hashFile(t, db) != before {
+		t.Fatal("the original qbit-jay database changed")
+	}
+	if !strings.Contains(stderr.String(), db) {
+		t.Fatalf("the error must name the existing database: %q", stderr.String())
+	}
+}
+
+func TestStartupAutoImportFailureFallbackDoesNotSuggestForce(t *testing.T) {
+	t.Setenv("ENGRAM_DATA_DIR", "")
+	t.Setenv("QBIT_JAY_NO_IMPORT", "")
+	home := t.TempDir()
+	t.Setenv("HOME", home)
+	t.Setenv("USERPROFILE", home)
+	if err := os.MkdirAll(filepath.Join(home, ".engram"), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(filepath.Join(home, ".engram", "engram.db"), []byte("not a database, padding padding padding padding padding"), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	dataDir := filepath.Join(home, ".qbit-jay")
+	var stderr bytes.Buffer
+	autoImportFromEngram(dataDir, &stderr)
+	if !strings.Contains(stderr.String(), "import --from-engram") || strings.Contains(stderr.String(), "--force") {
+		t.Fatalf("fallback message: %q", stderr.String())
+	}
+	stderr.Reset()
+	autoImportFromEngram(dataDir, &stderr)
+	if strings.Count(stderr.String(), "\n") != 1 || strings.Contains(stderr.String(), "--force") {
+		t.Fatalf("the second start must print one short warning: %q", stderr.String())
+	}
+}

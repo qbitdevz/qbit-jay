@@ -94,7 +94,7 @@ Variables outside that scheme, set or read by configurators:
 | Cursor, VS Code Copilot, Qwen, Kiro, Kimi, CommandCode, Antigravity | `qbit-jay setup <slug>` | MCP entry and rules (see Agent Setup) |
 | Any MCP client | n/a | `qbit-jay mcp --tools=agent` |
 
-`qbit-jay setup <agent>` replaces an existing Engram registration: it backs up the agent files first (`~/.qbit-jay/backups`, listed in the output), removes the Engram entries and writes the `qbit-jay` ones. `qbit-jay setup --restore <agent>` puts the backup back. **gentle-ai mode:** an `engram` MCP entry that already runs qbit-jay is left alone (no backup, no second entry; the output says so). Pi is excluded: `setup pi` refuses before touching any setting, and an existing `npm:gentle-engram` entry stays as it is.
+`qbit-jay setup <agent>` replaces an existing Engram registration: it backs up the agent files first (`~/.qbit-jay/backups`, listed in the output), removes the Engram entries and writes the `qbit-jay` ones. `qbit-jay setup --restore <agent>` puts the backup back (files edited since setup are skipped and listed unless `--force`; a setup that fails after installing restores the backup by itself). **gentle-ai mode:** an `engram` MCP entry that already runs qbit-jay is left alone (no backup, no second entry; the output says so). Pi is excluded: `setup pi` refuses before touching any setting, and an existing `npm:gentle-engram` entry stays as it is.
 
 ## ODD mirror convention
 

@@ -95,3 +95,26 @@ func TestSetupRestoreUsageErrors(t *testing.T) {
 		t.Fatalf("code=%d stderr=%q", code, stderr)
 	}
 }
+
+func TestSetupCLIRestoreForceOverwritesEditedFile(t *testing.T) {
+	home := setupHome(t)
+	cfg := filepath.Join(home, ".cursor", "mcp.json")
+	original := `{"mcpServers":{"engram":{"command":"/usr/local/bin/engram","args":["mcp"]}}}`
+	if err := os.MkdirAll(filepath.Dir(cfg), 0o755); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(cfg, []byte(original), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	runSetupCLI(t, "cursor")
+	if err := os.WriteFile(cfg, []byte(`{"edited":true}`), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	out := runSetupCLI(t, "--restore", "cursor", "--force")
+	if !strings.Contains(out, "Restored 1 file(s)") {
+		t.Fatalf("restore output: %s", out)
+	}
+	if got, _ := os.ReadFile(cfg); string(got) != original {
+		t.Fatalf("--force must restore the original: %s", got)
+	}
+}

@@ -23,6 +23,7 @@ import (
 
 	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
 	"github.com/qbitdevz/qbit-jay/internal/qbit/paths"
+	"github.com/qbitdevz/qbit-jay/internal/store"
 )
 
 const (
@@ -32,6 +33,10 @@ const (
 
 	// NoImportVar disables the automatic import (QBIT_JAY_NO_IMPORT=1).
 	NoImportVar = "NO_IMPORT"
+
+	// FailedMarkerFile is written in the data directory when the automatic
+	// import fails; while it exists the automatic import is skipped.
+	FailedMarkerFile = ".engram-import-failed"
 )
 
 // Options are test seams and output sinks. The zero value is usable.
@@ -123,10 +128,18 @@ func AutoImport(dataDir string, o Options) (bool, error) {
 	if err != nil || !info.Mode().IsRegular() {
 		return false, nil
 	}
+	marker := filepath.Join(dataDir, FailedMarkerFile)
+	if exists(marker) {
+		if o.Stderr != nil {
+			_, _ = fmt.Fprintf(o.Stderr, "qbit-jay: warning: skipping the automatic Engram import because an earlier attempt failed (see %s). Fix the source and run: qbit-jay import --from-engram\n", marker)
+		}
+		return false, nil
+	}
 	if err := Copy(srcDB, dataDir); err != nil {
 		if errors.Is(err, os.ErrExist) {
 			return false, nil // another qbit-jay process imported first
 		}
+		writeFailedMarker(marker, srcDB, err)
 		return false, fmt.Errorf("import Engram data from %s: %w", srcDB, err)
 	}
 	if o.Stderr != nil {
@@ -137,6 +150,16 @@ func AutoImport(dataDir string, o Options) (bool, error) {
 		_, _ = fmt.Fprintf(o.Stderr, "qbit-jay: imported Engram data from %s into %s (%d KB; the Engram database was not modified; set QBIT_JAY_NO_IMPORT=1 to skip this)\n", srcDB, target, size/1024)
 	}
 	return true, nil
+}
+
+// writeFailedMarker records a failed automatic import. Best effort: a marker
+// that cannot be written only means the next start tries again.
+func writeFailedMarker(marker, srcDB string, cause error) {
+	if err := os.MkdirAll(filepath.Dir(marker), 0o755); err != nil {
+		return
+	}
+	body := fmt.Sprintf("source: %s\nerror: %v\nRun `qbit-jay import --from-engram` to retry; success removes this file.\n", srcDB, cause)
+	_ = os.WriteFile(marker, []byte(body), 0o600)
 }
 
 // Explicit implements `qbit-jay import --from-engram [path]`. src is an Engram
@@ -168,23 +191,79 @@ func Explicit(src, dataDir string, force bool, o Options) (*Result, error) {
 	}
 
 	res := &Result{Source: srcDB, Destination: target}
-	if _, err := os.Lstat(target); err == nil {
-		if !force && hasData(target) {
-			return nil, fmt.Errorf("the qbit-jay database %s already has data; nothing was imported. Re-run with --force to set it aside as a timestamped backup and import over it", target)
+	_, statErr := os.Lstat(target)
+	existing := statErr == nil
+	if existing && !force && hasData(target) {
+		return nil, fmt.Errorf("the qbit-jay database %s already has data; nothing was imported. Re-run with --force to set it aside as a timestamped backup and import over it", target)
+	}
+	if err := os.MkdirAll(dataDir, 0o755); err != nil {
+		return nil, err
+	}
+	// Build the new database next to the old one and swap only when it is
+	// complete and migrated; any failure leaves the existing database as it is.
+	staging, err := os.MkdirTemp(dataDir, ".import-staging-")
+	if err != nil {
+		return nil, err
+	}
+	defer func() { _ = os.RemoveAll(staging) }()
+	fail := func(err error) (*Result, error) {
+		if existing {
+			return nil, fmt.Errorf("%w (the existing database %s was left untouched)", err, target)
 		}
+		return nil, err
+	}
+	if err := Copy(srcDB, staging); err != nil {
+		return fail(err)
+	}
+	stagedDB := filepath.Join(staging, paths.DatabaseFile)
+	if err := migrate(staging); err != nil {
+		return fail(fmt.Errorf("migrate the imported copy: %w", err))
+	}
+	if existing {
 		backup, err := setAside(target, o.now())
 		if err != nil {
-			return nil, err
+			return fail(err)
 		}
 		res.BackupOfExisting = backup
 	}
-	if err := Copy(srcDB, dataDir); err != nil {
-		return res, err
+	if err := os.Rename(stagedDB, target); err != nil {
+		if res.BackupOfExisting != "" {
+			_ = restoreAside(target, res.BackupOfExisting)
+		}
+		return fail(err)
 	}
 	if st, err := os.Stat(target); err == nil {
 		res.Bytes = st.Size()
 	}
+	_ = os.Remove(filepath.Join(dataDir, FailedMarkerFile))
 	return res, nil
+}
+
+// migrate opens the database in dir with qbit-jay's store, which runs its
+// migrations, and closes it so no WAL sidecar is left behind.
+func migrate(dir string) error {
+	cfg, err := store.DefaultConfig()
+	if err != nil {
+		cfg = store.Config{MaxObservationLength: 50000, MaxContextResults: 20, MaxSearchResults: 20, DedupeWindow: 15 * time.Minute}
+	}
+	cfg.DataDir = dir
+	s, err := store.New(cfg)
+	if err != nil {
+		return err
+	}
+	return s.Close()
+}
+
+// restoreAside undoes setAside after a failed swap.
+func restoreAside(target, backup string) error {
+	for _, suffix := range []string{"", "-wal", "-shm"} {
+		if _, err := os.Lstat(backup + suffix); err == nil {
+			if err := os.Rename(backup+suffix, target+suffix); err != nil {
+				return err
+			}
+		}
+	}
+	return nil
 }
 
 func sameFile(a, b string) bool {

@@ -216,7 +216,7 @@ func TestSetupReplacesEngramEntryBacksUpAndRestoresExactBytes(t *testing.T) {
 			}
 
 			// Restore brings back the exact original bytes (including deleted files).
-			restored, err := RestoreAgentBackup(tc.slug)
+			restored, err := RestoreAgentBackup(tc.slug, false)
 			if err != nil {
 				t.Fatalf("restore: %v", err)
 			}
@@ -274,17 +274,17 @@ func TestRestoreRefusesCorruptBackupAndUnknownAgent(t *testing.T) {
 			}
 		}
 	}
-	if _, err := RestoreAgentBackup("cursor"); err == nil || !strings.Contains(err.Error(), "corrupt") {
+	if _, err := RestoreAgentBackup("cursor", false); err == nil || !strings.Contains(err.Error(), "corrupt") {
 		t.Fatalf("expected a sha256 mismatch error, got %v", err)
 	}
 	after, _ := os.ReadFile(path)
 	if string(after) != string(modified) {
 		t.Fatal("a corrupt backup must not be written back")
 	}
-	if _, err := RestoreAgentBackup("nope"); err == nil {
+	if _, err := RestoreAgentBackup("nope", false); err == nil {
 		t.Fatal("unknown agent must fail")
 	}
-	if _, err := RestoreAgentBackup("windsurf"); err == nil || !strings.Contains(err.Error(), "no backup") {
+	if _, err := RestoreAgentBackup("windsurf", false); err == nil || !strings.Contains(err.Error(), "no backup") {
 		t.Fatalf("expected no backup error, got %v", err)
 	}
 }
@@ -312,5 +312,76 @@ func TestInstallReplacingEngramPiRefusesAndTouchesNothing(t *testing.T) {
 		if _, err := os.Stat(root); err == nil {
 			t.Fatalf("no backup expected for Pi, found %s", root)
 		}
+	}
+}
+
+func claudeReplaceCase(t *testing.T) (map[string]string, replaceCase) {
+	t.Helper()
+	for _, tc := range replaceCases() {
+		if tc.slug == "claude-code" {
+			isolateDataDir(t)
+			seed := tc.prepare(t)
+			seedFiles(t, seed)
+			return seed, tc
+		}
+	}
+	t.Fatal("no claude-code case")
+	return nil, replaceCase{}
+}
+
+func TestSetupRestoresBackupWhenStrippingFailsAfterInstall(t *testing.T) {
+	seed, _ := claudeReplaceCase(t)
+	mcpPath, settings := ClaudeCodeUserMCPPath(), ClaudeCodeSettingsPath()
+	inner := runCommand
+	// The first target's removal succeeds, then the second target turns out
+	// to be malformed when setup gets to it.
+	runCommand = func(name string, args ...string) ([]byte, error) {
+		out, err := inner(name, args...)
+		if len(args) >= 2 && args[0] == "mcp" && args[1] == "remove" {
+			_ = os.WriteFile(settings, []byte(`{"permissions": [broken`), 0o644)
+		}
+		return out, err
+	}
+	_, err := InstallReplacingEngram("claude-code")
+	if err == nil || !strings.Contains(err.Error(), "restored the backup") {
+		t.Fatalf("expected a failure that reports the automatic restore, got %v", err)
+	}
+	for _, p := range []string{mcpPath, settings} {
+		raw, rerr := os.ReadFile(p)
+		if rerr != nil || string(raw) != seed[p] {
+			t.Fatalf("%s must be back to its original bytes: %q (%v)", p, raw, rerr)
+		}
+	}
+}
+
+func TestRestoreRefusesFilesEditedSinceSetupUnlessForce(t *testing.T) {
+	isolateDataDir(t)
+	stubRegistryEnv(t)
+	path := cursorMCPPath()
+	original := `{"mcpServers":{"engram":` + engramJSONServer + `}}`
+	seedFiles(t, map[string]string{path: original})
+	if _, err := InstallReplacingEngram("cursor"); err != nil {
+		t.Fatal(err)
+	}
+	edited := `{"mcpServers":{"mine":{"command":"x"}}}`
+	if err := os.WriteFile(path, []byte(edited), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	res, err := RestoreAgentBackup("cursor", false)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(res.Refused) != 1 || res.Refused[0] != path || len(res.Restored) != 0 {
+		t.Fatalf("the edited file must be refused: %+v", res)
+	}
+	if raw, _ := os.ReadFile(path); string(raw) != edited {
+		t.Fatalf("a refused file must stay as it is: %q", raw)
+	}
+	res, err = RestoreAgentBackup("cursor", true)
+	if err != nil || len(res.Restored) != 1 {
+		t.Fatalf("--force restores: %+v %v", res, err)
+	}
+	if raw, _ := os.ReadFile(path); string(raw) != original {
+		t.Fatalf("force must restore the original: %q", raw)
 	}
 }

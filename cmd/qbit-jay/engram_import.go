@@ -17,10 +17,10 @@ const importFromEngramUsage = "usage: qbit-jay import --from-engram [path] [--fo
 
 // autoImportFromEngram runs the first-start import (spec 6.3). A failure is
 // reported on stderr and never stops the command: qbit-jay still starts, and
-// `qbit-jay import --from-engram --force` retries explicitly.
+// `qbit-jay import --from-engram` retries explicitly.
 func autoImportFromEngram(dataDir string, stderr io.Writer) {
 	if _, err := engramimport.AutoImport(dataDir, engramimport.Options{Stderr: stderr}); err != nil {
-		_, _ = fmt.Fprintf(stderr, "qbit-jay: warning: %v\n  Continuing with an empty database. Retry with: qbit-jay import --from-engram --force\n", err)
+		_, _ = fmt.Fprintf(stderr, "qbit-jay: warning: %v\n  Continuing with an empty database. Retry with: qbit-jay import --from-engram\n", err)
 	}
 }
 

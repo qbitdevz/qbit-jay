@@ -53,7 +53,14 @@ type BackupEntry struct {
 	File   string `json:"file"`   // file name inside the backup directory
 	SHA256 string `json:"sha256"` // of the saved bytes
 	Mode   uint32 `json:"mode"`
+	// InstalledSHA256 is the sha256 of the file as setup left it (installedAbsent
+	// when setup left no file). Restore refuses a file whose current bytes differ,
+	// because it was edited after setup. Empty in manifests that predate it.
+	InstalledSHA256 string `json:"installed_sha256,omitempty"`
 }
+
+// installedAbsent marks, in InstalledSHA256, a path that does not exist after setup.
+const installedAbsent = "absent"
 
 // BackupManifest describes one backup directory.
 type BackupManifest struct {
@@ -118,7 +125,14 @@ func InstallReplacingEngram(agentName string) (*Result, error) {
 		}
 	}
 	if len(found) == 0 {
-		return Install(agentName)
+		// A repeated setup rewrites its own files; keep the latest backup's
+		// recorded hashes in step for the files nobody edited since.
+		refresh := trackUnchangedInstalled(agentName)
+		result, err := Install(agentName)
+		if err == nil {
+			refresh()
+		}
+		return result, err
 	}
 
 	var foundPaths []string
@@ -134,14 +148,26 @@ func InstallReplacingEngram(agentName string) (*Result, error) {
 	if err != nil {
 		return nil, fmt.Errorf("%w (the Engram entries were not removed; backup at %s)", err, backupDir)
 	}
+	// Past this point the files are being rewritten: any failure puts the
+	// backup back so the agent is not left half converted.
+	rollback := func(cause error) error {
+		rres, rerr := restoreAgentBackup(agentName, true)
+		if rerr != nil {
+			return fmt.Errorf("%w; automatic restore failed: %v (backup at %s; run: qbit-jay setup --restore %s)", cause, rerr, backupDir, agentName)
+		}
+		return fmt.Errorf("%w; restored the backup for %s automatically (%d file(s) from %s)", cause, agentName, len(rres.Restored), rres.BackupDir)
+	}
 
 	var replaced []string
 	for _, i := range found {
 		msgs, err := applyTarget(targets[i])
 		if err != nil {
-			return nil, fmt.Errorf("remove the Engram entry from %s: %w (backup at %s)", targets[i].path, err, backupDir)
+			return nil, rollback(fmt.Errorf("remove the Engram entry from %s: %w", targets[i].path, err))
 		}
 		replaced = append(replaced, msgs...)
+	}
+	if err := recordInstalled(backupDir); err != nil {
+		return nil, rollback(fmt.Errorf("record the installed file hashes: %w", err))
 	}
 	result.Replaced = replaced
 	result.BackupDir = backupDir
@@ -347,17 +373,96 @@ func latestBackup(agentDir string) (string, *BackupManifest, bool) {
 	return "", nil, false
 }
 
+// installedHash is the sha256 of the file at path, or installedAbsent.
+func installedHash(path string) (string, error) {
+	data, err := os.ReadFile(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return installedAbsent, nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return sha256Hex(data), nil
+}
+
+// recordInstalled stores, in the backup manifest, the hash of every backed up
+// path as setup left it, so a later restore can tell edits made since.
+func recordInstalled(dir string) error {
+	return recordInstalledFor(dir, func(string) bool { return true })
+}
+
+func recordInstalledFor(dir string, include func(path string) bool) error {
+	manifestPath := filepath.Join(dir, backupManifestName)
+	raw, err := os.ReadFile(manifestPath)
+	if err != nil {
+		return err
+	}
+	var m BackupManifest
+	if err := json.Unmarshal(raw, &m); err != nil {
+		return err
+	}
+	for i := range m.Files {
+		if !include(m.Files[i].Path) {
+			continue
+		}
+		h, err := installedHash(m.Files[i].Path)
+		if err != nil {
+			return err
+		}
+		m.Files[i].InstalledSHA256 = h
+	}
+	out, err := json.MarshalIndent(m, "", "  ")
+	if err != nil {
+		return err
+	}
+	return os.WriteFile(manifestPath, append(out, '\n'), 0o600)
+}
+
+// trackUnchangedInstalled notes which files of the agent's latest backup still
+// match the hash setup recorded; the returned func records their new hashes.
+func trackUnchangedInstalled(slug string) func() {
+	root, err := BackupRoot()
+	if err != nil {
+		return func() {}
+	}
+	dir, manifest, ok := latestBackup(filepath.Join(root, slug))
+	if !ok {
+		return func() {}
+	}
+	unchanged := map[string]bool{}
+	for _, f := range manifest.Files {
+		if f.InstalledSHA256 == "" {
+			continue
+		}
+		if h, err := installedHash(f.Path); err == nil && h == f.InstalledSHA256 {
+			unchanged[f.Path] = true
+		}
+	}
+	return func() {
+		_ = recordInstalledFor(dir, func(path string) bool { return unchanged[path] })
+	}
+}
+
 // RestoreResult reports what RestoreAgentBackup put back.
 type RestoreResult struct {
 	Agent     string
 	BackupDir string
 	Restored  []string
+	// Refused lists files left as they are because they changed after setup
+	// wrote them; force restores them anyway.
+	Refused []string
 }
 
 // RestoreAgentBackup restores the files saved by the newest backup of the
 // agent. Every saved file is verified against the manifest sha256 before any
-// file is written.
-func RestoreAgentBackup(slug string) (*RestoreResult, error) {
+// file is written. A file edited since setup wrote it (its current sha256
+// differs from the recorded one) is not restored unless force is set; it is
+// listed in RestoreResult.Refused.
+func RestoreAgentBackup(slug string, force bool) (*RestoreResult, error) {
+	return restoreAgentBackup(slug, force)
+}
+
+func restoreAgentBackup(slug string, force bool) (*RestoreResult, error) {
 	if !isSupportedSlug(slug) {
 		return nil, fmt.Errorf("unknown agent: %q (supported: %s)", slug, strings.Join(supportedSlugs(), ", "))
 	}
@@ -392,6 +497,16 @@ func RestoreAgentBackup(slug string) (*RestoreResult, error) {
 	}
 	res := &RestoreResult{Agent: slug, BackupDir: dir}
 	for _, it := range items {
+		if !force && it.entry.InstalledSHA256 != "" {
+			current, err := installedHash(it.entry.Path)
+			if err != nil {
+				return nil, err
+			}
+			if current != it.entry.InstalledSHA256 {
+				res.Refused = append(res.Refused, it.entry.Path)
+				continue
+			}
+		}
 		if err := os.MkdirAll(filepath.Dir(it.entry.Path), 0o755); err != nil {
 			return nil, err
 		}

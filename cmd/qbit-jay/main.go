@@ -3717,6 +3717,7 @@ func cmdSetup(cfg store.Config) {
 		protocolFlag      bool
 		mcpOnly           bool
 		restore           bool
+		restoreForce      bool
 		allowMemoryWrites bool
 		nativePrompt      string
 		nativePromptSeen  bool
@@ -3755,6 +3756,8 @@ func cmdSetup(cfg store.Config) {
 			mcpOnly = true
 		case token == "--restore":
 			restore = true
+		case token == "--force":
+			restoreForce = true
 		case token == "--native-windows-prompt" || strings.HasPrefix(token, "--native-windows-prompt="):
 			unknownFlagSeen = unknownFlagSeen || nativePromptSeen
 			nativePromptSeen = true
@@ -3778,16 +3781,19 @@ func cmdSetup(cfg store.Config) {
 		}
 	}
 
+	if restoreForce && !restore {
+		unknownFlagSeen = true
+	}
 	switch {
 	case helpSeen:
 		printSetupUsage()
 		return
 	case restore:
 		if !slugSeen || extraBareSeen || unknownFlagSeen || mcpOnly || allowMemoryWrites || protocolFlag || nativePromptSeen || windowsGuardSeen {
-			fatal(fmt.Errorf("usage: qbit-jay setup --restore <agent>"))
+			fatal(fmt.Errorf("usage: qbit-jay setup --restore <agent> [--force]"))
 			return
 		}
-		res, err := setupRestoreAgent(slug)
+		res, err := setupRestoreAgent(slug, restoreForce)
 		if err != nil {
 			fatal(err)
 			return
@@ -3795,6 +3801,14 @@ func cmdSetup(cfg store.Config) {
 		fmt.Printf("✓ Restored %d file(s) for %s from %s\n", len(res.Restored), res.Agent, res.BackupDir)
 		for _, path := range res.Restored {
 			fmt.Printf("  ← %s\n", path)
+		}
+		if len(res.Refused) > 0 {
+			fmt.Fprintf(os.Stderr, "qbit-jay: %d file(s) changed since setup wrote them and were NOT restored:\n", len(res.Refused))
+			for _, path := range res.Refused {
+				fmt.Fprintf(os.Stderr, "  ✗ %s\n", path)
+			}
+			fatal(fmt.Errorf("re-run with --force to overwrite them: qbit-jay setup --restore %s --force", res.Agent))
+			return
 		}
 		fmt.Println("  The Engram registration is back; qbit-jay entries in those files were reverted with them.")
 		return
@@ -3961,7 +3975,7 @@ func printEngramReplacement(result *setup.Result) {
 // stdin (Guarantee 2 — safe under a detached/non-TTY stdin).
 func printSetupUsage() {
 	fmt.Println("usage: qbit-jay setup [<agent>] [--protocol=slim|full]")
-	fmt.Println("       qbit-jay setup --restore <agent>")
+	fmt.Println("       qbit-jay setup --restore <agent> [--force]")
 	fmt.Println()
 	fmt.Println("Install an agent plugin (claude-code, opencode, codex, ...).")
 	fmt.Println("If the agent already has an Engram registration, setup backs up the files it touches")
@@ -3990,6 +4004,8 @@ func printSetupUsage() {
 	fmt.Println("                          for Claude and 7 seconds for qbit-jay session confirmation.")
 	fmt.Println("  --restore <agent>       Restore the files saved by the latest setup backup of the")
 	fmt.Println("                          agent (sha256 verified), putting the Engram registration back.")
+	fmt.Println("                          Files edited since setup are listed and skipped.")
+	fmt.Println("  --force                 With --restore, overwrite files edited since setup too.")
 	fmt.Println("  --help, -h              Show this help and exit.")
 }
 
