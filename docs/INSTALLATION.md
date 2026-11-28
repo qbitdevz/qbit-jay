@@ -3,7 +3,7 @@
 # Installation
 
 - [Choose a release channel before installing](#choose-a-release-channel-before-installing)
-- [Package managers and releases (coming later)](#package-managers-and-releases-coming-later)
+- [Install a release](#install-a-release)
 - [Windows](#windows)
 - [Install from source (macOS / Linux)](#install-from-source-macos--linux)
 - [After upgrading](#after-upgrading)
@@ -16,13 +16,23 @@
 
 ## Choose a release channel before installing
 
-qbit-jay has no stable release yet, so `go install ...@latest` resolves to the newest tagged version, or to the latest commit while no tag exists. The [Release Policy](./RELEASE-POLICY.md) is inherited from upstream and describes how channels, upgrades and rollback are meant to work once qbit-jay publishes releases.
+`go install ...@latest` resolves to the newest tagged version, or to the latest commit while no tag exists. The [Release Policy](./RELEASE-POLICY.md) describes how channels, upgrades and rollback work.
 
 ---
 
-## Package managers and releases (coming later)
+## Install a release
 
-qbit-jay has no published release yet. There is no Homebrew formula, Scoop bucket, npm package, install script or prebuilt binary, so the only supported install today is from source with Go (below). When releases exist, this page will list each channel here.
+Pick one channel. Every script verifies the sha256 from the release's `checksums.txt` before installing and never asks for administrator rights.
+
+| Platform | Command |
+| --- | --- |
+| Linux, macOS, WSL | `curl -fsSL https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.sh \| sh` (installs to `~/.local/bin`; set `QBIT_JAY_INSTALL_DIR` to change) |
+| Windows (PowerShell 5.1 or 7) | `irm https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.ps1 \| iex` (installs to `%LOCALAPPDATA%\Programs\qbit-jay` and adds it to the user PATH) |
+| Any, with Go | `go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest` |
+| Homebrew | `brew install qbitdevz/tap/qbit-jay` |
+| Scoop | `scoop bucket add qbitdevz https://github.com/qbitdevz/scoop-bucket; scoop install qbit-jay` |
+
+For a specific version use `... | sh -s -- v0.1.0` or set `QBIT_JAY_VERSION` before the PowerShell command. Homebrew and Scoop are updated by hand after each release and can lag the GitHub Release ([releasing](./qbit/RELEASING.md)). Releases are not code-signed.
 
 ---
 

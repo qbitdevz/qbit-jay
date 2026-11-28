@@ -111,6 +111,7 @@ qbit-jay keeps memory local by default. The local SQLite database is authoritati
 | Need | Start here |
 | --- | --- |
 | Local memory and the runtime model | [Architecture](docs/ARCHITECTURE.md) |
+| Integrate qbit-jay with a configurator (qbit-ai, gentle-ai) | [Integration contract](docs/INTEGRATION.md) |
 | Share memory with Git | [Git Sync reference](DOCS.md#git-sync-chunked) |
 | Use optional Cloud replication | [qbit-jay Cloud](docs/engram-cloud/README.md) |
 | Diagnose or recover Cloud operations | [Cloud troubleshooting](docs/engram-cloud/troubleshooting.md) |
@@ -156,7 +157,7 @@ The screens above are the real TUI rendered with sample data. Navigate with `j`/
 | **[Doctor](docs/DOCTOR.md)** | `qbit-jay doctor` — read-only operational diagnostics |
 | **[Conflict surfacing](docs/AGENT-SETUP.md#conflict-surfacing-automatic)** | Flags related or conflicting memories so the agent can judge them |
 | **[Plugins](docs/PLUGINS.md)** | OpenCode and Claude Code plugin details |
-| **[Pi package](plugin/pi/README.md)** | The qbit-jay package for Pi (published as `gentle-engram` until it is renamed) |
+| **[Pi package](plugin/pi/README.md)** | The qbit-jay package for Pi (package name `qbit-jay-pi`; not distributed through npm, install with `pi install <repo>/plugin/pi`) |
 | **[Team usage](docs/TEAM-USAGE.md)** | Shared-memory conventions |
 | **[Binary self-testing](docs/SELF-TESTING.md)** | Isolated reliability and performance checks for released binaries |
 | **[Obsidian Brain](docs/beta/obsidian-brain.md)** | Export memories as an Obsidian knowledge graph (beta) |
@@ -171,16 +172,34 @@ The screens above are the real TUI rendered with sample data. Navigate with `j`/
 
 ### Install
 
-qbit-jay has no published release yet. Install it from source with Go (1.26 or newer):
+Pick one channel; the scripts verify the release checksum before installing and need no administrator rights.
 
 ```bash
+# Linux, macOS, WSL
+curl -fsSL https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.sh | sh
+```
+
+```powershell
+# Windows PowerShell
+irm https://raw.githubusercontent.com/qbitdevz/qbit-jay/main/scripts/install.ps1 | iex
+```
+
+```bash
+# Go 1.26 or newer, any platform
 go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
+
+# Homebrew
+brew install qbitdevz/tap/qbit-jay
+
+# Scoop
+scoop bucket add qbitdevz https://github.com/qbitdevz/scoop-bucket; scoop install qbit-jay
+```
+
+```bash
 qbit-jay version
 ```
 
-Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation](docs/INSTALLATION.md) for details.
-
-Coming later (none of these exists yet): GitHub Releases with prebuilt binaries, Homebrew, Scoop, npm and install scripts. See the [Release Policy](docs/RELEASE-POLICY.md) for how releases are meant to work.
+Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation](docs/INSTALLATION.md) and [Releasing](docs/qbit/RELEASING.md) for details.
 
 ### Existing Engram data
 
@@ -336,7 +355,7 @@ For parameters and the complete, current tool reference, see [the full documenta
 | Where to go | What you'll find |
 | :--- | :--- |
 | **[Intended Usage](docs/intended-usage.md)** | The human mental model for using qbit-jay |
-| **[Installation](docs/INSTALLATION.md)** · **[Release Policy](docs/RELEASE-POLICY.md)** · **[SignPath TEST pilot](docs/signpath-test.md)** | Platform support, release guidance, and the nonpublishing test-signing pilot |
+| **[Installation](docs/INSTALLATION.md)** · **[Release Policy](docs/RELEASE-POLICY.md)** · **[Releasing](docs/qbit/RELEASING.md)** | Platform support, release guidance, and the release pipeline |
 | **[Agent Setup](docs/AGENT-SETUP.md)** · **[Plugins](docs/PLUGINS.md)** | Per-agent configuration, compaction resilience, and OpenCode and Claude Code plugin details |
 | **[Architecture](docs/ARCHITECTURE.md)** · **[Codebase Guide](docs/CODEBASE-GUIDE.md)** | Memory model, tool behavior, project structure, flows, and implementation landmarks |
 | **[qbit-jay Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |

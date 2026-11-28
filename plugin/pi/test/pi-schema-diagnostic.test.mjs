@@ -77,16 +77,10 @@ test("default sandbox remains lightweight stub; explicit option uses real schema
   }, { realTypeBox });
 });
 
-test("CI installs test dependencies safely before Pi tests and retains candidate safeguards", async () => {
-  for (const name of ["ci", "publish-pi"]) {
-    const text = await readFile(new URL(`../../../.github/workflows/${name}.yml`, import.meta.url), "utf8");
-    assert.match(text, /working-directory: plugin\/pi\s+run: npm ci --ignore-scripts --legacy-peer-deps/);
-    assert.ok(text.indexOf("npm ci --ignore-scripts --legacy-peer-deps") < text.indexOf("run: npm test", name === "ci" ? text.indexOf("  plugin-tests:") : 0));
-    if (name === "publish-pi") {
-      assert.match(text, /run: npm publish --provenance --access public --tag candidate/);
-      assert.match(text, /id-token: write/);
-      assert.match(text, /run: node test\/release-contract.mjs "\$RELEASE_REF"/);
-      assert.match(text, /- "pi-v\*"/);
-    }
-  }
+test("CI installs test dependencies safely before Pi tests", async () => {
+  // publish-pi.yml was removed: the qbit-jay Pi plugin is never published to npm.
+  const text = await readFile(new URL("../../../.github/workflows/ci.yml", import.meta.url), "utf8");
+  assert.match(text, /working-directory: plugin\/pi\s+run: npm ci --ignore-scripts --legacy-peer-deps/);
+  assert.ok(text.indexOf("npm ci --ignore-scripts --legacy-peer-deps") < text.indexOf("run: npm test", text.indexOf("  plugin-tests:")));
+  await assert.rejects(readFile(new URL("../../../.github/workflows/publish-pi.yml", import.meta.url), "utf8"), { code: "ENOENT" });
 });

@@ -107,7 +107,7 @@ if (/engram-core-15[56789]-/.test(process.cwd())) {
 `)...)
 		}
 		if name == "package.json" {
-			body = encode(map[string]any{"name": "gentle-engram", "version": "4.5.6", "files": packageRuntimeFiles})
+			body = encode(map[string]any{"name": "qbit-jay-pi", "version": "4.5.6", "files": packageRuntimeFiles})
 		}
 		write(filepath.Join(repo, "plugin", "pi", name), body)
 		if err := tw.WriteHeader(&tar.Header{Name: "package/" + name, Mode: 0644, Size: int64(len(body))}); err != nil {
@@ -130,7 +130,7 @@ if (/engram-core-15[56789]-/.test(process.cwd())) {
 	if runtime.GOOS == "windows" {
 		host += ".exe"
 	}
-	members := map[string][]byte{"gentle-engram-4.5.6.tgz": packed.Bytes()}
+	members := map[string][]byte{"qbit-jay-pi-4.5.6.tgz": packed.Bytes()}
 	for _, system := range []string{"linux", "darwin", "windows"} {
 		for _, arch := range []string{"amd64", "arm64"} {
 			name := "engram_" + system + "_" + arch
@@ -141,13 +141,13 @@ if (/engram-core-15[56789]-/.test(process.cwd())) {
 		}
 	}
 	members[host] = core
-	members["npm-pack.json"] = encode([]map[string]any{{"name": "gentle-engram", "version": "4.5.6", "filename": "gentle-engram-4.5.6.tgz", "integrity": stagedIntegrity(packed.Bytes())}})
+	members["npm-pack.json"] = encode([]map[string]any{{"name": "qbit-jay-pi", "version": "4.5.6", "filename": "qbit-jay-pi-4.5.6.tgz", "integrity": stagedIntegrity(packed.Bytes())}})
 	want := stagingExpectation{WorkflowSHA: strings.Repeat("a", 40), CandidateSHA: revision, RunID: "123", RunAttempt: "1", CoreVersion: "1.2.3", PiVersion: "4.5.6"}
 	files := []map[string]any{}
 	for name, b := range members {
 		files = append(files, map[string]any{"name": name, "size": len(b), "sha256": stagedDigest(b), "sri": stagedIntegrity(b)})
 	}
-	members["manifest.json"] = encode(map[string]any{"workflow_sha": want.WorkflowSHA, "candidate_sha": revision, "run_id": want.RunID, "run_attempt": want.RunAttempt, "core_version": want.CoreVersion, "package_name": "gentle-engram", "package_version": want.PiVersion, "files": files})
+	members["manifest.json"] = encode(map[string]any{"workflow_sha": want.WorkflowSHA, "candidate_sha": revision, "run_id": want.RunID, "run_attempt": want.RunAttempt, "core_version": want.CoreVersion, "package_name": "qbit-jay-pi", "package_version": want.PiVersion, "files": files})
 	var archive bytes.Buffer
 	zw := zip.NewWriter(&archive)
 	for name, b := range members {

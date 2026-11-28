@@ -77,7 +77,7 @@ func TestStagedArtifacts(t *testing.T) {
 	}
 	pi := []byte("opaque Pi fixture: validated elsewhere, never executed")
 	want := stagingExpectation{WorkflowSHA: strings.Repeat("a", 40), CandidateSHA: revision, RunID: "123", RunAttempt: "1", CoreVersion: "1.2.3", PiVersion: "4.5.6"}
-	base := map[string][]byte{"gentle-engram-4.5.6.tgz": pi}
+	base := map[string][]byte{"qbit-jay-pi-4.5.6.tgz": pi}
 	for _, system := range []string{"linux", "darwin", "windows"} {
 		for _, arch := range []string{"amd64", "arm64"} {
 			name := "engram_" + system + "_" + arch
@@ -89,7 +89,7 @@ func TestStagedArtifacts(t *testing.T) {
 		}
 	}
 	base[host] = core
-	pack := []map[string]any{{"name": "gentle-engram", "version": want.PiVersion, "filename": "gentle-engram-4.5.6.tgz", "integrity": stagedIntegrity(pi)}}
+	pack := []map[string]any{{"name": "qbit-jay-pi", "version": want.PiVersion, "filename": "qbit-jay-pi-4.5.6.tgz", "integrity": stagedIntegrity(pi)}}
 	encode := func(v any) []byte {
 		b, e := json.Marshal(v)
 		if e != nil {
@@ -197,7 +197,7 @@ func TestStagedArtifacts(t *testing.T) {
 				b := members[n]
 				files = append(files, map[string]any{"name": n, "size": len(b), "sha256": stagedDigest(b), "sri": stagedIntegrity(b)})
 			}
-			manifest := map[string]any{"workflow_sha": want.WorkflowSHA, "candidate_sha": want.CandidateSHA, "run_id": want.RunID, "run_attempt": want.RunAttempt, "core_version": want.CoreVersion, "package_name": "gentle-engram", "package_version": want.PiVersion, "files": files}
+			manifest := map[string]any{"workflow_sha": want.WorkflowSHA, "candidate_sha": want.CandidateSHA, "run_id": want.RunID, "run_attempt": want.RunAttempt, "core_version": want.CoreVersion, "package_name": "qbit-jay-pi", "package_version": want.PiVersion, "files": files}
 			if tc.manifest != nil {
 				tc.manifest(manifest)
 			}

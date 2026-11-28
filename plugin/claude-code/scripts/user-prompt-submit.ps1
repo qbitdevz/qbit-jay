@@ -5,7 +5,7 @@
 # fork emulation is slowed or blocked by Defender/EDR. Keep this script small
 # and dependency-free; it must never block prompt submission.
 
-# Pi owns its Engram session natively (gentle-engram); stay a silent no-op when
+# Pi owns its Engram session natively (qbit-jay-pi); stay a silent no-op when
 # pi-claude-bridge runs Claude Code inside a Pi turn.
 if ($env:PI_CODING_AGENT) { exit 0 }
 

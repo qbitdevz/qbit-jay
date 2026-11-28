@@ -242,7 +242,7 @@ func validatePackageInto(root, version, filename, destination string) (count int
 			decoder := json.NewDecoder(bytes.NewReader(data))
 			decoder.UseNumber()
 			// Keep whole-document validation before comparing exact JSON numbers.
-			if json.Unmarshal(data, &packed) != nil || packed.Name != "gentle-engram" || packed.Version != version || decoder.Decode(&document) != nil || !reflect.DeepEqual(document, manifest) {
+			if json.Unmarshal(data, &packed) != nil || packed.Name != "qbit-jay-pi" || packed.Version != version || decoder.Decode(&document) != nil || !reflect.DeepEqual(document, manifest) {
 				return 0, errPackageRejected
 			}
 			if destination != "" {

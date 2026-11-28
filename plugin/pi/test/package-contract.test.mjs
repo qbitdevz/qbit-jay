@@ -37,26 +37,11 @@ test("package test runner serializes files without dropping any public tests", (
 });
 
 const PI_TUI = "@earendil-works/pi-tui";
-const PACKAGE_NAME = `npm:${pkg.name}@${pkg.version}`;
 test("next Pi package release is 0.8.0", () => {
 	assert.equal(pkg.version, "0.8.0");
 });
-const LEGACY_PACKAGE_NAMES = ["npm:gentle-engram@0.1.8", "npm:gentle-engram@0.1.11", "npm:gentle-engram@0.1.12", "npm:gentle-engram@0.1.14", "npm:gentle-engram@0.1.15", "npm:gentle-engram@0.1.16", "npm:gentle-engram@0.2.0", "npm:gentle-engram@0.3.0", "npm:gentle-engram@0.4.0", "npm:gentle-engram@0.4.1", "npm:gentle-engram@0.4.2", "npm:gentle-engram@0.5.0", "npm:gentle-engram@0.5.1", "npm:gentle-engram@0.6.0", "npm:gentle-engram@0.7.0", "npm:gentle-engram@0.7.1"];
-const MCP_ADAPTER_PACKAGE = "npm:pi-mcp-adapter";
 const CLI_PATH = fileURLToPath(new URL("../cli.js", import.meta.url));
 const RELEASE_CONTRACT_PATH = fileURLToPath(new URL("./release-contract.mjs", import.meta.url));
-const PUBLISH_WORKFLOW_SOURCE = readFileSync(new URL("../../../.github/workflows/publish-pi.yml", import.meta.url), "utf8");
-
-function runCli(agentDir, ...args) {
-	return execFileSync(process.execPath, [CLI_PATH, ...args], {
-		encoding: "utf8",
-		env: { ...process.env, PI_CODING_AGENT_DIR: agentDir },
-	});
-}
-
-function readPackages(agentDir) {
-	return JSON.parse(readFileSync(join(agentDir, "settings.json"), "utf8")).packages;
-}
 
 function runReleaseContract(tag) {
 	return spawnSync(process.execPath, [RELEASE_CONTRACT_PATH, tag], { encoding: "utf8" });
@@ -158,49 +143,32 @@ test("the peer declaration stays justified by actual pi-tui usage", () => {
 	);
 });
 
-test("pi-qbit-jay init adds the current package and help names its install command", () => {
-	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
-	try {
-		const output = runCli(agentDir, "init");
-		assert.deepEqual(readPackages(agentDir), [PACKAGE_NAME]);
-		assert.match(output, new RegExp(`Added ${PACKAGE_NAME} in settings\\.json`));
-		assert.match(runCli(agentDir), new RegExp(`pi install ${PACKAGE_NAME}`));
-	} finally {
-		rmSync(agentDir, { recursive: true, force: true });
+test("pi-qbit-jay init refuses npm distribution and never touches Pi settings", () => {
+	for (const original of [undefined, JSON.stringify({ packages: ["npm:gentle-engram@0.8.0", "npm:existing"] })]) {
+		const agentDir = mkdtempSync(join(tmpdir(), "qbit-jay-pi-cli-"));
+		try {
+			if (original !== undefined) writeFileSync(join(agentDir, "settings.json"), original);
+			const result = spawnSync(process.execPath, [CLI_PATH, "init"], {
+				encoding: "utf8", env: { ...process.env, PI_CODING_AGENT_DIR: agentDir },
+			});
+			assert.notEqual(result.status, 0);
+			assert.match(result.stderr, /not distributed through npm/);
+			assert.match(result.stderr, /pi install <repo>\/plugin\/pi/);
+			const outputs = result.stdout + result.stderr;
+			assert.doesNotMatch(outputs, /npm:qbit-jay-pi|npm:gentle-engram/);
+			assert.equal(existsSync(join(agentDir, "mcp.json")), false);
+			if (original === undefined) assert.equal(existsSync(join(agentDir, "settings.json")), false);
+			else assert.equal(readFileSync(join(agentDir, "settings.json"), "utf8"), original);
+		} finally {
+			rmSync(agentDir, { recursive: true, force: true });
+		}
 	}
 });
 
-test("pi-qbit-jay init does not register Engram MCP on a fresh profile", () => {
-	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
-	try {
-		const output = runCli(agentDir, "init", "--force");
-		assert.equal(existsSync(join(agentDir, "mcp.json")), false);
-		assert.deepEqual(readPackages(agentDir), [PACKAGE_NAME]);
-		assert.ok(output.includes("Pi-native mem_* tools"));
-		const help = runCli(agentDir, "--help");
-		assert.match(help, /settings\.json/);
-		assert.doesNotMatch(help, /Creates Pi's Engram MCP config/);
-		assert.doesNotMatch(help, /pi-mcp-adapter/);
-	} finally {
-		rmSync(agentDir, { recursive: true, force: true });
-	}
-});
-
-// Pi >= 0.99.0 ships built-in MCP; an installed pi-mcp-adapter replaces it, so init
-// must never add the adapter. An existing entry is left alone for the user to manage.
-test("pi-qbit-jay init does not add pi-mcp-adapter and keeps an existing entry", () => {
-	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
-	try {
-		const output = runCli(agentDir, "init");
-		assert.ok(!readPackages(agentDir).includes(MCP_ADAPTER_PACKAGE));
-		assert.doesNotMatch(output, /pi-mcp-adapter/);
-
-		writeFileSync(join(agentDir, "settings.json"), JSON.stringify({ packages: [MCP_ADAPTER_PACKAGE, PACKAGE_NAME] }));
-		runCli(agentDir, "init");
-		assert.deepEqual(readPackages(agentDir), [MCP_ADAPTER_PACKAGE, PACKAGE_NAME]);
-	} finally {
-		rmSync(agentDir, { recursive: true, force: true });
-	}
+test("pi-qbit-jay help names the local install and no registry source", () => {
+	const help = execFileSync(process.execPath, [CLI_PATH], { encoding: "utf8" });
+	assert.match(help, /pi install <repo>\/plugin\/pi/);
+	assert.doesNotMatch(help, /npm:/);
 });
 
 test("Pi MCP template retains its opt-in launcher, QBIT_JAY_BIN first and the ENGRAM_BIN fallback", () => {
@@ -231,76 +199,6 @@ test("Pi MCP template retains its opt-in launcher, QBIT_JAY_BIN first and the EN
 	assert.equal(selectBin({ QBIT_JAY_BIN: " ", ENGRAM_BIN: "/legacy" }), "/legacy", "a blank QBIT_JAY_BIN does not mask ENGRAM_BIN");
 });
 
-test("pi-qbit-jay init replaces legacy package entries without disturbing other packages", () => {
-	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-cli-"));
-	try {
-		writeFileSync(
-			join(agentDir, "settings.json"),
-			JSON.stringify({ packages: ["npm:existing", ...LEGACY_PACKAGE_NAMES, PACKAGE_NAME, LEGACY_PACKAGE_NAMES[1], MCP_ADAPTER_PACKAGE] }),
-		);
-		const originalMcp = JSON.stringify({ mcpServers: { engram: { command: "custom-engram" }, existing: { command: "existing" } }, unrelated: true });
-		writeFileSync(join(agentDir, "mcp.json"), originalMcp);
-
-		const output = runCli(agentDir, "init");
-		assert.deepEqual(readPackages(agentDir), ["npm:existing", PACKAGE_NAME, MCP_ADAPTER_PACKAGE]);
-		assert.match(output, new RegExp(`Added ${PACKAGE_NAME} in settings\\.json`));
-		assert.equal(readFileSync(join(agentDir, "mcp.json"), "utf8"), originalMcp);
-		const warning = spawnSync(process.execPath, [CLI_PATH, "init", "--force"], {
-			encoding: "utf8",
-			env: { ...process.env, PI_CODING_AGENT_DIR: agentDir },
-		});
-		assert.equal(warning.status, 0, warning.stderr);
-		for (const expected of [join(agentDir, "mcp.json"), "mcpServers.engram", "remove", "restart/reload", "not guaranteed"]) {
-			assert.ok(warning.stderr.includes(expected), warning.stderr);
-		}
-		assert.equal(readFileSync(join(agentDir, "mcp.json"), "utf8"), originalMcp);
-
-		const settingsAfterMigration = readFileSync(join(agentDir, "settings.json"), "utf8");
-		const repeatOutput = runCli(agentDir, "init");
-		assert.equal(readFileSync(join(agentDir, "settings.json"), "utf8"), settingsAfterMigration);
-		assert.match(repeatOutput, new RegExp(`Kept ${PACKAGE_NAME} in settings\\.json`));
-	} finally {
-		rmSync(agentDir, { recursive: true, force: true });
-	}
-});
-
-for (const previousVersion of ["0.1.5", "0.1.6", "0.1.7", "0.1.13", "0.2.0", "0.3.0", "0.4.0", "0.4.1", "0.4.2", "0.5.0", "0.5.1", "0.6.0", "0.7.0", "0.7.1"]) {
-test(`pi-qbit-jay init upgrades ${previousVersion} without changing unrelated config and remains idempotent`, () => {
-	const agentDir = mkdtempSync(join(tmpdir(), "engram-pi-upgrade-"));
-	try {
-		const settingsPath = join(agentDir, "settings.json");
-		const mcpPath = join(agentDir, "mcp.json");
-		const customPackages = ["npm:gentle-engram@0.1.10", { source: `npm:gentle-engram@${previousVersion}`, extensions: ["keep.ts"] }];
-		writeFileSync(settingsPath, JSON.stringify({ packages: ["npm:existing", `npm:gentle-engram@${previousVersion}`, ...customPackages], custom: true }));
-		const originalMcp = JSON.stringify({ mcpServers: { other: { command: "other" } } });
-		writeFileSync(mcpPath, originalMcp);
-		for (const action of ["Added", "Kept"]) {
-			const before = readFileSync(settingsPath, "utf8");
-			const result = spawnSync(process.execPath, [CLI_PATH, "init"], {
-				encoding: "utf8", env: { ...process.env, PI_CODING_AGENT_DIR: agentDir },
-			});
-			assert.equal(result.status, 0, result.stderr);
-			assert.equal(result.stderr, "");
-			assert.equal(result.stdout, [
-				`Pi agent dir: ${agentDir}`,
-				`${action} npm:gentle-engram@0.8.0 in settings.json`,
-				"Pi-native mem_* tools own agent writes; no qbit-jay MCP registration is created.",
-				"Set QBIT_JAY_URL for an existing qbit-jay serve instance, or QBIT_JAY_BIN for a custom qbit-jay binary path (ENGRAM_URL and ENGRAM_BIN still work).",
-				"",
-			].join("\n"));
-			assert.deepEqual(JSON.parse(readFileSync(settingsPath, "utf8")), {
-				packages: ["npm:existing", ...customPackages, "npm:gentle-engram@0.8.0"], custom: true,
-			});
-			assert.equal(readFileSync(mcpPath, "utf8"), originalMcp);
-			if (action === "Kept") assert.equal(readFileSync(settingsPath, "utf8"), before);
-		}
-	} finally {
-		rmSync(agentDir, { recursive: true, force: true });
-	}
-});
-
-}
-
 test("Pi release contract accepts the matching full tag ref and CLI guidance", () => {
 	const result = runReleaseContract(`refs/tags/pi-v${pkg.version}`);
 	assert.equal(result.status, 0, result.stderr);
@@ -320,15 +218,3 @@ test("Pi release contract rejects branch refs even when their names match", () =
 	}
 });
 
-test("Pi publish workflow passes the full event ref through a shell environment variable", () => {
-	assert.match(
-		PUBLISH_WORKFLOW_SOURCE,
-		/env:\s*\n\s+RELEASE_REF:\s*\$\{\{\s*github\.ref\s*\}\}\s*\n\s+run:\s*node test\/release-contract\.mjs "\$RELEASE_REF"/,
-		"the full event ref must be provided as RELEASE_REF and quoted when passed to the release contract",
-	);
-	assert.doesNotMatch(
-		PUBLISH_WORKFLOW_SOURCE,
-		/run:\s*node test\/release-contract\.mjs\s+[^\n]*\$\{\{/,
-		"the release contract shell command must not interpolate a GitHub expression directly",
-	);
-});

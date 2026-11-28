@@ -10,7 +10,7 @@ Uses the current directory as the candidate metadata/package root.
 Full refs define an ordered pair of independent strict SemVer versions.
 Go JSON version means core; piVersion means Pi and binds metadata/pin/archive.
 Identity is metadata only, not remote tag/source/digest or compatibility proof.
-Go validates refs, metadata and the installer pin. npm pack runs offline with
+Go validates refs and metadata. npm pack runs offline with
 lifecycle scripts disabled; Go validates the tarball without extraction.
 Requires local Go/npm and existing Go caches. Does not install dependencies.
 Tarball, npm cache/config and TEMP files are disposable and checkout-local.
@@ -87,7 +87,7 @@ async function validate(refs) {
     const metadata = JSON.parse(subprocess("go", goArgs, codeRoot, env));
     if (typeof metadata.version !== "string" || typeof metadata.piVersion !== "string") throw new Error("invalid metadata export");
     subprocess(process.execPath, [await npmEntrypoint(), "pack", "--offline", "--ignore-scripts", "--json", "--workspaces=false", "--pack-destination", temporary], join(root, "plugin/pi"), env);
-    const tarball = join(temporary, `gentle-engram-${metadata.piVersion}.tgz`);
+    const tarball = join(temporary, `qbit-jay-pi-${metadata.piVersion}.tgz`);
     const result = JSON.parse(subprocess("go", [...goArgs, "-pi-tarball", tarball], codeRoot, env));
     if (result.validation !== "local-package-only" || result.version !== metadata.version || result.piVersion !== metadata.piVersion || !Number.isInteger(result.files) || result.files < 1) throw new Error("invalid package validation result");
   } finally {

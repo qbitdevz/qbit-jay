@@ -42,7 +42,6 @@ func TestPiSourceEvidence(t *testing.T) {
 	candidateWrite(t, repo, ".gitignore", "plugin/pi/node_modules/\n")
 	candidateWrite(t, repo, "go.mod", "module example.invalid/pievidence\n\ngo 1.25.0\n")
 	candidateWrite(t, repo, "docs/contracts/agent-contract-v1.json", "{\"status\":\"mcp-foundation\"}\n")
-	candidateWrite(t, repo, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:gentle-engram@0.5.0\"\n")
 	owner := `package main
 import("encoding/json";"os")
 func main(){
@@ -64,10 +63,10 @@ func main(){
 		candidateWrite(t, repo, "plugin/pi/"+name, "{}")
 	}
 	index := `import {Type} from 'typebox'; export default function(pi){pi.registerTool({name:'mem_fixture',parameters:Type.Object({query:Type.KIND()})});}`
-	candidateWrite(t, repo, "plugin/pi/package.json", `{"name":"gentle-engram","version":"0.4.0"}`)
+	candidateWrite(t, repo, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"0.4.0"}`)
 	candidateWrite(t, repo, "plugin/pi/index.ts", strings.ReplaceAll(index, "KIND", "Number"))
 	core := commit()
-	candidateWrite(t, repo, "plugin/pi/package.json", `{"name":"gentle-engram","version":"0.5.0"}`)
+	candidateWrite(t, repo, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"0.5.0"}`)
 	candidateWrite(t, repo, "plugin/pi/index.ts", strings.ReplaceAll(index, "KIND", "String"))
 	// A verifier from the selected Pi/current checkout must NOT substitute for Core.
 	candidateWrite(t, repo, "tools/agent-contract/main.go", "package main\nimport \"os\"\nfunc main(){os.Exit(9)}\n")

@@ -1,5 +1,7 @@
 # Dormant manual-release controls (#2029 / #2030)
 
+> **qbit-jay note:** historical upstream record. The issue-proof adapter scripts it mentions (`issue-ci-proof-adapter.mjs` and its test) were removed with the upstream-only workflows (see `docs/qbit/RELEASING.md`); the commands below no longer run here.
+
 These are dormant CI-orchestration controls, **not hosted gate evidence**.
 The native and legacy workflows contain default-off boundary adapters. No
 repository variable or runtime control is activated by this change. Local models
