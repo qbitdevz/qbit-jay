@@ -4224,3 +4224,27 @@ func TestCmdDeleteSubCommandsInUsage(t *testing.T) {
 		}
 	}
 }
+
+func TestPrintSetupNotesPiShowsBackupUndoAndWarnings(t *testing.T) {
+	out, errOut := captureOutput(t, func() {
+		printSetupNotes(&setup.Result{Agent: "pi", BackupDir: "/b/pi/1", Warnings: []string{"left npm:gentle-engram alone"}})
+	})
+	for _, want := range []string{"Backup of Pi settings: /b/pi/1", "qbit-jay setup --restore pi"} {
+		if !strings.Contains(out, want) {
+			t.Errorf("stdout %q lacks %q", out, want)
+		}
+	}
+	if !strings.Contains(errOut, "warning: left npm:gentle-engram alone") {
+		t.Errorf("stderr %q lacks the warning", errOut)
+	}
+	out, errOut = captureOutput(t, func() { printSetupNotes(&setup.Result{Agent: "cursor"}); printSetupNotes(nil) })
+	if out != "" || errOut != "" {
+		t.Errorf("no notes expected, got %q %q", out, errOut)
+	}
+}
+
+func TestSetupBinaryVersionFollowsBuildVersion(t *testing.T) {
+	if setup.BinaryVersion != version {
+		t.Fatalf("setup.BinaryVersion = %q, want the build version %q", setup.BinaryVersion, version)
+	}
+}

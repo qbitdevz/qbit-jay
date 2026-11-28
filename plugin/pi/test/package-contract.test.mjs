@@ -41,11 +41,6 @@ test("next Pi package release is 0.8.0", () => {
 	assert.equal(pkg.version, "0.8.0");
 });
 const CLI_PATH = fileURLToPath(new URL("../cli.js", import.meta.url));
-const RELEASE_CONTRACT_PATH = fileURLToPath(new URL("./release-contract.mjs", import.meta.url));
-
-function runReleaseContract(tag) {
-	return spawnSync(process.execPath, [RELEASE_CONTRACT_PATH, tag], { encoding: "utf8" });
-}
 
 /**
  * Minimal range check for the peer declaration contract. Supports the range forms the
@@ -143,7 +138,7 @@ test("the peer declaration stays justified by actual pi-tui usage", () => {
 	);
 });
 
-test("pi-qbit-jay init refuses npm distribution and never touches Pi settings", () => {
+test("pi-qbit-jay init points to qbit-jay setup pi and never touches Pi settings", () => {
 	for (const original of [undefined, JSON.stringify({ packages: ["npm:gentle-engram@0.8.0", "npm:existing"] })]) {
 		const agentDir = mkdtempSync(join(tmpdir(), "qbit-jay-pi-cli-"));
 		try {
@@ -152,8 +147,8 @@ test("pi-qbit-jay init refuses npm distribution and never touches Pi settings", 
 				encoding: "utf8", env: { ...process.env, PI_CODING_AGENT_DIR: agentDir },
 			});
 			assert.notEqual(result.status, 0);
-			assert.match(result.stderr, /not distributed through npm/);
-			assert.match(result.stderr, /pi install <repo>\/plugin\/pi/);
+			assert.match(result.stderr, /embedded in the qbit-jay binary/);
+			assert.match(result.stderr, /qbit-jay setup pi/);
 			const outputs = result.stdout + result.stderr;
 			assert.doesNotMatch(outputs, /npm:qbit-jay-pi|npm:gentle-engram/);
 			assert.equal(existsSync(join(agentDir, "mcp.json")), false);
@@ -165,9 +160,9 @@ test("pi-qbit-jay init refuses npm distribution and never touches Pi settings", 
 	}
 });
 
-test("pi-qbit-jay help names the local install and no registry source", () => {
+test("pi-qbit-jay help names qbit-jay setup pi and no registry source", () => {
 	const help = execFileSync(process.execPath, [CLI_PATH], { encoding: "utf8" });
-	assert.match(help, /pi install <repo>\/plugin\/pi/);
+	assert.match(help, /qbit-jay setup pi/);
 	assert.doesNotMatch(help, /npm:/);
 });
 
@@ -198,23 +193,3 @@ test("Pi MCP template retains its opt-in launcher, QBIT_JAY_BIN first and the EN
 	assert.equal(selectBin({ QBIT_JAY_BIN: "/qj", ENGRAM_BIN: "/legacy" }), "/qj", "QBIT_JAY_BIN wins over ENGRAM_BIN");
 	assert.equal(selectBin({ QBIT_JAY_BIN: " ", ENGRAM_BIN: "/legacy" }), "/legacy", "a blank QBIT_JAY_BIN does not mask ENGRAM_BIN");
 });
-
-test("Pi release contract accepts the matching full tag ref and CLI guidance", () => {
-	const result = runReleaseContract(`refs/tags/pi-v${pkg.version}`);
-	assert.equal(result.status, 0, result.stderr);
-});
-
-test("Pi release contract rejects a tag that differs from the package version", () => {
-	const result = runReleaseContract("refs/tags/pi-v0.0.0");
-	assert.notEqual(result.status, 0);
-	assert.match(result.stderr, /must match package version/);
-});
-
-test("Pi release contract rejects branch refs even when their names match", () => {
-	for (const ref of ["refs/heads/main", `refs/heads/pi-v${pkg.version}`, `pi-v${pkg.version}`]) {
-		const result = runReleaseContract(ref);
-		assert.notEqual(result.status, 0, `${ref} must not be publishable`);
-		assert.match(result.stderr, /must match package version/);
-	}
-});
-

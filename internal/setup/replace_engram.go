@@ -12,9 +12,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/qbitdevz/qbit-jay/internal/qbit/env"
-	"github.com/qbitdevz/qbit-jay/internal/qbit/paths"
 )
 
 // This file implements the coexistence rule of spec 6.3: when an agent already
@@ -72,14 +69,11 @@ type BackupManifest struct {
 // BackupRoot returns the directory that holds setup backups, ~/.qbit-jay/backups
 // (or QBIT_JAY_DATA_DIR/backups).
 func BackupRoot() (string, error) {
-	if dir := strings.TrimSpace(env.Get("DATA_DIR")); dir != "" {
-		return filepath.Join(dir, "backups"), nil
-	}
-	home, err := userHome()
+	dir, err := dataDir()
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(home, paths.DataDirName, "backups"), nil
+	return filepath.Join(dir, "backups"), nil
 }
 
 // InstallReplacingEngram installs the agent like Install and, when the agent
@@ -111,6 +105,10 @@ func InstallReplacingEngram(agentName string) (*Result, error) {
 				}, nil
 			}
 		}
+	}
+
+	if agentName == "pi" {
+		return installPiReplacing()
 	}
 
 	var found []int
@@ -536,10 +534,9 @@ func replaceTargets(slug string) []replaceTarget {
 			{path: filepath.Join(openCodePluginDir(), "qbit-jay.ts")},
 		}
 	case "pi":
-		// No targets: `setup pi` refuses before reading or writing any Pi
-		// setting, so replacement never touches Pi (an existing
-		// npm:gentle-engram package stays as it is).
-		return nil
+		// Only used to spot a gentle-ai "engram" entry that already runs
+		// qbit-jay; settings.json is backed up by installPiReplacing.
+		return []replaceTarget{{path: filepath.Join(piAgentDir(), "mcp.json"), commands: jsonServerCommands(false, "mcpServers")}}
 	case "claude-code":
 		return []replaceTarget{
 			{path: ClaudeCodeUserMCPPath(), strip: stripJSONServers(false, "mcpServers"), apply: removeClaudeUserEngramServer, commands: jsonServerCommands(false, "mcpServers")},

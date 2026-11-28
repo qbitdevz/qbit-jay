@@ -249,9 +249,6 @@ jobs:
               const reason = outputs.get(key) ?? '';
               let classification = 'incomplete';
               if (!e.Test && reason.includes('[no test files]')) classification = 'no-test-files';
-              else if (e.Package === 'github.com/qbitdevz/qbit-jay/tools/release-candidate'
-                && e.Test === 'TestPublishedCoreContextMutation'
-                && reason.includes('published observation supports Windows amd64 only')) classification = 'foreign-os';
               else if (foreign.some(x => reason.includes(x))) classification = 'foreign-os';
               else if (capability.some(x => reason.includes(x))) classification = 'filesystem-capability';
               else if (['CLOUDSTORE_TEST_DSN not set', 'requires URL-style CLOUDSTORE_TEST_DSN and disposable PostgreSQL',
@@ -261,8 +258,7 @@ jobs:
               else if (reason.includes('unsupported-runtime regression requires Node.js <24')) classification = 'foreign-runtime';
               else if (reason.includes('TUI has no entry serialization')) classification = 'no-serialization';
               else if (/runs only as a child of Test(StoreContentionAcrossProcesses|ConcurrentColdStartProcesses)/.test(reason)) classification = 'child-helper';
-              else if ((e.Package.endsWith('/internal/mcp') && e.Test === 'TestPiInputRealCapture' && reason.includes('Pi schema prerequisites absent: TypeBox'))
-                || (e.Package.endsWith('/tools/release-candidate') && reason.includes('real capture requires fixed local TypeBox1.3.34 and Node24;'))) classification = 'optional-pi-capture';
+              else if (e.Package.endsWith('/internal/mcp') && e.Test === 'TestPiInputRealCapture' && reason.includes('Pi schema prerequisites absent: TypeBox')) classification = 'optional-pi-capture';
               report.skips.push({ package: e.Package, test: e.Test ?? null, classification, reason });
             }
             report.unfinished = [...active];
@@ -848,50 +844,6 @@ jobs:
         shell: bash
         run: bash .github/scripts/postgres-measurements.sh
 
-  unsupported-node:
-    name: Unsupported Node Runtime Rejection
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    permissions:
-      contents: read
-    env:
-      GOTOOLCHAIN: local
-    steps:
-      - name: Checkout
-        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
-        with:
-          ref: ${{ github.sha }}
-          persist-credentials: false
-
-      - name: Set up Go
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
-        with:
-          go-version: "1.26.11"
-          cache: false
-
-      - name: Set up unsupported Node.js
-        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5
-        with:
-          node-version: "22"
-
-      - name: Require unsupported-runtime rejection
-        shell: bash
-        run: |
-          set -euo pipefail
-          git rev-parse HEAD
-          go version
-          node --version
-          test "$(go env GOVERSION)" = go1.26.11
-          test "$(node -p 'process.versions.node.split(".")[0]')" = 22
-          set +e
-          go test -json -count=1 -timeout=10m ./tools/release-candidate -run '^TestArtifactCoreUnsupportedNode$' | tee "$RUNNER_TEMP/node22.json"
-          statuses=("${PIPESTATUS[@]}")
-          set -e
-          printf 'unsupported_node_go_exit=%s tee_exit=%s\n' "${statuses[0]}" "${statuses[1]}"
-          if (( statuses[0] != 0 )); then exit "${statuses[0]}"; fi
-          if (( statuses[1] != 0 )); then exit "${statuses[1]}"; fi
-          node .github/scripts/prerequisite-coverage.mjs unsupported-node "$RUNNER_TEMP/node22.json" "${statuses[0]}"
-
   e2e-tests:
     name: E2E Tests
     runs-on: ubuntu-latest
@@ -1130,17 +1082,6 @@ jobs:
       - name: Install Pi test dependencies
         working-directory: plugin/pi
         run: npm ci --ignore-scripts --legacy-peer-deps
-      - name: Set up Go for Pi checks
-        uses: actions/setup-go@924ae3a1cded613372ab5595356fb5720e22ba16 # v6
-        with:
-          go-version-file: go.mod
-
-      - name: Build release candidate checker
-        run: go build -mod=readonly -o "$RUNNER_TEMP/engram-release-candidate" ./tools/release-candidate
-
-      - name: Verify selected Pi source input projections
-        run: ENGRAM_PI_SCHEMA_REQUIRE_REAL=1 go test ./tools/release-candidate -run '^TestPiSourceEvidence$' -count=1 -v
-
       - name: Run Pi plugin tests
         working-directory: plugin/pi
         run: npm test

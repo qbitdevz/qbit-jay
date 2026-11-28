@@ -23,11 +23,11 @@ func agentAdapters() []agentAdapter {
 		},
 		{
 			slug:        "pi",
-			description: "Pi — not installable from npm yet (embedded plugin planned, T0.9)",
+			description: "Pi — embedded extension written locally and registered as a local Pi package (no npm)",
 			custom:      installPi,
 			installDir:  piAgentDir,
 			postInstall: []string{
-				"Restart Pi so packages and MCP config are reloaded",
+				"Restart Pi so the local package is loaded",
 				"Verify with: pi list",
 			},
 		},

@@ -172,7 +172,7 @@ Install it once. Keep coding. Pi remembers.
 - **Cloud when the team needs it** — qbit-jay Cloud adds opt-in, project-scoped replication, shared access, and a browser dashboard while keeping local SQLite authoritative.
 - **Token-efficient by design** — qbit-jay stores curated summaries, decisions, prompts, and session handoffs instead of a noisy firehose of raw tool calls. Agents search first, then fetch only the relevant memory.
 - **Compaction survival** — before context resets, the Memory Protocol pushes summaries into qbit-jay so the next session can recover what matters.
-- **Simple Pi setup** — install the Pi package, retain the MCP adapter for other servers, run `pi-qbit-jay init`, restart Pi.
+- **Simple Pi setup** — install the Pi package, retain the MCP adapter for other servers, run `qbit-jay setup pi`, restart Pi.
 - **Based on Engram** — qbit-jay is based on [Engram](https://github.com/Gentleman-Programming/engram) by Gentleman Programming (MIT). It is an independent fork with its own name, and is not official or endorsed by that project. See [UPSTREAM-DELTA.md](../../UPSTREAM-DELTA.md).
 
 ## Why this is different from “more context”
@@ -304,13 +304,13 @@ it. No trace file is created automatically.
 
 ## Quick start
 
-The qbit-jay Pi plugin is not distributed through npm: nothing named `qbit-jay-pi` is published, and neither `qbit-jay setup pi` nor `pi-qbit-jay init` installs or pins an `npm:` source for it (an unregistered name could be claimed by anyone). Both exit with an error without reading or changing Pi settings, and existing user entries, including `npm:gentle-engram` ones, are left untouched. Install it from a local checkout:
+The qbit-jay Pi plugin is embedded in the qbit-jay binary and is not distributed through npm: nothing named `qbit-jay-pi` is published and no `npm:` source is ever written. Install it with:
 
 ```bash
-pi install <repo>/plugin/pi
+qbit-jay setup pi
 ```
 
-T0.9 replaces this with a plugin embedded in the qbit-jay binary.
+It writes the package to `~/.qbit-jay/pi-plugin/<version>/`, lists that absolute path in the `packages` of Pi's `settings.json` (after saving the original; undo with `qbit-jay setup --restore pi`) and leaves every other entry, including an existing `npm:gentle-engram`, as it is. Running it again is safe, and a newer binary replaces the old version directory. For development, `pi install <repo>/plugin/pi` loads the checkout directly.
 
 Restart Pi after installation, then ask Pi what it remembers about the current project or call `mem_context`.
 
@@ -857,7 +857,7 @@ The Pi extension treats absent, empty, and whitespace-only `QBIT_JAY_URL`, `QBIT
 
 ## Install command details
 
-`pi-qbit-jay init` does not update any Pi-owned config: it prints the local install instruction and exits non-zero without touching `settings.json` or `mcp.json`.
+`pi-qbit-jay init` does not update any Pi-owned config: it prints that `qbit-jay setup pi` is the install path and exits non-zero without touching `settings.json` or `mcp.json`. `qbit-jay setup pi` edits `settings.json` only (`packages`, with a backup) and never `mcp.json`.
 
 - `mcp.json`: never created or changed. If it has `mcpServers.qbit-jay` (or the upstream `mcpServers.engram`), manually remove only that key and restart/reload Pi to guarantee native-only agent writes; preserve unrelated MCP servers.
 
@@ -921,7 +921,7 @@ There is no automatic inference: editing files in another repository never chang
 
 | Symptom                                                      | Fix                                                                                                                                                                                                                                                                     |
 | ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `mem_*` tools are missing                                    | Install the plugin from a local checkout with `pi install <repo>/plugin/pi` (it is not distributed through npm), then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
+| `mem_*` tools are missing                                    | Run `qbit-jay setup pi` (the plugin is embedded in the binary, not distributed through npm), then restart Pi. Earlier `0.1.16` init still registers qbit-jay MCP; do not use it for native-only setup.                                                                                                 |
 | Pi cannot find `qbit-jay`                                      | Set `QBIT_JAY_BIN=/absolute/path/to/qbit-jay`.                                                                                                                                                                                                                              |
 | Session capture should use another server                    | Set `QBIT_JAY_URL=http://host:7437`.                                                                                                                                                                                                                                      |
 | Pi shows `error MCP: 0/N servers` but `mem_*` works          | That status covers Pi's MCP servers, not qbit-jay's Pi-native HTTP tools. Check `~/.pi/agent/mcp.json` for stale/unreachable servers such as remote OAuth services. |

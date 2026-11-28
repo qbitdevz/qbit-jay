@@ -123,7 +123,7 @@ This catalog covers the tracked Markdown documentation surfaces. **Owner `GP`** 
 | [docs/intended-usage.md](docs/intended-usage.md) | Users | Guide: intended use | Living | GP |
 | [plugin/claude-code/skills/memory/SKILL.md](plugin/claude-code/skills/memory/SKILL.md) | Claude agents | Instruction: host-adapted memory skill | Living | GP |
 | [plugin/codex/skills/memory/SKILL.md](plugin/codex/skills/memory/SKILL.md) | Codex agents | Instruction: host-adapted memory skill | Living | GP |
-| [plugin/pi/README.md](plugin/pi/README.md) | Pi users | Guide: integration | Living | GP |
+| [plugin/pi/README.md](plugin/pi/README.md) | Pi users | Guide: integration (the plugin is embedded in the binary; install with `qbit-jay setup pi`) | Living | GP |
 | [skills/catalog.md](skills/catalog.md) | Contributor agents | Instruction: skill index | Living | GP |
 | [skills/*/SKILL.md](skills/) | Contributor agents | Instruction: domain skills | Living | GP |
 

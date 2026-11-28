@@ -203,17 +203,6 @@ current repository; qualified-only links do not expand discovery or rerun routin
 
 All required checks must pass before a PR can be merged. Issue API errors fail closed.
 
-#### Unsupported runtime rejection
-
-`Unsupported Node Runtime Rejection` runs only the existing
-`TestArtifactCoreUnsupportedNode` under Node22 with Go1.26.11. Node24 remains the
-ordinary supported test runtime. The separate ten-minute lane verifies the
-actual major versions and requires a named executed pass and successful package
-completion via `prerequisite-coverage.mjs unsupported-node EVENTS.json GO_EXIT`.
-A skip or nonzero Go exit cannot satisfy it; the original no-spawn/cleanup and
-20-second test-context assertions are unchanged. Local wiring checks are not
-proof that the hosted Node22 case executed.
-
 #### Observational Windows full-module baseline (#1891)
 
 `Windows Full Suite (Observational)` independently runs `go test -json -count=1 ./...`
@@ -736,14 +725,6 @@ relative to the repository root.
 | PR policy helpers | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/transient-artifacts.test.mjs .github/scripts/pr-size-notice.test.mjs` | Artifact and PR-size helper logic; not live GitHub permissions or event delivery. |
 | Technical CI contracts | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/ci-technical-contracts.test.mjs` | Proof-independent workflow commands, ordering, race, permissions, events, discovery and ordinary concurrency; not hosted execution/cancellation proof. |
 | Issue policy helpers | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/issue-*.test.mjs` | Issue-policy and proof-specific helper suites; not live approval-refresh behavior. |
-
-The **Unit Tests** job provides Node.js 24 for the Go-owned Core lifecycle tests.
-The `tools/release-candidate` Core lifecycle tests require Node.js >=24 in PATH;
-when Node is missing, cannot run, or is older, only the execution-dependent cases
-skip with a prerequisite message. Non-runtime admission cases still run. With
-Node.js <24, a separate regression verifies that Core is not started. To exercise
-all supported lifecycle paths locally, run `go test ./tools/release-candidate`
-with Node.js 24 in PATH.
 
 The [CI workflow](.github/workflows/ci.yml) is authoritative for hosted commands,
 setup steps and platform coverage; the [Makefile](Makefile) defines the existing

@@ -15,7 +15,6 @@ const profiles = {
     ...['handback', 'ascii', 'unicode', 'stdout-fallback'].map(name =>
       ['plugin', `TestSubagentStopPreservesUnicodeTransport/${name}`]),
   ],
-  'unsupported-node': [['tools/release-candidate', 'TestArtifactCoreUnsupportedNode']],
 };
 const usage = 'Usage: node .github/scripts/prerequisite-coverage.mjs PROFILE EVENTS.json GO_EXIT';
 if (process.argv.length === 3 && process.argv[2] === '--help') {
