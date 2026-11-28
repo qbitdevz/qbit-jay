@@ -154,7 +154,7 @@ Changes to labels on a linked issue do not themselves trigger PR Validation;
 the approval check fetches current issue labels and assignees when the workflow runs. PR label events
 and linked-issue label events are distinct.
 
-**Issue-refresh bootstrap (not yet live proof):** the candidate **Issue Validation
+**Issue-refresh bootstrap (upstream only; the workflow is removed in qbit-jay):** the candidate **Issue Validation
 Refresh** workflow adds trusted metadata-only publication for approval-label
 addition/removal and the same PR events via `pull_request_target`, not merge-group
 events. Native PR Validation merge-group jobs and their resolver remain unchanged
