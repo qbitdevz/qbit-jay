@@ -271,8 +271,8 @@ func validatePairMetadata(coreRoot, piRoot, version string) error {
 	if err := json.Unmarshal(data, &manifest); err != nil {
 		return errors.New("invalid plugin/pi/package.json")
 	}
-	if manifest.Name != "gentle-engram" {
-		return errors.New("package name must be gentle-engram")
+	if manifest.Name != "qbit-jay-pi" {
+		return errors.New("package name must be qbit-jay-pi")
 	}
 	if manifest.Version != version {
 		return errors.New("package version must match candidate version")
@@ -312,7 +312,7 @@ func validatePairMetadata(coreRoot, piRoot, version string) error {
 	if count != 1 {
 		return errors.New("expected exactly one piGentleEngramPackage pin")
 	}
-	if pin != "npm:gentle-engram@"+version {
+	if pin != "npm:qbit-jay-pi@"+version {
 		return errors.New("installer pin must match candidate version exactly")
 	}
 	return nil

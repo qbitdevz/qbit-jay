@@ -14,7 +14,7 @@ import (
 func isPiManagedPackage(pkg string) bool {
 	switch pkg {
 	case "npm:gentle-engram@0.1.5", "npm:gentle-engram@0.1.6", "npm:gentle-engram@0.1.7", "npm:gentle-engram@0.1.13",
-		piGentleEngramPackage, piLegacyGentleEngramPackage, piPreviousGentleEngramPackage, piPriorGentleEngramPackage, piPredecessorGentleEngramPackage, piFormerGentleEngramPackage, piEarlierGentleEngramPackage, piPriorReleaseGentleEngramPackage, piLastReleaseGentleEngramPackage, "npm:gentle-engram@0.4.0", "npm:gentle-engram@0.4.1", "npm:gentle-engram@0.4.2", "npm:gentle-engram@0.5.0", "npm:gentle-engram@0.5.1", "npm:gentle-engram@0.6.0", "npm:gentle-engram@0.7.0", "npm:gentle-engram@0.7.1":
+		piGentleEngramPackage, piPreRenameGentleEngramPackage, piLegacyGentleEngramPackage, piPreviousGentleEngramPackage, piPriorGentleEngramPackage, piPredecessorGentleEngramPackage, piFormerGentleEngramPackage, piEarlierGentleEngramPackage, piPriorReleaseGentleEngramPackage, piLastReleaseGentleEngramPackage, "npm:gentle-engram@0.4.0", "npm:gentle-engram@0.4.1", "npm:gentle-engram@0.4.2", "npm:gentle-engram@0.5.0", "npm:gentle-engram@0.5.1", "npm:gentle-engram@0.6.0", "npm:gentle-engram@0.7.0", "npm:gentle-engram@0.7.1":
 		return true
 	}
 	return false
@@ -36,12 +36,19 @@ func isPiGentleNpmSource(source string) bool {
 	}
 	const jsWhitespace = "\t\n\v\f\r \u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000\ufeff"
 	spec := strings.Trim(source[len("npm:"):], jsWhitespace)
-	if spec == "gentle-engram" {
-		return true
+	// The package was published as gentle-engram before it became qbit-jay-pi;
+	// both names are the same managed identity for Pi.
+	for _, name := range []string{"qbit-jay-pi", "gentle-engram"} {
+		if spec == name {
+			return true
+		}
+		version, ok := strings.CutPrefix(spec, name+"@")
+		// Pi's optional version is .+ (JavaScript dot excludes line terminators).
+		if ok && version != "" && !strings.ContainsAny(version, "\r\n\u2028\u2029") {
+			return true
+		}
 	}
-	version, ok := strings.CutPrefix(spec, "gentle-engram@")
-	// Pi's optional version is .+ (JavaScript dot excludes line terminators).
-	return ok && version != "" && !strings.ContainsAny(version, "\r\n\u2028\u2029")
+	return false
 }
 
 // Pi install persists by npm package identity, not by exact version. Protect the

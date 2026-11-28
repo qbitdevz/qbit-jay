@@ -62,7 +62,7 @@ Install qbit-jay's Pi-native package:
 qbit-jay setup pi
 ```
 
-This version of `qbit-jay setup pi` installs `npm:gentle-engram@0.8.0`, replaces recognized historical npm pin strings, and preserves custom package entries.
+This version of `qbit-jay setup pi` installs `npm:qbit-jay-pi@0.8.0`, replaces recognized historical npm pin strings, and preserves custom package entries. The Pi package was renamed from `gentle-engram` to `qbit-jay-pi`; `qbit-jay-pi` is not published to npm yet, so `qbit-jay setup pi` cannot install it from the registry until a package is available (the planned route is a local package embedded in the binary, tracked in T0.9). Until then install from a checkout with `pi install ./plugin/pi`.
 
 Pi agent writes use native `mem_*` tools. If Pi already has a qbit-jay MCP entry, setup reports the file and key. For native-only writes, remove the `mcpServers.qbit-jay` key from that file and restart Pi. Keep the entries for your other MCP servers.
 
@@ -75,10 +75,10 @@ When [mise](https://mise.jdx.dev/) is detected in `PATH`, `qbit-jay setup pi` al
 For a manual upgrade of the personal Pi package on qbit-jay 3.7.2, run the following command. Use it when an older native `mem_update` tool is still active and its schema lacks `expected_project`.
 
 ```bash
-pi install npm:gentle-engram@0.8.0
+pi install npm:qbit-jay-pi@0.8.0
 ```
 
-An active `gentle-engram` pin in a trusted project's `.pi/settings.json` can override the personal package. If that project has a plain npm pin, run `pi install --local npm:gentle-engram@0.8.0` from the project directory. For a package entry with custom settings, update its `source` pin and keep the other fields. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
+An active `qbit-jay-pi` pin in a trusted project's `.pi/settings.json` can override the personal package. If that project has a plain npm pin, run `pi install --local npm:qbit-jay-pi@0.8.0` from the project directory. For a package entry with custom settings, update its `source` pin and keep the other fields. [Pi package scope](https://github.com/earendil-works/pi/blob/v1.6.0/packages/coding-agent/docs/packages.md#understand-scope-and-identity)
 
 Restart Pi and check that the native `mem_update` tool exposes `expected_project`. Set it to the observation's existing project when updating.
 
@@ -94,7 +94,7 @@ Use an existing qbit-jay HTTP server:
 QBIT_JAY_URL=http://127.0.0.1:7437 pi
 ```
 
-`QBIT_JAY_URL` tells the `gentle-engram` Pi extension to use an already-running `qbit-jay serve` instance instead of auto-starting one. This is standard shell syntax: `KEY=value command`. The URL is the HTTP REST API base; it is not an MCP endpoint.
+`QBIT_JAY_URL` tells the `qbit-jay-pi` Pi extension to use an already-running `qbit-jay serve` instance instead of auto-starting one. This is standard shell syntax: `KEY=value command`. The URL is the HTTP REST API base; it is not an MCP endpoint.
 
 ### Local server ownership
 
@@ -134,7 +134,7 @@ For monorepos, prefer subproject configs such as `backend/.qbit-jay/config.json`
 
 **Recommended first call:** `mem_current_project` — confirms which project qbit-jay detected before you start writing. Returns `project_source` (how it was detected) and `available_projects` (if cwd is ambiguous).
 
-**Cross-project recall:** when the detected project is empty or the wrong one, call `mem_list_projects` to enumerate every known project with counts, then scope `mem_search`/`mem_context` to the project you need. `mem_list_projects` is included in the `agent` profile, and `qbit-jay mcp` registers all tools by default — `--tools=agent` is not required. The Pi-native `gentle-engram` plugin exposes the same listing over HTTP (`GET /projects`) and also offers `mem_pin`/`mem_unpin` for local observation pin state.
+**Cross-project recall:** when the detected project is empty or the wrong one, call `mem_list_projects` to enumerate every known project with counts, then scope `mem_search`/`mem_context` to the project you need. `mem_list_projects` is included in the `agent` profile, and `qbit-jay mcp` registers all tools by default — `--tools=agent` is not required. The Pi-native `qbit-jay-pi` plugin exposes the same listing over HTTP (`GET /projects`) and also offers `mem_pin`/`mem_unpin` for local observation pin state.
 
 Unexpected MCP project-resolution failures return `project_resolution_failed` with the underlying error detail. They do not offer project-choice recovery or a recovery token. Existing specific error codes remain distinct; `ambiguous_project` and its recovery guidance apply only to actual project ambiguity.
 
@@ -241,7 +241,7 @@ Alternatives: `cd` into the target repo before starting the MCP server, or add r
 
 `mem_update` and `mem_delete` require caller-supplied `expected_project`, including for personal/global scopes. Never fetch the target to fill a missing assertion. The normalized stored owner is checked atomically with the mutation. ID-addressed updates/deletes do not resolve server cwd or process overrides: a matching assertion works on shared multi-project servers, while an incorrect assertion is rejected without mutation. Update responses report the matched owner with `project_source: "explicit_override"` and an empty `project_path`. The assertion is not authentication, a permission grant, or a recovery token; save/recovery and session ownership protections remain unchanged.
 
-This is an intentional compatibility break for clients omitting `expected_project`. The in-repository Pi schema and forwarding require it; external gentle-engram relays need separate adaptation.
+This is an intentional compatibility break for clients omitting `expected_project`. The in-repository Pi schema and forwarding require it; external qbit-jay-pi relays need separate adaptation.
 
 ---
 

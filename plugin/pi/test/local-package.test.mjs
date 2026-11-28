@@ -27,7 +27,7 @@ function fixture(t, modify = () => {}) {
   mkdirSync(join(pkg, "test"));
   mkdirSync(join(dir, "internal/setup"), { recursive: true });
   const manifest = {
-    name: "gentle-engram", version: "1.2.3", type: "module",
+    name: "qbit-jay-pi", version: "1.2.3", type: "module",
     files: [...runtime, "package.json", "assets/", "test/"],
     // A real pack must not run candidate lifecycle code.
     scripts: { prepack: "node -e \"require('fs').writeFileSync('HOOK_RAN', 'unsafe')\"" },
@@ -37,7 +37,7 @@ function fixture(t, modify = () => {}) {
   for (const name of runtime) writeFileSync(join(pkg, name), `fixture ${name}\n`);
   writeFileSync(join(pkg, "assets/logo.txt"), "asset\n");
   writeFileSync(join(pkg, "test/example.test.mjs"), "fixture test, never executed\n");
-  writeFileSync(join(dir, "internal/setup/setup.go"), 'package setup\nconst piGentleEngramPackage = "npm:gentle-engram@1.2.3"\n');
+  writeFileSync(join(dir, "internal/setup/setup.go"), 'package setup\nconst piGentleEngramPackage = "npm:qbit-jay-pi@1.2.3"\n');
   return dir;
 }
 

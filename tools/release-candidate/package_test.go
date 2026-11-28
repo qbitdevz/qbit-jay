@@ -22,7 +22,7 @@ func packageFixture(t *testing.T) (string, []packedEntry) {
 	t.Helper()
 	root := candidateFixture(t, "1.2.3")
 	files := []string{"cli.js", "index.ts", "compaction-recovery.js", "memory-tool-chrome.js", "private-redaction.js", "mcp-template.json", "README.md", "assets/", "test/", "package.json"}
-	manifest, err := json.Marshal(map[string]any{"name": "gentle-engram", "version": "1.2.3", "files": files})
+	manifest, err := json.Marshal(map[string]any{"name": "qbit-jay-pi", "version": "1.2.3", "files": files})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,9 +80,9 @@ func TestPiPackageTarballCLI(t *testing.T) {
 			case "wrong name":
 				entries[0].body = `{"name":"other","version":"1.2.3"}`
 			case "wrong version":
-				entries[0].body = `{"name":"gentle-engram","version":"1.2.4"}`
+				entries[0].body = `{"name":"qbit-jay-pi","version":"1.2.4"}`
 			case "changed manifest":
-				entries[0].body = `{"name":"gentle-engram","version":"1.2.3","files":[]}`
+				entries[0].body = `{"name":"qbit-jay-pi","version":"1.2.3","files":[]}`
 			case "missing asset", "changed asset":
 				for i, entry := range entries {
 					if entry.name == "package/assets/logo.png" {
@@ -112,13 +112,13 @@ func TestPiPackageTarballCLI(t *testing.T) {
 			case "source changed":
 				candidateWrite(t, root, "plugin/pi/index.ts", "changed after packing")
 			case "unsupported allowlist":
-				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"gentle-engram","version":"1.2.3","files":["**"]}`)
+				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"1.2.3","files":["**"]}`)
 			case "missing declared source":
 				if err := os.Remove(filepath.Join(root, "plugin/pi/index.ts")); err != nil {
 					t.Fatal(err)
 				}
 			case "missing runtime declaration":
-				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"gentle-engram","version":"1.2.3","files":["package.json","README.md"]}`)
+				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"1.2.3","files":["package.json","README.md"]}`)
 			}
 			archive := packageArchive(t, entries)
 			switch name {

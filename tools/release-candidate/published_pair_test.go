@@ -139,7 +139,7 @@ func TestPublishedPairAdmission(t *testing.T) {
 			body = []byte(publishedPairPiFixture)
 		}
 		if name == "package.json" {
-			body, _ = json.Marshal(map[string]any{"name": "gentle-engram", "version": "4.5.6", "files": packageRuntimeFiles})
+			body, _ = json.Marshal(map[string]any{"name": "qbit-jay-pi", "version": "4.5.6", "files": packageRuntimeFiles})
 		}
 		write(filepath.Join(repo, "plugin", "pi", name), body)
 		if err := tw.WriteHeader(&tar.Header{Name: "package/" + name, Mode: 0644, Size: int64(len(body))}); err != nil {

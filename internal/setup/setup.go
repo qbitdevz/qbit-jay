@@ -10,7 +10,7 @@
 //     the resolved absolute binary path.
 //   - Gemini CLI: injects MCP registration in ~/.gemini/settings.json
 //   - Codex: injects MCP registration in ~/.codex/config.toml
-//   - Pi: installs the gentle-engram package; native tools own Engram writes
+//   - Pi: installs the qbit-jay-pi package; native tools own Engram writes
 package setup
 
 import (
@@ -117,7 +117,8 @@ const claudeCodePluginListTimeout = 2 * time.Second // bounds only the read-only
 const openCodeSubagentStatuslinePlugin = "opencode-subagent-statusline"
 
 const (
-	piGentleEngramPackage             = "npm:gentle-engram@0.8.0"
+	piGentleEngramPackage             = "npm:qbit-jay-pi@0.8.0"
+	piPreRenameGentleEngramPackage    = "npm:gentle-engram@0.8.0" // last pin before the Pi package became qbit-jay-pi
 	piLegacyGentleEngramPackage       = "npm:gentle-engram@0.1.8"
 	piPreviousGentleEngramPackage     = "npm:gentle-engram@0.1.11"
 	piPriorGentleEngramPackage        = "npm:gentle-engram@0.1.12"
@@ -313,7 +314,7 @@ func installPi() (*Result, error) {
 	agentDir := piAgentDir()
 	settingsPath := filepath.Join(agentDir, "settings.json")
 	if err := installPiPackage(settingsPath); err != nil {
-		return nil, fmt.Errorf("install %s: %w", piGentleEngramPackage, err)
+		return nil, fmt.Errorf("install %s: %w (the qbit-jay-pi package is not published to npm yet; install it from a local checkout with `pi install ./plugin/pi`)", piGentleEngramPackage, err)
 	}
 
 	files := 0

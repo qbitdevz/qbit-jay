@@ -339,3 +339,40 @@ func TestPiInstallUsesPiNpmIdentity(t *testing.T) {
 		})
 	}
 }
+
+func TestIsPiGentleNpmSourceCoversRenamedPackage(t *testing.T) {
+	for source, want := range map[string]bool{
+		"npm:qbit-jay-pi":        true,
+		"npm:qbit-jay-pi@9.9.9":  true,
+		"npm: qbit-jay-pi@1.0.0": true,
+		"npm:gentle-engram":      true,
+		"npm:qbit-jay-pix":       false,
+		"npm:qbit-jay-pi@":       false,
+		"npm:other@1.0.0":        false,
+	} {
+		if got := isPiGentleNpmSource(source); got != want {
+			t.Errorf("isPiGentleNpmSource(%q) = %v, want %v", source, got, want)
+		}
+	}
+}
+
+func TestPiSetupMigratesPreRenamePin(t *testing.T) {
+	resetSetupSeams(t)
+	dir := t.TempDir()
+	t.Setenv("PI_CODING_AGENT_DIR", dir)
+	path := filepath.Join(dir, "settings.json")
+	if err := os.WriteFile(path, []byte(`{"packages":["npm:gentle-engram@0.8.0"]}`), 0600); err != nil {
+		t.Fatal(err)
+	}
+	runCommand = func(string, ...string) ([]byte, error) { return nil, nil }
+	if _, err := Install("pi"); err != nil {
+		t.Fatal(err)
+	}
+	got, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if strings.Contains(string(got), "gentle-engram") || !strings.Contains(string(got), `"npm:qbit-jay-pi@0.8.0"`) {
+		t.Fatalf("expected the pre-rename pin replaced by qbit-jay-pi, got %s", got)
+	}
+}

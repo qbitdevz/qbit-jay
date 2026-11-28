@@ -60,7 +60,7 @@ func TestReleaseCandidateAssessment(t *testing.T) {
 	}{
 		{"valid independent pair", "", "", "blocked", "positive-proof-unavailable", "live Go contract does not establish Pi parity or release approval", 2},
 		{"observed invalid manifest", "plugin/pi/package.json", `{`, "rejected", "invalid-metadata", "invalid plugin/pi/package.json", 1},
-		{"observed wrong pin", "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:gentle-engram@3.0.0\"\n", "rejected", "invalid-metadata", "installer pin must match candidate version exactly", 1},
+		{"observed wrong pin", "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@3.0.0\"\n", "rejected", "invalid-metadata", "installer pin must match candidate version exactly", 1},
 		{"missing manifest", "missing-manifest", "", "blocked", "metadata-unavailable", "cannot read plugin/pi/package.json", 2},
 		{"missing installer", "missing-installer", "", "blocked", "metadata-unavailable", "cannot read internal/setup/setup.go", 2},
 		// A directory at a file path deterministically fails ReadFile even as root
@@ -70,10 +70,10 @@ func TestReleaseCandidateAssessment(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			root := t.TempDir()
 			if tc.file != "missing-manifest" && tc.name != "unreadable manifest" {
-				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"gentle-engram","version":"0.5.0"}`)
+				candidateWrite(t, root, "plugin/pi/package.json", `{"name":"qbit-jay-pi","version":"0.5.0"}`)
 			}
 			if tc.file != "missing-installer" {
-				candidateWrite(t, root, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:gentle-engram@0.5.0\"\n")
+				candidateWrite(t, root, "internal/setup/setup.go", "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@0.5.0\"\n")
 			}
 			if tc.content != "" {
 				candidateWrite(t, root, tc.file, tc.content)

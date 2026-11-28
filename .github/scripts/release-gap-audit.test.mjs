@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { audit, relevantPath } from './release-gap-audit.mjs';
 
 const fixtures = {
-  'https://registry.npmjs.org/gentle-engram/latest': { version: '0.1.15' },
+  'https://registry.npmjs.org/qbit-jay-pi/latest': { version: '0.1.15' },
   'https://api.github.com/repos/Gentleman-Programming/engram/releases/latest': { tag_name: 'v2.1.0', prerelease: false, draft: false },
 };
 function harness({ files = [], metadata = fixtures, tags = ['pi-v0.1.15', 'v2.1.0'], branch = 'main' } = {}) {
@@ -85,7 +85,7 @@ test('missing tag and unavailable or malformed metadata fail visibly', async () 
   for (const options of [
     { tags: ['v2.1.0'] },
     { metadata: {} },
-    { metadata: { ...fixtures, 'https://registry.npmjs.org/gentle-engram/latest': { version: '../evil' } } },
+    { metadata: { ...fixtures, 'https://registry.npmjs.org/qbit-jay-pi/latest': { version: '../evil' } } },
   ]) {
     const result = await audit(harness(options));
     assert.equal(result.failed, true);

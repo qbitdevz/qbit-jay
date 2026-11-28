@@ -5,8 +5,8 @@ import { test } from "node:test";
 
 const root = new URL("../../../", import.meta.url);
 const helper = new URL(".github/scripts/release-companion.mjs", root);
-const pkg = { name: "gentle-engram", version: "0.4.2", engram: { startupPolicy: 1, sessionOwned: 1 } };
-const pin = 'const piGentleEngramPackage = "npm:gentle-engram@0.4.2"';
+const pkg = { name: "qbit-jay-pi", version: "0.4.2", engram: { startupPolicy: 1, sessionOwned: 1 } };
+const pin = 'const piGentleEngramPackage = "npm:qbit-jay-pi@0.4.2"';
 const paths = ["plugin/pi/package.json", "internal/setup/setup.go", ".github/workflows/release.yml"];
 const before = paths.map(p => readFileSync(new URL(p, root), "utf8"));
 
@@ -29,10 +29,10 @@ for (const owned of [true, false]) test(`exact public metadata succeeds (session
 	if (!owned) delete source.engram.sessionOwned;
 	const result = run({ source, published: source });
 	assert.equal(result.status, 0, result.stderr);
-	assert.match(result.stdout, /Companion available: gentle-engram@0.4.2/);
+	assert.match(result.stdout, /Companion available: qbit-jay-pi@0.4.2/);
 	assert.match(result.stderr, /TRANSPORT {"calls":1}/);
 	const request = JSON.parse(result.stderr.split("\n").find(l => l.startsWith("GET ")).slice(4));
-	assert.deepEqual(request, { url: "https://registry.npmjs.org/gentle-engram/0.4.2", method: "GET", redirect: "error", credentials: "omit", headers: { Accept: "application/json" }, bounded: true });
+	assert.deepEqual(request, { url: "https://registry.npmjs.org/qbit-jay-pi/0.4.2", method: "GET", redirect: "error", credentials: "omit", headers: { Accept: "application/json" }, bounded: true });
 });
 
 for (const [label, options, calls] of [

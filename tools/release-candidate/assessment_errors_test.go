@@ -14,8 +14,8 @@ func assessmentErrorFixture(t *testing.T) (string, func()) {
 	t.Helper()
 	root := t.TempDir()
 	for name, content := range map[string]string{
-		"plugin/pi/package.json":  `{"name":"gentle-engram","version":"0.5.0"}`,
-		"internal/setup/setup.go": "package setup\nconst piGentleEngramPackage = \"npm:gentle-engram@0.5.0\"\n",
+		"plugin/pi/package.json":  `{"name":"qbit-jay-pi","version":"0.5.0"}`,
+		"internal/setup/setup.go": "package setup\nconst piGentleEngramPackage = \"npm:qbit-jay-pi@0.5.0\"\n",
 		"context.txt":             "unrelated candidate context\n",
 	} {
 		path := filepath.Join(root, name)

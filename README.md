@@ -156,7 +156,7 @@ The screens above are the real TUI rendered with sample data. Navigate with `j`/
 | **[Doctor](docs/DOCTOR.md)** | `qbit-jay doctor` — read-only operational diagnostics |
 | **[Conflict surfacing](docs/AGENT-SETUP.md#conflict-surfacing-automatic)** | Flags related or conflicting memories so the agent can judge them |
 | **[Plugins](docs/PLUGINS.md)** | OpenCode and Claude Code plugin details |
-| **[Pi package](plugin/pi/README.md)** | The qbit-jay package for Pi (published as `gentle-engram` until it is renamed) |
+| **[Pi package](plugin/pi/README.md)** | The qbit-jay package for Pi (npm name `qbit-jay-pi`, not published yet) |
 | **[Team usage](docs/TEAM-USAGE.md)** | Shared-memory conventions |
 | **[Binary self-testing](docs/SELF-TESTING.md)** | Isolated reliability and performance checks for released binaries |
 | **[Obsidian Brain](docs/beta/obsidian-brain.md)** | Export memories as an Obsidian knowledge graph (beta) |

@@ -41,7 +41,7 @@ const PACKAGE_NAME = `npm:${pkg.name}@${pkg.version}`;
 test("next Pi package release is 0.8.0", () => {
 	assert.equal(pkg.version, "0.8.0");
 });
-const LEGACY_PACKAGE_NAMES = ["npm:gentle-engram@0.1.8", "npm:gentle-engram@0.1.11", "npm:gentle-engram@0.1.12", "npm:gentle-engram@0.1.14", "npm:gentle-engram@0.1.15", "npm:gentle-engram@0.1.16", "npm:gentle-engram@0.2.0", "npm:gentle-engram@0.3.0", "npm:gentle-engram@0.4.0", "npm:gentle-engram@0.4.1", "npm:gentle-engram@0.4.2", "npm:gentle-engram@0.5.0", "npm:gentle-engram@0.5.1", "npm:gentle-engram@0.6.0", "npm:gentle-engram@0.7.0", "npm:gentle-engram@0.7.1"];
+const LEGACY_PACKAGE_NAMES = ["npm:gentle-engram@0.8.0", "npm:gentle-engram@0.1.8", "npm:gentle-engram@0.1.11", "npm:gentle-engram@0.1.12", "npm:gentle-engram@0.1.14", "npm:gentle-engram@0.1.15", "npm:gentle-engram@0.1.16", "npm:gentle-engram@0.2.0", "npm:gentle-engram@0.3.0", "npm:gentle-engram@0.4.0", "npm:gentle-engram@0.4.1", "npm:gentle-engram@0.4.2", "npm:gentle-engram@0.5.0", "npm:gentle-engram@0.5.1", "npm:gentle-engram@0.6.0", "npm:gentle-engram@0.7.0", "npm:gentle-engram@0.7.1"];
 const MCP_ADAPTER_PACKAGE = "npm:pi-mcp-adapter";
 const CLI_PATH = fileURLToPath(new URL("../cli.js", import.meta.url));
 const RELEASE_CONTRACT_PATH = fileURLToPath(new URL("./release-contract.mjs", import.meta.url));
@@ -283,13 +283,13 @@ test(`pi-qbit-jay init upgrades ${previousVersion} without changing unrelated co
 			assert.equal(result.stderr, "");
 			assert.equal(result.stdout, [
 				`Pi agent dir: ${agentDir}`,
-				`${action} npm:gentle-engram@0.8.0 in settings.json`,
+				`${action} npm:qbit-jay-pi@0.8.0 in settings.json`,
 				"Pi-native mem_* tools own agent writes; no qbit-jay MCP registration is created.",
 				"Set QBIT_JAY_URL for an existing qbit-jay serve instance, or QBIT_JAY_BIN for a custom qbit-jay binary path (ENGRAM_URL and ENGRAM_BIN still work).",
 				"",
 			].join("\n"));
 			assert.deepEqual(JSON.parse(readFileSync(settingsPath, "utf8")), {
-				packages: ["npm:existing", ...customPackages, "npm:gentle-engram@0.8.0"], custom: true,
+				packages: ["npm:existing", ...customPackages, "npm:qbit-jay-pi@0.8.0"], custom: true,
 			});
 			assert.equal(readFileSync(mcpPath, "utf8"), originalMcp);
 			if (action === "Kept") assert.equal(readFileSync(settingsPath, "utf8"), before);

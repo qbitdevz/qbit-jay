@@ -1,4 +1,4 @@
-name: Publish gentle-engram
+name: Publish qbit-jay-pi
 
 on:
   push:
