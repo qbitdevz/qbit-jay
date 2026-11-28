@@ -98,13 +98,26 @@ type Result struct {
 	Files            int
 	MCPConfigured    bool
 	TUIPluginEnabled bool
+
+	// Replaced lists the Engram entries InstallReplacingEngram removed; BackupDir
+	// is where the files setup touched were saved (BackupReused when an identical
+	// backup already existed).
+	Replaced     []string
+	BackupDir    string
+	BackupReused bool
+
+	// GentleAIMode is set when an existing "engram" entry already runs the
+	// qbit-jay binary (gentle-ai compatibility mode). Nothing was installed or
+	// changed; Notice is the one line to print.
+	GentleAIMode bool
+	Notice       string
 }
 
 const claudeCodeMarketplace = "qbitdevz/qbit-jay"
 
 // mcpServerName is the MCP server id setup writes into every agent config and
 // the Claude Code plugin name (spec S3). legacyMCPServerName is the upstream id:
-// setup never rewrites or removes it (replacing Engram entries is T0.5).
+// Install never rewrites or removes it; InstallReplacingEngram does, after a backup.
 const (
 	mcpServerName       = "qbit-jay"
 	legacyMCPServerName = "engram"

@@ -21,6 +21,12 @@ existing store. Do not rewrite a recorded core hash to bypass that policy.
    Neither path may contain symlinks;
    use canonical paths (on macOS, `/private/var`, not the `/var` alias).
 
+The source may also be an Engram data directory that holds `engram.db` and
+`.instance-id` but no `qbit-jay.db`: the database is first copied with the
+SQLite backup API into a temporary staging directory (the Engram files are only
+read) and the usual verified copy runs from there. The result reports the
+original directory as `source_dir`.
+
 For example, with isolated source data under `/srv/engram-old`, and no clients
 using it:
 

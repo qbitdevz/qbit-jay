@@ -37,6 +37,9 @@ type ProbeResult struct {
 	Version string
 	// Service is validated health metadata for diagnostics, never PID authority.
 	Service string
+	// Product is "qbit-jay" when the listener says so; an Engram server does not
+	// send it, so an engram service with an empty Product is Engram.
+	Product string
 	Err     error
 }
 
@@ -65,6 +68,7 @@ func Probe(ctx context.Context, port int, timeout time.Duration) ProbeResult {
 	var health struct {
 		DaemonToken string          `json:"daemon_token"`
 		Service     string          `json:"service"`
+		Product     string          `json:"product"`
 		Version     json.RawMessage `json:"version"`
 	}
 	// A body that is not the expected JSON still classifies by status code:
@@ -72,12 +76,13 @@ func Probe(ctx context.Context, port int, timeout time.Duration) ProbeResult {
 	// "identity did not answer".
 	decodeErr := json.NewDecoder(io.LimitReader(resp.Body, 1<<20)).Decode(&health)
 	if resp.StatusCode >= 200 && resp.StatusCode < 300 {
-		var version, service string
+		var version, service, productID string
 		if decodeErr == nil && health.Service == "engram" {
 			service = health.Service
+			productID = health.Product
 			_ = json.Unmarshal(health.Version, &version)
 		}
-		return ProbeResult{Status: StatusRunning, Port: port, Token: health.DaemonToken, Version: version, Service: service}
+		return ProbeResult{Status: StatusRunning, Port: port, Token: health.DaemonToken, Version: version, Service: service, Product: productID}
 	}
 	return ProbeResult{Status: StatusUnreachable, Port: port}
 }

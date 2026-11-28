@@ -22,6 +22,7 @@ This is the complete technical reference for qbit-jay. For getting started, see 
 | [Memory Protocol](#memory-protocol)                       | When/how agents should use the tools                         |
 | [Project Name Normalization](#project-name-normalization) | Auto-detection, normalization, similar-project warnings      |
 | [Features](#features)                                     | FTS5 search, timeline, privacy, git sync, compression        |
+| [Local telemetry](#local-telemetry)                         | What is recorded locally, where, retention, how to turn it off and clear it |
 | [TUI](#terminal-ui-tui)                                   | Screens, navigation, architecture                            |
 | [Running as a Service](#running-as-a-service)             | systemd setup                                                |
 | [Design Decisions](#design-decisions)                     | Why Go, why SQLite, why no raw auto-capture                  |
@@ -200,6 +201,8 @@ qbit-jay delete project <name> [--hard]
 qbit-jay timeline <obs_id>      Chronological context [--project P|--all]
 qbit-jay context [project]      Recent context [--project P|--all] [--older-history]
 qbit-jay stats                  Memory statistics [--project P|--all]
+qbit-jay stats --telemetry      Local usage telemetry summary (see Local telemetry)
+qbit-jay telemetry clear        Delete the local telemetry file [--yes]
 qbit-jay export [file]          Export memories to JSON [--project P|--all]
 qbit-jay import <file>          Import memories from JSON
 qbit-jay sync                   Export new memories to .qbit-jay/, excluding prompts [--all: every project]
@@ -837,6 +840,7 @@ unchanged.
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
 | `QBIT_JAY_MEM_SAVE_TIMING`        | Set to exactly `1` in the MCP server environment to log one privacy-safe stage timing record per `mem_save` invocation to stderr. See [mem_save timing diagnostics](#mem_save-timing-diagnostics). | (unset — disabled) |
 | `QBIT_JAY_HTTP_WRITE_TIMING`      | Set to exactly `1` in the local HTTP server environment to log one privacy-safe timing record for each session registration, observation save, or passive capture. See [HTTP write timing diagnostics](#http-write-timing-diagnostics). | (unset — disabled) |
+| `QBIT_JAY_NO_IMPORT`              | `1` (or `true`) disables the first-start import of `~/.engram/engram.db` (or `$ENGRAM_DATA_DIR/engram.db`) into `qbit-jay.db`. Engram data can still be imported explicitly with `qbit-jay import --from-engram`. | (unset — import on first start) |
 | `QBIT_JAY_DATA_DIR`               | qbit-jay CLI data directory. Empty or whitespace-only values use the platform default; nonblank values are used as provided.                                                                                                                               | `~/.qbit-jay`          |
 | `QBIT_JAY_PORT`                   | Override HTTP server port. Use an unsigned decimal value from `1` through `65535`; invalid values fall back to `7437` in `qbit-jay serve` and Claude Bash hooks. `qbit-jay run` honors it when no `-p` port is given, and `qbit-jay restart` honors it when neither `-p` nor the stopped daemon's recorded port exists.                                                                                         | `7437`               |
 | `QBIT_JAY_SOCKET`                 | POSIX-only Unix-domain socket path for `qbit-jay serve` and Claude Bash hooks. Socket mode listens exclusively on this path; it cannot be combined with an explicit `QBIT_JAY_PORT` or positional port. The default TCP listener remains unchanged when unset. PowerShell stays TCP-only. Bash hooks warn on stderr if socket transport cannot preserve memory capture. | (unset) |
@@ -1958,6 +1962,8 @@ Share memories across machines, backup, or migrate:
 
 - `qbit-jay export` — Versioned JSON backup of sessions, observations, prompts, local pin state, and memory-relation metadata
 - `qbit-jay import <file>` — Load an atomic backup transaction. Version `0.2.0` preserves pins and relations; legacy `0.1.0` backups without those fields remain compatible, while unsupported versions fail before mutation. Orphaned relation audit rows may retain missing endpoint observations; other dangling relations or missing superseding relations fail the complete transaction.
+- `qbit-jay import --from-engram [path] [--force]` — Copy an Engram database (a data directory or `engram.db`; default `ENGRAM_DATA_DIR`, else `~/.engram`) into `qbit-jay.db` with the SQLite backup API. The source is opened read-only and never modified. It refuses when `qbit-jay.db` already has data; `--force` renames the existing database (and WAL files) to `qbit-jay.db.bak-<timestamp>` first. The same copy runs automatically on first start unless `QBIT_JAY_NO_IMPORT=1`.
+- `qbit-jay setup <agent>` replaces an existing Engram registration (backup in `~/.qbit-jay/backups/<agent>/<timestamp>/` with a sha256 manifest) and `qbit-jay setup --restore <agent>` restores the latest backup. If removing the Engram entry fails after qbit-jay was installed, setup restores that backup by itself and says so. Setup records the sha256 of each file as it left it; restore skips (and lists) files edited since, and `--restore <agent> --force` overwrites them anyway. An `engram` entry whose command already runs qbit-jay (gentle-ai mode) is left as it is: setup prints one line and changes nothing.
 - `qbit-jay export --help` and `qbit-jay import --help` — Show command-specific usage and options without an update check, configuration lookup, database migration, or store access. Export accepts an optional output filename and `--project NAME` or `--all`; import requires a backup filename for normal operation.
 
 ### Git Sync (Chunked)
@@ -2023,6 +2029,26 @@ qbit-jay does not record a firehose of raw tool calls. Raw tool calls (`edit: {f
 `mem_save` can also best-effort store the current user prompt when its runtime supplies context for the same project/session and `capture_prompt` is not disabled. MCP uses process-local context (typically fed by `mem_save_prompt`); native Pi supplies its eligible current turn's redacted/truncated content. Go dedupes independent prompt rows by session/project/content; there is no explicit observation-ID link. The save still succeeds if context is missing or capture fails, and opting out does not disable Pi's independent lifecycle capture.
 
 ---
+
+## Local telemetry
+
+qbit-jay measures how it is used so improvements can be judged with numbers. This is **local only**: it never leaves your machine, is not sent to any server, and is not part of Git Sync or Cloud.
+
+- **Where:** `<data dir>/telemetry.db` (default `~/.qbit-jay/telemetry.db`), a SQLite file separate from the main database. The main database schema is untouched.
+- **What is stored**, per MCP session of the `qbit-jay mcp` process:
+  - *search:* query text, project, match mode, result count, the top 10 result ids, latency.
+  - *open:* a `mem_get_observation` of an id that a search of the same session returned in the last 10 minutes.
+  - *reformulation:* another search in the same session within 60 seconds of the previous one (with the previous query).
+  - *context:* bytes and estimated tokens (bytes / 4) of a `mem_context` result, the titles of the injected memories with the section they came from (`pinned` or `recent`), and whether the session later read (`mem_get_observation`) or updated (`mem_update`) a memory with the same title. `mem_context` does not render ids, so injected memories are matched by title.
+  - *save:* content size, latency and, when a save fails, only an error class (`error` or `limit`).
+  - *errors in general:* never the error message, only a class: `error`, `limit` or `timeout`. A failed call's message can echo what you wrote, so it is not kept.
+  Memory contents are never stored. What is stored is exactly: search query text, project names, result ids and counts, sizes, latencies, the titles of memories shown by `mem_context`, and the error classes above.
+- **Permissions:** `telemetry.db` is created owner-only (mode 0600 on Linux/macOS, the directory 0700 when qbit-jay creates it); on Windows the default folder permissions apply. The journal mode is rollback (no `-wal`/`-shm` files); its temporary `-journal` file takes the same mode.
+- **Retention:** rows older than 90 days are removed, and the file is capped at 50 MB (the oldest quarter is dropped and the file compacted, repeatedly, until it is under the cap). Both are checked when the MCP process starts and every 500 writes.
+- **Never in the way:** events are written by a background goroutine through a bounded queue. A full queue or a write error drops the event and is counted; it never changes or delays a tool response. The counters are saved in the file (a `meta` table, best effort, on flush and at exit) and shown by `stats --telemetry`. Several MCP processes can share the file; a write waits up to 2 s for another process, in the background.
+- **Turn it off:** `QBIT_JAY_TELEMETRY=off` (also `0` or `false`; `ENGRAM_TELEMETRY` is the fallback name). Nothing is created or written while it is off.
+- **Read it:** `qbit-jay stats --telemetry` prints searches, zero-result rate, reformulation rate, opens after search, the most opened ids, injected tokens per session, save errors, and `dropped events` / `write errors`. `--project <name>` limits it to that project's events (events recorded without a project, such as a save that used the default project, are then not counted); `--all` is the default; `--project` with `--all` is an error. The web "Telemetría" view arrives with the local web interface (not built yet).
+- **Delete it:** `qbit-jay telemetry clear` asks first; `qbit-jay telemetry clear --yes` deletes without a prompt. It empties the tables and compacts the file through SQLite, so it is safe while an MCP process is running (that process keeps a valid file and keeps recording). It removes the file only if it is not a usable database. Do not delete `telemetry.db` by hand while an MCP process is running: on Linux/macOS that process would keep writing to an unlinked file, on Windows the delete fails.
 
 ## Terminal UI (TUI)
 

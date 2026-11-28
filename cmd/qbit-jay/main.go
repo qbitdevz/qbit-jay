@@ -124,7 +124,8 @@ var (
 	migrateOrphanedDatabase = migrateOrphanedDB
 
 	setupSupportedAgents                   = setup.SupportedAgents
-	setupInstallAgent                      = setup.Install
+	setupInstallAgent                      = setup.InstallReplacingEngram
+	setupRestoreAgent                      = setup.RestoreAgentBackup
 	setupAddClaudeCodeAllowlist            = setup.AddClaudeCodeAllowlist
 	setupAddClaudeCodeMemoryWriteAllowlist = setup.AddClaudeCodeMemoryWriteAllowlist
 	setupEnsureClaudeCodeUserMCP           = setup.EnsureClaudeCodeUserMCP
@@ -826,6 +827,11 @@ func main() {
 	}
 
 	if usesLocalSQLite(os.Args[1:]) {
+		// First start: bring the Engram database over before the store opens
+		// qbit-jay's. `import --from-engram` does its own, explicit copy.
+		if os.Args[1] != "import" || len(os.Args) <= 2 || os.Args[2] != "--from-engram" {
+			autoImportFromEngram(cfg.DataDir, os.Stderr)
+		}
 		release, err := prepareSQLiteTemp(cfg.DataDir)
 		if err != nil {
 			fatal(err)
@@ -886,6 +892,8 @@ func main() {
 		cmdContext(cfg)
 	case "stats":
 		cmdStats(cfg)
+	case "telemetry":
+		cmdTelemetry(cfg)
 	case "export":
 		if _, err := cmdExport(cfg); err != nil {
 			fatal(err)
@@ -993,6 +1001,13 @@ func serveWith(cfg store.Config, options serveOptions) error {
 	}
 	readyFile, readyToken := env.Get("RUN_READY_FILE"), env.Get("RUN_READY_TOKEN")
 	detachedDaemon := readyFile != "" && readyToken != ""
+	// Engram uses the same default port and health protocol. Say so before
+	// opening the store instead of failing later or serving next to it.
+	if !options.sessionOwned && ownedListener == nil && options.socketPath == "" && options.port > 0 {
+		if err := serveEngramPortCheck(options.port); err != nil {
+			return err
+		}
+	}
 	var startup *server.LocalStartup
 	var trace *store.StartupTrace
 	if !options.sessionOwned && options.socketPath == "" && options.port > 0 && !detachedDaemon {
@@ -1349,6 +1364,10 @@ func cmdMCP(cfg store.Config) {
 	defer stopAutosync()
 
 	mcpCfg := mcp.MCPConfig{DefaultProject: projectOverride, Version: version}
+	if rec := newTelemetryRecorder(cfg); rec != nil { // nil when QBIT_JAY_TELEMETRY=off
+		mcpCfg.Observer = rec
+		defer rec.Close()
+	}
 	allowlist := resolveMCPTools(toolsFilter)
 	mcpSrv := newMCPServerWithConfig(s, mcpCfg, allowlist)
 
@@ -2189,8 +2208,11 @@ func cmdContext(cfg store.Config) {
 func cmdStats(cfg store.Config) {
 	projectName := ""
 	allProjects := false
+	wantTelemetry := false
 	for i := 2; i < len(os.Args); i++ {
 		switch os.Args[i] {
+		case "--telemetry":
+			wantTelemetry = true
 		case "--project":
 			value, err := requiredProjectValue(os.Args, i)
 			if err != nil {
@@ -2202,6 +2224,10 @@ func cmdStats(cfg store.Config) {
 		case "--all":
 			allProjects = true
 		}
+	}
+	if wantTelemetry {
+		cmdStatsTelemetry(cfg, projectName, allProjects)
+		return
 	}
 	s, err := storeNew(cfg)
 	if err != nil {
@@ -2296,8 +2322,15 @@ func cmdExport(cfg store.Config) (string, error) {
 }
 
 func cmdImport(cfg store.Config) {
+	if len(os.Args) >= 3 && os.Args[2] == "--from-engram" {
+		if code := runImportFromEngram(os.Args[3:], cfg.DataDir, os.Stdout, os.Stderr); code != 0 {
+			exitFunc(code)
+		}
+		return
+	}
 	if len(os.Args) < 3 {
 		fmt.Fprintln(os.Stderr, "usage: qbit-jay import <file.json>")
+		fmt.Fprintln(os.Stderr, "       qbit-jay import --from-engram [path] [--force]")
 		exitFunc(1)
 	}
 
@@ -3696,6 +3729,8 @@ func cmdSetup(cfg store.Config) {
 		protocolRaw       string
 		protocolFlag      bool
 		mcpOnly           bool
+		restore           bool
+		restoreForce      bool
 		allowMemoryWrites bool
 		nativePrompt      string
 		nativePromptSeen  bool
@@ -3732,6 +3767,10 @@ func cmdSetup(cfg store.Config) {
 			allowMemoryWrites = true
 		case token == "--mcp-only":
 			mcpOnly = true
+		case token == "--restore":
+			restore = true
+		case token == "--force":
+			restoreForce = true
 		case token == "--native-windows-prompt" || strings.HasPrefix(token, "--native-windows-prompt="):
 			unknownFlagSeen = unknownFlagSeen || nativePromptSeen
 			nativePromptSeen = true
@@ -3755,9 +3794,36 @@ func cmdSetup(cfg store.Config) {
 		}
 	}
 
+	if restoreForce && !restore {
+		unknownFlagSeen = true
+	}
 	switch {
 	case helpSeen:
 		printSetupUsage()
+		return
+	case restore:
+		if !slugSeen || extraBareSeen || unknownFlagSeen || mcpOnly || allowMemoryWrites || protocolFlag || nativePromptSeen || windowsGuardSeen {
+			fatal(fmt.Errorf("usage: qbit-jay setup --restore <agent> [--force]"))
+			return
+		}
+		res, err := setupRestoreAgent(slug, restoreForce)
+		if err != nil {
+			fatal(err)
+			return
+		}
+		fmt.Printf("✓ Restored %d file(s) for %s from %s\n", len(res.Restored), res.Agent, res.BackupDir)
+		for _, path := range res.Restored {
+			fmt.Printf("  ← %s\n", path)
+		}
+		if len(res.Refused) > 0 {
+			fmt.Fprintf(os.Stderr, "qbit-jay: %d file(s) changed since setup wrote them and were NOT restored:\n", len(res.Refused))
+			for _, path := range res.Refused {
+				fmt.Fprintf(os.Stderr, "  ✗ %s\n", path)
+			}
+			fatal(fmt.Errorf("re-run with --force to overwrite them: qbit-jay setup --restore %s --force", res.Agent))
+			return
+		}
+		fmt.Println("  The Engram registration is back; qbit-jay entries in those files were reverted with them.")
 		return
 	case nativePromptSeen || windowsGuardSeen:
 		if slug != "claude-code" || mcpOnly || allowMemoryWrites || protocolFlag || extraBareSeen || unknownFlagSeen ||
@@ -3817,6 +3883,10 @@ func cmdSetup(cfg store.Config) {
 			fatal(err)
 			return
 		}
+		if result.GentleAIMode {
+			fmt.Println(result.Notice)
+			return
+		}
 		if allowMemoryWrites {
 			if !result.MCPConfigured {
 				fatal(fmt.Errorf("--allow-memory-writes requires successful Claude Code MCP registration; no permissions added"))
@@ -3834,6 +3904,7 @@ func cmdSetup(cfg store.Config) {
 		}
 		fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 		fmt.Printf("  → %s\n", result.Destination)
+		printEngramReplacement(result)
 		printPostInstallWithMemoryWrites(result, allowMemoryWrites)
 	default:
 		// No slug: interactive menu. Mode (if any) applies to whichever
@@ -3879,6 +3950,10 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 	if err != nil {
 		fatal(err)
 	}
+	if result.GentleAIMode {
+		fmt.Println(result.Notice)
+		return
+	}
 	if mode != "" {
 		applyProtocolMode(cfg, selected.Name, mode)
 		warnIfClaudeCodeSlimUnverified(selected.Name, mode)
@@ -3886,7 +3961,26 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 
 	fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 	fmt.Printf("  → %s\n", result.Destination)
+	printEngramReplacement(result)
 	printPostInstall(result)
+}
+
+// printEngramReplacement says what setup replaced and where the backup is
+// (spec 6.3: "dejando constancia en la salida").
+func printEngramReplacement(result *setup.Result) {
+	if result == nil || len(result.Replaced) == 0 {
+		return
+	}
+	fmt.Printf("✓ Replaced the existing Engram registration (%d change(s)); the Engram database and binary were not touched:\n", len(result.Replaced))
+	for _, line := range result.Replaced {
+		fmt.Printf("  - %s\n", line)
+	}
+	if result.BackupReused {
+		fmt.Printf("  Backup (identical, reused): %s\n", result.BackupDir)
+	} else {
+		fmt.Printf("  Backup: %s\n", result.BackupDir)
+	}
+	fmt.Printf("  Undo with: qbit-jay setup --restore %s\n", result.Agent)
 }
 
 // printSetupUsage prints `qbit-jay setup --help` output. Its Flags section
@@ -3894,8 +3988,11 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 // stdin (Guarantee 2 — safe under a detached/non-TTY stdin).
 func printSetupUsage() {
 	fmt.Println("usage: qbit-jay setup [<agent>] [--protocol=slim|full]")
+	fmt.Println("       qbit-jay setup --restore <agent> [--force]")
 	fmt.Println()
 	fmt.Println("Install an agent plugin (claude-code, opencode, codex, ...).")
+	fmt.Println("If the agent already has an Engram registration, setup backs up the files it touches")
+	fmt.Println("to ~/.qbit-jay/backups/<agent>/<timestamp>/ and replaces the Engram entry with qbit-jay's.")
 	fmt.Println("Claude Code: already-installed qbit-jay@qbit-jay is updated at user scope; update failures fail setup.")
 	fmt.Println("Without <agent>, shows an interactive menu.")
 	fmt.Println()
@@ -3918,6 +4015,10 @@ func printSetupUsage() {
 	fmt.Println("  --windows-pretooluse=extended")
 	fmt.Println("                          With --native-windows-prompt=enable, allow 10 seconds")
 	fmt.Println("                          for Claude and 7 seconds for qbit-jay session confirmation.")
+	fmt.Println("  --restore <agent>       Restore the files saved by the latest setup backup of the")
+	fmt.Println("                          agent (sha256 verified), putting the Engram registration back.")
+	fmt.Println("                          Files edited since setup are listed and skipped.")
+	fmt.Println("  --force                 With --restore, overwrite files edited since setup too.")
 	fmt.Println("  --help, -h              Show this help and exit.")
 }
 
@@ -4186,6 +4287,9 @@ Commands:
                      Show recent context from previous sessions
   stats [--project PROJECT|--all]
                      Show memory system statistics
+  stats --telemetry  Summarize local usage telemetry (telemetry.db, never leaves this machine)
+  telemetry clear [--yes]
+                     Delete the local telemetry file; off with QBIT_JAY_TELEMETRY=off
   export [file] [--project PROJECT|--all]
                      Export memories to JSON (default: engram-export.json)
   import <file>      Import memories from a JSON export file
@@ -4242,6 +4346,7 @@ Environment:
   QBIT_JAY_DATA_DIR  qbit-jay data directory. Empty or whitespace-only values use the
                      platform default; nonblank values are used as provided (default: ~/.qbit-jay)
   QBIT_JAY_PORT    Override HTTP server port (default: 7437)
+  QBIT_JAY_TELEMETRY  Local-only usage telemetry in <data dir>/telemetry.db; off, 0 or false disables it (default: on)
   QBIT_JAY_PROJECT Process-level default project override, applied by every entry point
                      with one precedence rule: explicit request project (qbit-jay save --project,
                      an MCP tool project argument) > process override (qbit-jay mcp --project,

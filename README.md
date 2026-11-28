@@ -203,7 +203,12 @@ Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation]
 
 ### Existing Engram data
 
-qbit-jay keeps its data in `~/.qbit-jay/qbit-jay.db` and does not read, copy or change `~/.engram`. Importing an existing Engram database is planned and not available yet.
+qbit-jay keeps its data in `~/.qbit-jay/qbit-jay.db`. It never modifies, moves or deletes anything in `~/.engram`.
+
+- **Automatic import.** The first time a command opens the store and `~/.qbit-jay/qbit-jay.db` does not exist, qbit-jay copies `~/.engram/engram.db` (or `$ENGRAM_DATA_DIR/engram.db`) with the SQLite online backup API, so the copy is consistent even while Engram is running, and then applies its own migrations. One line on stderr says what was imported and from where. Set `QBIT_JAY_NO_IMPORT=1` to skip it.
+- **Explicit import.** `qbit-jay import --from-engram [path]` does the same copy from an Engram data directory or `engram.db` file. If the qbit-jay database already has data it refuses; `--force` first renames it to `qbit-jay.db.bak-<timestamp>`.
+- **Agents.** `qbit-jay setup <agent>` finds an existing Engram registration for that agent (MCP server, Claude Code permissions and plugin entry, Codex `[mcp_servers.engram]`, the OpenCode `engram.ts` plugin), saves every file it will touch under `~/.qbit-jay/backups/<agent>/<timestamp>/` with a sha256 manifest, installs qbit-jay and removes the Engram entry so the agent does not see two sets of `mem_*` tools. It prints what it replaced and where the backup is. `qbit-jay setup --restore <agent>` puts the saved files back; a file you edited after setup is listed and skipped unless you add `--force`. If setup fails while removing the Engram entry it restores the backup itself. The Engram binary and database are never touched. If the agent's `engram` entry already runs qbit-jay (the way gentle-ai registers it with `GENTLE_AI_ENGRAM_BIN`), setup changes nothing and says so.
+- **Port 7437.** Engram and qbit-jay both default to port 7437. If Engram holds it, `qbit-jay doctor` (check `engram_on_port`) and `qbit-jay serve` / `run -d` say so and tell you to stop Engram or set `QBIT_JAY_PORT`; hooks refuse to use an Engram server as qbit-jay.
 
 ### Configuration
 
@@ -361,6 +366,7 @@ For parameters and the complete, current tool reference, see [the full documenta
 | **[qbit-jay Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |
 | **[Doctor](docs/DOCTOR.md)** · **[Binary self-testing](docs/SELF-TESTING.md)** | Operational diagnosis and repair workflows, and isolated reliability and performance checks for released binaries |
 | **[Obsidian Brain](docs/beta/obsidian-brain.md)** · **[Upstream beta guide](docs/BETA_TESTING.md)** | Exporting memories as an Obsidian knowledge graph, and Engram's historical beta testing guide (kept as a record) |
+| **[Local telemetry](DOCS.md#local-telemetry)** | What qbit-jay records locally (never sent anywhere), retention, `QBIT_JAY_TELEMETRY=off`, `qbit-jay stats --telemetry` and `qbit-jay telemetry clear` |
 | **[Comparison](docs/COMPARISON.md)** | qbit-jay compared with claude-mem |
 | **[Full Docs](DOCS.md)** · **[Contributing](CONTRIBUTING.md)** | Complete CLI, environment, API, and operational reference, and the contributor workflow |
 
