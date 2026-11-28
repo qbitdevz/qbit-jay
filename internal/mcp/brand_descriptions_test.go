@@ -55,11 +55,11 @@ func TestToolDescriptionsCarryQbitJayBrand(t *testing.T) {
 
 func TestUpstreamBrandInTriangulation(t *testing.T) {
 	for text, want := range map[string]string{
-		"reads .engram/config.json":         "",
-		`marked_by_actor="engram"`:          "",
-		"into Engram.":                      "Engram",
-		"same as `engram doctor --json`":    "engram",
-		"into qbit-jay.":                    "",
+		"reads .engram/config.json":      "",
+		`marked_by_actor="engram"`:       "",
+		"into Engram.":                   "Engram",
+		"same as `engram doctor --json`": "engram",
+		"into qbit-jay.":                 "",
 	} {
 		if got := upstreamBrandIn(text); got != want {
 			t.Errorf("upstreamBrandIn(%q) = %q, want %q", text, got, want)
