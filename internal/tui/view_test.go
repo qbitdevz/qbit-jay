@@ -4,11 +4,12 @@ import (
 	"strings"
 	"testing"
 
+	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
+	"github.com/qbitdevz/qbit-jay/internal/qbit/theme"
 	"github.com/qbitdevz/qbit-jay/internal/setup"
 	"github.com/qbitdevz/qbit-jay/internal/store"
 	"github.com/qbitdevz/qbit-jay/internal/version"
-	tea "github.com/charmbracelet/bubbletea"
-	"github.com/charmbracelet/lipgloss"
 )
 
 func TestTruncateStr(t *testing.T) {
@@ -91,7 +92,7 @@ func TestViewRouterAndErrorRendering(t *testing.T) {
 	}
 }
 
-func TestAppStyleUsesDarkBaseBackground(t *testing.T) {
+func TestAppStyleUsesThemeBaseBackground(t *testing.T) {
 	if got := appStyle.GetBackground(); got != colorBase {
 		t.Fatalf("appStyle background = %v, want %v", got, colorBase)
 	}
@@ -165,7 +166,7 @@ func TestViewDashboardSearchAndRecent(t *testing.T) {
 	}
 
 	out := m.viewDashboard()
-	if !strings.Contains(out, "engram") || !strings.Contains(out, "Actions") {
+	if !strings.Contains(out, "qbit-jay") || !strings.Contains(out, "Actions") {
 		t.Fatal("dashboard should include header and actions")
 	}
 	if !strings.Contains(out, "...and 1 more projects") {
@@ -579,5 +580,46 @@ func TestObservationDetailScrollsInShortViewport(t *testing.T) {
 	}
 	if !strings.Contains(out, "scrollable line") || !strings.Contains(out, "j/k scroll") {
 		t.Fatal("short detail view should show content and scroll help")
+	}
+}
+
+func TestLogoHeaderCarriesQbitJayIdentity(t *testing.T) {
+	out := renderLogo("v0.1.0")
+	for _, want := range []string{"qbit-jay", "v0.1.0", theme.Mark, "by qbitdev"} {
+		if !strings.Contains(out, want) {
+			t.Fatalf("logo header lacks %q:\n%s", want, out)
+		}
+	}
+	for _, banned := range []string{"engram", "Engram", "ENGRAM", "elephant", "🐘", "█"} {
+		if strings.Contains(out, banned) {
+			t.Fatalf("logo header still carries upstream brand %q:\n%s", banned, out)
+		}
+	}
+	if lines := strings.Count(out, "\n"); lines > 8 {
+		t.Fatalf("logo header should be compact, got %d lines", lines)
+	}
+}
+
+func TestPaletteComesFromThemePackage(t *testing.T) {
+	if colorBase != theme.Bg.Adaptive() || colorText != theme.Ink.Adaptive() || colorLavender != theme.AccentText.Adaptive() {
+		t.Fatal("TUI colours must be the theme package's adaptive pairs")
+	}
+	if colorRed != theme.Error.Adaptive() || colorGreen != theme.Success.Adaptive() {
+		t.Fatal("semantic colours must come from the theme package")
+	}
+}
+
+func TestNoUpstreamBrandInVisibleScreens(t *testing.T) {
+	m := New(nil, "")
+	m.Version = "v0.1.0"
+	m.Width, m.Height = 100, 40
+	for _, screen := range []Screen{ScreenDashboard, ScreenSearch, ScreenRecent, ScreenSessions, ScreenSetup, ScreenCloudSettings} {
+		m.Screen = screen
+		out := m.View()
+		for _, banned := range []string{"Engram", "ENGRAM_", "elephant"} {
+			if strings.Contains(out, banned) {
+				t.Fatalf("screen %v shows upstream brand %q", screen, banned)
+			}
+		}
 	}
 }

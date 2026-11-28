@@ -56,6 +56,9 @@ var (
 	Green = Pair{"#3DFF8B", "#17B36A", "--qb-green", "--qb-light-green"}
 	Teal  = Pair{Dark: "#1FB6C9", Light: "#0FA6C7", DarkSource: "--qb-teal", LightSource: "--qb-light-cyan"}
 	White = Pair{"#FFFFFF", "#FFFFFF", "--qb-white", "--qb-white"}
+	// Sky is the secondary accent for identifiers and links on dark; in light
+	// mode it falls back to the emphasis blue.
+	Sky = Pair{Dark: "#5B9BFF", Light: "#1F6FEB", DarkSource: "--jay-blue-sky", LightSource: "--qb-light-blue"}
 
 	// Extensions (not in design/system.md): accent text that passes AA on
 	// both light surfaces (--qb-light-blue is 4.3:1 on --qb-light-bg), and
@@ -106,6 +109,7 @@ var Roles = []Role{
 	{CSS: "green", Pair: Green},
 	{CSS: "teal", Pair: Teal},
 	{CSS: "white", Pair: White, ModeIndependent: true},
+	{CSS: "sky", Pair: Sky},
 	{CSS: "accent-text", Pair: AccentText},
 	{CSS: "on-accent", Pair: OnAccent},
 	{CSS: "success", Pair: Success},
