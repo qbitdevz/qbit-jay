@@ -2,6 +2,8 @@
 
 > **This is the qbit-jay fork.** qbit-jay is based on [Engram](https://github.com/Gentleman-Programming/engram) by Gentleman Programming. The workflow below is inherited from upstream and is kept as written, including its links to upstream issues, labels and policies. Changes to qbit-jay go through issues and pull requests to [qbitdevz/qbit-jay](https://github.com/qbitdevz/qbit-jay); changes to Engram itself go to upstream.
 
+> **T0.9 (release pipeline) removed upstream-only automation:** the issue and PR policy workflows (issue validation, refresh router, status fallback, auto-assign, type-label check, stale handling), SignPath signing, CodeRabbit, the Pi npm publish workflow and the Cloud image workflow. Sections below that describe them are inherited text and no longer run in this repository. `ci.yml`, `pr-check.yml` (Claude plugin version guard), `transient-artifacts.yml`, `pr-size-notice.yml` and `release.yml` remain; see [docs/qbit/RELEASING.md](docs/qbit/RELEASING.md).
+
 Thanks for contributing. The upstream workflow enforces a strict **issue-first workflow** — every change starts with an approved issue.
 
 [Contribution policy transition](docs/contribution-policy-transition.md) is **PRE-CUTOVER / NOT ACTIVE** target guidance; the active requirements below remain unchanged.
@@ -160,8 +162,8 @@ and must remain intact even in later PR-writer retirement. It becomes
 available only after integration on the trusted branch; do not assume this
 introducing PR can run it. Original PR Validation and its issue jobs remain
 unchanged until live provider/required-gate compatibility is observed.
-See the [rollout and trusted manual recovery guide](docs/ci-issue-refresh-rollout.md)
-before relying on refresh or retiring legacy writers. The publisher uses only
+See the rollout and trusted manual recovery guide (removed with the issue-policy
+workflows) before relying on refresh or retiring legacy writers. The publisher uses only
 `checks: write`, PR/issues read access and contents read access for trusted helpers;
 it never executes PR-head code or changes approvals, settings or required gates.
 Its issue/default and PR-target/base triggers establish trusted provenance;
@@ -186,8 +188,7 @@ Partial target failures can leave earlier reruns requested; this is not atomic
 reconciliation. Local tests are not live required-gate proof. Legacy writers,
 the queue, six contexts and App15368 remain intact. #1802 stays open and #1810
 retirement stays blocked: fresh T4 probe consent and live evidence are required
-before rollout claims or retirement. See the
-[native-policy scope and rollout boundary](docs/ci-issue-native-policy.md).
+before rollout claims or retirement.
 
 Recognized references also support the qualified forms `Closes OWNER/REPO#N`,
 `Fixes OWNER/REPO#N`, `Resolves OWNER/REPO#N` and non-closing `Refs OWNER/REPO#N`
@@ -300,9 +301,6 @@ Manual changes between the final read and write still race: GitHub provides no
 atomic conditional assignment. Inspect current ownership before retrying a failed
 run; automation never removes an existing assignee.
 
-Run `node --test .github/scripts/issue-auto-assign.test.mjs` for local reference,
-eligibility, race, failure and trusted-workflow contract regressions.
-
 ### Existing PR Transition
 
 The original #1293 audit found 23 open PRs needing migration; that is a historical snapshot, not a permanent count. Activation does not wait for the whole backlog to be remediated. Review existing PRs when they become active again or before merge: confirm proportional evidence, replace outdated approval where needed, and assign a real owner. Close obsolete work through normal maintainer review. Do not assign a placeholder solely to turn CI green.
@@ -319,7 +317,7 @@ retain their trusted `pull_request_target` checkout boundaries; neither executes
 PR-head code. Local event-matrix tests do not prove hosted event delivery or
 measured savings; verify actual runs after integration on the trusted branch.
 
-Non-required PR checks include the Claude plugin version guard, lint, Windows setup and wrapper coverage, transient-artifact validation, **Policy Helper Tests** (the unchanged merge-queue, label-policy, transient-artifacts and PR-size-notice command, plus explicit `.github/scripts/ci-technical-contracts.test.mjs` execution and a separate step discovering available `.github/scripts/issue-*.test.mjs` regressions), and **Obsidian Build** (tests, typecheck, and build after dependency installation). Policy Helper Tests, Obsidian Build, and the Claude plugin version guard also run on merge groups; lint, Windows checks, and transient-artifact validation do not run as merge-group CI jobs. None of these are active `main` required contexts; a maintainer must explicitly add the Claude plugin version guard to the ruleset before it becomes required.
+Non-required PR checks include the Claude plugin version guard, lint, Windows setup and wrapper coverage, transient-artifact validation, **Policy Helper Tests** (the unchanged transient-artifacts and PR-size-notice command, plus explicit `.github/scripts/ci-technical-contracts.test.mjs` execution and a separate step discovering available `.github/scripts/issue-*.test.mjs` regressions), and **Obsidian Build** (tests, typecheck, and build after dependency installation). Policy Helper Tests, Obsidian Build, and the Claude plugin version guard also run on merge groups; lint, Windows checks, and transient-artifact validation do not run as merge-group CI jobs. None of these are active `main` required contexts; a maintainer must explicitly add the Claude plugin version guard to the ruleset before it becomes required.
 
 ### CI job execution ceilings
 
@@ -501,112 +499,6 @@ Any queue-policy change requires explicit owner/admin approval and an authorized
 administrator. If rollback is approved, disable or remove only the queue rule;
 retain the existing required contexts and unrelated rules. This documentation
 correction does not authorize settings changes.
-
-## Advisory AI Review
-
-CodeRabbit uses the versioned root [`.coderabbit.yaml`](.coderabbit.yaml). Its
-baseline is the [resolved Repository UI configuration](https://github.com/Gentleman-Programming/engram/pull/1728#issuecomment-6084792433);
-existing path instructions, generated-file exclusions and other settings are
-preserved. The only noise adjustments are the balanced `chill` profile and
-turning off the numeric docstring coverage warning. Documentation correctness
-still matters and remains part of review.
-
-JS/TS test suites have additional path instructions alongside the preserved
-Go-test and thin-adapter guidance:
-
-| Test surface | Instruction glob |
-|--------------|------------------|
-| Repository policy scripts | `.github/scripts/*.test.mjs` |
-| Obsidian | `plugin/obsidian/test/*.test.mjs` |
-| OpenCode JavaScript | `plugin/opencode/*.test.mjs` |
-| OpenCode TypeScript | `plugin/opencode/*.test.mts` |
-| Pi, including nested suites | `plugin/pi/test/**/*.test.mjs` |
-
-These instructions prioritize deterministic setup/cleanup, relevant success,
-error and boundary cases, and observable effects: returned values, outgoing
-requests, persisted files, warnings and prohibited side effects. Useful
-isolated mocks, stubs and internal seams remain valid when they protect real
-contracts, as do workflow, schema and package structural-contract checks.
-Assertions that merely mirror implementation details or fixtures deserve scrutiny;
-this is not a blanket integration-test or style-rewrite requirement. Helper-only
-files retain generic/plugin review without a dedicated test-suite instruction.
-These globs add guidance, not review exclusions or new required checks.
-
-GitHub Actions workflows have dedicated advisory instructions:
-
-| Workflow surface | Instruction glob |
-|------------------|------------------|
-| Workflow YAML | `.github/workflows/*.yml` |
-| Alternative YAML extension | `.github/workflows/*.yaml` |
-
-Review guidance considers event context, minimum necessary job/token permissions,
-secret exposure and checkout/execution provenance. It distinguishes trusted-base
-or trusted-workflow metadata/label checks from executing attacker-controlled PR
-code with privileged credentials. Fork inputs, PR metadata and downloaded
-artifacts remain untrusted data. Require justification for legitimate write scopes
-(releases, package publishing, OIDC and repository maintenance), rather than
-blanket `contents: read` or bans on privileged events. This adds no workflow,
-permission or required-check changes and does not replace actionlint or zizmor.
-
-Sync/import paths have targeted advisory instructions:
-
-| Sync surface | Instruction glob |
-|--------------|------------------|
-| Chunk export/import and replay | `internal/sync/**/*.go` |
-| Wire encoding | `internal/cloud/chunkcodec/**/*.go` |
-| Automatic push/pull orchestration | `internal/cloud/autosync/**/*.go` |
-| Transport | `internal/cloud/remote/transport.go` |
-| Chunk and mutation handlers | `internal/cloud/cloudserver/cloudserver.go`, `internal/cloud/cloudserver/mutations.go` |
-
-The existing `internal/store/**/*.go` and
-`internal/cloud/cloudstore/**/*.go` ownership instructions are retained, with
-additional guidance conditional on sync/import changes only. No duplicate
-persistence rules are added or instruction-overlap precedence assumed.
-
-Review record/identity and deletion preservation, and the existing `review_after`
-contract: omitted fields, explicit null and valid dates are not interchangeable.
-Check idempotent replay, transaction boundaries and recovery from partial
-failures; do not assume whole-sync atomicity. Check that push acknowledgements
-and pull cursors reflect successfully accepted/persisted work according to
-existing contracts. Policy rejection must stay explicit without bypassing
-enrollment or cloud pause. Seek deterministic regression evidence for changed
-observable behavior, including rejected-input side effects, replay and recovery.
-This guidance does not prescribe new sync algorithms, ownership/conflict rules
-or review scheduling, change data formats, permissions or required CI checks,
-or guarantee protection against data loss.
-
-CodeRabbit does not automatically approve PRs (`request_changes_workflow: false`),
-skips drafts, and does not replace human review or the required checks above.
-Generated outputs are excluded only from AI review, not from generation checks.
-Existing manually requested code-generation/fix features remain unchanged.
-
-Changes to this file require normal issue-first review. Run `go test . -run
-TestCodeRabbit -count=1` to check YAML parsing, the two adjustments, JS/TS and
-workflow and sync instruction content/scope, documentation and baseline preservation.
-The original export hash is retained: only the five exact JS/TS instruction
-blocks, two exact workflow instruction blocks and six exact sync instruction
-blocks are removed, and the two conditional persistence additions are reverted
-before comparing all other settings. Deliberate future settings changes must
-update the baseline test with their rationale. Local path examples exercise a
-limited plain-glob contract, not CodeRabbit's matcher, schema validation or live
-instruction overlap. To pause automatic reviews on one PR, comment
-`@coderabbitai pause`; to disable them through configuration, change
-`reviews.auto_review.enabled` to `false` in a reviewed PR. Reverting the initial
-configuration-file addition restores selection of the existing UI configuration,
-provided that UI configuration has not changed.
-
-Installation permissions could not be audited with the available credentials.
-Live review behavior and noise reduction must be observed after rollout; local
-policy tests do not establish those results. Inspect representative live feedback
-on these test surfaces and record useful findings, noise and limitations before
-claiming improved test-review quality. For workflow guidance, observe representative
-safe/unsafe review feedback without executing unsafe examples; record useful
-findings, false positives and limitations before claiming improved security review.
-For sync guidance, inspect representative live feedback for metadata preservation,
-replay and partial-failure changes; record useful findings, false positives and
-limitations after rollout. These local configuration tests do not prove live
-review quality or sync correctness; deterministic sync tests and human review
-remain necessary.
 
 ## Claude Plugin Version Rule
 
@@ -805,13 +697,8 @@ The only unnamespaced labels are maintainer-owned protected exceptions: `good fi
 | `documentation` | `type:docs` | Canonical label wins | Stop for manual review |
 | `up for grabs` | `help wanted` | Canonical label wins | Stop for manual review |
 
-Preview a label migration locally before changing an issue or pull request:
+Migrate deprecated labels by hand with `gh issue edit` or `gh pr edit`; the dry-run helper `label-policy.mjs` was removed with the label workflow.
 
-```bash
-node .github/scripts/label-policy.mjs --migrate --labels-json '["bug","type:bug"]'
-```
-
-The command is a dry run: it prints the canonical label list as JSON and never writes to GitHub. A singleton conflict returns a non-zero exit code and leaves the original list unchanged; stop and resolve that ambiguity manually. Otherwise, apply only the reported replacements with `gh issue edit` or `gh pr edit`, then rerun the command until it reports `"changed":false`.
 
 ---
 
@@ -846,7 +733,7 @@ relative to the repository root.
 | Go behavior | Repository root | Go version from [go.mod](go.mod) and module dependencies | `go test ./internal/setup -run '^TestStaleMCPCommands$' -count=1`, then `go test ./internal/setup -count=1` | Example focused regression and affected-package suite. Substitute the actual changed package and regression; this is not the full module suite. |
 | Pi plugin | `plugin/pi` | Node.js 24, npm, and Go from [go.mod](go.mod) for Go-backed fixtures; run `npm ci --ignore-scripts --legacy-peer-deps` for the locked real-TypeBox test dependency (no Pi SDK peers) | `npm test` | Pi plugin suite from a Go checkout, including fixture-based workflows; not the full installed-host lifecycle. See [scripts](plugin/pi/package.json) and [real HTTP test prerequisites](plugin/pi/README.md#testing-the-real-http-workflows). |
 | Obsidian plugin | `plugin/obsidian` | Node.js 24, npm, and dependencies installed with `npm ci` under the existing [dependency policy](#npm-dependency-hygiene) | `npm test`, `npm run typecheck`, `npm run build` | Plugin tests, TypeScript checking, and bundle generation; not an interactive Obsidian smoke test. See [scripts](plugin/obsidian/package.json). |
-| PR policy helpers | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/merge-queue.test.mjs .github/scripts/label-policy.test.mjs .github/scripts/transient-artifacts.test.mjs .github/scripts/pr-size-notice.test.mjs` | Merge-queue, label, artifact and PR-size helper logic; not live GitHub permissions or event delivery. |
+| PR policy helpers | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/transient-artifacts.test.mjs .github/scripts/pr-size-notice.test.mjs` | Artifact and PR-size helper logic; not live GitHub permissions or event delivery. |
 | Technical CI contracts | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/ci-technical-contracts.test.mjs` | Proof-independent workflow commands, ordering, race, permissions, events, discovery and ordinary concurrency; not hosted execution/cancellation proof. |
 | Issue policy helpers | Repository root | Node.js 24; no npm install step | `node --test .github/scripts/issue-*.test.mjs` | Issue-policy and proof-specific helper suites; not live approval-refresh behavior. |
 

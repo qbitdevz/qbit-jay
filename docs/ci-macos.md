@@ -185,9 +185,7 @@ node --test .github/scripts/issue-*.test.mjs
 ```
 
 The technical suite owns native job invariants and executes the workflow's JSON
-summarizer against isolated fixtures. Keep the LF-normalized full CI hash in
-`issue-refresh-router-workflow.test.mjs` aligned deliberately; never remove its
-integrity assertion.
+summarizer against isolated fixtures.
 
 After separately authorized delivery, follow the
 [accepted finite contract](https://github.com/Gentleman-Programming/engram/issues/2020#issuecomment-6423158281):
