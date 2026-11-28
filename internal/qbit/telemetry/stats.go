@@ -68,7 +68,7 @@ func Load(dataDir string) (Summary, error) {
 	if err != nil {
 		return sum, err
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	sum.Exists = true
 
 	one := func(dst any, q string, args ...any) error { return db.QueryRow(q, args...).Scan(dst) }
@@ -110,7 +110,7 @@ func Load(dataDir string) (Summary, error) {
 	if err != nil {
 		return sum, err
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 	for rows.Next() {
 		var st SessionTokens
 		if err := rows.Scan(&st.Session, &st.Tokens, &st.Items); err != nil {
@@ -123,31 +123,32 @@ func Load(dataDir string) (Summary, error) {
 
 // Render writes the human-readable summary.
 func (s Summary) Render(w io.Writer) {
-	fmt.Fprintf(w, "qbit-jay local telemetry (%s)\n", s.Path)
+	pf := func(format string, a ...any) { _, _ = fmt.Fprintf(w, format, a...) }
+	pf("qbit-jay local telemetry (%s)\n", s.Path)
 	if !s.Exists {
-		fmt.Fprintln(w, "No telemetry recorded yet.")
+		pf("No telemetry recorded yet.\n")
 		if !Enabled() {
-			fmt.Fprintln(w, "Telemetry is off (QBIT_JAY_TELEMETRY).")
+			pf("Telemetry is off (QBIT_JAY_TELEMETRY).\n")
 		}
 		return
 	}
-	fmt.Fprintf(w, "Searches: %d (avg %.1f ms)\n", s.Searches, s.AvgSearchMS)
-	fmt.Fprintf(w, "  zero-result rate:     %.1f%% (%d)\n", 100*s.ZeroRate(), s.ZeroResult)
-	fmt.Fprintf(w, "  reformulation rate:   %.1f%% (%d within 60 s)\n", 100*s.ReformulationRate(), s.Reformulations)
-	fmt.Fprintf(w, "  opens after search:   %d (%.1f%% of searches)\n", s.Opens, 100*s.OpenRate())
+	pf("Searches: %d (avg %.1f ms)\n", s.Searches, s.AvgSearchMS)
+	pf("  zero-result rate:     %.1f%% (%d)\n", 100*s.ZeroRate(), s.ZeroResult)
+	pf("  reformulation rate:   %.1f%% (%d within 60 s)\n", 100*s.ReformulationRate(), s.Reformulations)
+	pf("  opens after search:   %d (%.1f%% of searches)\n", s.Opens, 100*s.OpenRate())
 	if len(s.TopOpened) > 0 {
 		parts := make([]string, 0, len(s.TopOpened))
 		for _, t := range s.TopOpened {
 			parts = append(parts, fmt.Sprintf("#%s x%d", t.ID, t.Count))
 		}
-		fmt.Fprintf(w, "  top opened ids:       %s\n", strings.Join(parts, ", "))
+		pf("  top opened ids:       %s\n", strings.Join(parts, ", "))
 	}
-	fmt.Fprintf(w, "Context: %d injections, %d items, ~%d tokens\n", s.ContextEvents, s.InjectedItems, s.InjectedTokens)
-	fmt.Fprintf(w, "  later read: %d, later updated: %d\n", s.InjectedRead, s.InjectedUpdated)
+	pf("Context: %d injections, %d items, ~%d tokens\n", s.ContextEvents, s.InjectedItems, s.InjectedTokens)
+	pf("  later read: %d, later updated: %d\n", s.InjectedRead, s.InjectedUpdated)
 	for _, st := range s.PerSession {
-		fmt.Fprintf(w, "  session %s: ~%d tokens, %d items\n", st.Session, st.Tokens, st.Items)
+		pf("  session %s: ~%d tokens, %d items\n", st.Session, st.Tokens, st.Items)
 	}
-	fmt.Fprintf(w, "Saves: %d (avg %.1f ms), errors: %d, limit rejections: %d\n", s.Saves, s.AvgSaveMS, s.SaveErrors, s.SaveLimit)
+	pf("Saves: %d (avg %.1f ms), errors: %d, limit rejections: %d\n", s.Saves, s.AvgSaveMS, s.SaveErrors, s.SaveLimit)
 }
 
 // Clear deletes the telemetry database and returns whether a file was removed.

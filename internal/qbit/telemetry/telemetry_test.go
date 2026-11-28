@@ -114,12 +114,12 @@ func (r *rig) rows(q string, args ...any) []map[string]any {
 	if err != nil {
 		r.t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	rs, err := db.Query(q, args...)
 	if err != nil {
 		r.t.Fatal(err)
 	}
-	defer rs.Close()
+	defer func() { _ = rs.Close() }()
 	cols, _ := rs.Columns()
 	var out []map[string]any
 	for rs.Next() {
@@ -159,7 +159,7 @@ func TestSearchEventLandsInSeparateDBAndMainSchemaIsUntouched(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer db.Close()
+	defer func() { _ = db.Close() }()
 	var n int
 	if err := db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name IN ('events','injected') OR name LIKE '%telemetry%'`).Scan(&n); err != nil || n != 0 {
 		t.Fatalf("telemetry leaked into main schema: n=%d err=%v", n, err)

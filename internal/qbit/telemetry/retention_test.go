@@ -102,7 +102,7 @@ func strip(s string) string {
 		case map[string]any:
 			for k, e := range t {
 				switch k {
-				case "id", "sync_id", "created_at", "updated_at", "result", "project_path":
+				case "id", "sync_id", "created_at", "updated_at", "review_after", "result", "project_path":
 					delete(t, k)
 				default:
 					t[k] = walk(e)
