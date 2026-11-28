@@ -70,6 +70,10 @@ type MCPConfig struct {
 	// mem_save call (REQ-001). nil means "use the store default" (3).
 	// An explicit pointer value (including 0) is forwarded directly.
 	Limit *int
+
+	// Observer, when set, is told about every tool call (qbit-jay local
+	// telemetry). nil keeps upstream behavior.
+	Observer ToolObserver
 }
 
 var suggestTopicKey = store.SuggestTopicKey
@@ -459,12 +463,14 @@ func newServerWithActivity(s *store.Store, cfg MCPConfig, allowlist map[string]b
 	if version == "" {
 		version = "dev"
 	}
-	srv := server.NewMCPServer(
-		"engram",
-		version,
+	serverOpts := []server.ServerOption{
 		server.WithToolCapabilities(true),
 		server.WithInstructions(buildServerInstructions(allowlist)),
-	)
+	}
+	if cfg.Observer != nil {
+		serverOpts = append(serverOpts, server.WithToolHandlerMiddleware(observerMiddleware(cfg.Observer)))
+	}
+	srv := server.NewMCPServer("engram", version, serverOpts...)
 
 	registerTools(srv, s, cfg, allowlist, activity)
 	return srv
