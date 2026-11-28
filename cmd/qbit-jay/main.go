@@ -124,7 +124,8 @@ var (
 	migrateOrphanedDatabase = migrateOrphanedDB
 
 	setupSupportedAgents                   = setup.SupportedAgents
-	setupInstallAgent                      = setup.Install
+	setupInstallAgent                      = setup.InstallReplacingEngram
+	setupRestoreAgent                      = setup.RestoreAgentBackup
 	setupAddClaudeCodeAllowlist            = setup.AddClaudeCodeAllowlist
 	setupAddClaudeCodeMemoryWriteAllowlist = setup.AddClaudeCodeMemoryWriteAllowlist
 	setupEnsureClaudeCodeUserMCP           = setup.EnsureClaudeCodeUserMCP
@@ -826,12 +827,12 @@ func main() {
 	}
 
 	if usesLocalSQLite(os.Args[1:]) {
-		release, err := prepareSQLiteTemp(cfg.DataDir)
 		// First start: bring the Engram database over before the store opens
 		// qbit-jay's. `import --from-engram` does its own, explicit copy.
 		if !(os.Args[1] == "import" && len(os.Args) > 2 && os.Args[2] == "--from-engram") {
 			autoImportFromEngram(cfg.DataDir, os.Stderr)
 		}
+		release, err := prepareSQLiteTemp(cfg.DataDir)
 		if err != nil {
 			fatal(err)
 			return
@@ -2301,23 +2302,23 @@ func cmdExport(cfg store.Config) (string, error) {
 }
 
 func cmdImport(cfg store.Config) {
-	if len(os.Args) < 3 {
-		fmt.Fprintln(os.Stderr, "usage: qbit-jay import <file.json>")
-		exitFunc(1)
-	}
-
-	inFile := os.Args[2]
-	raw, err := os.ReadFile(inFile)
-	if err != nil {
 	if len(os.Args) >= 3 && os.Args[2] == "--from-engram" {
 		if code := runImportFromEngram(os.Args[3:], cfg.DataDir, os.Stdout, os.Stderr); code != 0 {
 			exitFunc(code)
 		}
 		return
 	}
+	if len(os.Args) < 3 {
+		fmt.Fprintln(os.Stderr, "usage: qbit-jay import <file.json>")
+		fmt.Fprintln(os.Stderr, "       qbit-jay import --from-engram [path] [--force]")
+		exitFunc(1)
+	}
+
+	inFile := os.Args[2]
+	raw, err := os.ReadFile(inFile)
+	if err != nil {
 		fatal(fmt.Errorf("read %s: %w", inFile, err))
 	}
-		fmt.Fprintln(os.Stderr, "       qbit-jay import --from-engram [path] [--force]")
 
 	var data store.ExportData
 	if err := json.Unmarshal(raw, &data); err != nil {
@@ -3708,6 +3709,7 @@ func cmdSetup(cfg store.Config) {
 		protocolRaw       string
 		protocolFlag      bool
 		mcpOnly           bool
+		restore           bool
 		allowMemoryWrites bool
 		nativePrompt      string
 		nativePromptSeen  bool
@@ -3744,6 +3746,8 @@ func cmdSetup(cfg store.Config) {
 			allowMemoryWrites = true
 		case token == "--mcp-only":
 			mcpOnly = true
+		case token == "--restore":
+			restore = true
 		case token == "--native-windows-prompt" || strings.HasPrefix(token, "--native-windows-prompt="):
 			unknownFlagSeen = unknownFlagSeen || nativePromptSeen
 			nativePromptSeen = true
@@ -3770,6 +3774,22 @@ func cmdSetup(cfg store.Config) {
 	switch {
 	case helpSeen:
 		printSetupUsage()
+		return
+	case restore:
+		if !slugSeen || extraBareSeen || unknownFlagSeen || mcpOnly || allowMemoryWrites || protocolFlag || nativePromptSeen || windowsGuardSeen {
+			fatal(fmt.Errorf("usage: qbit-jay setup --restore <agent>"))
+			return
+		}
+		res, err := setupRestoreAgent(slug)
+		if err != nil {
+			fatal(err)
+			return
+		}
+		fmt.Printf("✓ Restored %d file(s) for %s from %s\n", len(res.Restored), res.Agent, res.BackupDir)
+		for _, path := range res.Restored {
+			fmt.Printf("  ← %s\n", path)
+		}
+		fmt.Println("  The Engram registration is back; qbit-jay entries in those files were reverted with them.")
 		return
 	case nativePromptSeen || windowsGuardSeen:
 		if slug != "claude-code" || mcpOnly || allowMemoryWrites || protocolFlag || extraBareSeen || unknownFlagSeen ||
@@ -3846,6 +3866,7 @@ func cmdSetup(cfg store.Config) {
 		}
 		fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 		fmt.Printf("  → %s\n", result.Destination)
+		printEngramReplacement(result)
 		printPostInstallWithMemoryWrites(result, allowMemoryWrites)
 	default:
 		// No slug: interactive menu. Mode (if any) applies to whichever
@@ -3898,7 +3919,26 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 
 	fmt.Printf("✓ Installed %s plugin (%d files)\n", result.Agent, result.Files)
 	fmt.Printf("  → %s\n", result.Destination)
+	printEngramReplacement(result)
 	printPostInstall(result)
+}
+
+// printEngramReplacement says what setup replaced and where the backup is
+// (spec 6.3: "dejando constancia en la salida").
+func printEngramReplacement(result *setup.Result) {
+	if result == nil || len(result.Replaced) == 0 {
+		return
+	}
+	fmt.Printf("✓ Replaced the existing Engram registration (%d change(s)); the Engram database and binary were not touched:\n", len(result.Replaced))
+	for _, line := range result.Replaced {
+		fmt.Printf("  - %s\n", line)
+	}
+	if result.BackupReused {
+		fmt.Printf("  Backup (identical, reused): %s\n", result.BackupDir)
+	} else {
+		fmt.Printf("  Backup: %s\n", result.BackupDir)
+	}
+	fmt.Printf("  Undo with: qbit-jay setup --restore %s\n", result.Agent)
 }
 
 // printSetupUsage prints `qbit-jay setup --help` output. Its Flags section
@@ -3906,8 +3946,11 @@ func cmdSetupInteractive(cfg store.Config, mode string) {
 // stdin (Guarantee 2 — safe under a detached/non-TTY stdin).
 func printSetupUsage() {
 	fmt.Println("usage: qbit-jay setup [<agent>] [--protocol=slim|full]")
+	fmt.Println("       qbit-jay setup --restore <agent>")
 	fmt.Println()
 	fmt.Println("Install an agent plugin (claude-code, opencode, codex, ...).")
+	fmt.Println("If the agent already has an Engram registration, setup backs up the files it touches")
+	fmt.Println("to ~/.qbit-jay/backups/<agent>/<timestamp>/ and replaces the Engram entry with qbit-jay's.")
 	fmt.Println("Claude Code: already-installed qbit-jay@qbit-jay is updated at user scope; update failures fail setup.")
 	fmt.Println("Without <agent>, shows an interactive menu.")
 	fmt.Println()
@@ -3930,6 +3973,8 @@ func printSetupUsage() {
 	fmt.Println("  --windows-pretooluse=extended")
 	fmt.Println("                          With --native-windows-prompt=enable, allow 10 seconds")
 	fmt.Println("                          for Claude and 7 seconds for qbit-jay session confirmation.")
+	fmt.Println("  --restore <agent>       Restore the files saved by the latest setup backup of the")
+	fmt.Println("                          agent (sha256 verified), putting the Engram registration back.")
 	fmt.Println("  --help, -h              Show this help and exit.")
 }
 
