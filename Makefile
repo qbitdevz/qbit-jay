@@ -1,4 +1,4 @@
-.PHONY: templ lint perf-check perf-baseline deadcode-check deadcode-baseline
+.PHONY: templ lint perf-check perf-baseline deadcode-check deadcode-baseline eval eval-bench
 
 GOLANGCI_LINT_VERSION := 2.13.2
 
@@ -37,3 +37,13 @@ deadcode-check:
 
 deadcode-baseline:
 	bash scripts/deadcode-ratchet.sh --update
+
+# Evaluators E1 (context), E2 (search) and E3 (performance) on synthetic
+# corpora, built only with -tags eval. Sizes: QBIT_JAY_EVAL_SIZES (default
+# 1000,10000; add 100000 to opt in). JSON report: QBIT_JAY_EVAL_JSON=<file>.
+eval:
+	go test -tags eval -count=1 -timeout 120m ./internal/qbit/eval/... -run TestEval -v
+
+# Store benchmarks over the 10k corpus; QBIT_JAY_EVAL_100K=1 adds 100k.
+eval-bench:
+	go test -tags eval -run '^$$' -bench . -benchtime=1s -count=5 ./internal/qbit/eval/
