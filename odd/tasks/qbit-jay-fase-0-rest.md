@@ -1,0 +1,48 @@
+# qbit-jay — Phase 0, tasks T0.5 to T0.10
+
+Rest of Phase 0 of `docs/qbit-jay — Especificación para el agente de código.md` (section 11), after T0.1–T0.3 (`odd/tasks/qbit-jay-fase-0.md`) and T0.4 (`odd/tasks/qbit-jay-t04-rename.md`).
+Traceability: no business contract exists; this is internal technical work (fork parity, migration, measurement, delivery), exempt under the Working Agreement.
+Delivery: each task on its own branch and pull request to `main`, merged by the agent when CI tests are green (L2). Path: `odd/tasks/qbit-jay-fase-0-rest.md`.
+
+## Specs
+
+- **S1** (11, T0.5) "**T0.5 Migración y convivencia** (6.3): importación automática y manual desde `~/.engram`, sustitución segura de entradas de Engram en `setup`, `setup --restore`."
+- **S2** (6.3) "**Importación automática:** en el primer arranque, si `~/.qbit-jay` no existe y `~/.engram/engram.db` sí, qbit-jay copia la base con la API de backup de SQLite (consistente aunque Engram esté abierto) y aplica sus migraciones. **Nunca modifica la base original.** También existe el comando explícito `qbit-jay import --from-engram [ruta]`."
+- **S3** (6.3) "**Convivencia:** si Engram y qbit-jay están registrados a la vez en un agente, el agente vería las herramientas `mem_*` duplicadas. `qbit-jay setup <agente>` debe detectarlo, hacer copia de la configuración del agente y sustituir la entrada de Engram por la de qbit-jay, dejando constancia en la salida." and "**Reversibilidad:** un comando `qbit-jay setup --restore <agente>` restaura la configuración anterior desde la copia."
+- **S4** (6.3) "**Puerto y socket:** Engram usa por defecto el puerto HTTP 7437 (`ENGRAM_PORT`) y un socket configurable. qbit-jay mantiene el 7437 por compatibilidad con hooks y plugins, pero `qbit-jay doctor` y el arranque del daemon deben detectar si lo ocupa un proceso de Engram y explicarlo, en lugar de fallar en silencio o hablar con el servidor equivocado."
+- **S5** (11, T0.6) "**T0.6 Compatibilidad con gentle-ai** (7.3): inventario de invocaciones, test de compatibilidad y prueba real con `ENGRAM_BIN` en el WSL del usuario; comprobar el comportamiento de `eco-update`. Incluir los hooks y plugins que ejecutan engram por nombre y el paquete Pi gentle-engram que gentle-ai instala y limpia (G7). Con ese inventario, escribir docs/INTEGRATION.md, el contrato para qbit-ai (7.4)."
+- **S6** (7.3) G1–G7, quoted in the spec table; G1: "Aceptar exactamente la misma interfaz de línea de comandos que gentle-ai invoca (`mcp --tools=agent`, `version`, health probe, verify y cualquier otra)". G2: "Mantener la semántica exacta de upsert por `topic_key`, `mem_update`, `mem_get_observation` y el parámetro `capture_prompt`". G3: "**No truncar en silencio un espejo ODD**: `mem_get_observation` debe devolver exactamente lo que se guardó".
+- **S7** (7.4) "**Contrato de integración:** qbit-jay documenta en `docs/INTEGRATION.md` todo lo que necesita un configurador: comando MCP y perfiles (`mcp --tools=agent`), formato de `version` y health probe, rutas de datos, variables de entorno, plugins por agente y cómo instalarlos, y la convención ODD de espejos."
+- **S8** (11, T0.7) "**T0.7 Telemetría local** (10.1) en `internal/qbit/telemetry`, con enganches mínimos."
+- **S9** (10.1) "**Solo local.** Nunca sale de la máquina, no se sincroniza por Git Sync ni por Cloud y no se envía a ningún servidor." "Activa por defecto (cero fricción) y desactivable con `QBIT_JAY_TELEMETRY=off`." "En un archivo SQLite **separado** (`~/.qbit-jay/telemetry.db`), para no tocar el esquema principal ni la sync de upstream." "Retención acotada (propuesta: 90 días y un tamaño máximo) y un comando para borrarla." Events: búsqueda, apertura, reformulación, contexto, guardado (spec 10.1 list). "Consulta: `qbit-jay stats --telemetry` y la vista Telemetría de la web."
+- **S10** (11, T0.8) "**T0.8 Evaluadores** E1, E2 (con fixture sintético) y E3; `docs/qbit/BASELINE.md` con upstream y con el fork."
+- **S11** (10.2–10.4) E1 Contexto, E2 Búsqueda (recall@5, recall@10, MRR, % sin resultados; "consultas sintéticas en español e inglés generadas a partir de cada memoria"; "las genera un LLM una sola vez y se guardan como fixture"), E3 Rendimiento; "La base real del usuario **nunca** entra en el repositorio"; "Los evaluadores se ejecutan con `go test -tags eval ./...` o un subcomando oculto de desarrollo"; "ejecutar E1, E2 y E3 sobre upstream sin cambios y sobre el fork renombrado, y guardar los resultados en `docs/qbit/BASELINE.md`".
+- **S12** (11, T0.9, changed by L4) "**T0.9 CI y releases** (6.5): GoReleaser, Homebrew tap, Scoop, npm, go install y scripts de instalación curl y PowerShell (Q7), workflows adaptados." Changed by the user: no npm; the Pi plugin is embedded in the binary (L4).
+- **S13** (6.5) "Conservar `ci.yml` (tests, race, lint, deadcode, perf-check) y `release.yml` con GoReleaser apuntando a qbitdev." "Los scripts verifican el checksum antes de instalar." "Desactivar o adaptar lo que depende de upstream: firma SignPath (sin certificado propio, desactivar), políticas de issues y PR, `publish-pi` (al scope npm de qbitdev), `cloud-image` (al registro de qbitdev), CodeRabbit."
+- **S14** (11, T0.10) "**T0.10 Checklist de paridad** (8.1) completa y release **v0.1.0**."
+- **S15** (8.1) parity checklist, every item; "Cada punto se da por cumplido cuando sus tests de upstream pasan con el binario renombrado y una prueba manual confirma el comportamiento."
+- **S16** (5, Q9) "Numeración propia desde **0.1.0**; `qbit-jay version` indica la versión de Engram de la que parte, siempre que gentle-ai no dependa del formato".
+
+Assumptions (not user specs):
+
+- A1: "prueba real en el WSL del usuario" (S5) and manual parity checks (S15) run only in temporary environments while the user is away (L3); the real-machine run is left for the user and recorded as pending.
+- A2: owner for the tap and bucket repos is `qbitdevz` (`qbitdevz/homebrew-tap`, `qbitdevz/scoop-bucket`), per the naming rule (L5); the spec's `qbitdev/tap` predates it.
+- A3: the Cloud image (S13) is not published in v0.1.0; `cloud-image.yml` is disabled until a registry is chosen (spec Q6: Cloud only self-hosted).
+- A4: E2 synthetic queries are generated once by a subagent LLM from synthetic memories and stored as a fixture.
+
+## Tasks
+
+- [ ] T1 (T0.5) Migration and coexistence: auto import on first start and `qbit-jay import --from-engram [path]` via SQLite backup API, never modifying the source; setup replaces an Engram entry with backup and `setup --restore <agent>`; doctor and daemon start detect Engram on port 7437 — S1–S4 — worker — Risk: items 1 and 3
+- [ ] T2 (T0.6) gentle-ai compatibility: inventory of every gentle-ai invocation of the engram binary, compatibility test running qbit-jay with them (`ENGRAM_BIN`), `eco-update` behavior, `docs/INTEGRATION.md` — S5–S7 — explore + worker — Risk: item 3
+- [ ] T3 (T0.7) Local telemetry in `internal/qbit/telemetry`, separate `telemetry.db`, on by default, `QBIT_JAY_TELEMETRY=off`, retention and delete command, `stats --telemetry` — S8, S9 — worker — Risk: item 1
+- [ ] T4 (T0.8) Evaluators E1, E2 (synthetic fixture), E3 on synthetic corpora; BASELINE.md with upstream and fork — S10, S11 — worker
+- [ ] T5 (T0.9) Releases: GoReleaser to qbitdevz, GitHub Releases with checksums, curl and PowerShell install scripts verifying checksums, `go install`, Homebrew tap and Scoop bucket; embedded Pi plugin installed as a local Pi package; adapt or disable upstream-only workflows (SignPath, issue/PR policy, publish-pi, cloud-image, CodeRabbit) — S12, S13, S16 — worker — Risk: item 5
+- [ ] T6 (T0.10) Parity checklist with evidence per item, release v0.1.0 — S14, S15 — parent — Risk: item 5
+
+## Log
+
+- L1 (user, 2026-11-28): "me voy a ir al gym, quiero que sigas construytendo hasta finalizar todo. si necesitas algo de mi preguntamelo ahora asi despues trabaja hasta finalizar todo sin mi intervencion"
+- L2 (user, 2026-11-28): answers: "Cerrar T0.4 y seguir con toda la Fase 0"; release v0.1.0 "Sí, publicalo"; real machine "No, solo entornos temporales". Earlier rule: "todo lo que hagas siempre con pr asi va quedando un historial de todo"; merging delegated ("mergealo vos").
+- L3 (decision, 2026-11-28): real-machine tests (S5 real WSL, S15 manual checks) only in temporary environments until the user returns.
+- L4 (user, 2026-11-28): "con respecto a la instalacion y de mas debe ser de manera one command.. instalacion desde curl, powershell o go asi como engram. no se si conviene npm y demas es algo mas que mantener"; answers: channels "Esos tres + Homebrew y Scoop"; Pi plugin "Embebido en el binario". Confirmed: "esta perfecto asi".
+- L5 (user, 2026-11-28): "qbitdevz es mi cuenta de github y autora. qbitdev soy yo, mi marma personal, mi identidad. qbit-jay es la herramienta."
