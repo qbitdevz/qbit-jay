@@ -236,7 +236,11 @@ func TestClaudeCodeUserMCPRegistersQbitJayNextToEngram(t *testing.T) {
 	var added []string
 	run := func(_ string, args ...string) ([]byte, error) {
 		added = args
-		body := `{"mcpServers":{"engram":` + engram + `,"qbit-jay":{"type":"stdio","command":"` + filepath.ToSlash(command) + `","args":["mcp","--tools=agent"]}}}`
+		quoted, err := json.Marshal(command)
+		if err != nil {
+			return nil, err
+		}
+		body := `{"mcpServers":{"engram":` + engram + `,"qbit-jay":{"type":"stdio","command":` + string(quoted) + `,"args":["mcp","--tools=agent"]}}}`
 		return nil, os.WriteFile(cfgPath, []byte(body), 0644)
 	}
 	if err := ensureClaudeCodeUserMCP(run); err != nil {
