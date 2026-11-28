@@ -1,18 +1,17 @@
 # 🧠 Obsidian Brain
 
-> **Status**: Stable — feedback welcome on the [GitHub issues](https://github.com/Gentleman-Programming/engram/issues).
+> **Status**: Stable — feedback welcome on the [GitHub issues](https://github.com/qbitdevz/qbit-jay/issues).
 > **Available since**: `v1.12.0` (first shipped in `v1.12.0-beta.1`)
-> **Stability**: Included in the stable `engram` binary; no separate install is needed.
+> **Stability**: Included in the stable `qbit-jay` binary; no separate install is needed.
 
 Visualize your AI agent's memory as an interactive knowledge graph in [Obsidian](https://obsidian.md/). Every observation becomes a Markdown note. Sessions, projects, and topic clusters become connected hubs. Open Obsidian's Graph View and **see how your agent's brain actually thinks**.
 
-![Brain Graph Preview](https://raw.githubusercontent.com/Gentleman-Programming/engram/main/assets/obsidian-brain-graph.png)
 
 ---
 
 ## Why This Exists
 
-Engram already stores every decision, bugfix, and architectural insight your agent makes. But that data lives in a SQLite file. You can search it via the CLI, query it via MCP, browse it in the TUI — but you can't **see the connections**.
+qbit-jay already stores every decision, bugfix, and architectural insight your agent makes. But that data lives in a SQLite file. You can search it via the CLI, query it via MCP, browse it in the TUI — but you can't **see the connections**.
 
 Obsidian's graph view is the perfect canvas:
 - Each memory = a node
@@ -31,7 +30,7 @@ The result: your agent's knowledge becomes a **navigable cognitive map** instead
 mkdir -p ~/Obsidian/engram
 
 # 2. Export your full memory + bootstrap the engram-brain graph layout
-engram obsidian-export --vault ~/Obsidian/engram --graph-config force
+qbit-jay obsidian-export --vault ~/Obsidian/engram --graph-config force
 
 # 3. Open Obsidian, "Open folder as vault" → ~/Obsidian/engram
 # 4. Cmd+G (Mac) or Ctrl+G → Graph View
@@ -44,7 +43,7 @@ You should now see hundreds (or thousands) of connected nodes, color-coded by ty
 ## How It Works
 
 ```
-SQLite (~/.engram/engram.db)
+SQLite (~/.qbit-jay/qbit-jay.db)
         │
         ▼
  obsidian-export reads via store.Export()
@@ -59,7 +58,7 @@ SQLite (~/.engram/engram.db)
  Obsidian renders the graph from wikilinks
 ```
 
-Key principle: **the exporter is one-way**. Engram writes to the vault, never reads from it. Your manual edits in Obsidian don't propagate back. If you re-run the export, your edited notes are overwritten with the latest from Engram. This is by design — the vault is a **live mirror**, not a fork.
+Key principle: **the exporter is one-way**. qbit-jay writes to the vault, never reads from it. Your manual edits in Obsidian don't propagate back. If you re-run the export, your edited notes are overwritten with the latest from qbit-jay. This is by design — the vault is a **live mirror**, not a fork.
 
 The exporter only writes inside `{vault}/engram/`. It will never touch other folders in your vault, so you can safely point it at an existing vault that has your own notes.
 
@@ -101,7 +100,7 @@ Each observation becomes a Markdown file with YAML frontmatter:
 ---
 id: 1719
 type: architecture
-project: engram
+project: qbit-jay
 scope: project
 topic_key: architecture/obsidian-plugin/explore
 session_id: session-abc123
@@ -109,14 +108,14 @@ created_at: "2026-04-06T14:30:00Z"
 updated_at: "2026-04-06T14:35:00Z"
 revision_count: 1
 tags:
-  - engram
+  - qbit-jay
   - architecture
   - obsidian
 aliases:
-  - "Exploration: Obsidian plugin for Engram brain visualization"
+  - "Exploration: Obsidian plugin for qbit-jay brain visualization"
 ---
 
-# Exploration: Obsidian plugin for Engram brain visualization
+# Exploration: Obsidian plugin for qbit-jay brain visualization
 
 **What**: Complete exploration of Obsidian plugin architecture...
 **Why**: User wants to visualize agent memory as connected graph...
@@ -147,7 +146,7 @@ Slashes in topic keys become `--` in filenames for filesystem safety.
 ## CLI Reference
 
 ```bash
-engram obsidian-export --vault <path> [flags]
+qbit-jay obsidian-export --vault <path> [flags]
 ```
 
 | Flag | Required | Default | Description |
@@ -175,28 +174,28 @@ a safe capped export is not implemented.
 
 ```bash
 # Single export of the current project
-engram obsidian-export --vault ~/Obsidian/engram
+qbit-jay obsidian-export --vault ~/Obsidian/engram
 
 # Explicitly export every project
-engram obsidian-export --vault ~/Obsidian/engram --all
+qbit-jay obsidian-export --vault ~/Obsidian/engram --all
 
-# Export only the engram project
-engram obsidian-export --vault ~/Obsidian/engram --project engram
+# Export only the qbit-jay project
+qbit-jay obsidian-export --vault ~/Obsidian/engram --project qbit-jay
 
 # Force a complete re-export (useful after pruning observations)
-engram obsidian-export --vault ~/Obsidian/engram --force
+qbit-jay obsidian-export --vault ~/Obsidian/engram --force
 
 # Auto-sync every 10 minutes (default), runs forever
-engram obsidian-export --vault ~/Obsidian/engram --watch
+qbit-jay obsidian-export --vault ~/Obsidian/engram --watch
 
-# Auto-sync every 5 minutes, only the engram project
-engram obsidian-export --vault ~/Obsidian/engram --watch --interval 5m --project engram
+# Auto-sync every 5 minutes, only the qbit-jay project
+qbit-jay obsidian-export --vault ~/Obsidian/engram --watch --interval 5m --project qbit-jay
 
 # Reset the graph layout to the engram-brain default
-engram obsidian-export --vault ~/Obsidian/engram --graph-config force
+qbit-jay obsidian-export --vault ~/Obsidian/engram --graph-config force
 
 # Never touch the graph config (you have your own custom layout)
-engram obsidian-export --vault ~/Obsidian/engram --graph-config skip
+qbit-jay obsidian-export --vault ~/Obsidian/engram --graph-config skip
 ```
 
 ---
@@ -205,7 +204,7 @@ engram obsidian-export --vault ~/Obsidian/engram --graph-config skip
 
 The `--watch` flag turns the export into a long-running daemon. Use cases:
 - Keep your vault current while you work
-- Run on a server alongside `engram serve` for team-shared brains
+- Run on a server alongside `qbit-jay serve` for team-shared brains
 - Feed a live dashboard
 
 ### Behavior
@@ -234,23 +233,23 @@ To keep the daemon running across reboots, use `nohup`, `launchd` (macOS), `syst
 
 **macOS quick start with `nohup`**:
 ```bash
-nohup ~/go/bin/engram obsidian-export \
+nohup ~/go/bin/qbit-jay obsidian-export \
   --vault ~/Obsidian/engram \
   --watch --interval 10m \
-  > ~/.engram/obsidian-sync.log 2>&1 &
+  > ~/.qbit-jay/obsidian-sync.log 2>&1 &
 ```
 
-**macOS launchd plist** (`~/Library/LaunchAgents/com.engram.obsidian-sync.plist`):
+**macOS launchd plist** (`~/Library/LaunchAgents/dev.qbitdev.qbit-jay.obsidian-sync.plist`):
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.engram.obsidian-sync</string>
+    <string>dev.qbitdev.qbit-jay.obsidian-sync</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/usr/local/bin/engram</string>
+        <string>/usr/local/bin/qbit-jay</string>
         <string>obsidian-export</string>
         <string>--vault</string>
         <string>/Users/YOU/Obsidian/engram</string>
@@ -263,23 +262,23 @@ nohup ~/go/bin/engram obsidian-export \
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string>/Users/YOU/.engram/obsidian-sync.log</string>
+    <string>/Users/YOU/.qbit-jay/obsidian-sync.log</string>
     <key>StandardErrorPath</key>
-    <string>/Users/YOU/.engram/obsidian-sync.log</string>
+    <string>/Users/YOU/.qbit-jay/obsidian-sync.log</string>
 </dict>
 </plist>
 ```
 
 Then load it:
 ```bash
-launchctl load ~/Library/LaunchAgents/com.engram.obsidian-sync.plist
+launchctl load ~/Library/LaunchAgents/dev.qbitdev.qbit-jay.obsidian-sync.plist
 ```
 
 ---
 
 ## Graph Config
 
-Obsidian's graph view config lives in `{vault}/.obsidian/graph.json`. Engram ships an opinionated default tuned for the engram-brain visual style:
+Obsidian's graph view config lives in `{vault}/.obsidian/graph.json`. qbit-jay ships an opinionated default tuned for the engram-brain visual style:
 
 - **6 color groups**: `_sessions`, `_topics`, `#architecture`, `#bugfix`, `#decision`, `#pattern`
 - **Forces tuned for cohesion**: `centerStrength: 0.515`, `repelStrength: 12.71`, `linkStrength: 0.729`, `linkDistance: 207`
@@ -309,30 +308,30 @@ In `--watch` mode, the graph config is applied **only on the first cycle**. Subs
 
 ### Customizing the Graph
 
-You can absolutely tweak the graph view in Obsidian's UI — Engram's `preserve` default mode protects your changes. If you want to start fresh later, run `--graph-config force` once and the engram defaults come back.
+You can absolutely tweak the graph view in Obsidian's UI — qbit-jay's `preserve` default mode protects your changes. If you want to start fresh later, run `--graph-config force` once and the qbit-jay defaults come back.
 
 ---
 
 ## HTTP Obsidian Plugin (Optional)
 
-Unlike the CLI exporter above, this plugin reads `GET /export` from a running `engram serve` instance. Each poll receives a **full snapshot**; the server does not support incremental `since` export. The plugin writes one Markdown note per observation under the configured vault subfolder (`observations/observation-<id>.md`), updating changed notes in place and leaving notes absent from later snapshots untouched. It does not generate CLI session/topic hubs or graph configuration. Set a project filter to request only that project; leave it empty to explicitly request all projects (`all_projects=true`). Scoped exports may include legacy observations with no project when their exported session belongs to the selected project. Truly foreign observations fail without writing notes or recording success. An incompatible response also fails explicitly rather than treating it as an empty export.
+Unlike the CLI exporter above, this plugin reads `GET /export` from a running `qbit-jay serve` instance. Each poll receives a **full snapshot**; the server does not support incremental `since` export. The plugin writes one Markdown note per observation under the configured vault subfolder (`observations/observation-<id>.md`), updating changed notes in place and leaving notes absent from later snapshots untouched. It does not generate CLI session/topic hubs or graph configuration. Set a project filter to request only that project; leave it empty to explicitly request all projects (`all_projects=true`). Scoped exports may include legacy observations with no project when their exported session belongs to the selected project. Truly foreign observations fail without writing notes or recording success. An incompatible response also fails explicitly rather than treating it as an empty export.
 
-For an in-Obsidian experience with a ribbon button, settings tab, and status bar indicator, there's a TypeScript community plugin in [`plugin/obsidian/`](https://github.com/Gentleman-Programming/engram/tree/main/plugin/obsidian).
+For an in-Obsidian experience with a ribbon button, settings tab, and status bar indicator, there's a TypeScript community plugin in [`plugin/obsidian/`](https://github.com/qbitdevz/qbit-jay/tree/main/plugin/obsidian).
 
-It uses Engram's HTTP API (`engram serve`) instead of reading SQLite directly:
+It uses qbit-jay's HTTP API (`qbit-jay serve`) instead of reading SQLite directly:
 
 ```bash
 cd plugin/obsidian
 npm install
 npm run build
 
-mkdir -p ~/Obsidian/engram/.obsidian/plugins/engram-brain
-cp manifest.json main.js ~/Obsidian/engram/.obsidian/plugins/engram-brain/
+mkdir -p ~/Obsidian/engram/.obsidian/plugins/qbit-jay
+cp manifest.json main.js ~/Obsidian/engram/.obsidian/plugins/qbit-jay/
 ```
 
-Then in Obsidian: Settings → Community plugins → enable "Engram Brain". Configure the URL to your `engram serve` endpoint (default: `http://127.0.0.1:7437`).
+Then in Obsidian: Settings → Community plugins → enable "qbit-jay Brain". Configure the URL to your `qbit-jay serve` endpoint (default: `http://127.0.0.1:7437`).
 
-This is **lower priority than the CLI** — the CLI doesn't require `engram serve` to be running, works fully offline, and is the recommended path for daily use.
+This is **lower priority than the CLI** — the CLI doesn't require `qbit-jay serve` to be running, works fully offline, and is the recommended path for daily use.
 
 ---
 
@@ -351,7 +350,7 @@ In the Filter panel of Graph View:
 
 | Query | Shows |
 |-------|-------|
-| `path:engram/engram` | Only your engram project's brain |
+| `path:engram/engram` | Only your qbit-jay project's brain |
 | `tag:#bugfix` | Constellation of every bug you've ever fixed |
 | `tag:#architecture path:engram/engram` | Architectural decisions in this project only |
 | `path:_topics` | Just the topic hubs — your "table of contents" |
@@ -380,7 +379,7 @@ In the Filter panel of Graph View:
 - Minimum interval is 1 minute. This is to prevent hammering your filesystem and SQLite. If you need faster updates, consider running the export in a tight loop with your own scheduler.
 
 ### "I customized the graph and now it looks weird"
-- Run `engram obsidian-export --vault ~/Obsidian/engram --graph-config force` to reset to the engram-brain default.
+- Run `qbit-jay obsidian-export --vault ~/Obsidian/engram --graph-config force` to reset to the engram-brain default.
 
 ### "I want to keep my custom graph layout AND auto-sync"
 - This is the default! `--watch` only applies graph config on the first cycle, and the default mode is `preserve` which only writes when the file is missing.
@@ -404,7 +403,7 @@ In the Filter panel of Graph View:
 - Did the daemon mode crash, leak memory, or behave unexpectedly?
 - Did the graph config bootstrap clobber something you cared about?
 
-File issues at [github.com/Gentleman-Programming/engram/issues](https://github.com/Gentleman-Programming/engram/issues) and mention `obsidian-export` in the title.
+File issues at [github.com/qbitdevz/qbit-jay/issues](https://github.com/qbitdevz/qbit-jay/issues) and mention `obsidian-export` in the title.
 
 ---
 
@@ -413,9 +412,9 @@ File issues at [github.com/Gentleman-Programming/engram/issues](https://github.c
 Ideas under consideration, prioritized by feedback:
 
 - **Embeddings + semantic edges** — optional `--with-embeddings` flag using local Ollama
-- **Bidirectional sync** — let Obsidian edits flow back to Engram (with conflict resolution)
+- **Bidirectional sync** — let Obsidian edits flow back to qbit-jay (with conflict resolution)
 - **Custom hub templates** — user-defined templates for session/topic hub notes
 - **Graph layout presets** — multiple curated layouts beyond the engram-brain default
-- **`engram serve` integration** — auto-export when the HTTP server is running, no separate daemon needed
+- **`qbit-jay serve` integration** — auto-export when the HTTP server is running, no separate daemon needed
 
 If any of those resonate strongly with you, open an issue and it'll get prioritized.

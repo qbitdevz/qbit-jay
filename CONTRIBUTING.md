@@ -1,6 +1,8 @@
-# Contributing to Engram
+# Contributing to qbit-jay
 
-Thanks for contributing. Engram enforces a strict **issue-first workflow** — every change starts with an approved issue.
+> **This is the qbit-jay fork.** qbit-jay is based on [Engram](https://github.com/Gentleman-Programming/engram) by Gentleman Programming. The workflow below is inherited from upstream and is kept as written, including its links to upstream issues, labels and policies. Changes to qbit-jay go through issues and pull requests to [qbitdevz/qbit-jay](https://github.com/qbitdevz/qbit-jay); changes to Engram itself go to upstream.
+
+Thanks for contributing. The upstream workflow enforces a strict **issue-first workflow** — every change starts with an approved issue.
 
 [Contribution policy transition](docs/contribution-policy-transition.md) is **PRE-CUTOVER / NOT ACTIVE** target guidance; the active requirements below remain unchanged.
 

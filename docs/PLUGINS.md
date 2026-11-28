@@ -2,7 +2,7 @@
 
 # Plugins
 
-> Deferred scope note: plugin-level automatic cloud enrollment/login/upgrade orchestration is not part of this rollout yet. Current cloud flows are CLI-driven (`engram cloud ...`).
+> Deferred scope note: plugin-level automatic cloud enrollment/login/upgrade orchestration is not part of this rollout yet. Current cloud flows are CLI-driven (`qbit-jay cloud ...`).
 >
 > Validation boundary (current): plugin scripts are validated for memory/session workflows, not as cloud bootstrap orchestrators. Use CLI for cloud config/auth/enrollment/upgrade.
 
@@ -17,18 +17,18 @@
 
 | Integration | Coverage |
 |---|---|
-| OpenCode | TypeScript plugin plus MCP registration via `engram setup opencode`. |
-| Claude Code | Marketplace/bundled plugin for hooks, scripts, and skills; `engram setup claude-code` solely registers MCP. |
-| Codex | Codex plugin assets under `plugin/codex/`; `engram setup codex` best-effort installs the marketplace plugin and writes MCP/instruction config. |
+| OpenCode | TypeScript plugin plus MCP registration via `qbit-jay setup opencode`. |
+| Claude Code | Marketplace/bundled plugin for hooks, scripts, and skills; `qbit-jay setup claude-code` solely registers MCP. |
+| Codex | Codex plugin assets under `plugin/codex/`; `qbit-jay setup codex` best-effort installs the marketplace plugin and writes MCP/instruction config. |
 | Pi | Pi package under `plugin/pi/` exposes Pi-native HTTP memory tools; Pi 0.99.0+ built-in MCP handles other servers, and an installed `pi-mcp-adapter` replaces it, so setup does not add it. |
 
 ### Client-local project inspection
 
-`engram hook resolve-hook-project` reads existing hook JSON from stdin and uses its exact lowercase `cwd` field to inspect the local filesystem. The `cwd` must be an absolute path; relative paths return `{}`. Other hook fields are ignored. It prints canonical `project`, `project_source` and `project_path` JSON, or `{}` when input or identity is unusable. Malformed input, duplicate `cwd`, inaccessible directories, ambiguity and invalid/unbound Git identities never fall back to an HTTP lookup. Malformed Git metadata in the cwd, its ancestors or a promoted child is not treated as a plain directory. Readable non-Git directories retain basename resolution.
+`qbit-jay hook resolve-hook-project` reads existing hook JSON from stdin and uses its exact lowercase `cwd` field to inspect the local filesystem. The `cwd` must be an absolute path; relative paths return `{}`. Other hook fields are ignored. It prints canonical `project`, `project_source` and `project_path` JSON, or `{}` when input or identity is unusable. Malformed input, duplicate `cwd`, inaccessible directories, ambiguity and invalid/unbound Git identities never fall back to an HTTP lookup. Malformed Git metadata in the cwd, its ancestors or a promoted child is not treated as a plain directory. Readable non-Git directories retain basename resolution.
 
 Inspection does not open the database, initialize global configuration, create Git bindings or register sessions. Existing config and repository bindings remain authoritative. Standalone inspection uses a 1.5-second deadline, matching the native Codex prompt budget; that context does not bound reading stdin. Native callers pass their existing context directly to the shared Go inspector; inspection does not start another timeout.
 
-For native Claude PreToolUse and Codex registration, resolution, session-end, PreToolUse and prompt commands, an originally nonblank `ENGRAM_URL` selects client-local inspection—even a loopback URL used for an SSH tunnel. With an unset or blank URL, port/socket-derived transport retains server-side project resolution. External routing never asks the server to interpret the client cwd through `/project/current`. Codex Bash startup, compaction and prompt adapters preserve the original URL intent for native dispatch separately from their synthesized curl/context transport URL.
+For native Claude PreToolUse and Codex registration, resolution, session-end, PreToolUse and prompt commands, an originally nonblank `QBIT_JAY_URL` selects client-local inspection—even a loopback URL used for an SSH tunnel. With an unset or blank URL, port/socket-derived transport retains server-side project resolution. External routing never asks the server to interpret the client cwd through `/project/current`. Codex Bash startup, compaction and prompt adapters preserve the original URL intent for native dispatch separately from their synthesized curl/context transport URL.
 
 Claude keeps an existing registered owner; only first registration requires inspection. Codex first reads the authoritative session: a known `project_owned` session keeps its persisted project even if cwd changes or becomes inaccessible. Shared and unknown Codex sessions require successful client inspection; shared requests retain the inspected caller project without changing the persisted owner. Failed required inspection causes no registration, runtime or prompt-persistence POST and never falls back to server filesystem detection. Codex still sends `resume: true` on registration and preserves the received-conflict-only runtime retry described below. Tool binding changes session identity only, not model-supplied project arguments or server permission checks.
 
@@ -56,7 +56,7 @@ Agent-attributed writes require a confirmed runtime session.
 ### Codex Bash passive capture
 
 The synchronous `SubagentStop` hook resolves the supplied host through native
-`engram hook codex-resolve` before passive capture. Only a confirmed host or its
+`qbit-jay hook codex-resolve` before passive capture. Only a confirmed host or its
 numeric continuation is submitted; identity bytes remain opaque JSON data,
 including trailing newlines. Missing, invalid, foreign or unavailable confirmation
 skips capture without registering or reopening a session. Go owns live identity
@@ -68,7 +68,7 @@ exit status; project lookup (2s), native resolution (1.5s aggregate) and capture
 - The manifest launches plugin-root `run-native-hook.ps1` through SystemRoot-qualified Windows PowerShell.
 - The adapter reads the setup-owned absolute pin and invokes its native hook command.
 - This path needs no Git Bash, `jq`, or `curl`.
-- The Git Bash SessionStart adapter starts a missing local server with `engram serve-background LOG_PATH` on Windows. The CLI launches `serve` with detached stdin/stdout and server stderr appended to the selected log; `engram serve` itself remains foreground. An explicit `ENGRAM_URL` leaves server startup to its external owner.
+- The Git Bash SessionStart adapter starts a missing local server with `qbit-jay serve-background LOG_PATH` on Windows. The CLI launches `serve` with detached stdin/stdout and server stderr appended to the selected log; `qbit-jay serve` itself remains foreground. An explicit `QBIT_JAY_URL` leaves server startup to its external owner.
 
 ---
 
@@ -77,15 +77,15 @@ exit status; project lookup (2s), native resolution (1.5s aggregate) and capture
 For [OpenCode](https://opencode.ai) users, a thin TypeScript plugin adds enhanced session management on top of the MCP tools:
 
 ```bash
-# Install via engram (recommended — works from Homebrew or binary install)
-engram setup opencode
+# Install via qbit-jay (recommended)
+qbit-jay setup opencode
 
-# Or manually: cp plugin/opencode/engram.ts ~/.config/opencode/plugins/
+# Or manually: cp plugin/opencode/qbit-jay.ts ~/.config/opencode/plugins/
 ```
 
-For the default local connection, the plugin reuses a healthy server with the expected local identity or starts a managed daemon with `engram run -d`. The plugin waits up to 40 seconds for the launcher, then checks the server again. Later hooks can reuse it when it becomes ready. You can inspect or control that daemon with `engram ps`, `engram stop`, and `engram restart`. Older binaries that do not implement `run` retain the detached `engram serve` startup path. An explicit `ENGRAM_URL` leaves server startup to the endpoint owner.
+For the default local connection, the plugin reuses a healthy server with the expected local identity or starts a managed daemon with `qbit-jay run -d`. The plugin waits up to 40 seconds for the launcher, then checks the server again. Later hooks can reuse it when it becomes ready. You can inspect or control that daemon with `qbit-jay ps`, `qbit-jay stop`, and `qbit-jay restart`. Older binaries that do not implement `run` retain the detached `qbit-jay serve` startup path. An explicit `QBIT_JAY_URL` leaves server startup to the endpoint owner.
 
-The same `engram.ts` supports OpenCode 1.x (1.18.29+) and 2.x. Its default export provides a V1 `server` entry and a V2 `setup` entry; the V2 entry maps session, context, compaction, and tool hooks onto the same handlers, so both majors share one behavior. On V2, user prompts are captured from the durable `session.inbox.enqueued` event (user items only) and sent with the item's `inboxID` as `source_inbox_id`, so a replayed admission never creates a second prompt, distinct items with identical text stay distinct, and a deleted prompt is not resurrected (the server answers `409`, which the plugin drops). This idempotency requires a server with prompt inbox identity support (#1464); older servers ignore the field and store every admission. OpenCode 2.x still accepts the MCP entry written by `engram setup opencode`, so the same command covers both majors.
+The same `qbit-jay.ts` supports OpenCode 1.x (1.18.29+) and 2.x. Its default export provides a V1 `server` entry and a V2 `setup` entry; the V2 entry maps session, context, compaction, and tool hooks onto the same handlers, so both majors share one behavior. On V2, user prompts are captured from the durable `session.inbox.enqueued` event (user items only) and sent with the item's `inboxID` as `source_inbox_id`, so a replayed admission never creates a second prompt, distinct items with identical text stay distinct, and a deleted prompt is not resurrected (the server answers `409`, which the plugin drops). This idempotency requires a server with prompt inbox identity support (#1464); older servers ignore the field and store every admission. OpenCode 2.x still accepts the MCP entry written by `qbit-jay setup opencode`, so the same command covers both majors.
 
 > **Local model compatibility:** The plugin works with all models, including local ones served via llama.cpp, Ollama, or similar. The Memory Protocol is concatenated into the existing system prompt (not added as a separate system message), so models with strict Jinja templates (Qwen, Mistral/Ministral) work correctly.
 
@@ -103,9 +103,9 @@ Explicit attributed-write resolution failures keep the `could not resolve an aut
 
 These categories expose no runtime IDs, project names, paths or raw lookup errors. They describe adapter validation failures, not proof of how live runtime history acquired a global project ID.
 
-Automatic OpenCode memory operations remain fail-open. Readiness, server/import launch, transport, malformed-response, HTTP, and invalid session-end acknowledgement failures queue privacy-safe `Engram degraded` warnings for the next supported tool result. Each reason is reported once per plugin instance; pending warnings survive unsupported results. V1 string output and V2 completed string/text-or-file content are supported; tool errors and unknown result shapes are left untouched. Warnings contain no paths, raw errors, or response payloads. They do not promise automatic restart, backoff, or recovery. Expected session registration conflicts retain their specific refusal diagnostics rather than being labeled server-down.
+Automatic OpenCode memory operations remain fail-open. Readiness, server/import launch, transport, malformed-response, HTTP, and invalid session-end acknowledgement failures queue privacy-safe `qbit-jay degraded` warnings for the next supported tool result. Each reason is reported once per plugin instance; pending warnings survive unsupported results. V1 string output and V2 completed string/text-or-file content are supported; tool errors and unknown result shapes are left untouched. Warnings contain no paths, raw errors, or response payloads. They do not promise automatic restart, backoff, or recovery. Expected session registration conflicts retain their specific refusal diagnostics rather than being labeled server-down.
 
-Early local readiness failures include privacy-safe categories: `binary-not-found`, `identity-command-failed` (launch failure or nonzero exit), and `identity-output-invalid` (malformed identity output). Binary selection is reported as `ENGRAM_BIN override` or `setup-default`, frozen with the selected configuration. `identity-mismatch` remains a separate server-identity failure; HTTP rejection and acknowledgement diagnostics are unchanged. No paths, identities, or raw command output are included. A missing selected binary never triggers automatic PATH fallback. After a disk migration, rerun `engram setup opencode` from the current installation and restart OpenCode; correct or unset any stale `ENGRAM_BIN` override first. See [recovery and layer verification](AGENT-SETUP.md#recover-after-moving-the-engram-binary). This diagnostic improvement does not establish or resolve the original healthy-server attribution failure cause.
+Early local readiness failures include privacy-safe categories: `binary-not-found`, `identity-command-failed` (launch failure or nonzero exit), and `identity-output-invalid` (malformed identity output). Binary selection is reported as `QBIT_JAY_BIN override` or `setup-default`, frozen with the selected configuration. `identity-mismatch` remains a separate server-identity failure; HTTP rejection and acknowledgement diagnostics are unchanged. No paths, identities, or raw command output are included. A missing selected binary never triggers automatic PATH fallback. After a disk migration, rerun `qbit-jay setup opencode` from the current installation and restart OpenCode; correct or unset any stale `QBIT_JAY_BIN` override first. See [recovery and layer verification](AGENT-SETUP.md#recover-after-moving-the-qbit-jay-binary). This diagnostic improvement does not establish or resolve the original healthy-server attribution failure cause.
 
 The V2 adapter forwards `session.updated` as well as `session.created`, allowing the shared handler to close a prior root registration if an update later supplies `parentID`. This behavior is covered by deterministic adapter tests; delayed parent attribution has not been verified in a live V2 runtime.
 
@@ -116,16 +116,16 @@ Session closure is confirmed only when the response contains the matching effect
 ### What the Plugin Does
 
 The plugin:
-- **Auto-starts** the engram server if not running
+- **Auto-starts** the qbit-jay server if not running
 - **Resolves project identity** through the server's canonical resolver, so configured projects and repository worktrees keep their shared project identity
-- **Auto-imports** git-synced memories from `.engram/manifest.json` if present in the project
+- **Auto-imports** git-synced memories from `.qbit-jay/manifest.json` if present in the project
 - **Creates sessions** on-demand via `ensureSession()` (resilient to restarts/reconnects)
 - **Injects the Memory Protocol** into the agent's system prompt via `chat.system.transform` — strict rules for when to save, when to search, and a mandatory session close protocol. The protocol is concatenated into the existing system message (not pushed as a separate one), ensuring compatibility with models that only accept a single system block (Qwen, Mistral/Ministral via llama.cpp, etc.)
 - **Injects session-only runtime context** into the compaction prompt; manual `mem_context` and `GET /context` remain project/scope-scoped
 - **Instructs the compressor** to tell the new agent to persist the compacted summary via `mem_session_summary`
 - **Captures delegation learnings** from OpenCode V1 `task` output and V2 `subagent` output (normalized internally to the legacy `Task` alias), using passive capture with source `task-complete`. V1 result objects contribute their string `output` field rather than wrapper metadata; plain string results remain unchanged, and other object shapes retain JSON serialization as a fallback. Other tool results are not submitted for passive capture.
 - **Strips `<private>` tags** before sending data
-- **Enables** `opencode-subagent-statusline` in `tui.json` or `tui.jsonc` during `engram setup opencode`, adding a live sub-agent monitor to OpenCode's sidebar/home footer. To disable it later, remove `"opencode-subagent-statusline"` from the `"plugin"` array in your TUI config and restart OpenCode.
+- **Enables** `opencode-subagent-statusline` in `tui.json` or `tui.jsonc` during `qbit-jay setup opencode`, adding a live sub-agent monitor to OpenCode's sidebar/home footer. To disable it later, remove `"opencode-subagent-statusline"` from the `"plugin"` array in your TUI config and restart OpenCode.
 
 **No raw tool call recording** — the agent handles memory through curated saves such as `mem_save` and `mem_session_summary`. `mem_save` may best-effort attach prompt context, but only when that prompt was already fed to the same MCP process lifecycle.
 
@@ -153,33 +153,33 @@ The OpenCode plugin uses a defense-in-depth strategy to ensure memories survive 
 
 ## Claude Code Plugin
 
-For [Claude Code](https://docs.anthropic.com/en/docs/claude-code) users, a plugin adds enhanced session management using Claude's native hook and skill system. Marketplace installation provides hooks, scripts, and skills; `engram setup claude-code` is required for the supported complete setup because it solely registers MCP:
+For [Claude Code](https://docs.anthropic.com/en/docs/claude-code) users, a plugin adds enhanced session management using Claude's native hook and skill system. Marketplace installation provides hooks, scripts, and skills; `qbit-jay setup claude-code` is required for the supported complete setup because it solely registers MCP:
 
 ```bash
 # Install plugin assets via Claude Code marketplace
-claude plugin marketplace add Gentleman-Programming/engram
-claude plugin install engram
+claude plugin marketplace add qbitdevz/qbit-jay
+claude plugin install qbit-jay
 
 # Register MCP for the supported complete setup
-engram setup claude-code
+qbit-jay setup claude-code
 
 # Or for local development/testing from the repo
 claude --plugin-dir ./plugin/claude-code
 ```
 
-The supported plugin-and-hook setup requires Claude Code **2.1.295 or later** and Engram plugin **0.1.16 or later** for hook-failure protection, plus `jq` and `curl` on `PATH` before installation. Older Claude Code versions do not provide this guarantee and must be upgraded. MCP-only setup has no hook-failure protection. On Windows, `curl.exe` satisfies curl detection, but `jq` must also be installed and available to the shell Claude Code uses. Bare MCP is the MCP-only fallback: it does not install or run hooks when those prerequisites are unavailable.
+The supported plugin-and-hook setup requires Claude Code **2.1.295 or later** and qbit-jay plugin **0.1.16 or later** for hook-failure protection, plus `jq` and `curl` on `PATH` before installation. Older Claude Code versions do not provide this guarantee and must be upgraded. MCP-only setup has no hook-failure protection. On Windows, `curl.exe` satisfies curl detection, but `jq` must also be installed and available to the shell Claude Code uses. Bare MCP is the MCP-only fallback: it does not install or run hooks when those prerequisites are unavailable.
 
 The Claude Bash project helper accepts exactly one valid JSON response before emitting the project with an LF terminator, including with native Windows jq and jq 1.6.
 
-MCP registration happens during explicit installation or repair with `engram setup claude-code` (or `engram setup claude-code --mcp-only` for MCP-only repair). SessionStart does not run setup or inspect, write, or delete Claude configuration. Claude CLI owns the user-scope `mcpServers.engram` entry in `~/.claude.json` (Windows: `%USERPROFILE%\\.claude.json`) or `$CLAUDE_CONFIG_DIR/.claude.json` when that override is set. Setup accepts only the exact expected stdio command and arguments as configured; mismatched or unreadable entries are visible conflicts and are never overwritten. Do not edit the plugin cache manually.
+MCP registration happens during explicit installation or repair with `qbit-jay setup claude-code` (or `qbit-jay setup claude-code --mcp-only` for MCP-only repair). SessionStart does not run setup or inspect, write, or delete Claude configuration. Claude CLI owns the user-scope `mcpServers.qbit-jay` entry in `~/.claude.json` (Windows: `%USERPROFILE%\\.claude.json`) or `$CLAUDE_CONFIG_DIR/.claude.json` when that override is set. Setup accepts only the exact expected stdio command and arguments as configured; mismatched or unreadable entries are visible conflicts and are never overwritten. Do not edit the plugin cache manually.
 
-The `--protocol=slim` setup option requires Engram plugin 0.1.1 or later. After successful Claude Code setup, Engram checks `claude plugin list --json`; an unverifiable, disabled, or older plugin produces a warning but does not fail setup or replace the selected slim mode. Use your normal Claude Code plugin update path, then restart Claude Code. Plugins loaded with session-only `claude --plugin-dir ...` cannot be detected.
+The `--protocol=slim` setup option requires qbit-jay plugin 0.1.1 or later. After successful Claude Code setup, qbit-jay checks `claude plugin list --json`; an unverifiable, disabled, or older plugin produces a warning but does not fail setup or replace the selected slim mode. Use your normal Claude Code plugin update path, then restart Claude Code. Plugins loaded with session-only `claude --plugin-dir ...` cannot be detected.
 
 ### What the Plugin Provides with Setup (vs bare MCP)
 
 | Feature | Bare MCP | Plugin + setup |
 |---------|----------|----------------|
-| MCP tools available | 27 default (`engram mcp`) | 23 agent-profile tools (`engram mcp --tools=agent`) |
+| MCP tools available | 27 default (`qbit-jay mcp`) | 23 agent-profile tools (`qbit-jay mcp --tools=agent`) |
 | Session tracking (auto-start) | ✗ | ✓ |
 | Auto-import git-synced memories | ✗ | ✓ |
 | Compaction recovery | ✗ | ✓ |
@@ -204,44 +204,44 @@ plugin/claude-code/
 
 ### How It Works
 
-**Before Engram write/session MCP tools** (`PreToolUse`):
-1. `hooks/hooks.json` uses its canonical matcher and launches the `engram` executable on PATH directly with the arguments `hook` and `claude-pre-tool-use`. This avoids starting a shell for the write gate, including on Windows where Claude Code resolves `engram.exe`.
-   Before rewriting input, the hook confirms project-owned session registration using one shared inspection/HTTP budget (four seconds by default). Set `ENGRAM_HOOK_SESSION_CONFIRMATION_TIMEOUT` in the hook process environment to a positive Go duration such as `8s` or `500ms` to override it; unset, blank, invalid, overflowed, zero, or negative values use `4s`. A session that is already registered is confirmed against its registered owner project (#1717): the cwd names the project only on first registration, so writes keep succeeding wherever the shell currently is. The default leaves one second within the configured five-second hook timeout for process startup and verdict output. If increasing the budget, also raise the host's configured PreToolUse timeout above that budget with startup/output headroom; the environment variable does not change the host timeout. The same variable applies to Codex PreToolUse (whose shipped outer timeout is ten seconds), but not to Codex prompt capture. This is a slow-server mitigation, not a fix for autosync latency. A confirmation timeout denies the call with `Claude host session confirmation timed out (server slow or unavailable)`; unexplained failures retain `Claude host session registration could not be confirmed`. Denials the server explains name their cause instead: an ended session reports `host session ... already ended`, a project conflict reports `session_project_conflict` with the owner and requested projects, and a cwd the server cannot resolve for first registration reports the resolution failure with the server's reason. With a nonblank `ENGRAM_URL`, a failed client-local inspection reports the generic `Claude host session registration could not be confirmed` denial (or the timeout denial). Registration remains mandatory on each mutating gated call; registration has no cache or bypass and is never retried. The managed-local recovery path below may retry the owner lookup once.
+**Before qbit-jay write/session MCP tools** (`PreToolUse`):
+1. `hooks/hooks.json` uses its canonical matcher and launches the `qbit-jay` executable on PATH directly with the arguments `hook` and `claude-pre-tool-use`. This avoids starting a shell for the write gate, including on Windows where Claude Code resolves `qbit-jay.exe`.
+   Before rewriting input, the hook confirms project-owned session registration using one shared inspection/HTTP budget (four seconds by default). Set `QBIT_JAY_HOOK_SESSION_CONFIRMATION_TIMEOUT` in the hook process environment to a positive Go duration such as `8s` or `500ms` to override it; unset, blank, invalid, overflowed, zero, or negative values use `4s`. A session that is already registered is confirmed against its registered owner project (#1717): the cwd names the project only on first registration, so writes keep succeeding wherever the shell currently is. The default leaves one second within the configured five-second hook timeout for process startup and verdict output. If increasing the budget, also raise the host's configured PreToolUse timeout above that budget with startup/output headroom; the environment variable does not change the host timeout. The same variable applies to Codex PreToolUse (whose shipped outer timeout is ten seconds), but not to Codex prompt capture. This is a slow-server mitigation, not a fix for autosync latency. A confirmation timeout denies the call with `Claude host session confirmation timed out (server slow or unavailable)`; unexplained failures retain `Claude host session registration could not be confirmed`. Denials the server explains name their cause instead: an ended session reports `host session ... already ended`, a project conflict reports `session_project_conflict` with the owner and requested projects, and a cwd the server cannot resolve for first registration reports the resolution failure with the server's reason. With a nonblank `QBIT_JAY_URL`, a failed client-local inspection reports the generic `Claude host session registration could not be confirmed` denial (or the timeout denial). Registration remains mandatory on each mutating gated call; registration has no cache or bypass and is never retried. The managed-local recovery path below may retry the owner lookup once.
    Claude Code keeps the same `session_id` on `--resume`. When that original session has already ended, the hook binds the call to the live `<id>:resume:N` continuation that SessionStart registered, resolved from the original session's persisted project and directory. SessionStart and post-compaction registration preserve a known root's project even if the cwd now resolves differently, and retain ended legacy shared ownership. Session lookup distinguishes a received 404 from transport or HTTP failures. It retries a transient read once, with two half-second attempts sharing the previous one-second lookup allowance; persistent failures skip registration instead of guessing an owner. Registration POSTs are not retried. A failed registration emits a fixed stderr warning without logging the response, session ID or paths; context injection still proceeds, while writes remain subject to the gate. The ended session stays ended, and the gate never creates a continuation itself; with no live continuation the call is denied with `host session ... already ended`. This does not recover a lifecycle event that Claude never emits; UserPromptSubmit does not open continuations.
 2. After confirmation, a call whose decoded `session_id` (or `id` for `mem_session_start` and `mem_session_end`) already equals the confirmed effective session produces no rewrite. This comparison is exact, including whitespace; an ended root must still bind to its live continuation. Missing or different values are replaced while preserving other arguments.
 3. `mem_review` has no session argument. Its read-only `action=list` passes through without session confirmation. Mutating review actions retain session confirmation and then pass through without injecting an unused field; MCP retains its existing project resolution and validation.
 4. Necessary rewrites use `updatedInput`; the Claude hook never auto-approves a permission decision.
 
-**Auto mode:** necessary session-binding rewrites can differ from the input Claude Code's server reviewed and be denied. The [documented exact-retry path](https://code.claude.com/docs/en/hooks#pretooluse-updatedinput-in-auto-mode) drops subsequent hook rewrites, so an earlier binding must not be assumed current after the authoritative session changes. Engram never automatically retries or grants permission from its Claude hook.
+**Auto mode:** necessary session-binding rewrites can differ from the input Claude Code's server reviewed and be denied. The [documented exact-retry path](https://code.claude.com/docs/en/hooks#pretooluse-updatedinput-in-auto-mode) drops subsequent hook rewrites, so an earlier binding must not be assumed current after the authoritative session changes. qbit-jay never automatically retries or grants permission from its Claude hook.
 
-Startup/resume and compaction hooks now provide a **Confirmed Engram session ID (JSON)** in both slim and full context when confirmation succeeds. The model should send that exact decoded value in `session_id`, or `id` for `mem_session_start` and `mem_session_end`; `mem_review` takes neither field. The Go helper confirms the effective identity, including a live continuation of an ended host root, using the same ownership rules as PreToolUse. Optional context confirmation has a fixed 500 ms shared HTTP budget and omits the hint on failure; it runs before optional history retrieval. This bounds the added confirmation work, not the total duration of the existing lifecycle hook. The project result and memory context remain independent.
+Startup/resume and compaction hooks now provide a **Confirmed qbit-jay session ID (JSON)** in both slim and full context when confirmation succeeds. The model should send that exact decoded value in `session_id`, or `id` for `mem_session_start` and `mem_session_end`; `mem_review` takes neither field. The Go helper confirms the effective identity, including a live continuation of an ended host root, using the same ownership rules as PreToolUse. Optional context confirmation has a fixed 500 ms shared HTTP budget and omits the hint on failure; it runs before optional history retrieval. This bounds the added confirmation work, not the total duration of the existing lifecycle hook. The project result and memory context remain independent.
 
 PreToolUse still confirms every mutation. A stale or missing hint can require a rewrite or denial, and the model may omit the supplied ID. This mitigation does not guarantee every interactive auto-mode call will pass and grants no permissions.
 
 To explicitly authorize the bounded memory tools during setup, including unattended installs:
 
 ```sh
-engram setup claude-code --allow-memory-writes
+qbit-jay setup claude-code --allow-memory-writes
 ```
 
-This option adds exact `permissions.allow` entries in the Claude settings file for both `mcp__engram__` and `mcp__plugin_engram_engram__`: `mem_save`, `mem_update`, `mem_review`, `mem_save_prompt`, `mem_pin`, `mem_unpin`, `mem_session_summary`, `mem_session_start`, `mem_session_end`, `mem_capture_passive`, `mem_judge`, and `mem_compare`. These tools bypass permission prompts and auto-mode classification; session confirmation and authoritative binding still run. Existing deny/ask rules and other settings are preserved and remain subject to Claude's permission precedence. No wildcard, `mem_delete`, or `mem_merge_projects` entry is added, and future tools are not automatically authorized. Pre-existing broader rules are not removed.
+This option adds exact `permissions.allow` entries in the Claude settings file for both `mcp__qbit-jay__` and `mcp__plugin_qbit-jay_qbit-jay__`: `mem_save`, `mem_update`, `mem_review`, `mem_save_prompt`, `mem_pin`, `mem_unpin`, `mem_session_summary`, `mem_session_start`, `mem_session_end`, `mem_capture_passive`, `mem_judge`, and `mem_compare`. These tools bypass permission prompts and auto-mode classification; session confirmation and authoritative binding still run. Existing deny/ask rules and other settings are preserved and remain subject to Claude's permission precedence. No wildcard, `mem_delete`, or `mem_merge_projects` entry is added, and future tools are not automatically authorized. Pre-existing broader rules are not removed.
 
 The flag is only valid with an explicit `claude-code` agent and cannot be combined with `--mcp-only`. Successful plugin installation and MCP registration are required before permissions are written; settings errors fail the command. It skips the existing broader allowlist prompt and does not read stdin. Without the flag, setup retains its existing opt-in prompt (EOF skips it); other agents are unchanged. To revoke this opt-in, remove the corresponding entries from `permissions.allow` in the Claude settings file. Necessary-rewrite compatibility without explicit permission remains tracked in [#2231](https://github.com/Gentleman-Programming/engram/issues/2231); repository setup/guard tests do not establish an affected interactive classifier end-to-end pass.
 
 The authoritative mutating PreToolUse hook sets `onFailure: "block"`. On supported Claude Code versions, the host blocks the matched tool call if the hook cannot start, times out, returns invalid output, or exits with a failure code; an explicit hook denial also blocks the call. This prevents a failed or cancelled rebind from permitting a write through an older binding. See Claude Code's [hook failure behavior](https://code.claude.com/docs/en/hooks#block-the-action-when-a-hook-fails). These are documented host semantics, not verified here by actual-host execution; protection requires the plugin hook to be installed, enabled, and matched.
 
-**Windows managed-local recovery (#1956).** If Claude's initial session-owner lookup receives a direct dial connection refusal from the default `127.0.0.1` endpoint, the native hook may start shared `serve`, verify `/health` identifies Engram and the same data-directory instance, then retry that read once. Explicit nonblank `ENGRAM_URL` or `ENGRAM_SOCKET`, redirects, HTTP/JSON failures from that initial lookup, other transport failures, cancellation and timeouts never authorize recovery. All existing owner, ended-session and continuation checks still apply; no memory/tool call is replayed. Instance equality establishes continuity, not authentication against a malicious local listener.
+**Windows managed-local recovery (#1956).** If Claude's initial session-owner lookup receives a direct dial connection refusal from the default `127.0.0.1` endpoint, the native hook may start shared `serve`, verify `/health` identifies qbit-jay and the same data-directory instance, then retry that read once. Explicit nonblank `QBIT_JAY_URL` or `QBIT_JAY_SOCKET`, redirects, HTTP/JSON failures from that initial lookup, other transport failures, cancellation and timeouts never authorize recovery. All existing owner, ended-session and continuation checks still apply; no memory/tool call is replayed. Instance equality establishes continuity, not authentication against a malicious local listener.
 
 After an eligible launch, readiness polling may retry HTTP 500 responses from `/health` within the existing confirmation deadline. Other HTTP statuses, redirects and malformed or mismatched identities still fail closed; a matching HTTP 200 response is required before the owner lookup can be retried. This does not authorize another launch or replay a write.
 
 Identity-lock waits, readiness and the retry share the confirmation deadline. Synchronous filesystem operations and native process creation cannot be forcibly cancelled; admission is checked before launch after preparation. Once started, the server is shared and may already have been adopted by another hook, so a caller's cancellation does not kill it. Recovery changes neither Windows Job policy nor SessionStart's shell lifecycle and cannot promise survival after host Job termination. Concurrent contenders use the existing store-startup locks and listener arbitration rather than a new service or scheduler.
 
-**Host-process session binding (#1693).** For omitted-ID MCP calls, an exec-form `SessionStart` hook (startup, resume, clear, fork) runs `engram hook claude-bind-session` and records which session the Claude process serves, as a small file under `<data dir>/host-sessions/<pid>.json` (host PID plus its process start time, so a reused PID never matches; entries of exited hosts are pruned). The hook is registered with `"args"`, so Claude Code spawns it directly with no shell: its parent is the Claude process on Linux, macOS and Windows. Shell-form hooks run through `sh -c` or Git Bash, where the parent is an intermediate shell on Ubuntu and Windows, so they are not used for the binding. `engram mcp` is a child of the same Claude process, so when a write omits `session_id` it first looks up its own parent's binding. The binding is used only if the bound session (or its live `:resume:N` continuation) is live and belongs to the same project as the write. Only absence of a verified process binding keeps the existing project/directory fallback, including its fail-closed ambiguity refusal. A verified binding naming an unknown session, another project, or an ended/unresolvable session without a live continuation rejects the write without fallback: `host session binding cannot resolve a live session for the requested project; provide session_id explicitly or restart the host session to refresh its binding`. This shared rule applies to omitted-ID `mem_save`, `mem_session_summary`, `mem_save_prompt`, and `mem_capture_passive` calls. An explicit `session_id` is never overridden. Writing the binding is best-effort: the command prints nothing, always exits 0, and never affects session start. SessionStart is not write-time freshness authority: a failed or cancelled rebind can leave the previous live binding in place. The registry alone cannot prevent that stale attribution; the supported PreToolUse gate above confirms and rewrites each matched call or blocks it on failure. Exec-form hooks were introduced in Claude Code 2.1.139, and the binding hook shipped in plugin 0.1.15; neither older minimum provides the hook-failure protection now required. The binding also needs an `engram` binary that includes the command. The measurements behind this design (Claude Code 2.1.304 on GitHub Actions, Windows/macOS/Ubuntu, npm and native installs) are in https://github.com/doblas/engram-1693-probe.
+**Host-process session binding (#1693).** For omitted-ID MCP calls, an exec-form `SessionStart` hook (startup, resume, clear, fork) runs `qbit-jay hook claude-bind-session` and records which session the Claude process serves, as a small file under `<data dir>/host-sessions/<pid>.json` (host PID plus its process start time, so a reused PID never matches; entries of exited hosts are pruned). The hook is registered with `"args"`, so Claude Code spawns it directly with no shell: its parent is the Claude process on Linux, macOS and Windows. Shell-form hooks run through `sh -c` or Git Bash, where the parent is an intermediate shell on Ubuntu and Windows, so they are not used for the binding. `qbit-jay mcp` is a child of the same Claude process, so when a write omits `session_id` it first looks up its own parent's binding. The binding is used only if the bound session (or its live `:resume:N` continuation) is live and belongs to the same project as the write. Only absence of a verified process binding keeps the existing project/directory fallback, including its fail-closed ambiguity refusal. A verified binding naming an unknown session, another project, or an ended/unresolvable session without a live continuation rejects the write without fallback: `host session binding cannot resolve a live session for the requested project; provide session_id explicitly or restart the host session to refresh its binding`. This shared rule applies to omitted-ID `mem_save`, `mem_session_summary`, `mem_save_prompt`, and `mem_capture_passive` calls. An explicit `session_id` is never overridden. Writing the binding is best-effort: the command prints nothing, always exits 0, and never affects session start. SessionStart is not write-time freshness authority: a failed or cancelled rebind can leave the previous live binding in place. The registry alone cannot prevent that stale attribution; the supported PreToolUse gate above confirms and rewrites each matched call or blocks it on failure. Exec-form hooks were introduced in Claude Code 2.1.139, and the binding hook shipped in plugin 0.1.15; neither older minimum provides the hook-failure protection now required. The binding also needs an `qbit-jay` binary that includes the command. The measurements behind this design (Claude Code 2.1.304 on GitHub Actions, Windows/macOS/Ubuntu, npm and native installs) are in https://github.com/doblas/engram-1693-probe.
 
 **On session start** (`startup`, `resume`, `clear`, `fork`):
-1. Ensures the engram HTTP server is running
+1. Ensures the qbit-jay HTTP server is running
 2. Registers the session via the API with `resume: true`, so a resumed conversation whose session already ended gets a live `<id>:resume:N` continuation instead of a refused registration. The registration is `project_owned`, except when the ended session is a legacy `shared` root (created before Claude registered project-owned sessions): it is resumed as `shared` so the continuation stays resolvable. A new continuation inherits the complete persisted root scope, so a same-project resume from another non-Git directory or linked worktree does not split registration from write binding and closure.
-3. Auto-imports git-synced chunks from `.engram/manifest.json` (if present)
+3. Auto-imports git-synced chunks from `.qbit-jay/manifest.json` (if present)
 4. Injects previous session context into Claude's initial context
 
 **On compaction** (`compact`):
@@ -257,10 +257,10 @@ Resume does not rewrite or skip an already-existing continuation with a conflict
 **On user prompt submit**:
 The Bash capture paths and PowerShell fallback ask the Go server's `POST /prompts/capture-decision` endpoint whether to capture a prompt. This replaces capture's former `GET /project/current` read, rather than adding another human-prompt preflight. Go skips blank prompts and prompts whose trimmed content starts with `<task-notification>`, `<agent-message`, `<system-reminder>`, or `<ci-monitor-event>`; only a valid `capture` decision with canonical project metadata permits `POST /prompts`, using the original content unchanged. Filtering affects persistence only, not ToolSearch or save reminders, and does not delete existing rows. The Windows Git Bash safe path remains builtin-only and skips all prompt persistence and API calls.
 
-**Server compatibility:** Automatic Claude prompt capture requires an Engram server with `/prompts/capture-decision`. Older servers (404), unavailable/slow servers, and malformed or invalid decisions silently skip capture; normal hooks, first-message ToolSearch, and existing save-reminder reads continue to work. There is no local classifier fallback. Decision responses must be 2xx without redirects. Adapters reject project metadata containing path separators, ASCII controls, or surrounding whitespace; these are transport sanity checks, not project normalization. Go remains the canonical-name authority, including lowercasing and repeated separator normalization; adapters never repair server metadata.
+**Server compatibility:** Automatic Claude prompt capture requires a qbit-jay server with `/prompts/capture-decision`. Older servers (404), unavailable/slow servers, and malformed or invalid decisions silently skip capture; normal hooks, first-message ToolSearch, and existing save-reminder reads continue to work. There is no local classifier fallback. Decision responses must be 2xx without redirects. Adapters reject project metadata containing path separators, ASCII controls, or surrounding whitespace; these are transport sanity checks, not project normalization. Go remains the canonical-name authority, including lowercasing and repeated separator normalization; adapters never repair server metadata.
 
-1. The first prompt injects a ToolSearch instruction so Claude Code loads Engram MCP tools before responding. After loading tools, the Bash hook and PowerShell fallback instruct the model to reuse usable prior-session context already provided by SessionStart and call `mem_context` only if that context was absent or not useful (including empty or unavailable context). This is guidance, not hook-side detection of injected context or a guarantee of model compliance.
-2. Later prompts may inject a save reminder if the local Engram API is fast and available.
+1. The first prompt injects a ToolSearch instruction so Claude Code loads qbit-jay MCP tools before responding. After loading tools, the Bash hook and PowerShell fallback instruct the model to reuse usable prior-session context already provided by SessionStart and call `mem_context` only if that context was absent or not useful (including empty or unavailable context). This is guidance, not hook-side detection of injected context or a guarantee of model compliance.
+2. Later prompts may inject a save reminder if the local qbit-jay API is fast and available.
 3. On Windows Git Bash/MSYS2, the hook uses a bash-builtin-only safe path to avoid fork-heavy helpers (`jq`, `git`, `curl`, `date`). In that mode first-prompt ToolSearch still works, but later save reminders degrade to `{}` so prompt submission stays fast.
 
 If Git Bash itself is blocked by enterprise security tooling, `scripts/user-prompt-submit.ps1` is provided as a native PowerShell fallback for manual hook testing or local override. It applies only to `UserPromptSubmit`; the complete plugin setup still requires `jq` and `curl` for shared Bash hooks.
@@ -269,7 +269,7 @@ PowerShell local override/testing example for locked-down Windows endpoints:
 
 ```powershell
 # Test the native fallback directly. First run emits ToolSearch; second run emits {}.
-'{"session_id":"edr/test:1"}' | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\path\to\engram\plugin\claude-code\scripts\user-prompt-submit.ps1"
+'{"session_id":"edr/test:1"}' | pwsh -NoProfile -ExecutionPolicy Bypass -File "C:\path\to\qbit-jay\plugin\claude-code\scripts\user-prompt-submit.ps1"
 
 # Local Claude Code override in .claude/settings.json or user settings:
 {
@@ -279,7 +279,7 @@ PowerShell local override/testing example for locked-down Windows endpoints:
         "hooks": [
           {
             "type": "command",
-            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\engram\\plugin\\claude-code\\scripts\\user-prompt-submit.ps1\"",
+            "command": "pwsh -NoProfile -ExecutionPolicy Bypass -File \"C:\\path\\to\\qbit-jay\\plugin\\claude-code\\scripts\\user-prompt-submit.ps1\"",
             "timeout": 10
           }
         ]
@@ -317,7 +317,7 @@ Repeated IDs are processed in order, so later successful decisions overwrite ear
 
 ## MCP Tool Reference — mem_judge
 
-`mem_judge` is available in the `agent` profile (`engram mcp --tools=agent`). It is NOT exposed in the `admin` profile.
+`mem_judge` is available in the `agent` profile (`qbit-jay mcp --tools=agent`). It is NOT exposed in the `admin` profile.
 
 ### Purpose
 
@@ -394,7 +394,7 @@ Multiple entries appear on separate lines (one per related observation), in quer
 
 ### Cloud sync for judgments
 
-When a project is enrolled in Engram Cloud and autosync is enabled, `mem_judge` verdicts sync across machines. The `memory_relations` table propagates via the standard mutation push/pull cycle — the same pipeline used for observations and sessions. Judgments appear in `mem_search` annotations on any machine that has pulled the relevant mutations.
+When a project is enrolled in qbit-jay Cloud and autosync is enabled, `mem_judge` verdicts sync across machines. The `memory_relations` table propagates via the standard mutation push/pull cycle — the same pipeline used for observations and sessions. Judgments appear in `mem_search` annotations on any machine that has pulled the relevant mutations.
 
 Relations where the referenced observation does not yet exist locally are deferred (see `sync_apply_deferred`) and retried automatically on subsequent pull cycles.
 
@@ -415,7 +415,7 @@ Old clients that read only the `result` string continue to work — these fields
 
 ### mem_save prompt capture
 
-`mem_save` accepts `capture_prompt` as an optional boolean in MCP and native Pi. Omission defaults to `true`. In MCP, a present value must be a typed boolean: strings (including `"false"`), numbers, and `null` return the exact tool error `capture_prompt must be a boolean` before project resolution or any session, observation, or prompt write. The shared Go policy defaults to `true`: when the runtime supplies a current user prompt for the same project and session, Engram best-effort stores an independent `user_prompts` row using exact project + session + stored-content dedupe. This is not an observation-ID-to-prompt-ID link. Passing `capture_prompt=false` skips only that save's prompt capture attempt and is intended for automated saves.
+`mem_save` accepts `capture_prompt` as an optional boolean in MCP and native Pi. Omission defaults to `true`. In MCP, a present value must be a typed boolean: strings (including `"false"`), numbers, and `null` return the exact tool error `capture_prompt must be a boolean` before project resolution or any session, observation, or prompt write. The shared Go policy defaults to `true`: when the runtime supplies a current user prompt for the same project and session, qbit-jay best-effort stores an independent `user_prompts` row using exact project + session + stored-content dedupe. This is not an observation-ID-to-prompt-ID link. Passing `capture_prompt=false` skips only that save's prompt capture attempt and is intended for automated saves.
 
 If no current prompt is available to the MCP process, or if best-effort prompt capture fails, `mem_save` still succeeds and no prompt is invented from the observation content. Plugins/protocol hooks that can observe user prompts must feed that prompt context before relying on automatic capture. Calling `mem_save_prompt` in the same MCP process records the prompt and makes it available to later `mem_save` calls for the same project/session; a different MCP process lifecycle does not inherit that in-memory prompt context.
 
@@ -431,30 +431,30 @@ Pi-native `mem_save` sends one generated operation UUID with a frozen request pa
 
 Phase 3 adds an admin-facing observability layer over the conflict/relation system. This is NOT for end users — end users continue to interact with conflicts via the normal agent conversation flow (Phase 1). The tools below are for operators and maintainers who need to inspect or audit the `memory_relations` and `sync_apply_deferred` tables directly.
 
-### engram conflicts CLI
+### qbit-jay conflicts CLI
 
-The `engram conflicts <sub-command>` command provides read and scan access to the conflict layer from the terminal. It is intended for maintainers, not for agents or end users.
+The `qbit-jay conflicts <sub-command>` command provides read and scan access to the conflict layer from the terminal. It is intended for maintainers, not for agents or end users.
 
 | Sub-command | What it does |
 |-------------|-------------|
-| `engram conflicts list` | List `memory_relations` rows with optional `--project`, `--status`, `--since`, `--limit` filters |
-| `engram conflicts show <id>` | Show full detail for one relation row (source/target observation snippets) |
-| `engram conflicts stats` | Aggregate counts grouped by relation type and judgment status; includes deferred and dead queue sizes |
-| `engram conflicts scan` | Walk observations for a project, find conflict candidates, and (with `--apply`) insert new pending relation rows up to a `--max-insert` cap |
-| `engram conflicts deferred` | Inspect and replay rows in `sync_apply_deferred`; supports `--status`, `--inspect <sync_id>`, and `--replay` |
-| `engram conflicts prune` | Bound dead rows in `sync_apply_deferred` by age and per-scope count; dry run by default, deletes with `--apply` |
+| `qbit-jay conflicts list` | List `memory_relations` rows with optional `--project`, `--status`, `--since`, `--limit` filters |
+| `qbit-jay conflicts show <id>` | Show full detail for one relation row (source/target observation snippets) |
+| `qbit-jay conflicts stats` | Aggregate counts grouped by relation type and judgment status; includes deferred and dead queue sizes |
+| `qbit-jay conflicts scan` | Walk observations for a project, find conflict candidates, and (with `--apply`) insert new pending relation rows up to a `--max-insert` cap |
+| `qbit-jay conflicts deferred` | Inspect and replay rows in `sync_apply_deferred`; supports `--status`, `--inspect <sync_id>`, and `--replay` |
+| `qbit-jay conflicts prune` | Bound dead rows in `sync_apply_deferred` by age and per-scope count; dry run by default, deletes with `--apply` |
 
-When `--project` is omitted, the command falls back to the cwd-detected project (same resolution as all other `engram` commands).
+When `--project` is omitted, the command falls back to the cwd-detected project (same resolution as all other `qbit-jay` commands).
 
-`engram conflicts scan` also supports `--semantic` for LLM-judge semantic detection beyond FTS5 lexical candidates. This catches vocabulary-different concepts that share no keywords (e.g., "Hexagonal Architecture" vs "Ports and Adapters"). Set `ENGRAM_AGENT_CLI=claude` or `ENGRAM_AGENT_CLI=opencode` before running. Additional flags: `--concurrency N` (default 5), `--timeout-per-call N` seconds (default 60), `--max-semantic N` (default 100), `--yes` (skip confirmation).
+`qbit-jay conflicts scan` also supports `--semantic` for LLM-judge semantic detection beyond FTS5 lexical candidates. This catches vocabulary-different concepts that share no keywords (e.g., "Hexagonal Architecture" vs "Ports and Adapters"). Set `QBIT_JAY_AGENT_CLI=claude` or `QBIT_JAY_AGENT_CLI=opencode` before running. Additional flags: `--concurrency N` (default 5), `--timeout-per-call N` seconds (default 60), `--max-semantic N` (default 100), `--yes` (skip confirmation).
 
-> **Subscription note**: `--semantic` uses your existing agent CLI quota (Claude Pro/Max, OpenCode subscription). Engram itself adds no extra cost — you pay only what your LLM provider charges for the prompts.
+> **Subscription note**: `--semantic` uses your existing agent CLI quota (Claude Pro/Max, OpenCode subscription). qbit-jay itself adds no extra cost — you pay only what your LLM provider charges for the prompts.
 
 For the full HTTP API reference and CLI flag details, see [DOCS.md](../DOCS.md).
 
 ### HTTP endpoints
 
-All eight `/conflicts/*` endpoints are served by `engram serve` on the local runtime (`127.0.0.1:7437`). They are not exposed on the cloud runtime. Full request/response documentation is in [DOCS.md](../DOCS.md).
+All eight `/conflicts/*` endpoints are served by `qbit-jay serve` on the local runtime (`127.0.0.1:7437`). They are not exposed on the cloud runtime. Full request/response documentation is in [DOCS.md](../DOCS.md).
 
 | Route | Purpose |
 |-------|---------|
@@ -471,7 +471,7 @@ All eight `/conflicts/*` endpoints are served by `engram serve` on the local run
 
 ## MCP Tool Reference — mem_compare
 
-`mem_compare` is available in the `agent` profile (`engram mcp --tools=agent`). It is NOT exposed in the `admin` profile.
+`mem_compare` is available in the `agent` profile (`qbit-jay mcp --tools=agent`). It is NOT exposed in the `admin` profile.
 
 ### Purpose
 

@@ -1,40 +1,40 @@
-[← Back to Engram Cloud](./README.md)
+[← Back to qbit-jay Cloud](./README.md)
 
-# Engram Cloud Troubleshooting
+# qbit-jay Cloud Troubleshooting
 
-Use this guide when local Engram saves work but cloud sync does not advance. The safest rule is simple: **local SQLite is the source of truth; cloud is replication**. Back up the local database before repairing anything.
+Use this guide when local qbit-jay saves work but cloud sync does not advance. The safest rule is simple: **local SQLite is the source of truth; cloud is replication**. Back up the local database before repairing anything.
 
 ---
 
 ## Blank-project pending session mutations
 
-If cloud export reports a pending session mutation with `seq` and `entity_key`, run `engram cloud upgrade doctor --project <project>` and apply its deterministic repair before retrying export. Repair uses the matching local session as authority for project and directory. A conflicting payload or missing local session requires manual investigation; do not assign ownership from the journal payload alone.
+If cloud export reports a pending session mutation with `seq` and `entity_key`, run `qbit-jay cloud upgrade doctor --project <project>` and apply its deterministic repair before retrying export. Repair uses the matching local session as authority for project and directory. A conflicting payload or missing local session requires manual investigation; do not assign ownership from the journal payload alone.
 
 ## Startup spends time checking mutation chunks
 
-Watch the server's standard error for the current project and its position in the startup repair. While rows are being processed, Engram logs the phase, rows scanned in that phase, and elapsed time for the project at most once every five seconds. The `chunks` phase checks stored chunks, and the `journal` phase checks legacy mutations. The final summary includes the count of invalid legacy mutations skipped during repair.
+Watch the server's standard error for the current project and its position in the startup repair. While rows are being processed, qbit-jay logs the phase, rows scanned in that phase, and elapsed time for the project at most once every five seconds. The `chunks` phase checks stored chunks, and the `journal` phase checks legacy mutations. The final summary includes the count of invalid legacy mutations skipped during repair.
 
 ## Quick Triage
 
 Run these commands first:
 
 ```bash
-engram version
-engram cloud status
-engram cloud upgrade doctor --project <project>
-engram sync --cloud --status --project <project>
+qbit-jay version
+qbit-jay cloud status
+qbit-jay cloud upgrade doctor --project <project>
+qbit-jay sync --cloud --status --project <project>
 ```
 
 Check three things:
 
 | Signal | Healthy value | What it means |
 |---|---|---|
-| `engram version` | Latest release on client and server | Client/server version skew can block old chunk sync |
+| `qbit-jay version` | Latest release on client and server | Client/server version skew can block old chunk sync |
 | `cloud status` | configured + auth ready | CLI has a server URL and runtime token |
 | `doctor` | `ready` or actionable repair | Local metadata is safe to upload |
 | `last_acked_seq` | Advances after sync | Cloud accepted the pending journal |
 
-`engram cloud upgrade doctor --project <project>` checks policy failures recorded locally for that project only. A denial recorded for another project in the shared `cloud` sync target does not block the selected project. Doctor does not probe server authorization; it persists its diagnosis as `doctor_ready` or `doctor_blocked`. Use `engram sync --cloud --project <project>` to check the current server response.
+`qbit-jay cloud upgrade doctor --project <project>` checks policy failures recorded locally for that project only. A denial recorded for another project in the shared `cloud` sync target does not block the selected project. Doctor does not probe server authorization; it persists its diagnosis as `doctor_ready` or `doctor_blocked`. Use `qbit-jay sync --cloud --project <project>` to check the current server response.
 
 If the dashboard shows `0` observations but local saves exist, the cloud server has not accepted the client's pending sync yet. Do not delete local data.
 
@@ -45,46 +45,46 @@ If the dashboard shows `0` observations but local saves exist, the cloud server 
 Use the supported commands exactly:
 
 ```bash
-engram cloud config --server https://your-cloud-host
-engram cloud status
-engram cloud enroll <project>
-engram sync --cloud --project <project>
+qbit-jay cloud config --server https://your-cloud-host
+qbit-jay cloud status
+qbit-jay cloud enroll <project>
+qbit-jay sync --cloud --project <project>
 ```
 
-`engram cloud config --status` is not the documented status command. Use `engram cloud status`.
+`qbit-jay cloud config --status` is not the documented status command. Use `qbit-jay cloud status`.
 
 Cloud auth token is runtime config:
 
 ```bash
-export ENGRAM_CLOUD_TOKEN="your-token"
+export QBIT_JAY_CLOUD_TOKEN="your-token"
 ```
 
-The local `~/.engram/cloud.json` stores the server URL and may also store a `token` fallback. `ENGRAM_CLOUD_TOKEN` takes precedence over any token in `cloud.json`; if the env var is unset, Engram falls back to `cloud.json.token`. This fallback is intentional (issue #343) for use cases such as background autosync where exporting the env var on every shell is not practical.
+The local `~/.qbit-jay/cloud.json` stores the server URL and may also store a `token` fallback. `QBIT_JAY_CLOUD_TOKEN` takes precedence over any token in `cloud.json`; if the env var is unset, qbit-jay falls back to `cloud.json.token`. This fallback is intentional (issue #343) for use cases such as background autosync where exporting the env var on every shell is not practical.
 
 ### Stop future replication or clear persisted settings
 
 ```bash
-engram cloud status --project <project>
-engram cloud unenroll <project>
-engram cloud config --clear
+qbit-jay cloud status --project <project>
+qbit-jay cloud unenroll <project>
+qbit-jay cloud config --clear
 ```
 
 `cloud status` reports effective server/auth configuration separately from project enrollment. Use `--project` to see whether that project is enrolled.
 
 `cloud unenroll` is idempotent and stops future replication eligibility for that project. It does not delete local data, remote history, or pending journal rows, and it does not cancel an already in-flight push.
 
-`cloud config --clear` clears only the persisted `cloud.json` server URL and token. Active `ENGRAM_CLOUD_SERVER` and `ENGRAM_CLOUD_TOKEN` overrides remain effective and are reported by the command and status output; unset them separately when you need them inactive.
+`cloud config --clear` clears only the persisted `cloud.json` server URL and token. Active `QBIT_JAY_CLOUD_SERVER` and `QBIT_JAY_CLOUD_TOKEN` overrides remain effective and are reported by the command and status output; unset them separately when you need them inactive.
 
 ## Prompt source attestation did not complete
 
-`engram cloud attest-prompt-source --sync-id <exact-sync-id> --owner-project <owner-project>` requires a configured cloud endpoint and human bearer token. If the local preview is absent or ambiguous, verify the exact sync ID; no remote request is sent. A declined or invalid confirmation also sends nothing. A remote denial can mean either project grant is missing: check both grants with your cloud administrator rather than treating the prompt project as ownership proof. If the remote call succeeds but local confirmation fails, the error includes the remote attestation ID; **do not assume local authorization**. Resolve the local mismatch and retry deliberately. No import, pull, or deletion is part of this command.
+`qbit-jay cloud attest-prompt-source --sync-id <exact-sync-id> --owner-project <owner-project>` requires a configured cloud endpoint and human bearer token. If the local preview is absent or ambiguous, verify the exact sync ID; no remote request is sent. A declined or invalid confirmation also sends nothing. A remote denial can mean either project grant is missing: check both grants with your cloud administrator rather than treating the prompt project as ownership proof. If the remote call succeeds but local confirmation fails, the error includes the remote attestation ID; **do not assume local authorization**. Resolve the local mismatch and retry deliberately. No import, pull, or deletion is part of this command.
 
 ## Cloud project was recreated or deleted
 
 When a project's cloud data was deleted or recreated while the correct local data is already acknowledged, replay the current local project state with:
 
 ```bash
-engram cloud upgrade remirror --project <project>
+qbit-jay cloud upgrade remirror --project <project>
 ```
 
 The project must already be enrolled and the configured cloud credentials must be authorized for it. Remirror creates new project-scoped upsert and locally represented tombstone mutations, then sends them through the normal cloud export path. It preserves existing acknowledgement and attempt history; it does not reopen acknowledged rows, delete mutation history, or reset `last_acked_seq`. Re-running the command is safe because remote entities use stable identities and upsert semantics.
@@ -97,21 +97,20 @@ This error means the legacy chunk upload endpoint rejected a payload because the
 
 ### Fix
 
-Upgrade both sides to `v1.14.8` or newer:
+Upgrade both sides to a build that includes the fix (upstream Engram `v1.14.8` or newer; every qbit-jay build does):
 
 ```bash
-brew update
-brew upgrade engram
-engram version
+go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
+qbit-jay version
 ```
 
-Redeploy or restart the cloud server so the server binary also runs `v1.14.8` or newer.
+Redeploy or restart the cloud server so the server binary runs the same build.
 
 Then retry:
 
 ```bash
-engram sync --cloud --project <project>
-engram sync --cloud --status --project <project>
+qbit-jay sync --cloud --project <project>
+qbit-jay sync --cloud --status --project <project>
 ```
 
 ### Why this works
@@ -142,13 +141,13 @@ write chunk: cloud: push chunk ...: status 400: invalid push payload: sessions[N
 write chunk: cloud: push chunk ...: status 400: invalid push payload: observations[N].title is required
 ```
 
-It means a historical `session` mutation in `sync_mutations` is missing `directory`, a local `sessions` row included in the project export still has an empty/null `directory`, a local `observations` row included in the project export is missing a cloud-push required field, or a historical `observation` mutation is missing one of the required upsert fields: `sync_id`, `session_id`, `type`, `title`, `content`, or `scope`. Newer Engram versions write these fields correctly, but old journal rows, local session rows, or exported local observation rows may still need repair before first cloud upload.
+It means a historical `session` mutation in `sync_mutations` is missing `directory`, a local `sessions` row included in the project export still has an empty/null `directory`, a local `observations` row included in the project export is missing a cloud-push required field, or a historical `observation` mutation is missing one of the required upsert fields: `sync_id`, `session_id`, `type`, `title`, `content`, or `scope`. Newer qbit-jay versions write these fields correctly, but old journal rows, local session rows, or exported local observation rows may still need repair before first cloud upload.
 
 Isolated cross-project sessions are an exception: `ownership_mode: "project_owned"` with an omitted or blank string directory is valid and replicates without a repair. If an older client or cloud server rejects that payload, update both sides to a version supporting isolated cloud sessions. Do not use the directory rescue helper on these sessions: assigning a directory breaks their isolation contract. JSON null and non-string directory values are still invalid.
 
 ### Safe path: helper script
 
-Engram includes a temporary rescue helper. Despite the historical file name, it repairs missing session directories in both `sync_mutations` payloads and local `sessions.directory` rows, missing observation payload fields, and exported local `observations` rows whose required cloud-push fields are empty:
+qbit-jay includes a temporary rescue helper. Despite the historical file name, it repairs missing session directories in both `sync_mutations` payloads and local `sessions.directory` rows, missing observation payload fields, and exported local `observations` rows whose required cloud-push fields are empty:
 
 ```bash
 tools/repair-missing-session-directory.sh <project>
@@ -185,7 +184,7 @@ If doctor reveals another legacy blocker after each repair, use loop mode after 
 tools/repair-missing-session-directory.sh --apply --interactive --all <project>
 ```
 
-Loop mode repairs exactly one supported blocker (`entity=session|observation op=upsert`), reruns `engram cloud upgrade doctor --project <project>`, then repeats until doctor no longer reports a supported blocker. If doctor reports ready but local `sessions` rows included in the project export still have empty/null `directory`, loop mode applies that fallback repair and reruns doctor once more. If exported local `observations` rows are missing required fields such as `title`, loop mode applies that fallback repair next and reruns doctor again. It still stops on unsupported blockers, project mismatches, or observation data that cannot be fully inferred. In non-interactive loop mode, rerun with `--interactive` when the script asks for human-provided observation fields.
+Loop mode repairs exactly one supported blocker (`entity=session|observation op=upsert`), reruns `qbit-jay cloud upgrade doctor --project <project>`, then repeats until doctor no longer reports a supported blocker. If doctor reports ready but local `sessions` rows included in the project export still have empty/null `directory`, loop mode applies that fallback repair and reruns doctor once more. If exported local `observations` rows are missing required fields such as `title`, loop mode applies that fallback repair next and reruns doctor again. It still stops on unsupported blockers, project mismatches, or observation data that cannot be fully inferred. In non-interactive loop mode, rerun with `--interactive` when the script asks for human-provided observation fields.
 
 If one-shot mode finds no doctor blocker but reports local sessions with empty/null directory, preview and apply the fallback explicitly:
 
@@ -217,10 +216,10 @@ tools/repair-missing-session-directory.sh --apply --interactive --all --max 5 <p
 Then rerun the normal flow:
 
 ```bash
-engram cloud upgrade doctor --project <project>
-engram cloud upgrade repair --project <project> --dry-run
-engram cloud upgrade repair --project <project> --apply
-engram sync --cloud --project <project>
+qbit-jay cloud upgrade doctor --project <project>
+qbit-jay cloud upgrade repair --project <project> --dry-run
+qbit-jay cloud upgrade repair --project <project> --apply
+qbit-jay sync --cloud --project <project>
 ```
 
 ### What the script changes
@@ -255,7 +254,7 @@ It never changes `last_acked_seq`, never deletes mutations, and creates a timest
 If you do not pass `--seq`, the script runs:
 
 ```bash
-engram cloud upgrade doctor --project <project>
+qbit-jay cloud upgrade doctor --project <project>
 ```
 
 and extracts the first matching blocker:
@@ -311,11 +310,11 @@ tools/repair-missing-session-directory.sh --apply --seq 873 sias-app C:/Users/us
 If you want to inspect before using the helper:
 
 ```bash
-sqlite3 ~/.engram/engram.db "select seq, entity, op, entity_key, payload from sync_mutations where seq = 873;"
-sqlite3 ~/.engram/engram.db "select id, project, directory from sessions where id = 'manual-save-current';"
-sqlite3 ~/.engram/engram.db "select id, project, started_at, directory from sessions where project = '<project>' and (directory is null or directory = '');"
-sqlite3 ~/.engram/engram.db "select s.id, s.project, s.started_at, s.directory from sessions s where (s.directory is null or s.directory = '') and (s.project = '<project>' or s.id in (select session_id from observations where ifnull(project, '') = '<project>' union select session_id from user_prompts where ifnull(project, '') = '<project>'));"
-sqlite3 ~/.engram/engram.db "select o.id, ifnull(o.sync_id, '') as sync_id, ifnull(o.session_id, '') as session_id, ifnull(o.project, '') as project, ifnull(o.type, '') as type, ifnull(o.title, '') as title, ifnull(o.scope, '') as scope from observations o where (ifnull(o.project, '') = '<project>' or (ifnull(o.project, '') = '' and o.session_id in (select id from sessions where ifnull(project, '') = '<project>'))) and (ifnull(o.sync_id, '') = '' or ifnull(o.session_id, '') = '' or ifnull(o.type, '') = '' or ifnull(o.title, '') = '' or ifnull(o.content, '') = '' or ifnull(o.scope, '') = '');"
+sqlite3 ~/.qbit-jay/qbit-jay.db "select seq, entity, op, entity_key, payload from sync_mutations where seq = 873;"
+sqlite3 ~/.qbit-jay/qbit-jay.db "select id, project, directory from sessions where id = 'manual-save-current';"
+sqlite3 ~/.qbit-jay/qbit-jay.db "select id, project, started_at, directory from sessions where project = '<project>' and (directory is null or directory = '');"
+sqlite3 ~/.qbit-jay/qbit-jay.db "select s.id, s.project, s.started_at, s.directory from sessions s where (s.directory is null or s.directory = '') and (s.project = '<project>' or s.id in (select session_id from observations where ifnull(project, '') = '<project>' union select session_id from user_prompts where ifnull(project, '') = '<project>'));"
+sqlite3 ~/.qbit-jay/qbit-jay.db "select o.id, ifnull(o.sync_id, '') as sync_id, ifnull(o.session_id, '') as session_id, ifnull(o.project, '') as project, ifnull(o.type, '') as type, ifnull(o.title, '') as title, ifnull(o.scope, '') as scope from observations o where (ifnull(o.project, '') = '<project>' or (ifnull(o.project, '') = '' and o.session_id in (select id from sessions where ifnull(project, '') = '<project>'))) and (ifnull(o.sync_id, '') = '' or ifnull(o.session_id, '') = '' or ifnull(o.type, '') = '' or ifnull(o.title, '') = '' or ifnull(o.content, '') = '' or ifnull(o.scope, '') = '');"
 ```
 
 Do not manually edit SQLite without a backup.
@@ -324,7 +323,7 @@ Do not manually edit SQLite without a backup.
 
 ## Error: `invalid push payload: invalid character '\x1f' looking for beginning of value`
 
-Full symptom during `engram sync --cloud`:
+Full symptom during `qbit-jay sync --cloud`:
 
 ```text
 write chunk: cloud: push chunk ...: status 400: invalid push payload: invalid character '\x1f' looking for beginning of value
@@ -332,7 +331,7 @@ write chunk: cloud: push chunk ...: status 400: invalid push payload: invalid ch
 
 **Cause:** the client sends the push body as a gzip-compressed envelope declared with `Content-Type: application/vnd.engram.sync+gzip; version=1`. `\x1f` is the first byte of the gzip magic number (`0x1f 0x8b`), so this error means the server tried to decode raw gzip bytes as plain JSON. That happens when a proxy in front of the cloud server dropped or rewrote the request `Content-Type` header, or when the running server binary predates the compressed envelope support.
 
-**Current server behavior:** up-to-date `engram cloud serve` binaries sniff the gzip magic bytes and decode the compressed envelope when the declared `Content-Type` is missing or rewritten to a non-envelope value such as `application/json`, so a rewritten header no longer causes this error server-side. One shape still fails before sniffing: a request that still declares `application/vnd.engram.sync+gzip` with an unsupported `version` parameter is rejected with HTTP 415 (`unsupported push payload`), because the declared envelope version is validated before the request body is read. If you still see this error, the running server binary is older than this fix — upgrade the server.
+**Current server behavior:** up-to-date `qbit-jay cloud serve` binaries sniff the gzip magic bytes and decode the compressed envelope when the declared `Content-Type` is missing or rewritten to a non-envelope value such as `application/json`, so a rewritten header no longer causes this error server-side. One shape still fails before sniffing: a request that still declares `application/vnd.engram.sync+gzip` with an unsupported `version` parameter is rejected with HTTP 415 (`unsupported push payload`), because the declared envelope version is validated before the request body is read. If you still see this error, the running server binary is older than this fix — upgrade the server.
 
 **Proxy advice:** if you run a proxy (nginx, Traefik, an API gateway, a WAF) in front of the cloud server, configure it to preserve the client request `Content-Type` header — in particular `application/vnd.engram.sync+gzip; version=1` — instead of replacing it with `application/json` or stripping it.
 
@@ -349,30 +348,30 @@ write chunk: cloud: push chunk ...: status 400: invalid push payload: invalid ch
 | `sessions[N].directory is required` | Run the missing session directory helper with `--fix-empty-sessions` or `--all` |
 | `observation payload title is required for upsert` | Run the missing session directory helper; it also repairs missing observation payload fields from local `observations` |
 | `observations[N].title is required` | Run the missing session directory helper with `--fix-empty-observations` or `--all` |
-| `401` or `auth_required` | Check `ENGRAM_CLOUD_TOKEN` on the client and server |
-| `403` or `policy_forbidden` | Check the server-side `ENGRAM_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents. |
+| `401` or `auth_required` | Check `QBIT_JAY_CLOUD_TOKEN` on the client and server |
+| `403` or `policy_forbidden` | Check the server-side `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents. |
 | `server_unsupported` | Redeploy a cloud server with mutation endpoints |
 
 ---
 
-## `engram cloud bootstrap` errors
+## `qbit-jay cloud bootstrap` errors
 
 | Message | Cause | Next step |
 |---|---|---|
 | `a managed admin already exists; refusing to create a duplicate first admin via CLI bootstrap` | A managed admin was already bootstrapped (via CLI or dashboard). | This is expected safety behavior, not a bug. Use the existing managed admin, or a documented recovery path, instead of re-running first-admin bootstrap. |
-| `--issue-token requires ENGRAM_CLOUD_TOKEN_PEPPER to be configured` | `--issue-token` was passed without `ENGRAM_CLOUD_TOKEN_PEPPER` set. | Set `ENGRAM_CLOUD_TOKEN_PEPPER` to a dedicated secret (distinct from `ENGRAM_JWT_SECRET`) and re-run. No admin/user was created by the failed attempt. |
-| `stranded admin token recovery is not eligible` | `recover-token` found an unsafe admin or token state. | Use `engram cloud bootstrap recover-token` only for the documented partial-bootstrap state. To replace one unused active bootstrap token whose output was lost, explicitly add `--revoke-existing`; it may be retried after another lost output only while the current token remains unused, and refuses used, revoked, ambiguous, or multiple-active-token states. |
-| `recover-token requires ENGRAM_CLOUD_TOKEN_PEPPER to be configured` | The recovery command cannot hash a managed token safely. | Set the dedicated pepper, then retry. No token was created. |
-| `connect cloud store` | `ENGRAM_DATABASE_URL` is missing/unreachable, same as any other `engram cloud` database command. | Verify `ENGRAM_DATABASE_URL` and that Postgres is reachable, same as `engram cloud serve`. |
+| `--issue-token requires QBIT_JAY_CLOUD_TOKEN_PEPPER to be configured` | `--issue-token` was passed without `QBIT_JAY_CLOUD_TOKEN_PEPPER` set. | Set `QBIT_JAY_CLOUD_TOKEN_PEPPER` to a dedicated secret (distinct from `QBIT_JAY_JWT_SECRET`) and re-run. No admin/user was created by the failed attempt. |
+| `stranded admin token recovery is not eligible` | `recover-token` found an unsafe admin or token state. | Use `qbit-jay cloud bootstrap recover-token` only for the documented partial-bootstrap state. To replace one unused active bootstrap token whose output was lost, explicitly add `--revoke-existing`; it may be retried after another lost output only while the current token remains unused, and refuses used, revoked, ambiguous, or multiple-active-token states. |
+| `recover-token requires QBIT_JAY_CLOUD_TOKEN_PEPPER to be configured` | The recovery command cannot hash a managed token safely. | Set the dedicated pepper, then retry. No token was created. |
+| `connect cloud store` | `QBIT_JAY_DATABASE_URL` is missing/unreachable, same as any other `qbit-jay cloud` database command. | Verify `QBIT_JAY_DATABASE_URL` and that Postgres is reachable, same as `qbit-jay cloud serve`. |
 
-Rollback / legacy migration path: `engram cloud bootstrap admin` only adds new `cloud_principals`/`cloud_human_users`/`cloud_principal_tokens`/`cloud_project_grants` rows — it never disables `ENGRAM_CLOUD_TOKEN` or `ENGRAM_CLOUD_ADMIN`. If you want to stop using managed admins/tokens, simply keep using the legacy env credentials (or unset `ENGRAM_CLOUD_TOKEN_PEPPER` to disable managed-token authentication entirely); no migration or rollback command is required to fall back. See [DOCS.md — Managed users, tokens, and CLI bootstrap](../../DOCS.md#managed-users-tokens-and-cli-bootstrap) for how `engram cloud serve` resolves managed tokens first, then legacy env-token credentials.
+Rollback / legacy migration path: `qbit-jay cloud bootstrap admin` only adds new `cloud_principals`/`cloud_human_users`/`cloud_principal_tokens`/`cloud_project_grants` rows — it never disables `QBIT_JAY_CLOUD_TOKEN` or `QBIT_JAY_CLOUD_ADMIN`. If you want to stop using managed admins/tokens, simply keep using the legacy env credentials (or unset `QBIT_JAY_CLOUD_TOKEN_PEPPER` to disable managed-token authentication entirely); no migration or rollback command is required to fall back. See [DOCS.md — Managed users, tokens, and CLI bootstrap](../../DOCS.md#managed-users-tokens-and-cli-bootstrap) for how `qbit-jay cloud serve` resolves managed tokens first, then legacy env-token credentials.
 
 ## Managed-token runtime authentication errors
 
 | Symptom | Cause | Next step |
 |---|---|---|
-| A managed token returns `401` against `/sync/*` or `/admin/*` | `ENGRAM_CLOUD_TOKEN_PEPPER` is not set on the server, the token was revoked, or the owning managed user is disabled. | Confirm `ENGRAM_CLOUD_TOKEN_PEPPER` is set on the running `engram cloud serve` process (must match at issuance and at runtime) and that the token/user has not been revoked/disabled. |
-| A managed token returns `403` against `/sync/*` | The managed principal has no project grant for the requested project (deny-by-default). | Grant the project via `engram cloud bootstrap admin --grant-project <project>` or the dashboard/`/admin/*` grant routes. |
+| A managed token returns `401` against `/sync/*` or `/admin/*` | `QBIT_JAY_CLOUD_TOKEN_PEPPER` is not set on the server, the token was revoked, or the owning managed user is disabled. | Confirm `QBIT_JAY_CLOUD_TOKEN_PEPPER` is set on the running `qbit-jay cloud serve` process (must match at issuance and at runtime) and that the token/user has not been revoked/disabled. |
+| A managed token returns `403` against `/sync/*` | The managed principal has no project grant for the requested project (deny-by-default). | Grant the project via `qbit-jay cloud bootstrap admin --grant-project <project>` or the dashboard/`/admin/*` grant routes. |
 
 ---
 
@@ -381,12 +380,12 @@ Rollback / legacy migration path: `engram cloud bootstrap admin` only adds new `
 After any repair, verify in this order:
 
 ```bash
-engram cloud status
-engram cloud upgrade doctor --project <project>
-engram cloud upgrade repair --project <project> --dry-run
-engram cloud upgrade repair --project <project> --apply
-engram sync --cloud --project <project>
-engram sync --cloud --status --project <project>
+qbit-jay cloud status
+qbit-jay cloud upgrade doctor --project <project>
+qbit-jay cloud upgrade repair --project <project> --dry-run
+qbit-jay cloud upgrade repair --project <project> --apply
+qbit-jay sync --cloud --project <project>
+qbit-jay sync --cloud --status --project <project>
 ```
 
 Expected result:

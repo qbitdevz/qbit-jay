@@ -2,21 +2,21 @@
 
 # Binary self-testing
 
-Released Engram binaries include a local self-test command for RC performance and reliability reports. It is safe to run alongside an existing installation:
+Released qbit-jay binaries include a local self-test command for RC performance and reliability reports. It is safe to run alongside an existing installation:
 
 ```bash
-engram test
+qbit-jay test
 ```
 
 The default run executes both suites. Use `--quick` for a bounded smoke run, or select one suite when investigating a result:
 
 ```bash
-engram test --quick
-engram test reliability --quick
-engram test performance
+qbit-jay test --quick
+qbit-jay test reliability --quick
+qbit-jay test performance
 ```
 
-`engram test` prints a result for every scenario. A passing run exits `0`; an executed suite with one or more failed scenarios exits `2`; invalid command usage exits `1`. Performance results report elapsed time and throughput for comparison between runs, but have no hardware-dependent pass/fail threshold.
+`qbit-jay test` prints a result for every scenario. A passing run exits `0`; an executed suite with one or more failed scenarios exits `2`; invalid command usage exits `1`. Performance results report elapsed time and throughput for comparison between runs, but have no hardware-dependent pass/fail threshold.
 
 ## What the suites exercise
 
@@ -28,7 +28,7 @@ engram test performance
 Use `--json` for CI, issue attachments, or RC reports:
 
 ```bash
-engram test --quick --json > engram-self-test.json
+qbit-jay test --quick --json > engram-self-test.json
 ```
 
 The stable top-level shape is `engram-self-test/v1`:
@@ -48,6 +48,6 @@ Each scenario contains `name`, `suite`, `passed`, and `duration_ms`. Failed scen
 
 ## Isolation and limitations
 
-Each run creates a new temporary directory and removes it after completion. The command does not resolve or use `ENGRAM_DATA_DIR`, your `~/.engram` database, cloud credentials, configured endpoints, or user databases. All scenarios are local and offline; they open no network connection and start no service.
+Each run creates a new temporary directory and removes it after completion. The command does not resolve or use `QBIT_JAY_DATA_DIR`, your `~/.qbit-jay` database, cloud credentials, configured endpoints, or user databases. All scenarios are local and offline; they open no network connection and start no service.
 
-Run the command on the same supported Windows, macOS, or Linux platform as the released binary. It requires permission to create temporary files and a working local filesystem. It does **not** validate live Engram Cloud, Postgres, remote sync, agent plugins, or production-network reliability. Use the platform binary and the relevant cloud or end-to-end procedures for those checks.
+Run the command on the same supported Windows, macOS, or Linux platform as the released binary. It requires permission to create temporary files and a working local filesystem. It does **not** validate live qbit-jay Cloud, Postgres, remote sync, agent plugins, or production-network reliability. Use the platform binary and the relevant cloud or end-to-end procedures for those checks.

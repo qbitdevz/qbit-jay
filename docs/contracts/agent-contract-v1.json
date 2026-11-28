@@ -1,6 +1,6 @@
 {
   "contract_id": "engram.agent-contract/v1",
-  "digest": "96341a7066409d29857b2c65a459cd54fe625f93e2619bb07200a4d0e3fa0d15",
+  "digest": "0d08b996e15fee8b4b8d29572de8310ea98cdae1f956fc40017dd190b5c37462",
   "operations": {
     "mem_capture_passive": {
       "annotations": {
@@ -58,7 +58,7 @@
         "readOnlyHint": false,
         "title": "Compare Memory Pair (Persist Semantic Verdict)"
       },
-      "description": "Persist a semantic verdict you have already judged externally (with your LLM) into Engram.\n\nWHEN TO CALL: After you have evaluated two memories and reached a verdict, call mem_compare to PERSIST that verdict into the relation store. You do the judgment; mem_compare records it.\n\nPARAMS:\n  memory_id_a  (required) — integer id of the first observation (from mem_search or mem_get_observation)\n  memory_id_b  (required) — integer id of the second observation\n  relation     (required) — one of: related, compatible, scoped, conflicts_with, supersedes, not_conflict\n  confidence   (required) — float 0..1; your self-reported confidence in the verdict\n  reasoning    (required) — explanation of the verdict, max 200 chars\n  model        (optional) — your model identifier, stored for provenance (e.g. \"claude-haiku-4-5\")\n\nBEHAVIOR:\n  - Persists the verdict via JudgeBySemantic with system provenance (marked_by_actor=\"engram\").\n  - not_conflict: persists a judged relation and returns its sync_id, so future scans do not re-evaluate the pair.\n  - Idempotent: calling again for the same pair updates the existing row.\n  - Cross-project pairs are rejected.\n\nSUCCESS: Returns { \"sync_id\": \"rel-...\" } on every persisted verdict.\nERROR: Returns IsError=true if IDs are unknown, relation is invalid, or cross-project pair.",
+      "description": "Persist a semantic verdict you have already judged externally (with your LLM) into qbit-jay.\n\nWHEN TO CALL: After you have evaluated two memories and reached a verdict, call mem_compare to PERSIST that verdict into the relation store. You do the judgment; mem_compare records it.\n\nPARAMS:\n  memory_id_a  (required) — integer id of the first observation (from mem_search or mem_get_observation)\n  memory_id_b  (required) — integer id of the second observation\n  relation     (required) — one of: related, compatible, scoped, conflicts_with, supersedes, not_conflict\n  confidence   (required) — float 0..1; your self-reported confidence in the verdict\n  reasoning    (required) — explanation of the verdict, max 200 chars\n  model        (optional) — your model identifier, stored for provenance (e.g. \"claude-haiku-4-5\")\n\nBEHAVIOR:\n  - Persists the verdict via JudgeBySemantic with system provenance (marked_by_actor=\"engram\").\n  - not_conflict: persists a judged relation and returns its sync_id, so future scans do not re-evaluate the pair.\n  - Idempotent: calling again for the same pair updates the existing row.\n  - Cross-project pairs are rejected.\n\nSUCCESS: Returns { \"sync_id\": \"rel-...\" } on every persisted verdict.\nERROR: Returns IsError=true if IDs are unknown, relation is invalid, or cross-project pair.",
       "input_schema": {
         "properties": {
           "confidence": {
@@ -280,9 +280,9 @@
         "idempotentHint": true,
         "openWorldHint": false,
         "readOnlyHint": true,
-        "title": "Run Engram Doctor"
+        "title": "Run qbit-jay Doctor"
       },
-      "description": "Run read-only operational diagnostics. Returns the same structured envelope as `engram doctor --json`.",
+      "description": "Run read-only operational diagnostics. Returns the same structured envelope as `qbit-jay doctor --json`.",
       "input_schema": {
         "properties": {
           "check": {
@@ -495,7 +495,7 @@
         "readOnlyHint": true,
         "title": "List Known Projects"
       },
-      "description": "List every project known to Engram, with per-project observation/session/prompt counts, ordered by observation count (same view as `engram projects list`). Use for cross-project discovery when the working directory matches no known project: pick the right project, then scope mem_search/mem_context to it. Returns a successful empty list when nothing is stored yet; a store failure returns a tool error.",
+      "description": "List every project known to qbit-jay, with per-project observation/session/prompt counts, ordered by observation count (same view as `qbit-jay projects list`). Use for cross-project discovery when the working directory matches no known project: pick the right project, then scope mem_search/mem_context to it. Returns a successful empty list when nothing is stored yet; a store failure returns a tool error.",
       "input_schema": {
         "properties": {
           "org": {
@@ -628,7 +628,7 @@
             "type": "string"
           },
           "org": {
-            "description": "Optional org — a free-text grouping axis orthogonal to scope. Overrides the org inherited from .engram/config.json for the current directory, if any.",
+            "description": "Optional org — a free-text grouping axis orthogonal to scope. Overrides the org inherited from .qbit-jay/config.json (or the legacy .engram/config.json) for the current directory, if any.",
             "type": "string"
           },
           "project": {
@@ -988,7 +988,7 @@
         "readOnlyHint": false,
         "title": "Start Session"
       },
-      "description": "Register a caller-provided session ID. Engram does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency.",
+      "description": "Register a caller-provided session ID. qbit-jay does not generate a new ID; the result only confirms the supplied registration. Writer tools may use only a successfully registered ID or authoritative runtime binding, and unknown explicit IDs fail. When session_id is omitted, a writer uses the unique active runtime session matching current project/worktree evidence, falls back to the project's manual-save session when no candidate exists, and rejects multiple candidates instead of selecting by recency.",
       "input_schema": {
         "properties": {
           "directory": {
@@ -996,7 +996,7 @@
             "type": "string"
           },
           "id": {
-            "description": "Caller-provided unique session ID; Engram does not generate one.",
+            "description": "Caller-provided unique session ID; qbit-jay does not generate one.",
             "type": "string"
           }
         },

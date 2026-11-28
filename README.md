@@ -3,67 +3,38 @@
 
 <div align="center">
 
-<img width="100%" alt="Engram neon elephant banner: the elephant exhales a memory stream (remember, sync, recall), the ENGRAM wordmark is written on, and the tagline One Brain. Local or Cloud. appears" src="assets/branding/engram-banner.gif" />
+<img width="100%" alt="qbit-jay faceted blue jay hides acorns in a hexagon grid, the qbit-jay wordmark is written on, and the tagline Hides thousands of acorns. Remembers where, months later. appears" src="assets/branding/qbit-jay-banner.gif" />
 
-<h1>Engram™</h1>
+<h1>qbit-jay</h1>
 
 <p><strong>Persistent memory for AI coding agents.</strong></p>
 
 <p>
-<a href="https://github.com/Gentleman-Programming/engram/releases"><img src="https://img.shields.io/github/v/release/Gentleman-Programming/engram?style=for-the-badge&labelColor=1A1218&color=F095C8" alt="Release"></a>
-<a href="https://github.com/Gentleman-Programming/engram/stargazers"><img src="https://img.shields.io/github/stars/Gentleman-Programming/engram?style=for-the-badge&labelColor=1A1218&color=F095C8" alt="Stars"></a>
-<img src="https://img.shields.io/badge/agents-14-F095C8?style=for-the-badge&labelColor=1A1218" alt="14 agents">
-<img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-D7A0B8?style=for-the-badge&labelColor=1A1218" alt="Platform">
-<a href="LICENSE"><img src="https://img.shields.io/badge/MIT-D7A0B8?style=for-the-badge&labelColor=1A1218" alt="License: MIT"></a>
+<a href="https://github.com/qbitdevz/qbit-jay/stargazers"><img src="https://img.shields.io/github/stars/qbitdevz/qbit-jay?style=for-the-badge&labelColor=0B1020&color=3D8BFF" alt="Stars"></a>
+<img src="https://img.shields.io/badge/agents-14-3D8BFF?style=for-the-badge&labelColor=0B1020" alt="14 agents">
+<img src="https://img.shields.io/badge/macOS%20%C2%B7%20Linux%20%C2%B7%20Windows-3D8BFF?style=for-the-badge&labelColor=0B1020" alt="Platform">
+<a href="LICENSE"><img src="https://img.shields.io/badge/MIT-3D8BFF?style=for-the-badge&labelColor=0B1020" alt="License: MIT"></a>
 </p>
 
 <p>
-<a href="https://trendshift.io/repositories/22750?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-22750" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/repositories/22750" alt="Gentleman-Programming%2Fengram | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/22750?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-22750" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/22750/weekly?language=Go" alt="Gentleman-Programming%2Fengram | Trendshift" width="250" height="55"/></a>
-<a href="https://trendshift.io/repositories/22750?utm_source=trendshift-badge&amp;utm_medium=badge&amp;utm_campaign=badge-trendshift-22750" target="_blank" rel="noopener noreferrer"><img src="https://trendshift.io/api/badge/trendshift/repositories/22750/monthly?language=Go" alt="Gentleman-Programming%2Fengram | Trendshift" width="250" height="55"/></a>
-</p>
-
-<p>
-<a href="https://engram.gentlemanprogramming.com/"><strong>Website</strong></a> &bull;
 <a href="#get-started"><strong>Quickstart</strong></a> &bull;
 <a href="DOCS.md"><strong>Docs</strong></a> &bull;
-<a href="docs/RELEASE-STAGING.md"><strong>Candidate staging</strong></a> &bull;
-<a href="https://gentle-ai.gentlemanprogramming.com/"><strong>Gentle-AI</strong></a> &bull;
-<a href="https://gentle-ai-wiki.gentlemanprogramming.com/"><strong>Wiki</strong></a>
+<a href="docs/AGENT-SETUP.md"><strong>Agent setup</strong></a> &bull;
+<a href="#attribution"><strong>Attribution</strong></a>
 </p>
 
 <br/>
 
 <p>
-<strong>engram</strong> <code>/ˈen.ɡræm/</code> — <em>neuroscience</em>: the physical trace of a memory in the brain.
+<strong>jay</strong> — the bird (Spanish <em>arrendajo</em>) that hides food in thousands of places and remembers where.
 </p>
 
 <p>
 Your AI coding agent forgets everything when the session ends.
-<strong>Engram gives it a brain.</strong>
+<strong>qbit-jay gives it a memory that lasts.</strong>
 </p>
 
-<p><sub>One brain. Local or cloud. Agent-agnostic, single binary, zero dependencies.</sub></p>
-
-<br/>
-
-<sub><strong>If Engram saved you from re-explaining your project, a star helps other people find it.</strong></sub>
-
-<!--
-  sealed_token is a GitHub fine-grained token encrypted against Star History's
-  public key, so only the encrypted value is published here. It is required
-  because GitHub restricted the stargazers API to a repository's admins and
-  collaborators on 2026-06-30; without it the chart renders an error placeholder.
-  Regenerate it at https://www.star-history.com/?repos=Gentleman-Programming%2Fengram&type=date&legend=top-left
--->
-
-<a href="https://www.star-history.com/?repos=Gentleman-Programming%2Fengram&type=date&legend=top-left">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=Gentleman-Programming%2Fengram&type=date&theme=dark&legend=top-left&sealed_token=zwrd_DfwYZeJU7nhGYNtREEheKWYEslW_uzrqORlZ36v-JSMepdqGLkKExp1M-xbNq6t-ebVS5iM3WoPDO26tXbSGkjXC2Jo3kHQ3uNzlRkCrWoqRHkPVQXvosKciY109ObiwGV1z8aajyedcloppmekCGrvVKJb6KWxGLXW_mHcRAVIBZUOa4SzW75D" />
-    <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=Gentleman-Programming%2Fengram&type=date&legend=top-left&sealed_token=zwrd_DfwYZeJU7nhGYNtREEheKWYEslW_uzrqORlZ36v-JSMepdqGLkKExp1M-xbNq6t-ebVS5iM3WoPDO26tXbSGkjXC2Jo3kHQ3uNzlRkCrWoqRHkPVQXvosKciY109ObiwGV1z8aajyedcloppmekCGrvVKJb6KWxGLXW_mHcRAVIBZUOa4SzW75D" />
-    <img width="620" alt="Star History Chart" src="https://api.star-history.com/chart?repos=Gentleman-Programming%2Fengram&type=date&legend=top-left&sealed_token=zwrd_DfwYZeJU7nhGYNtREEheKWYEslW_uzrqORlZ36v-JSMepdqGLkKExp1M-xbNq6t-ebVS5iM3WoPDO26tXbSGkjXC2Jo3kHQ3uNzlRkCrWoqRHkPVQXvosKciY109ObiwGV1z8aajyedcloppmekCGrvVKJb6KWxGLXW_mHcRAVIBZUOa4SzW75D" />
-  </picture>
-</a>
+<p><sub>One memory. Local or cloud. Agent-agnostic, single binary, zero dependencies.</sub></p>
 
 <br/>
 
@@ -88,26 +59,18 @@ Your AI coding agent forgets everything when the session ends.
 
 </div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+## The name
 
-## Support the project
+A jay hides food in many places and finds it again later. That is the job of this tool, for your agent's work.
 
-<div align="center">
+- **What, where, when.** Scrub jays were the first animals shown to remember *what* they hid, *where* and *when* ([Clayton and Dickinson, *Nature*, 1998](https://doi.org/10.1038/26216)). qbit-jay keeps the same three for your project: the memory itself, the project and files it belongs to, and when it was saved.
+- **Hide thousands, recall months later.** The acorns on the banner are the memories your agent saves; the grid cells are the operations around them (`save`, `search`, `context`, `sync`, `recall`, `remember`).
 
-<a href="https://github.com/sponsors/Gentleman-Programming"><img width="100%" src="assets/branding/sponsor-banner.svg" alt="Free forever, independent by choice. No investors, no paywalls: Gentle AI, Engram and Gentle Shell are funded by the people who use them. Sponsor on GitHub, monthly or one-time."></a>
+## Attribution
 
-<p>
-We deliberately don't depend on investors: no outside agenda deciding the roadmap and no features locked behind paywalls.<br/>
-Donations through <a href="https://github.com/sponsors/Gentleman-Programming"><strong>GitHub Sponsors</strong></a> go straight into maintenance, new features and keeping everything free and ours.
-</p>
+qbit-jay is based on [Engram](https://github.com/Gentleman-Programming/engram) by Gentleman Programming (Alan Buscaglia), under the MIT license. It is an independent fork with its own name and identity; it is not official, sponsored or endorsed by the Engram project. See [UPSTREAM-DELTA.md](UPSTREAM-DELTA.md) for every point where it differs, [LICENSE](LICENSE) for the copyright lines and [TRADEMARKS.md](TRADEMARKS.md) for the upstream trademark policy.
 
-<p>Can't donate? A ⭐, a bug report or a pull request helps too.</p>
-
-<sub>Sponsorship never buys rankings, default selections or endorsements; see <a href="TRADEMARKS.md">TRADEMARKS.md</a>.</sub>
-
-</div>
-
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="right"><a href="#top">Back to top</a></div>
 
 ## Features
 
@@ -118,16 +81,16 @@ Donations through <a href="https://github.com/sponsors/Gentleman-Programming"><s
 ```
 Agent (Claude Code / OpenCode / Gemini CLI / Codex / VS Code / Antigravity / ...)
     ↓ MCP stdio
-Engram (single Go binary)
+qbit-jay (single Go binary)
     ↓
-SQLite + FTS5 (~/.engram/engram.db)
+SQLite + FTS5 (~/.qbit-jay/qbit-jay.db)
 ```
 
-Codex mutating Engram tools require the running core's `/health` response to advertise `capabilities.runtime_session_resolution: true` before resolving the host session. `root_session_resume` alone is not sufficient. If the core is incompatible, upgrade it to match the CLI, manually restart the running Engram server, and start a new Codex session. Hooks never restart the server automatically. Unregistered sessions and connection or invalid-response failures remain safely blocked with distinct diagnostics; read-only and non-Engram calls are unaffected.
+Codex mutating qbit-jay tools require the running core's `/health` response to advertise `capabilities.runtime_session_resolution: true` before resolving the host session. `root_session_resume` alone is not sufficient. If the core is incompatible, upgrade it to match the CLI, manually restart the running qbit-jay server, and start a new Codex session. Hooks never restart the server automatically. Unregistered sessions and connection or invalid-response failures remain safely blocked with distinct diagnostics; read-only and non-qbit-jay calls are unaffected.
 
 A **Go binary** with SQLite + FTS5 full-text search, exposed through CLI, HTTP API, MCP, and an interactive TUI. It works with any MCP-compatible agent, including Claude Code, OpenCode, Gemini CLI, Codex, VS Code (Copilot), Antigravity, Cursor, and Windsurf. No Node.js, Python, or Docker is required: one binary, one SQLite file.
 
-The data directory defaults to `~/.engram`; a nonblank `ENGRAM_DATA_DIR` overrides it and must be an absolute path. On Windows, local-SQLite commands (including `serve`, `mcp`, and `doctor`) create and check `<data-directory>/tmp/sqlite` before opening SQLite, then set `TEMP` and `TMP` for that process only. Startup fails with an operation-specific diagnostic if the directory cannot be used. User/system environment settings and the working directory are unchanged. The directory is shared between processes and is not cleaned by Engram; SQLite manages its own uniquely named temporary files. This preparation also covers cloud `status`, `enroll`, `unenroll`, `attest-prompt-source`, and the local-store `cloud upgrade` operations (`doctor`, `repair`, `bootstrap`, `remirror`, `status`, `rollback`). It does not run for `protocol-mode`, `setup`, `cloud serve`, `cloud config`, top-level `cloud repair` or `cloud bootstrap` (distinct from the included `cloud upgrade repair` and `cloud upgrade bootstrap`), other `cloud upgrade` subcommands, or unknown commands. Existing orphan-database migration behavior is unchanged, including for commands excluded from this preparation. Linux/macOS, config-free commands, isolated self-tests, `compatibility`, and `migrate-copy` retain their existing behavior.
+The data directory defaults to `~/.qbit-jay` (`%USERPROFILE%\.qbit-jay` on Windows); a nonblank `QBIT_JAY_DATA_DIR` overrides it and must be an absolute path. The legacy `ENGRAM_DATA_DIR` is still read when `QBIT_JAY_DATA_DIR` is not set. On Windows, local-SQLite commands (including `serve`, `mcp`, and `doctor`) create and check `<data-directory>/tmp/sqlite` before opening SQLite, then set `TEMP` and `TMP` for that process only. Startup fails with an operation-specific diagnostic if the directory cannot be used. User/system environment settings and the working directory are unchanged. The directory is shared between processes and is not cleaned by qbit-jay; SQLite manages its own uniquely named temporary files. This preparation also covers cloud `status`, `enroll`, `unenroll`, `attest-prompt-source`, and the local-store `cloud upgrade` operations (`doctor`, `repair`, `bootstrap`, `remirror`, `status`, `rollback`). It does not run for `protocol-mode`, `setup`, `cloud serve`, `cloud config`, top-level `cloud repair` or `cloud bootstrap` (distinct from the included `cloud upgrade repair` and `cloud upgrade bootstrap`), other `cloud upgrade` subcommands, or unknown commands. Existing orphan-database migration behavior is unchanged, including for commands excluded from this preparation. Linux/macOS, config-free commands, isolated self-tests, `compatibility`, and `migrate-copy` retain their existing behavior.
 
 **[Docs →](docs/ARCHITECTURE.md)**
 
@@ -135,7 +98,7 @@ The data directory defaults to `~/.engram`; a nonblank `ENGRAM_DATA_DIR` overrid
 
 ### Project-aware — The right memory for the right repo
 
-Project-aware reads use the canonical current project when no selector is supplied: an explicit project, then `ENGRAM_PROJECT`, then cwd detection. Use `--all` in the CLI or `all_projects=true` in HTTP for an intentional global read; do not combine either with an explicit project. `engram context` retains its positional project as an alias for `--project`. `GET /sync/status` supports one resolved project and rejects `all_projects=true` because its provider cannot aggregate status.
+Project-aware reads use the canonical current project when no selector is supplied: an explicit project, then `QBIT_JAY_PROJECT` (or the legacy `ENGRAM_PROJECT`), then cwd detection. Use `--all` in the CLI or `all_projects=true` in HTTP for an intentional global read; do not combine either with an explicit project. `qbit-jay context` retains its positional project as an alias for `--project`. `GET /sync/status` supports one resolved project and rejects `all_projects=true` because its provider cannot aggregate status.
 
 **[Docs →](DOCS.md#mcp-project-resolution)**
 
@@ -143,23 +106,23 @@ Project-aware reads use the canonical current project when no selector is suppli
 
 ### Local first — Portable when needed
 
-Engram keeps memory local by default. The local SQLite database is authoritative; Git Sync exports portable compressed chunks for sharing across machines, and Engram Cloud is optional, project-scoped replication/shared access with browser visibility.
+qbit-jay keeps memory local by default. The local SQLite database is authoritative; Git Sync exports portable compressed chunks for sharing across machines, and qbit-jay Cloud is optional, project-scoped replication/shared access with browser visibility.
 
 | Need | Start here |
 | --- | --- |
 | Local memory and the runtime model | [Architecture](docs/ARCHITECTURE.md) |
 | Share memory with Git | [Git Sync reference](DOCS.md#git-sync-chunked) |
-| Use optional Cloud replication | [Engram Cloud](docs/engram-cloud/README.md) |
+| Use optional Cloud replication | [qbit-jay Cloud](docs/engram-cloud/README.md) |
 | Diagnose or recover Cloud operations | [Cloud troubleshooting](docs/engram-cloud/troubleshooting.md) |
 
 For an existing local database, use the guided upgrade sequence. If the dry run reports changes, apply them before bootstrap; otherwise continue directly to bootstrap.
 
 ```bash
-engram cloud upgrade doctor --project <project>
-engram cloud upgrade repair --project <project> --dry-run
-engram cloud upgrade repair --project <project> --apply # only when the dry run reports changes
-engram cloud upgrade bootstrap --project <project>
-engram cloud upgrade status --project <project>
+qbit-jay cloud upgrade doctor --project <project>
+qbit-jay cloud upgrade repair --project <project> --dry-run
+qbit-jay cloud upgrade repair --project <project> --apply # only when the dry run reports changes
+qbit-jay cloud upgrade bootstrap --project <project>
+qbit-jay cloud upgrade status --project <project>
 ```
 
 **[Docs →](DOCS.md#cloud-upgrade-flow)**
@@ -169,17 +132,16 @@ engram cloud upgrade status --project <project>
 ### Terminal UI — Browse what your agent remembers
 
 ```bash
-engram tui
+qbit-jay tui
 ```
 
 <p align="center">
-  <img src="assets/tui-dashboard.png" alt="TUI Dashboard" width="400" />
-  <img width="400" alt="TUI recent observations" src="assets/tui-recent.png" />
-  <img src="assets/tui-detail.png" alt="TUI Observation Detail" width="400" />
-  <img src="assets/tui-search.png" alt="TUI Search Results" width="400" />
+  <img src="assets/screenshots/qbit-jay-tui-dashboard.png" alt="qbit-jay TUI dashboard" width="640" /><br/><br/>
+  <img src="assets/screenshots/qbit-jay-tui-recent.png" alt="qbit-jay TUI recent observations" width="640" /><br/><br/>
+  <img src="assets/screenshots/qbit-jay-tui-detail.png" alt="qbit-jay TUI observation detail" width="640" />
 </p>
 
-Navigate with `j`/`k`, use `Enter` to drill in, `c` to copy content to the clipboard, `/` to search, and `Esc` to go back. The TUI uses the Engram Elephant color palette.
+The screens above are the real TUI rendered with sample data. Navigate with `j`/`k`, use `Enter` to drill in, `c` to copy content to the clipboard, `/` to search, and `Esc` to go back. The TUI reads its colours from the same theme tokens as the web dashboard (dark and light).
 
 **[Docs →](DOCS.md#terminal-ui-tui)**
 
@@ -191,10 +153,10 @@ Navigate with `j`/`k`, use `Enter` to drill in, `c` to copy content to the clipb
 | :--- | :--- |
 | **[MCP tools](DOCS.md#mcp-tools-27-tools)** | Save, search, timeline, session, review, and diagnosis tools for your agent |
 | **[HTTP API](DOCS.md#http-api-endpoints)** | The same memory over local HTTP endpoints; [compound agent workflows](docs/HTTP-AGENT-WORKFLOWS.md) |
-| **[Doctor](docs/DOCTOR.md)** | `engram doctor` — read-only operational diagnostics |
+| **[Doctor](docs/DOCTOR.md)** | `qbit-jay doctor` — read-only operational diagnostics |
 | **[Conflict surfacing](docs/AGENT-SETUP.md#conflict-surfacing-automatic)** | Flags related or conflicting memories so the agent can judge them |
 | **[Plugins](docs/PLUGINS.md)** | OpenCode and Claude Code plugin details |
-| **[`gentle-engram`](plugin/pi/README.md)** | The Engram package for Pi |
+| **[Pi package](plugin/pi/README.md)** | The qbit-jay package for Pi (published as `gentle-engram` until it is renamed) |
 | **[Team usage](docs/TEAM-USAGE.md)** | Shared-memory conventions |
 | **[Binary self-testing](docs/SELF-TESTING.md)** | Isolated reliability and performance checks for released binaries |
 | **[Obsidian Brain](docs/beta/obsidian-brain.md)** | Export memories as an Obsidian knowledge graph (beta) |
@@ -203,58 +165,67 @@ Navigate with `j`/`k`, use `Enter` to drill in, `c` to copy content to the clipb
 
 <div align="right"><a href="#top">Back to top</a></div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="center"><img src="assets/branding/qbit-jay-isotype-dark-256.png" width="28" alt="" /></div>
 
 ## Get started
 
 ### Install
 
-For production use and security support, install the latest stable release from [GitHub Releases](https://github.com/Gentleman-Programming/engram/releases). Release candidates are prerelease validation and feedback builds; choose one only when you accept prerelease risk. See the [Release Policy](docs/RELEASE-POLICY.md) before upgrading.
-
-Homebrew installs the latest stable release:
+qbit-jay has no published release yet. Install it from source with Go (1.26 or newer):
 
 ```bash
-brew install gentleman-programming/tap/engram
+go install github.com/qbitdevz/qbit-jay/cmd/qbit-jay@latest
+qbit-jay version
 ```
 
-For Windows, Linux, source builds, and all installation methods, see [Installation](docs/INSTALLATION.md).
+Or build from a clone: `go build -o qbit-jay ./cmd/qbit-jay`. See [Installation](docs/INSTALLATION.md) for details.
+
+Coming later (none of these exists yet): GitHub Releases with prebuilt binaries, Homebrew, Scoop, npm and install scripts. See the [Release Policy](docs/RELEASE-POLICY.md) for how releases are meant to work.
+
+### Existing Engram data
+
+qbit-jay keeps its data in `~/.qbit-jay/qbit-jay.db` and does not read, copy or change `~/.engram`. Importing an existing Engram database is planned and not available yet.
+
+### Configuration
+
+Every setting is an environment variable named `QBIT_JAY_*` (for example `QBIT_JAY_DATA_DIR`, `QBIT_JAY_PROJECT`, `QBIT_JAY_PORT`). The legacy `ENGRAM_*` names are still accepted; when both are set, the `QBIT_JAY_*` value wins. The full list is in the [reference](DOCS.md).
 
 ### Set up your agent
 
-Run the setup command for the agent you use, then restart that agent. `engram setup` writes the applicable MCP and integration configuration; it does not require you to start a server for the usual stdio-only setup.
+Run the setup command for the agent you use, then restart that agent. `qbit-jay setup` writes the applicable MCP and integration configuration; it does not require you to start a server for the usual stdio-only setup.
 
 | Agent | Setup |
 | --- | --- |
-| Claude Code | `engram setup claude-code` |
-| Pi | `engram setup pi` |
-| OpenCode | `engram setup opencode` |
-| Gemini CLI | `engram setup gemini-cli` |
-| Codex | `engram setup codex` |
-| Antigravity CLI | `engram setup antigravity-cli` |
-| Windsurf | `engram setup windsurf` |
-| Qwen Code | `engram setup qwen` |
-| Kiro | `engram setup kiro` |
-| Cursor | `engram setup cursor` |
-| VS Code (Copilot) | `engram setup vscode-copilot` |
-| Kilo Code | `engram setup kilocode` |
-| Kimi Code | `engram setup kimi` |
-| CommandCode | `engram setup commandcode` |
+| Claude Code | `qbit-jay setup claude-code` |
+| Pi | `qbit-jay setup pi` |
+| OpenCode | `qbit-jay setup opencode` |
+| Gemini CLI | `qbit-jay setup gemini-cli` |
+| Codex | `qbit-jay setup codex` |
+| Antigravity CLI | `qbit-jay setup antigravity-cli` |
+| Windsurf | `qbit-jay setup windsurf` |
+| Qwen Code | `qbit-jay setup qwen` |
+| Kiro | `qbit-jay setup kiro` |
+| Cursor | `qbit-jay setup cursor` |
+| VS Code (Copilot) | `qbit-jay setup vscode-copilot` |
+| Kilo Code | `qbit-jay setup kilocode` |
+| Kimi Code | `qbit-jay setup kimi` |
+| CommandCode | `qbit-jay setup commandcode` |
 | Another MCP-compatible agent | [Manual MCP setup](docs/AGENT-SETUP.md#any-other-mcp-agent) |
 
-For Claude Code, rerunning setup updates the marketplace and the user-scope `engram@engram` plugin when it is already installed; existing project- or local-scope copies are not updated. An update failure fails setup; restart Claude Code after a successful update to load the new hooks.
+For Claude Code, rerunning setup updates the marketplace and the user-scope `qbit-jay@qbit-jay` plugin when it is already installed; existing project- or local-scope copies are not updated. An update failure fails setup; restart Claude Code after a successful update to load the new hooks.
 
-> **Per-agent configuration, plugin behavior, manual MCP setup, compaction resilience, and troubleshooting: [Agent Setup →](docs/AGENT-SETUP.md)** · Pi users can also find the package at [`gentle-engram`](plugin/pi/README.md).
+> **Per-agent configuration, plugin behavior, manual MCP setup, compaction resilience, and troubleshooting: [Agent Setup →](docs/AGENT-SETUP.md)** · Pi users can also find the package in [`plugin/pi`](plugin/pi/README.md).
 
 <div align="right"><a href="#top">Back to top</a></div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="center"><img src="assets/branding/qbit-jay-isotype-dark-256.png" width="28" alt="" /></div>
 
 ## Read-only compatibility observations
 
 Before considering an existing store, run the explicit-path probe:
 
 ```sh
-engram compatibility --data-dir /absolute/path/to/fixture --json
+qbit-jay compatibility --data-dir /absolute/path/to/fixture --json
 ```
 
 This command dispatches before updates, configuration, orphan migration or
@@ -263,7 +234,7 @@ only; it does not load SQLite, read memories, create directories/locks or repair
 identity. Exactly one `--data-dir` and one `--json` are accepted; any other
 argument, including `--help`, prints the usage line to stderr. Invalid arguments
 or unsafe metadata produce exit 2, no stdout and a diagnostic on stderr.
-`engram help` lists the command. Successful observations produce exit 0 and one
+`qbit-jay help` lists the command. Successful observations produce exit 0 and one
 JSON object with `revision: 1`, `source: "offline"`, both authorization flags
 false and, for an existing store, its `instance_id`. Status is `fresh` for
 an empty directory, `legacy_schema`/`future_schema` for non-current headers,
@@ -294,7 +265,7 @@ up, update and restart the existing server, then recheck.
 
 ## For agents
 
-Treat Engram as a curated project memory, not a transcript sink. Use this operating contract throughout the session.
+Treat qbit-jay as a curated project memory, not a transcript sink. Use this operating contract throughout the session.
 
 1. **Orient before writing.** Start with `mem_current_project` to confirm the resolved project and its source. At the start of related work, use `mem_context` and `mem_search` to recover the relevant history.
 2. **Search before repeating.** Before revisiting a decision, bug, convention, or request that may already be known, search with focused terms. Search results are previews, not the complete record.
@@ -306,23 +277,23 @@ Treat Engram as a curated project memory, not a transcript sink. Use this operat
 
 ### When Git initialization changes the detected project
 
-Before creating a repository's first private Git identity, Engram checks local
+Before creating a repository's first private Git identity, qbit-jay checks local
 session history for the exact working directory. If Git suggests `remote-app`
 but that directory has history under `local-app`, implicit project selection
 stops with `project_transition_conflict` instead of silently changing scope.
 History is only a precaution: explicit or imported sessions can also trigger it.
 
 Choose the intended scope deliberately. For a persistent choice, run
-`engram init local-app` in the project directory; existing explicit project
+`qbit-jay init local-app` in the project directory; existing explicit project
 filters and valid registered-session writes remain available. Do not overwrite
 an existing configuration without reviewing it. This choice changes future
 resolution; it does **not** merge or move previously split memories.
 
 Historical directories are matched as absolute, lexically normalized paths;
-Engram does not access their filesystems. Relative history without a recorded
+qbit-jay does not access their filesystems. Relative history without a recorded
 base is ignored. Only the selected working directory is filesystem-canonicalized,
 so legacy history stored under a symlink alias may require an explicit project
-choice (`engram init local-app`) rather than automatic recognition.
+choice (`qbit-jay init local-app`) rather than automatic recognition.
 
 Existing Git bindings stay stable. This check cannot reconstruct history without
 a usable absolute directory, across relocated paths, or in another local store.
@@ -358,69 +329,52 @@ For parameters and the complete, current tool reference, see [the full documenta
 
 <div align="right"><a href="#top">Back to top</a></div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="center"><img src="assets/branding/qbit-jay-isotype-dark-256.png" width="28" alt="" /></div>
 
 ## Documentation
 
 | Where to go | What you'll find |
 | :--- | :--- |
-| **[Intended Usage](docs/intended-usage.md)** | The human mental model for using Engram |
+| **[Intended Usage](docs/intended-usage.md)** | The human mental model for using qbit-jay |
 | **[Installation](docs/INSTALLATION.md)** · **[Release Policy](docs/RELEASE-POLICY.md)** · **[SignPath TEST pilot](docs/signpath-test.md)** | Platform support, release guidance, and the nonpublishing test-signing pilot |
 | **[Agent Setup](docs/AGENT-SETUP.md)** · **[Plugins](docs/PLUGINS.md)** | Per-agent configuration, compaction resilience, and OpenCode and Claude Code plugin details |
 | **[Architecture](docs/ARCHITECTURE.md)** · **[Codebase Guide](docs/CODEBASE-GUIDE.md)** | Memory model, tool behavior, project structure, flows, and implementation landmarks |
-| **[Engram Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |
+| **[qbit-jay Cloud](docs/engram-cloud/README.md)** · **[Team Usage](docs/TEAM-USAGE.md)** | Cloud quickstart, deployment, technical links, and shared-memory conventions |
 | **[Doctor](docs/DOCTOR.md)** · **[Binary self-testing](docs/SELF-TESTING.md)** | Operational diagnosis and repair workflows, and isolated reliability and performance checks for released binaries |
-| **[Beta Testing](docs/BETA_TESTING.md)** · **[Obsidian Brain](docs/beta/obsidian-brain.md)** | Isolated beta testing flows and cleanup guidance, and exporting memories as an Obsidian knowledge graph (beta) |
-| **[Comparison](docs/COMPARISON.md)** | Engram compared with claude-mem |
+| **[Obsidian Brain](docs/beta/obsidian-brain.md)** · **[Upstream beta guide](docs/BETA_TESTING.md)** | Exporting memories as an Obsidian knowledge graph, and Engram's historical beta testing guide (kept as a record) |
+| **[Comparison](docs/COMPARISON.md)** | qbit-jay compared with claude-mem |
 | **[Full Docs](DOCS.md)** · **[Contributing](CONTRIBUTING.md)** | Complete CLI, environment, API, and operational reference, and the contributor workflow |
 
 > **Dashboard contributors:** if you modify `.templ` files in `internal/cloud/dashboard/`, run `make templ` to regenerate before committing. See [Dashboard templ regeneration](DOCS.md#dashboard-templ-regeneration).
 
 <div align="right"><a href="#top">Back to top</a></div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="center"><img src="assets/branding/qbit-jay-isotype-dark-256.png" width="28" alt="" /></div>
 
 ## Community
 
-Every change starts with an approved issue. See [Contributing](CONTRIBUTING.md) for the issue-first workflow, labels, review requirements, and contributor standards.
+Every change starts with an approved issue. See [Contributing](CONTRIBUTING.md) for the issue-first workflow, labels, review requirements, and contributor standards. Issues and pull requests go to [qbitdevz/qbit-jay](https://github.com/qbitdevz/qbit-jay).
 
 <div align="center">
 
-<a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/Contributing%20Guide-F095C8?style=for-the-badge&labelColor=1A1218&logo=git&logoColor=F095C8" alt="Contributing Guide"></a>
-<a href="https://github.com/Gentleman-Programming/engram/graphs/contributors"><img src="https://img.shields.io/badge/Contributors-D7A0B8?style=for-the-badge&labelColor=1A1218&logo=github&logoColor=D7A0B8" alt="Contributors"></a>
-<a href="https://discord.com/invite/gentleman-programming-769863833996754944"><img src="https://img.shields.io/badge/Discord-Gentleman%20Programming-F095C8?style=for-the-badge&labelColor=1A1218" alt="Gentleman Programming Discord"></a>
-
-<br/><br/>
-
-<a href="https://github.com/Gentleman-Programming/engram/graphs/contributors">
-  <img width="100%" src="https://contrib.rocks/image?repo=Gentleman-Programming/engram&max=100" alt="Engram contributors" />
-</a>
-
-<p><sub>This project exists because of these people.</sub></p>
+<a href="CONTRIBUTING.md"><img src="https://img.shields.io/badge/Contributing%20Guide-3D8BFF?style=for-the-badge&labelColor=0B1020&logo=git&logoColor=3D8BFF" alt="Contributing Guide"></a>
+<a href="https://github.com/qbitdevz/qbit-jay/issues"><img src="https://img.shields.io/badge/Issues-3D8BFF?style=for-the-badge&labelColor=0B1020&logo=github&logoColor=3D8BFF" alt="Issues"></a>
 
 </div>
 
 <div align="right"><a href="#top">Back to top</a></div>
 
-<div align="center"><img src="assets/branding/engram-logo-only.png" width="28" alt="" /></div>
+<div align="center"><img src="assets/branding/qbit-jay-isotype-dark-256.png" width="28" alt="" /></div>
 
-## About the author
+## About
 
-Built by [Alan Buscaglia](https://github.com/Gentleman-Programming) (Gentleman Programming). Engram is also the memory layer of [Gentle-AI](https://github.com/Gentleman-Programming/gentle-ai), and it stays a standalone tool you can use with any MCP-compatible agent.
-
-<div align="center">
-
-<a href="https://gentlemanprogramming.com/"><img src="https://img.shields.io/badge/Website-F095C8?style=for-the-badge&labelColor=1A1218&logo=googlechrome&logoColor=F095C8" alt="Website"></a>
-<a href="https://www.youtube.com/@GentlemanProgramming"><img src="https://img.shields.io/badge/YouTube-F095C8?style=for-the-badge&labelColor=1A1218&logo=youtube&logoColor=F095C8" alt="YouTube"></a>
-<a href="https://github.com/Gentleman-Programming"><img src="https://img.shields.io/badge/GitHub-D7A0B8?style=for-the-badge&labelColor=1A1218&logo=github&logoColor=D7A0B8" alt="GitHub"></a>
-
-</div>
+qbit-jay is built by qbitdev ([Leandro Alvarez](https://github.com/qbitdevz)). It stands on the work of [Alan Buscaglia](https://github.com/Gentleman-Programming) (Gentleman Programming), whose [Engram](https://github.com/Gentleman-Programming/engram) it is based on. Engram is also the memory layer of [Gentle-AI](https://github.com/Gentleman-Programming/gentle-ai); qbit-jay is a separate project and has no affiliation with either.
 
 ---
 
 <div align="center">
 
-<img src="assets/branding/engram-logo-only.png" width="56" alt="" />
+<img src="assets/branding/qbit-jay-isotype-dark-256.png" width="56" alt="" />
 
 <br/>
 
@@ -428,8 +382,8 @@ Built by [Alan Buscaglia](https://github.com/Gentleman-Programming) (Gentleman P
 
 <br/>
 
-<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-F095C8?style=for-the-badge&labelColor=1A1218" alt="License: MIT"></a>
+<a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-3D8BFF?style=for-the-badge&labelColor=0B1020" alt="License: MIT"></a>
 
 </div>
 
-> **Trademark notice:** The Engram™ names and logos are trademarks of Alan Buscaglia. The symbol appears on the first prominent mention, and this notice covers the rest. The MIT License applies to the code; it does not permit implying endorsement or official affiliation. See [TRADEMARKS.md](TRADEMARKS.md).
+> **Trademark notice:** Engram™ and its logos are trademarks of Alan Buscaglia. qbit-jay is an independent fork, not official, sponsored or endorsed by the Engram project, and uses none of its logos. The MIT License applies to the code; it does not permit implying endorsement or official affiliation. See [TRADEMARKS.md](TRADEMARKS.md).

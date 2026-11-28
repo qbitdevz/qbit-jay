@@ -17,15 +17,11 @@ Local `POST /prompts` accepts optional `source_inbox_id` alongside `session_id`,
 
 ## How It Works
 
-<p align="center">
-  <img src="../assets/agent-save.png" alt="Agent saving a memory via mem_save" width="800" />
-  <br />
-  <em>The agent proactively calls <code>mem_save</code> after significant work — structured, searchable, no noise.</em>
-</p>
+The agent proactively calls `mem_save` after significant work — structured, searchable, no noise.
 
-Engram trusts the **agent** to decide what's worth remembering — not a firehose of raw tool calls.
+qbit-jay trusts the **agent** to decide what's worth remembering — not a firehose of raw tool calls.
 
-### The Agent Saves, Engram Stores
+### The Agent Saves, qbit-jay Stores
 
 ```
 1. Agent completes significant work (bugfix, architecture decision, etc.)
@@ -33,7 +29,7 @@ Engram trusts the **agent** to decide what's worth remembering — not a firehos
    - title: "Fixed N+1 query in user list"
    - type: "bugfix"
    - content: What/Why/Where/Learned format
-3. Engram persists to SQLite with FTS5 indexing
+3. qbit-jay persists to SQLite with FTS5 indexing
 4. Next session: agent searches memory, gets relevant context
 ```
 
@@ -190,8 +186,8 @@ Topic keys are not pruned automatically. An observation updated via upsert keeps
 `topic_key` upsert is scoped to `project + scope + topic_key`. The same key used with different scopes creates independent observations:
 
 ```
-project=engram, scope=project, topic_key=architecture/auth-model  → observation A
-project=engram, scope=personal, topic_key=architecture/auth-model → observation B (independent)
+project=qbit-jay, scope=project, topic_key=architecture/auth-model  → observation A
+project=qbit-jay, scope=personal, topic_key=architecture/auth-model → observation B (independent)
 ```
 
 This means a `personal` note on the same topic does not overwrite the shared `project` observation.
@@ -201,8 +197,8 @@ This means a `personal` note on the same topic does not overwrite the shared `pr
 ## Project Structure
 
 ```
-engram/
-├── cmd/engram/main.go              # CLI entrypoint
+qbit-jay/
+├── cmd/qbit-jay/main.go              # CLI entrypoint
 ├── internal/
 │   ├── store/store.go              # Core: SQLite + FTS5 + all data ops
 │   ├── server/server.go            # HTTP REST API (port 7437)
@@ -218,18 +214,18 @@ engram/
 │   ├── sync/sync.go                # Git sync: manifest + compressed chunks
 │   └── tui/                        # Bubbletea terminal UI
 │       ├── model.go                # Screen constants, Model, Init()
-│       ├── styles.go               # Lipgloss styles with the Engram Elephant palette
+│       ├── styles.go               # Lipgloss styles with the qbit-jay Elephant palette
 │       ├── update.go               # Input handling, per-screen handlers
 │       └── view.go                 # Rendering, per-screen views
 ├── plugin/
-│   ├── opencode/engram.ts          # OpenCode adapter plugin
+│   ├── opencode/qbit-jay.ts         # OpenCode adapter plugin
 │   └── claude-code/                # Claude Code plugin (hooks + skill)
 │       ├── .claude-plugin/plugin.json
 │       ├── .mcp.json
 │       ├── hooks/hooks.json
 │       ├── scripts/                # session-start, post-compaction, subagent-stop, session-end
 │       └── skills/memory/SKILL.md
-├── skills/                         # Contributor AI skills (repo-wide standards + Engram-specific guardrails)
+├── skills/                         # Contributor AI skills (repo-wide standards + qbit-jay-specific guardrails)
 ├── setup.sh                        # Links repo skills into .claude/.codex/.gemini (project-local)
 ├── assets/                         # Screenshots and media
 ├── DOCS.md                         # Full technical documentation
@@ -246,21 +242,21 @@ The CLI offers local memory and project operations alongside optional cloud repl
 
 Local server auth:
 
-- `ENGRAM_HTTP_TOKEN`: optional Bearer auth for `engram serve`. When set, `DELETE /sessions/{id}`, `DELETE /observations/{id}`, `DELETE /prompts/{id}`, `GET /export`, and `POST /import` require `Authorization: Bearer <token>`. `POST /projects/rescue-ownership` always requires a configured token and matching Bearer credential; deprecated alias `POST /projects/migrate` uses the same handler and requirement. Comparison is constant-time; token is read per-request. Other routes remain open when unset (zero-config default). Ownership repair does not depend on this token: `engram projects rescue-ownership` does the same work against the local store.
-- `ENGRAM_TIMEZONE`: IANA zone name for timestamp display in TUI and cloud dashboard (e.g. `America/New_York`). Falls back to system local when unset or invalid.
+- `QBIT_JAY_HTTP_TOKEN`: optional Bearer auth for `qbit-jay serve`. When set, `DELETE /sessions/{id}`, `DELETE /observations/{id}`, `DELETE /prompts/{id}`, `GET /export`, and `POST /import` require `Authorization: Bearer <token>`. `POST /projects/rescue-ownership` always requires a configured token and matching Bearer credential; deprecated alias `POST /projects/migrate` uses the same handler and requirement. Comparison is constant-time; token is read per-request. Other routes remain open when unset (zero-config default). Ownership repair does not depend on this token: `qbit-jay projects rescue-ownership` does the same work against the local store.
+- `QBIT_JAY_TIMEZONE`: IANA zone name for timestamp display in TUI and cloud dashboard (e.g. `America/New_York`). Falls back to system local when unset or invalid.
 
-Project selection for reads is explicit: omitted project selectors resolve the current project (explicit project, then `ENGRAM_PROJECT`, then cwd detection). Use `--all` in the CLI or `all_projects=true` in HTTP to intentionally read every project. Do not combine an explicit project with an all-project selector. `engram context` accepts its legacy positional project as an alias for `--project`; the two forms cannot be combined. `GET /sync/status` supports only one resolved project and rejects `all_projects=true`.
+Project selection for reads is explicit: omitted project selectors resolve the current project (explicit project, then `QBIT_JAY_PROJECT`, then cwd detection). Use `--all` in the CLI or `all_projects=true` in HTTP to intentionally read every project. Do not combine an explicit project with an all-project selector. `qbit-jay context` accepts its legacy positional project as an alias for `--project`; the two forms cannot be combined. `GET /sync/status` supports only one resolved project and rejects `all_projects=true`.
 
 Cloud constraints (current behavior):
 
 - Cloud is opt-in replication/shared access; local SQLite remains source of truth.
-- `engram cloud serve` requires `ENGRAM_CLOUD_ALLOWED_PROJECTS` in both token-auth and insecure no-auth mode. Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request.
-- Authenticated cloud serve requires `ENGRAM_CLOUD_TOKEN` + explicit non-default `ENGRAM_JWT_SECRET`.
-- Insecure local-dev mode (`ENGRAM_CLOUD_INSECURE_NO_AUTH=1`) still requires the project allowlist and must not be used in production.
+- `qbit-jay cloud serve` requires `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` in both token-auth and insecure no-auth mode. Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request.
+- Authenticated cloud serve requires `QBIT_JAY_CLOUD_TOKEN` + explicit non-default `QBIT_JAY_JWT_SECRET`.
+- Insecure local-dev mode (`QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1`) still requires the project allowlist and must not be used in production.
 
 Cloud route/auth split (current behavior):
 
-`engram serve` and `engram cloud serve` are distinct runtimes: the former serves local APIs, while the latter serves cloud sync and the browser dashboard. In authenticated cloud mode, sync requests use a bearer token in the Authorization header; protected dashboard browser routes instead require a signed cookie obtained through login, not a bearer header as a browser-session substitute. Insecure development mode bypasses dashboard authentication and is distinct from authenticated mode.
+`qbit-jay serve` and `qbit-jay cloud serve` are distinct runtimes: the former serves local APIs, while the latter serves cloud sync and the browser dashboard. In authenticated cloud mode, sync requests use a bearer token in the Authorization header; protected dashboard browser routes instead require a signed cookie obtained through login, not a bearer header as a browser-session substitute. Insecure development mode bypasses dashboard authentication and is distinct from authenticated mode.
 
 For documented methods and paths and the dashboard route tree, see [HTTP API Endpoints](../DOCS.md#http-api-endpoints). For routes not yet documented there, check the [cloud server route registrations](../internal/cloud/cloudserver/cloudserver.go).
 
@@ -316,7 +312,7 @@ Path values are extracted via `r.PathValue(name)` (Go 1.22 `net/http.ServeMux`).
 
 ## Cloud Autosync Manager
 
-`internal/cloud/autosync/Manager` is a lease-guarded background goroutine started by `engram serve` and `engram mcp` when `ENGRAM_CLOUD_AUTOSYNC=1`. It implements the local-first invariant: all network I/O happens in its own goroutine and never holds locks shared with the SQLite write path.
+`internal/cloud/autosync/Manager` is a lease-guarded background goroutine started by `qbit-jay serve` and `qbit-jay mcp` when `QBIT_JAY_CLOUD_AUTOSYNC=1`. It implements the local-first invariant: all network I/O happens in its own goroutine and never holds locks shared with the SQLite write path.
 
 ### Data flow
 
@@ -349,12 +345,12 @@ The cloud server exposes two routes registered in `cloudserver.go` and handled b
 | `POST` | `/sync/mutations/push` | Accept a batch of up to 100 mutations from the client |
 | `GET` | `/sync/mutations/pull` | Return mutations since a cursor, filtered by caller's enrolled projects |
 
-Both require `Authorization: Bearer <token>`. Push enforces the project-level sync pause (HTTP 409 on `sync_enabled=false`) and the configured cloud push body limit (`ENGRAM_CLOUD_MAX_PUSH_BYTES`, default 8 MiB). Pull filters server-side.
+Both require `Authorization: Bearer <token>`. Push enforces the project-level sync pause (HTTP 409 on `sync_enabled=false`) and the configured cloud push body limit (`QBIT_JAY_CLOUD_MAX_PUSH_BYTES`, default 8 MiB). Pull filters server-side.
 
 ---
 
 ## Next Steps
 
-- [Agent Setup](AGENT-SETUP.md) — connect your agent to Engram
+- [Agent Setup](AGENT-SETUP.md) — connect your agent to qbit-jay
 - [Plugins](PLUGINS.md) — what the OpenCode and Claude Code plugins add
 - [Obsidian Brain](beta/obsidian-brain.md) — visualize memories as a knowledge graph (beta)

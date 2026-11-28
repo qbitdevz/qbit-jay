@@ -2086,10 +2086,10 @@ func TestCloudUpgradeDocsMatchHelpAndLocalFirstSemantics(t *testing.T) {
 	plugins := read("..", "..", "docs", "PLUGINS.md")
 
 	commandExamples := []string{
-		"engram cloud upgrade doctor --project",
-		"engram cloud upgrade repair --project",
-		"engram cloud upgrade bootstrap --project",
-		"engram cloud upgrade status --project",
+		"qbit-jay cloud upgrade doctor --project",
+		"qbit-jay cloud upgrade repair --project",
+		"qbit-jay cloud upgrade bootstrap --project",
+		"qbit-jay cloud upgrade status --project",
 	}
 	for _, cmd := range commandExamples {
 		if !strings.Contains(readme, cmd) {
@@ -2113,10 +2113,10 @@ func TestCloudUpgradeDocsMatchHelpAndLocalFirstSemantics(t *testing.T) {
 		}
 	}
 
-	if !strings.Contains(strings.ToLower(agentSetup), "deferred") || !strings.Contains(agentSetup, "engram cloud") {
+	if !strings.Contains(strings.ToLower(agentSetup), "deferred") || !strings.Contains(agentSetup, "qbit-jay cloud") {
 		t.Fatalf("AGENT-SETUP must describe deferred automation/manual cloud CLI flow")
 	}
-	if !strings.Contains(strings.ToLower(plugins), "deferred") || !strings.Contains(plugins, "engram cloud") {
+	if !strings.Contains(strings.ToLower(plugins), "deferred") || !strings.Contains(plugins, "qbit-jay cloud") {
 		t.Fatalf("PLUGINS must describe deferred automation/manual cloud CLI flow")
 	}
 }
@@ -2139,13 +2139,13 @@ func TestCloudDashboardDocsEnablementFlowIsExecutable(t *testing.T) {
 	readme := read("..", "..", "README.md")
 	docs := read("..", "..", "DOCS.md")
 	for _, token := range []string{
-		"engram cloud config --server",
-		"engram cloud enroll smoke-project",
+		"qbit-jay cloud config --server",
+		"qbit-jay cloud enroll smoke-project",
 		"/dashboard/login",
 		"/dashboard/contributors",
-		"ENGRAM_CLOUD_TOKEN",
-		"ENGRAM_JWT_SECRET",
-		"ENGRAM_CLOUD_ADMIN",
+		"QBIT_JAY_CLOUD_TOKEN",
+		"QBIT_JAY_JWT_SECRET",
+		"QBIT_JAY_CLOUD_ADMIN",
 	} {
 		if !strings.Contains(readme, token) && !strings.Contains(docs, token) {
 			t.Fatalf("expected docs-backed enablement token %q in README or DOCS", token)

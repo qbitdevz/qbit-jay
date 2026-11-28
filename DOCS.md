@@ -1,10 +1,10 @@
 [← Back to README](README.md)
 
-# Engram — Technical Reference
+# qbit-jay — Technical Reference
 
 **Persistent memory for AI coding agents**
 
-This is the complete technical reference for Engram. For getting started, see the [README](README.md). For per-agent setup, see [Agent Setup](docs/AGENT-SETUP.md).
+This is the complete technical reference for qbit-jay. For getting started, see the [README](README.md). For per-agent setup, see [Agent Setup](docs/AGENT-SETUP.md).
 
 ---
 
@@ -31,7 +31,7 @@ For other docs:
 | Doc                                         | Description                                                                                   |
 | ------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [Installation](docs/INSTALLATION.md)        | All install methods + platform support                                                        |
-| [Engram Cloud](docs/engram-cloud/README.md) | Cloud landing page, quickstart path, branding, and reference links                            |
+| [qbit-jay Cloud](docs/engram-cloud/README.md) | Cloud landing page, quickstart path, branding, and reference links                            |
 | [Agent Setup](docs/AGENT-SETUP.md)          | Per-agent configuration + compaction survival                                                 |
 | [Codebase Guide](docs/CODEBASE-GUIDE.md)    | Definitive guide to repository structure, package ownership, flows, and maintainer guardrails |
 | [Capture Project Provenance](docs/CAPTURE-PROJECT-PROVENANCE.md) | Optional local capture evidence, compatibility and limits |
@@ -42,7 +42,7 @@ For other docs:
 | [Architecture](docs/ARCHITECTURE.md)        | How it works, session lifecycle, CLI reference, project structure                             |
 | [Plugins](docs/PLUGINS.md)                  | OpenCode & Claude Code plugin details                                                         |
 | [Team Usage](docs/TEAM-USAGE.md)            | Scope conventions, language strategy, and sync behavior for collaborative teams               |
-| [Comparison](docs/COMPARISON.md)            | Why Engram vs claude-mem                                                                      |
+| [Comparison](docs/COMPARISON.md)            | Why qbit-jay vs claude-mem                                                                      |
 
 ---
 
@@ -66,7 +66,7 @@ Reader and status guide:
 | Memory Protocol                        | `DOCS.md#memory-protocol-full-text` | (none; prose contract)                                                       | `skills/memory-protocol/SKILL.md`; `memoryProtocolMarkdown` embedded in `internal/setup`; `plugin/*/skills/memory/SKILL.md`                |
 | Setup instructions and per-agent paths | docs/AGENT-SETUP.md                 | `internal/setup/agents.go` + `setup.go`                                      | README.md setup table                                                                                                                      |
 | Plugin contracts                       | docs/PLUGINS.md                     | `plugin/*` assets, `internal/setup/plugins/`                                 | `docs/AGENT-SETUP.md` per-agent sections                                                                                                   |
-| HTTP API and CLI                       | DOCS.md HTTP API / CLI sections     | `internal/server/server.go` (local routes); `internal/cloud/cloudserver/cloudserver.go` (cloud routes); `cmd/engram` | `docs/PLUGINS.md` conflicts table (subset)                                                                                                 |
+| HTTP API and CLI                       | DOCS.md HTTP API / CLI sections     | `internal/server/server.go` (local routes); `internal/cloud/cloudserver/cloudserver.go` (cloud routes); `cmd/qbit-jay` | `docs/PLUGINS.md` conflicts table (subset)                                                                                                 |
 | Package ownership boundaries           | docs/CODEBASE-GUIDE.md              | (none; prose contract)                                                       | (none)                                                                                                                                     |
 
 Code and tests beat docs: `internal/mcp` owns agent-facing tool schemas, `internal/store` owns the durable schema, `internal/setup` owns install surfaces, and `plugin/*` translates host events without duplicating durable policy.
@@ -149,7 +149,7 @@ The live schema is created and incrementally migrated by `Store.migrate` in [`in
 - **project_aliases** — local-only future-derivation mappings: `kind` (`key` or `cwd`), `alias_key`, `project`; composite primary key (`kind`, `alias_key`). Aliases are not exported, do not enroll projects, and do not transfer historical ownership.
 - **sync_enrolled_projects** — enrolled project and enrollment timestamp; **cloud_upgrade_state** — per-project upgrade stage, repair class, snapshot, findings, actions, error, and update metadata
 - **memory_relations** — stores conflict-surfacing verdicts from `mem_judge`; columns include `id` (INTEGER PK AUTOINCREMENT), `sync_id` (TEXT UNIQUE), `source_id`, `target_id`, `relation`, `judgment_status` (`pending` | `judged` | `orphaned` | `ignored`), provenance, supersession, and timestamp metadata. The SQLite table does not store a `project` column; project is carried in relation sync payloads and derived from joined observations for project-scoped listing. Syncs across machines via local chunks and via cloud autosync when the project is enrolled.
-- **sync_apply_deferred** — holds pulled mutations that could not be applied locally due to a missing FK dependency (e.g. relation references an observation not yet present), including target, remote sequence, entity, operation, project, scope, retry, status, and error metadata. Rows with `apply_status='dead'` are excluded from ordinary replay. They include terminal discarded-mutation evidence and relations that exceeded the retry cap (5 attempts); cloud imports may rearm eligible retry-cap relations when their dependencies become available. `engram conflicts prune --apply` bounds the evidence eligible for pruning by age and per-scope count, preserving potentially recoverable retry-cap relations.
+- **sync_apply_deferred** — holds pulled mutations that could not be applied locally due to a missing FK dependency (e.g. relation references an observation not yet present), including target, remote sequence, entity, operation, project, scope, retry, status, and error metadata. Rows with `apply_status='dead'` are excluded from ordinary replay. They include terminal discarded-mutation evidence and relations that exceeded the retry cap (5 attempts); cloud imports may rearm eligible retry-cap relations when their dependencies become available. `qbit-jay conflicts prune --apply` bounds the evidence eligible for pruning by age and per-scope count, preserving potentially recoverable retry-cap relations.
 
 ### SQLite Configuration
 
@@ -160,72 +160,72 @@ The live schema is created and incrementally migrated by `Store.migrate` in [`in
 
 ### Data-directory filesystem safety
 
-Persistent SQLite WAL is unsafe on network filesystems. Engram rejects known NFS and SMB/CIFS data directories before it opens, migrates, or changes the database files. An unknown filesystem remains compatible, but is not a proof that the directory is local.
+Persistent SQLite WAL is unsafe on network filesystems. qbit-jay rejects known NFS and SMB/CIFS data directories before it opens, migrates, or changes the database files. An unknown filesystem remains compatible, but is not a proof that the directory is local.
 
-If startup reports a network filesystem, stop **all** Engram processes, then copy the complete `engram.db`, `engram.db-wal`, and `engram.db-shm` triplet together to local storage. Set `ENGRAM_DATA_DIR` to the absolute path of that local directory (relative paths are rejected), start Engram, and run `engram doctor`. Then run the integrity check for your shell:
+If startup reports a network filesystem, stop **all** qbit-jay processes, then copy the complete `qbit-jay.db`, `qbit-jay.db-wal`, and `qbit-jay.db-shm` triplet together to local storage. Set `QBIT_JAY_DATA_DIR` to the absolute path of that local directory (relative paths are rejected), start qbit-jay, and run `qbit-jay doctor`. Then run the integrity check for your shell:
 
 ```bash
 # POSIX shell or Git Bash
-sqlite3 "$ENGRAM_DATA_DIR/engram.db" "PRAGMA integrity_check;"
+sqlite3 "$QBIT_JAY_DATA_DIR/qbit-jay.db" "PRAGMA integrity_check;"
 ```
 
 ```powershell
 # PowerShell
-sqlite3 (Join-Path $env:ENGRAM_DATA_DIR 'engram.db') 'PRAGMA integrity_check;'
+sqlite3 (Join-Path $env:QBIT_JAY_DATA_DIR 'qbit-jay.db') 'PRAGMA integrity_check;'
 ```
 
-Engram does not auto-repair, quarantine, checkpoint, or fall back to rollback journaling for this condition.
+qbit-jay does not auto-repair, quarantine, checkpoint, or fall back to rollback journaling for this condition.
 
 ---
 
 ## CLI Reference
 
-The CLI groups local memory operations, project maintenance, conflict audit, and optional cloud replication. Use `engram help` for live usage; the inventory below points to the detailed [conflict](#conflict-audit-cli-admin) and [cloud](#cloud-cli-opt-in) references.
+The CLI groups local memory operations, project maintenance, conflict audit, and optional cloud replication. Use `qbit-jay help` for live usage; the inventory below points to the detailed [conflict](#conflict-audit-cli-admin) and [cloud](#cloud-cli-opt-in) references.
 
 ```text
-engram setup [agent]          Install an available agent integration (see Agent Setup)
-engram serve [port]           Start local HTTP API (default: 7437)
-engram mcp                    Start stdio MCP server
-engram tui                    Launch terminal UI
-engram test [suite]            Run isolated self-tests [--quick] [--json]
-engram init [name]             Initialize .engram/config.json [--force]
-engram search <query>         Search memories [--project P|--all] [--match all|any]
-engram save <title> <msg>     Save a memory [--project P]
-engram delete <obs_id>        Delete an observation [--hard]
-engram delete session <id>    Delete an empty session
-engram delete prompt <id>     Delete a prompt permanently
-engram delete project <name> [--hard]
+qbit-jay setup [agent]          Install an available agent integration (see Agent Setup)
+qbit-jay serve [port]           Start local HTTP API (default: 7437)
+qbit-jay mcp                    Start stdio MCP server
+qbit-jay tui                    Launch terminal UI
+qbit-jay test [suite]            Run isolated self-tests [--quick] [--json]
+qbit-jay init [name]             Initialize .qbit-jay/config.json [--force]
+qbit-jay search <query>         Search memories [--project P|--all] [--match all|any]
+qbit-jay save <title> <msg>     Save a memory [--project P]
+qbit-jay delete <obs_id>        Delete an observation [--hard]
+qbit-jay delete session <id>    Delete an empty session
+qbit-jay delete prompt <id>     Delete a prompt permanently
+qbit-jay delete project <name> [--hard]
                               Remove prompts; soft-delete observations by default; --hard deletes observations and only unreferenced sessions
-engram timeline <obs_id>      Chronological context [--project P|--all]
-engram context [project]      Recent context [--project P|--all] [--older-history]
-engram stats                  Memory statistics [--project P|--all]
-engram export [file]          Export memories to JSON [--project P|--all]
-engram import <file>          Import memories from JSON
-engram sync                   Export new memories to .engram/, excluding prompts [--all: every project]
-engram sync --include-prompts  Intentionally include prompts in local Git export
-engram sync --cloud --project <name>
+qbit-jay timeline <obs_id>      Chronological context [--project P|--all]
+qbit-jay context [project]      Recent context [--project P|--all] [--older-history]
+qbit-jay stats                  Memory statistics [--project P|--all]
+qbit-jay export [file]          Export memories to JSON [--project P|--all]
+qbit-jay import <file>          Import memories from JSON
+qbit-jay sync                   Export new memories to .qbit-jay/, excluding prompts [--all: every project]
+qbit-jay sync --include-prompts  Intentionally include prompts in local Git export
+qbit-jay sync --cloud --project <name>
                               Sync one project against the configured cloud endpoint
-engram conflicts <sub>        Conflict audit: list, show, stats, scan, deferred, prune
-engram doctor                 Read-only diagnostics [--json] [--project P] [--check CODE]
-engram cloud <sub>            Optional cloud configuration, enrollment, upgrade, and server
-engram projects list          List projects with observation/session/prompt counts
-engram projects alias --help  Local future-only aliases; set/list/remove/resolve
-engram projects alias set --key old-name --project team-app
-engram projects alias list
-engram projects alias resolve --designation old-name
-engram projects alias remove --key old-name
-engram projects merge --from acmeapi --to acme-api --dry-run
-engram projects merge --from acmeapi --to acme-api --apply
-engram projects consolidate [--all] [--dry-run]
+qbit-jay conflicts <sub>        Conflict audit: list, show, stats, scan, deferred, prune
+qbit-jay doctor                 Read-only diagnostics [--json] [--project P] [--check CODE]
+qbit-jay cloud <sub>            Optional cloud configuration, enrollment, upgrade, and server
+qbit-jay projects list          List projects with observation/session/prompt counts
+qbit-jay projects alias --help  Local future-only aliases; set/list/remove/resolve
+qbit-jay projects alias set --key old-name --project team-app
+qbit-jay projects alias list
+qbit-jay projects alias resolve --designation old-name
+qbit-jay projects alias remove --key old-name
+qbit-jay projects merge --from acmeapi --to acme-api --dry-run
+qbit-jay projects merge --from acmeapi --to acme-api --apply
+qbit-jay projects consolidate [--all] [--dry-run]
                               Merge similar names interactively; --all --dry-run previews without prompts
-engram projects prune         Prune projects with zero observations [--dry-run] [--paths-only]
-engram projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]
+qbit-jay projects prune         Prune projects with zero observations [--dry-run] [--paths-only]
+qbit-jay projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]
                               Repair legacy local ownership without a server token
-engram obsidian-export        Export memories to Obsidian (beta; --all for every project)
-engram version                Show version
+qbit-jay obsidian-export        Export memories to Obsidian (beta; --all for every project)
+qbit-jay version                Show version
 ```
 
-For `setup [agent]`, see [Agent Setup](docs/AGENT-SETUP.md) for supported integrations rather than treating a fixed agent list as exhaustive. `--all` deliberately selects every project for applicable reads and local sync export (cloud sync still requires a single project); do not combine it with an explicit project. `engram context [project]` accepts the positional project as an alternative to `--project`. `projects prune --paths-only` limits candidates to names containing `/` or `\`.
+For `setup [agent]`, see [Agent Setup](docs/AGENT-SETUP.md) for supported integrations rather than treating a fixed agent list as exhaustive. `--all` deliberately selects every project for applicable reads and local sync export (cloud sync still requires a single project); do not combine it with an explicit project. `qbit-jay context [project]` accepts the positional project as an alternative to `--project`. `projects prune --paths-only` limits candidates to names containing `/` or `\`.
 
 Cloud commands include `cloud status`, `cloud config --server <url>`, `cloud enroll <project>`, `cloud unenroll <project>`, and `cloud serve`. For upgrades, use `cloud upgrade <doctor|repair|bootstrap|remirror|status|rollback> --project <name>`; `remirror` rebuilds cloud state from authoritative local data. Server-side repair uses `cloud repair materialize-mutations --project <project> (--dry-run|--apply)`. Managed-admin setup uses `cloud bootstrap admin --username <name> [--email <email>] [--grant-project <project>]... [--issue-token [name]]`; stranded-admin token recovery uses `cloud bootstrap recover-token [--name <name>] [--revoke-existing]`. See [Cloud CLI](#cloud-cli-opt-in) and [managed-user bootstrap](#managed-users-tokens-and-cli-bootstrap) for constraints and detailed syntax.
 
@@ -241,7 +241,7 @@ Keep these boundaries separate:
 
 | Boundary | Supported authority |
 | --- | --- |
-| Standalone local HTTP | `ENGRAM_HTTP_TOKEN` provides selective instance-level authentication on wrapped routes, not project authorization. In particular, observation DELETE requires a matching Bearer credential when configured; observation PATCH is not gated by that selective wrapper, even when the token is configured. Other handler validation still applies. |
+| Standalone local HTTP | `QBIT_JAY_HTTP_TOKEN` provides selective instance-level authentication on wrapped routes, not project authorization. In particular, observation DELETE requires a matching Bearer credential when configured; observation PATCH is not gated by that selective wrapper, even when the token is configured. Other handler validation still applies. |
 | Session-owned local HTTP | The private child-lifetime token configured by `SetSessionOwnedToken` authenticates the entire handler, including PATCH and health. This is separate from standalone selective-token protection. |
 | Native MCP | Tool profiles select registered capabilities: `mem_update` is in `agent`, `mem_delete` is in `admin`, and legacy `all` retains both. Profiles are not per-project grants, and hiding tools is not a security boundary. |
 | Cloud | Authenticated principals and server-enforced project grants or legacy allowlists belong to the separate cloud server boundary. They do not establish local tenant isolation. |
@@ -268,25 +268,25 @@ Policy decision: [#1580](https://github.com/Gentleman-Programming/engram/issues/
 
 When HOME itself is a Git repository, capture from an untracked descendant requires an explicit project designation. This includes new dotfiles folders: folder names alone are not project intent. HOME itself, subfolders containing Git-index-tracked files, nested independent repositories, and ordinary non-HOME monorepos retain normal detection.
 
-Selection retains request project → process override (`engram mcp --project`, then `ENGRAM_PROJECT`) → applicable `.engram/config.json` → cwd detection precedence. Existing config inheritance and session-bound authority are unchanged; operations that require known explicit projects still require them.
+Selection retains request project → process override (`qbit-jay mcp --project`, then `QBIT_JAY_PROJECT`) → applicable `.qbit-jay/config.json` → cwd detection precedence. Existing config inheritance and session-bound authority are unchanged; operations that require known explicit projects still require them.
 
-- CLI: use `engram save <title> <content> --project <name>`, `ENGRAM_PROJECT`, or `.engram/config.json` containing `{"project_name":"<name>"}`. Rejection happens before SQLite is opened or a Git binding is created.
+- CLI: use `qbit-jay save <title> <content> --project <name>`, `QBIT_JAY_PROJECT`, or `.qbit-jay/config.json` containing `{"project_name":"<name>"}`. Rejection happens before SQLite is opened or a Git binding is created.
 - MCP: implicit capture, session start/end, and project-context negotiation require designation. Capture errors use `error_code:"explicit_project_required"` with English guidance, not ambiguity-recovery tokens. `mem_current_project` remains informational, returning an empty project and an actionable `error_hint`; do not promote an unsafe HOME label into an explicit request. Use process/config designation or a supported explicit project argument. Existing session-authoritative captures remain supported.
-- HTTP: both `GET /project/current` and human-input `POST /prompts/capture-decision` return `409` with `code:"explicit_project_required"` and `error:"project resolution failed: explicit project required: use --project, ENGRAM_PROJECT, or .engram/config.json project_name"`. Configure the server process or an applicable project config before retrying; skipped non-human input still returns `decision:"skip"`. Explicit/session-bound capture endpoints retain their existing authority contracts.
+- HTTP: both `GET /project/current` and human-input `POST /prompts/capture-decision` return `409` with `code:"explicit_project_required"` and `error:"project resolution failed: explicit project required: use --project, QBIT_JAY_PROJECT, or .qbit-jay/config.json project_name"`. Configure the server process or an applicable project config before retrying; skipped non-human input still returns `decision:"skip"`. Explicit/session-bound capture endpoints retain their existing authority contracts.
 
 Rejected captures preserve stored records, counters and journal entries, and do not initialize a mistaken HOME binding. Ordinary reads/listing and stored-record-ID reads are unchanged. This policy does not migrate memories, rename private bindings, or rebind sessions.
 
 ### Project-scoped read migration
 
-Project-aware reads resolve an omitted project to the canonical current project: explicit `project`, then `ENGRAM_PROJECT`, then cwd detection. To read across every project, pass `all_projects=true`; do not combine it with `project`. CLI counterparts use `--all`. This intentionally replaces formerly implicit-global behavior for recent lists, review, prompts, export, stats, and conflict inspection. `GET /sync/status` resolves and validates one current or explicit project but rejects `all_projects=true` because its provider cannot aggregate project status.
+Project-aware reads resolve an omitted project to the canonical current project: explicit `project`, then `QBIT_JAY_PROJECT`, then cwd detection. To read across every project, pass `all_projects=true`; do not combine it with `project`. CLI counterparts use `--all`. This intentionally replaces formerly implicit-global behavior for recent lists, review, prompts, export, stats, and conflict inspection. `GET /sync/status` resolves and validates one current or explicit project but rejects `all_projects=true` because its provider cannot aggregate project status.
 
-Engram exposes two different runtimes. Keep routes split by runtime:
+qbit-jay exposes two different runtimes. Keep routes split by runtime:
 
-- **Local runtime (`engram serve`, JSON on `127.0.0.1:7437` by default, or a POSIX Unix socket when selected)**
+- **Local runtime (`qbit-jay serve`, JSON on `127.0.0.1:7437` by default, or a POSIX Unix socket when selected)**
   - `GET /health` (local service health)
   - includes memory CRUD/search/context endpoints documented below
   - includes `GET /sync/status` (local node sync status)
-- **Cloud runtime (`engram cloud serve`)**
+- **Cloud runtime (`qbit-jay cloud serve`)**
   - `GET /health` (cloud service health)
   - `GET /sync/pull`, `GET /sync/pull/{chunkID}`, `POST /sync/push`, `POST /sync/mutations/push`, `GET /sync/mutations/pull` (cloud sync transport)
   - `POST /sync/session-authorities` registers a session explicitly with JSON `session_id` and owner `project`.
@@ -301,7 +301,7 @@ Engram exposes two different runtimes. Keep routes split by runtime:
     `MutationTransport.RegisterSessionAuthority` and `ClaimPromptPair` can POST these JSON requests over the configured transport; non-200 responses are errors, with an absent old-server route classified as `server_unsupported`. Autosync does not invoke these methods yet. Clients must explicitly register the session under its owner and claim the pair under dual authorization before relying on remote pair provenance. Delete enforcement and the client handshake/pending retry path are not implemented yet; this route alone does not make unverified deletes safe.
   - `GET /dashboard/*` HTML routes (browser dashboard)
 
-Dashboard route tree (`engram cloud serve`):
+Dashboard route tree (`qbit-jay cloud serve`):
 
 - Public
   - `GET /dashboard/health` — dashboard subsystem health
@@ -354,9 +354,9 @@ Dashboard bootstrap/recovery (separate from Public and Protected routes):
 - `GET /dashboard/bootstrap` — show the first managed-admin creation form.
 - `POST /dashboard/bootstrap` — create the first managed admin; rejects creation when an active admin already exists.
 
-Both routes require legacy dashboard recovery access. In authenticated mode, this means a valid dashboard session for the configured legacy `ENGRAM_CLOUD_ADMIN` principal; managed admins and members cannot use these routes. In insecure mode, bypassing the dashboard session check does not supply a `LegacyEnvAdmin` principal, so the bootstrap handlers are not generally open.
+Both routes require legacy dashboard recovery access. In authenticated mode, this means a valid dashboard session for the configured legacy `QBIT_JAY_CLOUD_ADMIN` principal; managed admins and members cannot use these routes. In insecure mode, bypassing the dashboard session check does not supply a `LegacyEnvAdmin` principal, so the bootstrap handlers are not generally open.
 
-Engram is local-first: local SQLite is authoritative; cloud features are optional replication/shared access and enrollment controls.
+qbit-jay is local-first: local SQLite is authoritative; cloud features are optional replication/shared access and enrollment controls.
 
 ### Mutation materialization attribution
 
@@ -364,13 +364,13 @@ For an accepted `POST /sync/mutations/push`, each future materialized cloud chun
 
 ### Health
 
-- Local runtime (`engram serve`): A foreground server on a fixed loopback TCP port answers `503` with `{"status":"starting","service":"engram"}` on its application routes during initialization. That response indicates a listener without a confirmed store identity or usable memory API. Current Pi local auto-start waits within its existing startup budget and checks the ready instance identity before sending memory requests. Once initialized, `GET /health` checks readability of the core sessions, observations and prompts tables with one bounded read on a dedicated read-only connection that uses the same store generation fence. It does not calculate statistics or perform a full integrity or writeability audit. On success it returns `200` with `{"status":"ok","service":"engram","version":"<release version>","instance_id":"<store instance ID>","capabilities":{"isolated_session_registration":true,"root_session_resume":true,"runtime_session_resolution":true,"runtime_session_conditional_end":true}}`; a failed store returns `500` with `{"error":"health check failed"}` instead of reporting healthy.
+- Local runtime (`qbit-jay serve`): A foreground server on a fixed loopback TCP port answers `503` with `{"status":"starting","service":"engram"}` on its application routes during initialization. That response indicates a listener without a confirmed store identity or usable memory API. Current Pi local auto-start waits within its existing startup budget and checks the ready instance identity before sending memory requests. Once initialized, `GET /health` checks readability of the core sessions, observations and prompts tables with one bounded read on a dedicated read-only connection that uses the same store generation fence. It does not calculate statistics or perform a full integrity or writeability audit. On success it returns `200` with `{"status":"ok","service":"qbit-jay","version":"<release version>","instance_id":"<store instance ID>","capabilities":{"isolated_session_registration":true,"root_session_resume":true,"runtime_session_resolution":true,"runtime_session_conditional_end":true}}`; a failed store returns `500` with `{"error":"health check failed"}` instead of reporting healthy.
 
-The Claude native PreToolUse gate omits a rewrite when the caller already supplies the exact confirmed effective session ID; confirmation remains mandatory. Startup/resume and compaction context provide that confirmed effective ID when available, in slim and full modes, including live continuations of ended host roots. The hint grants no permission and may become stale; the guard still corrects or denies changed bindings. `mem_review` list needs no session confirmation, while mutating review calls keep confirmation without injecting an unused session field. Required binding changes can still be denied by interactive auto mode. `engram setup claude-code --allow-memory-writes` explicitly authorizes a fixed memory tool set for both MCP prefixes without an interactive prompt, while preserving session confirmation. This bypasses prompts and auto-mode classification for those tools; delete and project-merge permissions are not added. Without the flag, defaults remain unchanged. See [the permission scope and integration limitation](docs/PLUGINS.md#how-it-works).
+The Claude native PreToolUse gate omits a rewrite when the caller already supplies the exact confirmed effective session ID; confirmation remains mandatory. Startup/resume and compaction context provide that confirmed effective ID when available, in slim and full modes, including live continuations of ended host roots. The hint grants no permission and may become stale; the guard still corrects or denies changed bindings. `mem_review` list needs no session confirmation, while mutating review calls keep confirmation without injecting an unused session field. Required binding changes can still be denied by interactive auto mode. `qbit-jay setup claude-code --allow-memory-writes` explicitly authorizes a fixed memory tool set for both MCP prefixes without an interactive prompt, while preserving session confirmation. This bypasses prompts and auto-mode classification for those tools; delete and project-merge permissions are not added. Without the flag, defaults remain unchanged. See [the permission scope and integration limitation](docs/PLUGINS.md#how-it-works).
 
-The Claude native PreToolUse gate verifies the local `/health` instance ID against its configured data directory before sending session or cwd data. Directory resolution uses the same home fallback as `engram serve`. An unrelated, unidentified, redirected, or unhealthy local listener denies the write with an identity error. If a healthy Engram listener reports a release that differs from the CLI, the identity denial shows both releases and asks the operator to verify the listener and restart the intended server manually. Explicit `ENGRAM_URL` selects an intentional remote endpoint and retains its existing connection contract. Local instance comparison prevents accidental cross-store routing; it does not authenticate a malicious server. Windows connection-refused recovery remains bounded by the hook confirmation deadline.
-- When a local HTTP request observes permanent database generation invalidation, its existing error response is preserved. After the handler returns, `engram serve` logs one restart diagnostic, stops autosync, drains HTTP requests for up to five seconds (then force-closes remaining connections), releases its listener, and exits nonzero after cleanup. Ordinary transient health failures remain generic `500` responses and do not stop the server. Detection is request-triggered, not a background watchdog; the database is not reopened automatically.
-- Cloud runtime (`engram cloud serve`): `GET /health` returns `503 Service Unavailable` while startup work is underway. When ready it returns `200` with `{"status": "ok", "service": "engram-cloud"}`.
+The Claude native PreToolUse gate verifies the local `/health` instance ID against its configured data directory before sending session or cwd data. Directory resolution uses the same home fallback as `qbit-jay serve`. An unrelated, unidentified, redirected, or unhealthy local listener denies the write with an identity error. If a healthy qbit-jay listener reports a release that differs from the CLI, the identity denial shows both releases and asks the operator to verify the listener and restart the intended server manually. Explicit `QBIT_JAY_URL` selects an intentional remote endpoint and retains its existing connection contract. Local instance comparison prevents accidental cross-store routing; it does not authenticate a malicious server. Windows connection-refused recovery remains bounded by the hook confirmation deadline.
+- When a local HTTP request observes permanent database generation invalidation, its existing error response is preserved. After the handler returns, `qbit-jay serve` logs one restart diagnostic, stops autosync, drains HTTP requests for up to five seconds (then force-closes remaining connections), releases its listener, and exits nonzero after cleanup. Ordinary transient health failures remain generic `500` responses and do not stop the server. Detection is request-triggered, not a background watchdog; the database is not reopened automatically.
+- Cloud runtime (`qbit-jay cloud serve`): `GET /health` returns `503 Service Unavailable` while startup work is underway. When ready it returns `200` with `{"status": "ok", "service": "engram-cloud"}`.
 
 ### Sessions
 
@@ -396,7 +396,7 @@ The Claude native PreToolUse gate verifies the local `/health` instance ID again
   - Both validate root and selected identity using existing project-sharing policy, exact ownership mode and canonical worktree. Shared sessions permit cross-project use without changing ownership; foreign project-owned contexts reject. Blank stored directories or incompatible scopes return `409`; no live identity returns `404`. Malformed/unknown/trailing input returns `400`.
   - Neither operation creates, repairs, advances or reopens sessions. Generic exact-ID ending remains unchanged.
 - Session-owned Core exposes private owner routes under `/internal/managed-runtime/` for a supervisor with its own Store.
-  On Linux, a supervisor can supply an IPv4 TCP listener, including Multipath TCP, bound to `127.0.0.1` via descriptor 3 and set `ENGRAM_OWNED_LISTENER_FD=3`. The absolute Store path must lead to an existing private directory through trusted directories owned by root or the current user. Parent directories allow shared writes only with the sticky bit. The Core takes a lease before opening the Store, then reports the inherited endpoint and `exclusive_store: true` in its readiness record. An inherited-mode replacement waits for a predecessor that holds this lease to exit before reopening the same Store. Older Core versions and ordinary Store clients access the Store outside this lease protocol.
+  On Linux, a supervisor can supply an IPv4 TCP listener, including Multipath TCP, bound to `127.0.0.1` via descriptor 3 and set `QBIT_JAY_OWNED_LISTENER_FD=3`. The absolute Store path must lead to an existing private directory through trusted directories owned by root or the current user. Parent directories allow shared writes only with the sticky bit. The Core takes a lease before opening the Store, then reports the inherited endpoint and `exclusive_store: true` in its readiness record. An inherited-mode replacement waits for a predecessor that holds this lease to exit before reopening the same Store. Older Core versions and ordinary Store clients access the Store outside this lease protocol.
   `GET /internal/managed-runtime/scopes` takes no arguments. It returns a `scopes` array ordered by root, with only the most recent generation of each root included if its managed binding remains open. A session ended externally can still have an open binding for retirement. An empty inventory returns `{"scopes":[]}`. The request uses the owner bearer and reads the existing catalog without creating it.
   Each scope has `root`, `effective_id`, `project`, `directory` and `ownership_mode`. Pass that scope to the managed POST routes.
   On Linux, `POST /internal/managed-runtime/attach` requires `host` and `resume`. When `effective_id` is omitted, Core selects the effective session and records host admission in the same transaction. A managed admission to a new continuation waits until every host bound to an earlier effective ID of the same root has retired. While any remains, admission returns `409` with `managed_runtime_hosts_remain`.
@@ -421,7 +421,7 @@ The Claude native PreToolUse gate verifies the local `/health` instance ID again
 
 - `POST /observations` — Add observation. Body: `{session_id, type, title, content, tool_name?, project?, scope?, topic_key?, operation_id?, capture_prompt?, current_prompt?}`
   - `capture_prompt` is an optional boolean (default `true`); after a successful observation save, `current_prompt` (optional string) is best-effort saved for the same session/project using exact stored-content dedupe. `false` skips this attempt. Missing prompt context or a capture error does not fail the observation save. No current prompt is inferred from persisted history and no observation-ID link is created.
-  - `400` when `title` or `content` is missing, empty, or whitespace-only. The observation-create paths (`engram save`, `mem_save`, `POST /observations`) enforce the same title rule because cloud sync rejects observation upserts without a title, and one rejected mutation blocks every later mutation for the project
+  - `400` when `title` or `content` is missing, empty, or whitespace-only. The observation-create paths (`qbit-jay save`, `mem_save`, `POST /observations`) enforce the same title rule because cloud sync rejects observation upserts without a title, and one rejected mutation blocks every later mutation for the project
   - Omit `operation_id` to retain legacy save behavior. With one, an exact replay returns the original `201` result without another observation or sync mutation; a changed payload returns `409`, and a deleted result returns `410`.
   - Use a stable client-generated `operation_id` for one logical save and preserve the original request while recovering an uncertain acknowledgement.
   - Replay identity is the Store's normalized request fingerprint, including the requested project before session ownership resolution; a later ownership change does not change an exact replay result.
@@ -530,20 +530,20 @@ use the LIKE term cap. Valid inputs are not silently truncated by this policy.
 
 - `GET /stats` — Current-project memory statistics. Use `?project=<name>` or `?all_projects=true` to select scope. Store query failures return `500` with a generic JSON error (`{"error":"stats unavailable"}`), not a successful zero-count response. Store-backed project resolution failures return `500` with `{"error":"project resolution failed","code":"project_resolution_failed"}`; invalid, unknown, and ambiguous projects retain their input-error responses.
 - `GET /doctor` — Read-only operational diagnostics. Query: `?project=X&check=CHECK_CODE`
-  - Returns the same diagnostic report envelope as `engram doctor --json` and MCP `mem_doctor`
+  - Returns the same diagnostic report envelope as `qbit-jay doctor --json` and MCP `mem_doctor`
   - `project` and `check` are optional; omitted `project` uses current project detection
   - Unknown explicit projects return `404` with `{error, code:"unknown_project", available_projects:[...]}`
 
 ### Project Detection / Migration
 
 - `GET /project/current` — Detect the current project. Query: `?cwd=/path/to/repo`
-  - Successful detection returns `{project, project_source, project_path, cwd, available_projects}` plus optional `org` from the nearest applicable `.engram/config.json` and optional `warning`/`error_hint`; unsafe untracked HOME descendants instead return the `409 explicit_project_required` contract above. A process project override preserves the caller cwd's org label independently of the selected project.
+  - Successful detection returns `{project, project_source, project_path, cwd, available_projects}` plus optional `org` from the nearest applicable `.qbit-jay/config.json` and optional `warning`/`error_hint`; unsafe untracked HOME descendants instead return the `409 explicit_project_required` contract above. A process project override preserves the caller cwd's org label independently of the selected project.
   - Ambiguous cwd is a successful discovery response: `project` is empty, `project_source` is `ambiguous`, `available_projects` lists the candidates, and `error_hint` explains why no project was selected.
   - Other current-project-scoped HTTP routes return `404` for an unknown explicit project, `409` with `{error, code:"ambiguous_project", available_projects, project_source, project_path}` for an ambiguous cwd, and `400` for an invalid selector or configuration.
-  - For automatic Git detection, Engram creates a private versioned binding in the repository's shared Git metadata. It retains the first normalized remote/root label through remote renames, linked worktrees, and repository moves; the binding is not tracked and clones or forks create their own opaque ID. A corrupt or unwritable binding fails closed: configure `.engram/config.json` with the intended project name rather than relying on a renamed remote. Global local/cloud `project_id` propagation and alias migration remain deferred.
+  - For automatic Git detection, qbit-jay creates a private versioned binding in the repository's shared Git metadata. It retains the first normalized remote/root label through remote renames, linked worktrees, and repository moves; the binding is not tracked and clones or forks create their own opaque ID. A corrupt or unwritable binding fails closed: configure `.qbit-jay/config.json` with the intended project name rather than relying on a renamed remote. Global local/cloud `project_id` propagation and alias migration remain deferred.
 - `POST /projects/rescue-ownership` — Bulk-assign ownership to explicitly selected historical records that carry none. `POST /projects/migrate` is a deprecated compatibility alias routed to the same handler. The JSON body is limited to 8 KiB: `{target_project, confirmed:true, observation_ids?:[], session_ids?:[], prompt_ids?:[]}`.
-  - A configured `ENGRAM_HTTP_TOKEN`, matching `Authorization: Bearer <token>`, `target_project`, `confirmed:true`, and at least one positive observation/prompt ID or non-blank session ID are required. Missing server token returns `503`; missing or wrong credentials return `401`; malformed or invalid requests return `400`.
-  - This route is a convenience, not the only repair. `engram projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]` performs the same operation against the local store and needs no server token, so ownership stays repairable in a zero-config install.
+  - A configured `QBIT_JAY_HTTP_TOKEN`, matching `Authorization: Bearer <token>`, `target_project`, `confirmed:true`, and at least one positive observation/prompt ID or non-blank session ID are required. Missing server token returns `503`; missing or wrong credentials return `401`; malformed or invalid requests return `400`.
+  - This route is a convenience, not the only repair. `qbit-jay projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]` performs the same operation against the local store and needs no server token, so ownership stays repairable in a zero-config install.
   - `200` returns `{status, complete, blocked, target_project, rescued_observations, rescued_sessions, rescued_prompts, conflicting_records, skipped_records, journaled_local, reconciliation_status}`. Owned records are never reassigned.
   - `status` is `rescued` when `complete` is `true` and everything selected now belongs to `target_project`, or `partially_rescued` when something was left behind. `blocked` then names each item exactly — `{kind, id, reason, owned_by}` with `kind` one of `session`/`observation`/`prompt` and `reason` one of `owned_by_other_project`, `session_owned_by_other_project`, `dependent_record_owned_by_other_project`, `missing` — so a partial outcome is never inferred from counters.
   - The whole plan is resolved before anything is written: which sessions and which records will move is decided first, then applied. An unowned session that already parents a record owned by a different project is therefore left in place rather than moved out from under it, in either direction. A blank project is treated exactly like `NULL` — neither identifies an owner — and no sync mutation is ever journaled for a blank-owned record.
@@ -551,7 +551,7 @@ use the LIKE term cap. Valid inputs are not silently truncated by this policy.
 
 ### Conflict Audit (admin — local runtime only)
 
-These endpoints are served by `engram serve` on the local runtime only. They are not exposed on the cloud runtime. All routes are additive — no existing routes changed.
+These endpoints are served by `qbit-jay serve` on the local runtime only. They are not exposed on the cloud runtime. All routes are additive — no existing routes changed.
 
 #### GET /conflicts
 
@@ -695,7 +695,7 @@ Request body:
 - `cursor` — optional `next_cursor` from a completed previous page; omit to start the first page
 - `apply: false` (default) — dry-run for the non-semantic lexical scan; reports candidates without inserting pending rows
 - `apply: true` — non-semantic lexical scan inserts new pending relation rows up to `max_insert` cap (default 100)
-- `semantic: true` — after FTS5 lexical scan, run LLM-judge semantic detection on the candidate pairs returned by `FindCandidates`. It does not discover totally lexically unrelated pairs on its own. Requires `ENGRAM_AGENT_CLI` to be set on the server to `claude` or `opencode`.
+- `semantic: true` — after FTS5 lexical scan, run LLM-judge semantic detection on the candidate pairs returned by `FindCandidates`. It does not discover totally lexically unrelated pairs on its own. Requires `QBIT_JAY_AGENT_CLI` to be set on the server to `claude` or `opencode`.
 - Semantic dry-runs evaluate verdicts without persisting them; `not_conflict` results are reported as skipped. Applied semantic scans persist every valid verdict, including `not_conflict`.
 - `concurrency` — worker pool size for parallel LLM calls when `semantic: true` (default 5, range 1–20)
 - `timeout_per_call_seconds` — per-LLM-call timeout in seconds when `semantic: true` (default 60, range 1–600)
@@ -795,8 +795,8 @@ Response:
 
 ### Sync Status (local runtime only)
 
-- `GET /sync/status` — Runtime sync-state status for the local node (`engram serve` only).
-- In `engram serve`, sync status is wired to persisted SQLite sync state (project-scoped for detected/current project).
+- `GET /sync/status` — Runtime sync-state status for the local node (`qbit-jay serve` only).
+- In `qbit-jay serve`, sync status is wired to persisted SQLite sync state (project-scoped for detected/current project).
 - `?project=<name>` selects one known project; `?all_projects=true` returns HTTP 400 with `code: "unsupported_project_scope"`.
 - Response fields when provider is injected:
   - `enabled`
@@ -820,7 +820,9 @@ Response:
 
 ### Environment Variables
 
-Release update checks are skipped for `version`, `--version`, `-v`, `help`, `--help`, and `-h`. `engram tui` performs its single update check from inside the TUI. Set `ENGRAM_NO_UPDATE_CHECK=1` to disable every update check, including the TUI check.
+Every variable below is read as `QBIT_JAY_<NAME>` first. Upstream's `ENGRAM_<NAME>` is still accepted as a fallback for compatibility; when both are set, the `QBIT_JAY_` value wins, and an empty `QBIT_JAY_` value falls back to a set `ENGRAM_` one. The data directory is `~/.qbit-jay` (`qbit-jay.db`), and a repository folder is `.qbit-jay/` (an existing `.engram/` is read when it is the only one).
+
+Release update checks are skipped for `version`, `--version`, `-v`, `help`, `--help`, and `-h`. `qbit-jay tui` performs its single update check from inside the TUI. Set `QBIT_JAY_NO_UPDATE_CHECK=1` to disable every update check, including the TUI check.
 
 Only plain release versions (`X.Y.Z`, optionally prefixed with `v`) are compared.
 Development labels such as `main`, Go pseudo-versions, prereleases, and build
@@ -832,40 +834,40 @@ unchanged.
 
 | Variable                        | Description                                                                                                                                                                                                                                               | Default              |
 | ------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------- |
-| `ENGRAM_MEM_SAVE_TIMING`        | Set to exactly `1` in the MCP server environment to log one privacy-safe stage timing record per `mem_save` invocation to stderr. See [mem_save timing diagnostics](#mem_save-timing-diagnostics). | (unset — disabled) |
-| `ENGRAM_HTTP_WRITE_TIMING`      | Set to exactly `1` in the local HTTP server environment to log one privacy-safe timing record for each session registration, observation save, or passive capture. See [HTTP write timing diagnostics](#http-write-timing-diagnostics). | (unset — disabled) |
-| `ENGRAM_DATA_DIR`               | Engram CLI data directory. Empty or whitespace-only values use the platform default; nonblank values are used as provided.                                                                                                                               | `~/.engram`          |
-| `ENGRAM_PORT`                   | Override HTTP server port. Use an unsigned decimal value from `1` through `65535`; invalid values fall back to `7437` in `engram serve` and Claude Bash hooks. `engram run` honors it when no `-p` port is given, and `engram restart` honors it when neither `-p` nor the stopped daemon's recorded port exists.                                                                                         | `7437`               |
-| `ENGRAM_SOCKET`                 | POSIX-only Unix-domain socket path for `engram serve` and Claude Bash hooks. Socket mode listens exclusively on this path; it cannot be combined with an explicit `ENGRAM_PORT` or positional port. The default TCP listener remains unchanged when unset. PowerShell stays TCP-only. Bash hooks warn on stderr if socket transport cannot preserve memory capture. | (unset) |
-| `ENGRAM_PROJECT`                | Process-level default project override for `current` project-scoped operations. Precedence: **explicit request project** (`engram save --project`, an MCP tool `project` argument) → **process override** (`engram mcp --project`, then `ENGRAM_PROJECT`) → **cwd detection**. The value must be a project name, not a path. Explicit/process values are checked against known context when an operation MUST NOT establish a bucket; documented creation and recovery writes retain that behavior. Deliberately global operations such as `mem_review` list with no project and `mem_search(all_projects=true)` remain global. | cwd-detected project |
-| `ENGRAM_HTTP_TOKEN`             | Optional Bearer auth for the local HTTP server. When set, `DELETE /sessions/{id}`, `DELETE /observations/{id}`, `DELETE /prompts/{id}`, `GET /export`, and `POST /import` require `Authorization: Bearer <token>`. `POST /projects/rescue-ownership` (and deprecated alias `POST /projects/migrate`) always requires a configured token and matching Bearer credential. Comparison is constant-time. Token is read at request time (no restart needed). Other routes remain open when unset (zero-config default). Ownership repair never depends on this token: `engram projects rescue-ownership` performs the same repair against the local store. | (unset — HTTP rescue route not served; CLI repair still available) |
-| `ENGRAM_TIMEZONE`               | Timezone for timestamp display in the TUI and cloud dashboard. Accepts any IANA zone name (e.g. `America/New_York`, `Europe/Berlin`). Falls back to system local time when unset or invalid.                                                               | system local         |
-| `ENGRAM_AGENT_CLI`              | LLM runner name used by `engram conflicts scan --semantic` and the HTTP `/conflicts/scan` endpoint. Accepted values: `claude`, `opencode`.                                                                                                                | (unset)              |
-| `ENGRAM_NO_UPDATE_CHECK`        | Set to `1` to disable GitHub release update checks for every caller, including the TUI. `true`, `yes`, and `on` are also accepted.                                                                                                                       | (unset — eligible commands check for updates) |
-| `ENGRAM_CLOUD_AUTOSYNC`         | Set to `1` to enable background autosync. Requires `ENGRAM_CLOUD_TOKEN` and `ENGRAM_CLOUD_SERVER` to also be set.                                                                                                                                         | (unset — disabled)   |
-| `ENGRAM_CLOUD_SERVER`           | Cloud server URL used by the autosync manager and `engram sync --cloud`.                                                                                                                                                                                  | (unset)              |
-| `ENGRAM_DATABASE_URL`           | Postgres DSN for `engram cloud serve`.                                                                                                                                                                                                                    | (unset)              |
-| `ENGRAM_CLOUD_HOST`             | Bind host for `engram cloud serve`.                                                                                                                                                                                                                       | `127.0.0.1`          |
-| `ENGRAM_CLOUD_MAX_PUSH_BYTES`   | Max cloud push payload bytes.                                                                                                                                                                                                                             | `8388608`            |
-| `ENGRAM_CLOUD_TOKEN`            | Bearer token required in authenticated `engram cloud serve` mode.                                                                                                                                                                                         | (unset)              |
-| `ENGRAM_CLOUD_INSECURE_NO_AUTH` | Set to `1` for local insecure cloud serve (no auth). Cannot be combined with `ENGRAM_CLOUD_TOKEN`.                                                                                                                                                        | (unset)              |
-| `ENGRAM_CLOUD_ALLOWED_PROJECTS` | Comma-separated project allowlist enforced by `engram cloud serve`. Required in both token-auth and insecure modes. Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request. | (unset) |
-| `ENGRAM_JWT_SECRET`             | Required in authenticated cloud serve mode. Must be explicitly set to a non-default value.                                                                                                                                                                | (unset)              |
-| `ENGRAM_CLOUD_ADMIN`            | Optional legacy dashboard-admin token in authenticated cloud serve mode. It can access dashboard admin read surfaces, project sync controls, and audit logs, but not managed-user, token, or grant mutations. Ignored/rejected in insecure mode. | (unset) |
-| `ENGRAM_CLOUD_TOKEN_PEPPER`     | Dedicated secret used to hash managed cloud tokens. Required both to issue tokens via `engram cloud bootstrap admin --issue-token` (and the admin API/dashboard) and to enable managed-token authentication on `engram cloud serve`. Distinct from `ENGRAM_JWT_SECRET` on purpose — see [Managed users, tokens, and CLI bootstrap](#managed-users-tokens-and-cli-bootstrap). | (unset)              |
+| `QBIT_JAY_MEM_SAVE_TIMING`        | Set to exactly `1` in the MCP server environment to log one privacy-safe stage timing record per `mem_save` invocation to stderr. See [mem_save timing diagnostics](#mem_save-timing-diagnostics). | (unset — disabled) |
+| `QBIT_JAY_HTTP_WRITE_TIMING`      | Set to exactly `1` in the local HTTP server environment to log one privacy-safe timing record for each session registration, observation save, or passive capture. See [HTTP write timing diagnostics](#http-write-timing-diagnostics). | (unset — disabled) |
+| `QBIT_JAY_DATA_DIR`               | qbit-jay CLI data directory. Empty or whitespace-only values use the platform default; nonblank values are used as provided.                                                                                                                               | `~/.qbit-jay`          |
+| `QBIT_JAY_PORT`                   | Override HTTP server port. Use an unsigned decimal value from `1` through `65535`; invalid values fall back to `7437` in `qbit-jay serve` and Claude Bash hooks. `qbit-jay run` honors it when no `-p` port is given, and `qbit-jay restart` honors it when neither `-p` nor the stopped daemon's recorded port exists.                                                                                         | `7437`               |
+| `QBIT_JAY_SOCKET`                 | POSIX-only Unix-domain socket path for `qbit-jay serve` and Claude Bash hooks. Socket mode listens exclusively on this path; it cannot be combined with an explicit `QBIT_JAY_PORT` or positional port. The default TCP listener remains unchanged when unset. PowerShell stays TCP-only. Bash hooks warn on stderr if socket transport cannot preserve memory capture. | (unset) |
+| `QBIT_JAY_PROJECT`                | Process-level default project override for `current` project-scoped operations. Precedence: **explicit request project** (`qbit-jay save --project`, an MCP tool `project` argument) → **process override** (`qbit-jay mcp --project`, then `QBIT_JAY_PROJECT`) → **cwd detection**. The value must be a project name, not a path. Explicit/process values are checked against known context when an operation MUST NOT establish a bucket; documented creation and recovery writes retain that behavior. Deliberately global operations such as `mem_review` list with no project and `mem_search(all_projects=true)` remain global. | cwd-detected project |
+| `QBIT_JAY_HTTP_TOKEN`             | Optional Bearer auth for the local HTTP server. When set, `DELETE /sessions/{id}`, `DELETE /observations/{id}`, `DELETE /prompts/{id}`, `GET /export`, and `POST /import` require `Authorization: Bearer <token>`. `POST /projects/rescue-ownership` (and deprecated alias `POST /projects/migrate`) always requires a configured token and matching Bearer credential. Comparison is constant-time. Token is read at request time (no restart needed). Other routes remain open when unset (zero-config default). Ownership repair never depends on this token: `qbit-jay projects rescue-ownership` performs the same repair against the local store. | (unset — HTTP rescue route not served; CLI repair still available) |
+| `QBIT_JAY_TIMEZONE`               | Timezone for timestamp display in the TUI and cloud dashboard. Accepts any IANA zone name (e.g. `America/New_York`, `Europe/Berlin`). Falls back to system local time when unset or invalid.                                                               | system local         |
+| `QBIT_JAY_AGENT_CLI`              | LLM runner name used by `qbit-jay conflicts scan --semantic` and the HTTP `/conflicts/scan` endpoint. Accepted values: `claude`, `opencode`.                                                                                                                | (unset)              |
+| `QBIT_JAY_NO_UPDATE_CHECK`        | Set to `1` to disable GitHub release update checks for every caller, including the TUI. `true`, `yes`, and `on` are also accepted.                                                                                                                       | (unset — eligible commands check for updates) |
+| `QBIT_JAY_CLOUD_AUTOSYNC`         | Set to `1` to enable background autosync. Requires `QBIT_JAY_CLOUD_TOKEN` and `QBIT_JAY_CLOUD_SERVER` to also be set.                                                                                                                                         | (unset — disabled)   |
+| `QBIT_JAY_CLOUD_SERVER`           | Cloud server URL used by the autosync manager and `qbit-jay sync --cloud`.                                                                                                                                                                                  | (unset)              |
+| `QBIT_JAY_DATABASE_URL`           | Postgres DSN for `qbit-jay cloud serve`.                                                                                                                                                                                                                    | (unset)              |
+| `QBIT_JAY_CLOUD_HOST`             | Bind host for `qbit-jay cloud serve`.                                                                                                                                                                                                                       | `127.0.0.1`          |
+| `QBIT_JAY_CLOUD_MAX_PUSH_BYTES`   | Max cloud push payload bytes.                                                                                                                                                                                                                             | `8388608`            |
+| `QBIT_JAY_CLOUD_TOKEN`            | Bearer token required in authenticated `qbit-jay cloud serve` mode.                                                                                                                                                                                         | (unset)              |
+| `QBIT_JAY_CLOUD_INSECURE_NO_AUTH` | Set to `1` for local insecure cloud serve (no auth). Cannot be combined with `QBIT_JAY_CLOUD_TOKEN`.                                                                                                                                                        | (unset)              |
+| `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` | Comma-separated project allowlist enforced by `qbit-jay cloud serve`. Required in both token-auth and insecure modes. Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request. | (unset) |
+| `QBIT_JAY_JWT_SECRET`             | Required in authenticated cloud serve mode. Must be explicitly set to a non-default value.                                                                                                                                                                | (unset)              |
+| `QBIT_JAY_CLOUD_ADMIN`            | Optional legacy dashboard-admin token in authenticated cloud serve mode. It can access dashboard admin read surfaces, project sync controls, and audit logs, but not managed-user, token, or grant mutations. Ignored/rejected in insecure mode. | (unset) |
+| `QBIT_JAY_CLOUD_TOKEN_PEPPER`     | Dedicated secret used to hash managed cloud tokens. Required both to issue tokens via `qbit-jay cloud bootstrap admin --issue-token` (and the admin API/dashboard) and to enable managed-token authentication on `qbit-jay cloud serve`. Distinct from `QBIT_JAY_JWT_SECRET` on purpose — see [Managed users, tokens, and CLI bootstrap](#managed-users-tokens-and-cli-bootstrap). | (unset)              |
 
 ### mem_save timing diagnostics
 
-Set `ENGRAM_MEM_SAVE_TIMING=1` in the environment of the **Engram MCP server process**, then restart that process. Other values (including `true`) leave diagnostics disabled. Remove the variable and restart to disable them again.
+Set `QBIT_JAY_MEM_SAVE_TIMING=1` in the environment of the **qbit-jay MCP server process**, then restart that process. Other values (including `true`) leave diagnostics disabled. Remove the variable and restart to disable them again.
 
 For a manually launched server in PowerShell:
 
 ```powershell
-$env:ENGRAM_MEM_SAVE_TIMING = '1'
-engram mcp
+$env:QBIT_JAY_MEM_SAVE_TIMING = '1'
+qbit-jay mcp
 ```
 
-For an agent-managed server, add `"ENGRAM_MEM_SAVE_TIMING": "1"` to that server's MCP environment configuration and restart it; retrieve stderr from the host's MCP logs. No diagnostic text is written to MCP stdout or added to tool responses.
+For an agent-managed server, add `"QBIT_JAY_MEM_SAVE_TIMING": "1"` to that server's MCP environment configuration and restart it; retrieve stderr from the host's MCP logs. No diagnostic text is written to MCP stdout or added to tool responses.
 
 With timing enabled, each completed inner `handleSave` invocation writes one line with this prefix and JSON fields (values below are illustrative milliseconds):
 
@@ -909,7 +911,7 @@ The test binary enables `SQLITE_CONFIG_MEMSTATUS` in `TestMain`, before opening
 any fixture. Only the exact selectors above are accepted; an invalid opt-in
 value or selecting ordinary tests/other benchmarks exits with status 2 before
 SQLite configuration. The default unset variable leaves normal test startup
-unchanged. This variable is not an Engram runtime setting and does not enable
+unchanged. This variable is not a qbit-jay runtime setting and does not enable
 counters in production or persist an environment change in the parent shell.
 Without the opt-in, the allocator benchmark skips before creating fixtures and
 prints the required variable; ordinary all-benchmark runs remain supported.
@@ -967,36 +969,36 @@ C-style argument adapter, confined to test files.
 
 ### HTTP write timing diagnostics
 
-Set `ENGRAM_HTTP_WRITE_TIMING=1` before starting `engram serve`. The local server writes one `engram: http_write_timing` JSON record to stderr after each `POST /sessions`, `POST /observations`, and `POST /observations/passive` handler returns. Records contain only the enumerated operation/outcome, transaction attempt count, and request, connection-wait, transaction, commit, and response-write durations. For passive_capture, attempts and database-stage durations are totals across every learning saved by the request. `connection_wait_ms` is the store's `Begin` stage, including connection-pool or SQLite lock waiting; `transaction_ms` excludes that stage and commit.
+Set `QBIT_JAY_HTTP_WRITE_TIMING=1` before starting `qbit-jay serve`. The local server writes one `engram: http_write_timing` JSON record to stderr after each `POST /sessions`, `POST /observations`, and `POST /observations/passive` handler returns. Records contain only the enumerated operation/outcome, transaction attempt count, and request, connection-wait, transaction, commit, and response-write durations. For passive_capture, attempts and database-stage durations are totals across every learning saved by the request. `connection_wait_ms` is the store's `Begin` stage, including connection-pool or SQLite lock waiting; `transaction_ms` excludes that stage and commit.
 
 `response_write` describes the server's write attempt, not client acknowledgement. A completed server response write is never proof that a client received it. Records omit request URLs, identifiers, payloads, projects, paths, credentials, and errors; diagnostic-write failures are ignored and do not alter the request.
 
 ### Conflict Audit CLI (admin)
 
-The `engram conflicts` sub-command provides admin/maintainer access to the conflict layer. It is NOT for end users — end users interact with conflicts via the normal agent conversation flow.
+The `qbit-jay conflicts` sub-command provides admin/maintainer access to the conflict layer. It is NOT for end users — end users interact with conflicts via the normal agent conversation flow.
 
 When `--project` is omitted, the cwd-detected project is used.
 
 ```
-engram conflicts list [--project <name>] [--status <pending|judged|orphaned|ignored>] [--since <RFC3339>] [--limit <N>]
+qbit-jay conflicts list [--project <name>] [--status <pending|judged|orphaned|ignored>] [--since <RFC3339>] [--limit <N>]
 ```
 
 List `memory_relations` rows. Output: label-colon aligned columns (`id`, `sync_id`, `relation`, `judgment_status`, `source`, `target`, `created_at`).
 
 ```
-engram conflicts show <relation_id>
+qbit-jay conflicts show <relation_id>
 ```
 
 Show full detail for one relation: relation_id, sync_id, relation, judgment_status, created_at, updated_at, source_id, source_title, target_id, target_title. Exits non-zero when relation_id does not exist.
 
 ```
-engram conflicts stats [--project <name>]
+qbit-jay conflicts stats [--project <name>]
 ```
 
 Print aggregate grouped `judgment_status` counts (`pending` | `judged` | `orphaned` | `ignored`) plus deferred and dead queue sizes. When relation counts exist, also prints `By relation type` counts.
 
 ```
-engram conflicts scan [--project <name>] [--dry-run] [--apply] [--max-insert <N>]
+qbit-jay conflicts scan [--project <name>] [--dry-run] [--apply] [--max-insert <N>]
                       [--since <RFC3339>] [--limit <N>] [--cursor <ID>]
                       [--semantic] [--concurrency <N>] [--timeout-per-call <N>]
                       [--max-semantic <N>] [--yes]
@@ -1010,7 +1012,7 @@ Walk observations for the project, run FindCandidates, and report or insert new 
 - `--since RFC3339`: scan only observations created at or after the timestamp.
 - `--limit N`: inspect 1–100 observations per page (default 100), ordered by observation ID.
 - `--cursor ID`: resume after a printed `next_cursor`; no automatic follow-up page is run.
-- `--semantic`: enable LLM-judge semantic detection on FTS5 candidate pairs returned by `FindCandidates`. It can improve verdict quality for candidates that share lexical terms, but it does not discover totally lexically unrelated pairs on its own. Requires `ENGRAM_AGENT_CLI=claude` or `ENGRAM_AGENT_CLI=opencode`.
+- `--semantic`: enable LLM-judge semantic detection on FTS5 candidate pairs returned by `FindCandidates`. It can improve verdict quality for candidates that share lexical terms, but it does not discover totally lexically unrelated pairs on its own. Requires `QBIT_JAY_AGENT_CLI=claude` or `QBIT_JAY_AGENT_CLI=opencode`.
 - With `--semantic`, `--dry-run` evaluates verdicts without persistence and reports `not_conflict` as skipped. `--apply` persists every valid verdict, including `not_conflict`.
 - `--concurrency N`: worker pool size for parallel LLM calls (default 5, max 20).
 - `--timeout-per-call N`: per-LLM-call timeout in seconds (default 60).
@@ -1018,7 +1020,7 @@ Walk observations for the project, run FindCandidates, and report or insert new 
 - `--yes`: skip the cost-estimate confirmation prompt before LLM calls.
 
 ```
-engram conflicts deferred [--status <deferred|dead|applied>] [--limit <N>] [--inspect <sync_id>] [--replay]
+qbit-jay conflicts deferred [--status <deferred|dead|applied>] [--limit <N>] [--inspect <sync_id>] [--replay]
 ```
 
 Inspect or replay the `sync_apply_deferred` queue.
@@ -1028,7 +1030,7 @@ Inspect or replay the `sync_apply_deferred` queue.
 - `--replay`: call `ReplayDeferred()` and print retried/succeeded/failed/dead counts.
 
 ```
-engram conflicts prune [--max-age-days <N>] [--max-per-scope <N>] [--dry-run] [--apply]
+qbit-jay conflicts prune [--max-age-days <N>] [--max-per-scope <N>] [--dry-run] [--apply]
 ```
 
 Bound prune-eligible dead evidence in `sync_apply_deferred` (`apply_status='dead'` only; deferred retry state is never touched). An eligible row is selected when its `first_seen_at` is older than `--max-age-days` (default 30), or when it falls beyond the newest `--max-per-scope` (default 1000) eligible rows of its scope (`target_key` + `project`), so one noisy peer cannot evict another scope's evidence.
@@ -1043,18 +1045,18 @@ Potentially recoverable retry-cap relations are excluded from both age pruning a
 
 ### Cloud CLI (opt-in)
 
-- `engram cloud status` — show current cloud config state plus auth/sync readiness without mutating local state. When cloud is configured, also probes the local `engram serve` daemon at `127.0.0.1:7437` (respects `ENGRAM_PORT`) and prints a `Local daemon:` line (`running` / `not running` / `unreachable`) so you can detect a silently dead autosync. The probe currently uses the TCP daemon endpoint, so `ENGRAM_SOCKET` socket-only mode can report the daemon as not running. A running Engram response also produces a `Versions:` line for server and installed CLI semantic releases. A known difference prints `Restart pending` with manual supervisor guidance; missing, malformed or development versions are unknown and cannot establish a pending restart. Build metadata is ignored. No restart occurs, and version equality is never an identity signal. Exit code is unaffected; these lines are informational
-- `engram cloud enroll <project>` — enroll one project for cloud replication
-- `engram cloud config --server <url>` — persist cloud server URL to `~/.engram/cloud.json`
-- `engram cloud serve` — run cloud backend API + dashboard (`/dashboard`) using Postgres config from env
-- `engram cloud upgrade doctor --project <project>` — deterministic read-only readiness diagnosis (`ready|blocked`, class/reason)
-- `engram cloud upgrade repair --project <project> [--dry-run|--apply]` — deterministic local-safe repair planner/apply (no remote mutation)
-- `engram cloud upgrade bootstrap --project <project> [--resume]` — resumable checkpointed enroll/push/verify flow
-- `engram cloud upgrade status --project <project>` — show upgrade stage/class/reason
-- `engram cloud upgrade rollback --project <project>` — restore pre-upgrade local snapshot before `bootstrap_verified`; blocked afterwards
-- `engram cloud repair materialize-mutations --project <project> (--dry-run|--apply)` — explicit server-side Postgres repair that backfills existing `cloud_mutations` into compatible `cloud_chunks` without deleting remote data
-- `engram cloud bootstrap admin --username <name> [--email <email>] [--grant-project <project>]... [--issue-token [name]]` — create the first managed admin (see [Managed users, tokens, and CLI bootstrap](#managed-users-tokens-and-cli-bootstrap))
-- `engram cloud bootstrap recover-token [--name <name>] [--revoke-existing]` — recover the stranded managed admin token state described below
+- `qbit-jay cloud status` — show current cloud config state plus auth/sync readiness without mutating local state. When cloud is configured, also probes the local `qbit-jay serve` daemon at `127.0.0.1:7437` (respects `QBIT_JAY_PORT`) and prints a `Local daemon:` line (`running` / `not running` / `unreachable`) so you can detect a silently dead autosync. The probe currently uses the TCP daemon endpoint, so `QBIT_JAY_SOCKET` socket-only mode can report the daemon as not running. A running qbit-jay response also produces a `Versions:` line for server and installed CLI semantic releases. A known difference prints `Restart pending` with manual supervisor guidance; missing, malformed or development versions are unknown and cannot establish a pending restart. Build metadata is ignored. No restart occurs, and version equality is never an identity signal. Exit code is unaffected; these lines are informational
+- `qbit-jay cloud enroll <project>` — enroll one project for cloud replication
+- `qbit-jay cloud config --server <url>` — persist cloud server URL to `~/.qbit-jay/cloud.json`
+- `qbit-jay cloud serve` — run cloud backend API + dashboard (`/dashboard`) using Postgres config from env
+- `qbit-jay cloud upgrade doctor --project <project>` — deterministic read-only readiness diagnosis (`ready|blocked`, class/reason)
+- `qbit-jay cloud upgrade repair --project <project> [--dry-run|--apply]` — deterministic local-safe repair planner/apply (no remote mutation)
+- `qbit-jay cloud upgrade bootstrap --project <project> [--resume]` — resumable checkpointed enroll/push/verify flow
+- `qbit-jay cloud upgrade status --project <project>` — show upgrade stage/class/reason
+- `qbit-jay cloud upgrade rollback --project <project>` — restore pre-upgrade local snapshot before `bootstrap_verified`; blocked afterwards
+- `qbit-jay cloud repair materialize-mutations --project <project> (--dry-run|--apply)` — explicit server-side Postgres repair that backfills existing `cloud_mutations` into compatible `cloud_chunks` without deleting remote data
+- `qbit-jay cloud bootstrap admin --username <name> [--email <email>] [--grant-project <project>]... [--issue-token [name]]` — create the first managed admin (see [Managed users, tokens, and CLI bootstrap](#managed-users-tokens-and-cli-bootstrap))
+- `qbit-jay cloud bootstrap recover-token [--name <name>] [--revoke-existing]` — recover the stranded managed admin token state described below
 
 Cloud enrollment, unenrollment, and explicit cloud sync project inputs decode one
 layer of URL path encoding by default (for example, `my%20project` selects
@@ -1064,78 +1066,78 @@ Project normalization still applies. Literal plus signs remain plus signs in
 both modes; malformed percent escapes are accepted only in literal mode.
 
 ```bash
-engram cloud enroll --literal-project 'my%20project'
-engram cloud status --project 'my%20project'
-engram sync --cloud --literal-project --project 'my%20project'
-engram sync --cloud --status --literal-project --project 'my%20project'
-engram sync --cloud --import --literal-project --project 'my%20project'
-engram cloud unenroll 'my%20project' --literal-project
+qbit-jay cloud enroll --literal-project 'my%20project'
+qbit-jay cloud status --project 'my%20project'
+qbit-jay sync --cloud --literal-project --project 'my%20project'
+qbit-jay sync --cloud --status --literal-project --project 'my%20project'
+qbit-jay sync --cloud --import --literal-project --project 'my%20project'
+qbit-jay cloud unenroll 'my%20project' --literal-project
 ```
 
 `cloud status --project` already accepts literal names and needs no modifier.
 For sync, the modifier requires an explicit non-empty `--project` and cloud
-mode (`--cloud` or `ENGRAM_CLOUD_SYNC=true`); it cannot be combined with `--all`.
+mode (`--cloud` or `QBIT_JAY_CLOUD_SYNC=true`); it cannot be combined with `--all`.
 For enroll/unenroll it may appear before or after the single project argument.
 Use `--` before positional names beginning with a hyphen (or named `help`),
-for example `engram cloud enroll --literal-project -- -project` and
-`engram cloud unenroll --literal-project -- -project`. Flags must precede `--`.
+for example `qbit-jay cloud enroll --literal-project -- -project` and
+`qbit-jay cloud unenroll --literal-project -- -project`. Flags must precede `--`.
 For sync, address leading-hyphen names with `--project=-project`, for example
-`engram sync --cloud --status --literal-project --project=-project`.
+`qbit-jay sync --cloud --status --literal-project --project=-project`.
 This is input selection only: existing enrollments are not migrated or merged,
 and unenrolling a literal name leaves a separately enrolled decoded name intact.
 Detection retains percent-encoded project names; no identity migration occurs.
 Copy the detected name with `--literal-project` to select that same stored bucket.
 
-`engram sync --cloud --import --project <project>` runs in the foreground and prints plain-text import progress that is safe for non-interactive logs. It emits an initial snapshot, bounded event-count-throttled updates, and a final `100%` / `0 pending` snapshot before the normal import summary. Each snapshot includes local, remote, and pending chunk counts; percentage is based on the pending work captured at import start, so retries do not inflate completion.
+`qbit-jay sync --cloud --import --project <project>` runs in the foreground and prints plain-text import progress that is safe for non-interactive logs. It emits an initial snapshot, bounded event-count-throttled updates, and a final `100%` / `0 pending` snapshot before the normal import summary. Each snapshot includes local, remote, and pending chunk counts; percentage is based on the pending work captured at import start, so retries do not inflate completion.
 
-Cloud auth token is provided at runtime via `ENGRAM_CLOUD_TOKEN` (not by a dedicated CLI subcommand).
-Cloud server startup fails closed when the token is missing unless `ENGRAM_CLOUD_INSECURE_NO_AUTH=1` is explicitly set for local insecure development.
-`ENGRAM_CLOUD_INSECURE_NO_AUTH=1` cannot be combined with `ENGRAM_CLOUD_TOKEN`.
-Cloud server always requires `ENGRAM_CLOUD_ALLOWED_PROJECTS` (comma-separated), including insecure mode, so project scope remains server-enforced.
-`ENGRAM_CLOUD_TOKEN` + `ENGRAM_CLOUD_ALLOWED_PROJECTS` are server-side requirements for authenticated mode and must be configured before `engram cloud serve` (or compose startup).
-Authenticated mode also requires an explicit non-default `ENGRAM_JWT_SECRET`; implicit development defaults are rejected.
-Dashboard requests support browser login in authenticated mode: use `/dashboard/login` to exchange the bearer token for an HttpOnly dashboard cookie scoped to `/dashboard`. Protected `/dashboard/*` HTML routes require that cookie and do **not** treat raw `Authorization: Bearer ...` headers as an authenticated browser session. Sync API routes (`/sync/pull`, `/sync/pull/{chunkID}`, `/sync/push`, `/sync/mutations/push`, `/sync/mutations/pull`, `/sync/session-authorities`, `/sync/prompt-pair-claims`) remain header-auth only. For cloud authenticated sync and admin requests, the Authorization parser trims outer whitespace and requires exactly two whitespace-delimited fields: a case-insensitive `Bearer` scheme and one credential. Tabs or multiple spaces between fields are accepted; whitespace embedded in the credential and a scheme glued to the credential are rejected. This describes field separation, not an RFC credential-character grammar; it does not describe the local `ENGRAM_HTTP_TOKEN` parser. In insecure mode (`ENGRAM_CLOUD_INSECURE_NO_AUTH=1` + no `ENGRAM_CLOUD_TOKEN`), dashboard auth is bypassed and `/dashboard/login` redirects to `/dashboard/`.
+Cloud auth token is provided at runtime via `QBIT_JAY_CLOUD_TOKEN` (not by a dedicated CLI subcommand).
+Cloud server startup fails closed when the token is missing unless `QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1` is explicitly set for local insecure development.
+`QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1` cannot be combined with `QBIT_JAY_CLOUD_TOKEN`.
+Cloud server always requires `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` (comma-separated), including insecure mode, so project scope remains server-enforced.
+`QBIT_JAY_CLOUD_TOKEN` + `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` are server-side requirements for authenticated mode and must be configured before `qbit-jay cloud serve` (or compose startup).
+Authenticated mode also requires an explicit non-default `QBIT_JAY_JWT_SECRET`; implicit development defaults are rejected.
+Dashboard requests support browser login in authenticated mode: use `/dashboard/login` to exchange the bearer token for an HttpOnly dashboard cookie scoped to `/dashboard`. Protected `/dashboard/*` HTML routes require that cookie and do **not** treat raw `Authorization: Bearer ...` headers as an authenticated browser session. Sync API routes (`/sync/pull`, `/sync/pull/{chunkID}`, `/sync/push`, `/sync/mutations/push`, `/sync/mutations/pull`, `/sync/session-authorities`, `/sync/prompt-pair-claims`) remain header-auth only. For cloud authenticated sync and admin requests, the Authorization parser trims outer whitespace and requires exactly two whitespace-delimited fields: a case-insensitive `Bearer` scheme and one credential. Tabs or multiple spaces between fields are accepted; whitespace embedded in the credential and a scheme glued to the credential are rejected. This describes field separation, not an RFC credential-character grammar; it does not describe the local `QBIT_JAY_HTTP_TOKEN` parser. In insecure mode (`QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1` + no `QBIT_JAY_CLOUD_TOKEN`), dashboard auth is bypassed and `/dashboard/login` redirects to `/dashboard/`.
 
-`ENGRAM_CLOUD_ADMIN` is optional in authenticated mode. Its sessions can access the existing dashboard admin read surfaces, project sync controls, and audit logs, but managed-user, token, and project-grant mutations require a managed admin token.
-`ENGRAM_CLOUD_ADMIN` is rejected in insecure mode (`ENGRAM_CLOUD_INSECURE_NO_AUTH=1`) to avoid an incoherent admin/browser auth path.
+`QBIT_JAY_CLOUD_ADMIN` is optional in authenticated mode. Its sessions can access the existing dashboard admin read surfaces, project sync controls, and audit logs, but managed-user, token, and project-grant mutations require a managed admin token.
+`QBIT_JAY_CLOUD_ADMIN` is rejected in insecure mode (`QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1`) to avoid an incoherent admin/browser auth path.
 
-Cloud runtime bind host is controlled by `ENGRAM_CLOUD_HOST`:
+Cloud runtime bind host is controlled by `QBIT_JAY_CLOUD_HOST`:
 
 - default: `127.0.0.1` (local-only, safer default)
-- container/compose: set `ENGRAM_CLOUD_HOST=0.0.0.0` so published host ports can reach the cloud server
+- container/compose: set `QBIT_JAY_CLOUD_HOST=0.0.0.0` so published host ports can reach the cloud server
 
-Cloud runtime envs for `engram cloud serve`:
+Cloud runtime envs for `qbit-jay cloud serve`:
 
 | Variable                        | Required                 | Notes                                                                                 |
 | ------------------------------- | ------------------------ | ------------------------------------------------------------------------------------- |
-| `ENGRAM_DATABASE_URL`           | yes                      | Postgres DSN for cloud chunk storage/dashboard read model                             |
-| `ENGRAM_PORT`                   | no                       | Runtime port (default `8080`)                                                         |
-| `ENGRAM_CLOUD_HOST`             | no                       | Bind host (default `127.0.0.1`; use `0.0.0.0` for containers)                         |
-| `ENGRAM_CLOUD_MAX_PUSH_BYTES`   | no                       | Max chunk/mutation push request body bytes (default `8388608`)                        |
-| `ENGRAM_CLOUD_ALLOWED_PROJECTS` | yes                      | Comma-separated allowlist; always required (authenticated + insecure modes). Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request. |
-| `ENGRAM_CLOUD_TOKEN`            | yes (authenticated mode) | Enables bearer auth mode                                                              |
-| `ENGRAM_JWT_SECRET`             | yes (authenticated mode) | Must be explicitly set and non-default when token mode is enabled                     |
-| `ENGRAM_CLOUD_INSECURE_NO_AUTH` | no                       | Set to `1` only for local insecure mode; cannot be combined with `ENGRAM_CLOUD_TOKEN` |
-| `ENGRAM_CLOUD_ADMIN`            | no                       | Optional legacy dashboard-admin token for read surfaces, project sync controls, and audit logs; managed-user mutations require a managed admin token; rejected in insecure mode |
-| `ENGRAM_CLOUD_TOKEN_PEPPER`     | no (required to enable managed-token auth) | Dedicated managed-token hashing secret. Must differ from `ENGRAM_JWT_SECRET`. Required both by `engram cloud bootstrap admin --issue-token` and by `engram cloud serve` to accept managed tokens at runtime (see below). |
+| `QBIT_JAY_DATABASE_URL`           | yes                      | Postgres DSN for cloud chunk storage/dashboard read model                             |
+| `QBIT_JAY_PORT`                   | no                       | Runtime port (default `8080`)                                                         |
+| `QBIT_JAY_CLOUD_HOST`             | no                       | Bind host (default `127.0.0.1`; use `0.0.0.0` for containers)                         |
+| `QBIT_JAY_CLOUD_MAX_PUSH_BYTES`   | no                       | Max chunk/mutation push request body bytes (default `8388608`)                        |
+| `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` | yes                      | Comma-separated allowlist; always required (authenticated + insecure modes). Use `*` to allow all projects (dev/internal deploys) — bypasses per-project name enforcement while still requiring a non-empty project on each request. |
+| `QBIT_JAY_CLOUD_TOKEN`            | yes (authenticated mode) | Enables bearer auth mode                                                              |
+| `QBIT_JAY_JWT_SECRET`             | yes (authenticated mode) | Must be explicitly set and non-default when token mode is enabled                     |
+| `QBIT_JAY_CLOUD_INSECURE_NO_AUTH` | no                       | Set to `1` only for local insecure mode; cannot be combined with `QBIT_JAY_CLOUD_TOKEN` |
+| `QBIT_JAY_CLOUD_ADMIN`            | no                       | Optional legacy dashboard-admin token for read surfaces, project sync controls, and audit logs; managed-user mutations require a managed admin token; rejected in insecure mode |
+| `QBIT_JAY_CLOUD_TOKEN_PEPPER`     | no (required to enable managed-token auth) | Dedicated managed-token hashing secret. Must differ from `QBIT_JAY_JWT_SECRET`. Required both by `qbit-jay cloud bootstrap admin --issue-token` and by `qbit-jay cloud serve` to accept managed tokens at runtime (see below). |
 
 ### Managed users, tokens, and CLI bootstrap
 
-`engram cloud bootstrap admin` creates the first **managed admin** — a principal record stored in the cloud Postgres database (`cloud_principals` / `cloud_human_users`), independent from the legacy `ENGRAM_CLOUD_TOKEN` / `ENGRAM_CLOUD_ADMIN` env-token model:
+`qbit-jay cloud bootstrap admin` creates the first **managed admin** — a principal record stored in the cloud Postgres database (`cloud_principals` / `cloud_human_users`), independent from the legacy `QBIT_JAY_CLOUD_TOKEN` / `QBIT_JAY_CLOUD_ADMIN` env-token model:
 
 ```bash
 # Create the first managed admin (safe: refuses to create a duplicate first admin)
-engram cloud bootstrap admin --username alice
+qbit-jay cloud bootstrap admin --username alice
 
 # Also grant project access and issue a sync token in the same command
-engram cloud bootstrap admin --username alice \
+qbit-jay cloud bootstrap admin --username alice \
   --grant-project my-project \
   --issue-token first-token
 ```
 
 - `--username` is required; `--email` is optional.
 - `--grant-project <project>` may be repeated to grant one or more projects (managed principals are deny-by-default: no grants means no sync access).
-- `--issue-token [name]` issues a managed bearer token and prints the **raw token exactly once** in the command output. It is never logged, persisted, or re-printed — store it immediately. Issuing a token requires `ENGRAM_CLOUD_TOKEN_PEPPER` to be set to a dedicated secret (distinct from `ENGRAM_JWT_SECRET`); the command fails clearly, before creating anything, if the pepper is missing.
+- `--issue-token [name]` issues a managed bearer token and prints the **raw token exactly once** in the command output. It is never logged, persisted, or re-printed — store it immediately. Issuing a token requires `QBIT_JAY_CLOUD_TOKEN_PEPPER` to be set to a dedicated secret (distinct from `QBIT_JAY_JWT_SECRET`); the command fails clearly, before creating anything, if the pepper is missing.
 - Running the command again once a managed admin already exists is rejected (no silent duplicate first-admin creation); the attempt is still recorded as a denied `bootstrap.cli` audit event.
 - Every bootstrap attempt (accepted or denied) writes a `bootstrap.cli` audit event to `cloud_auth_audit_log`, with the same non-secret metadata rules (no raw tokens, hashes, or bearer headers) as every other cloud auth audit event.
 - Grant/role/duplicate-admin validation reuses the exact same `cloudstore` methods and last-admin guard used by the dashboard's own first-admin bootstrap flow — there is no parallel/looser bootstrap path.
@@ -1143,29 +1145,29 @@ engram cloud bootstrap admin --username alice \
 If a historical failed bootstrap left exactly one enabled managed human admin, retained its grants, and created no principal token anywhere in the deployment, run the explicit recovery command:
 
 ```bash
-engram cloud bootstrap recover-token --name replacement
+qbit-jay cloud bootstrap recover-token --name replacement
 ```
 
-It requires `ENGRAM_CLOUD_TOKEN_PEPPER`, preserves existing grants, and prints the recovered raw token exactly once only after the token and its `bootstrap.cli` recovery audit event commit together. It refuses all other states, including multiple enabled managed human admins or any existing principal token; it does not create users, grants, or partial tokens.
+It requires `QBIT_JAY_CLOUD_TOKEN_PEPPER`, preserves existing grants, and prints the recovered raw token exactly once only after the token and its `bootstrap.cli` recovery audit event commit together. It refuses all other states, including multiple enabled managed human admins or any existing principal token; it does not create users, grants, or partial tokens.
 
 If the bootstrap token was persisted but its one-time output was lost, explicitly opt in to replacement:
 
 ```bash
-engram cloud bootstrap recover-token --name replacement --revoke-existing
+qbit-jay cloud bootstrap recover-token --name replacement --revoke-existing
 ```
 
 This path requires exactly one enabled managed human admin and exactly one active principal token. That token must be unrevoked, never used, and owned by the sole enabled admin; the command atomically revokes it and creates the replacement while preserving grants. Earlier revoked recovery tokens may remain as audit history. If the replacement output is lost again, retry `--revoke-existing` while the current token remains unused; once it has been used, this escape hatch never replaces it. The command refuses used, revoked/inactive, ambiguous, or multiple-active-token states.
 
-**Runtime authentication:** `engram cloud serve` resolves managed tokens first, then falls back to the legacy env-token credentials (`ENGRAM_CLOUD_TOKEN` for sync and `ENGRAM_CLOUD_ADMIN` for dashboard access), on every `/sync/*`, `/admin/*`, and dashboard-login request. Authentication does not grant managed-user mutation authority: only a managed-token admin principal may create or enable/disable users, create or revoke tokens, or create or revoke project grants.
+**Runtime authentication:** `qbit-jay cloud serve` resolves managed tokens first, then falls back to the legacy env-token credentials (`QBIT_JAY_CLOUD_TOKEN` for sync and `QBIT_JAY_CLOUD_ADMIN` for dashboard access), on every `/sync/*`, `/admin/*`, and dashboard-login request. Authentication does not grant managed-user mutation authority: only a managed-token admin principal may create or enable/disable users, create or revoke tokens, or create or revoke project grants.
 
-- Set `ENGRAM_CLOUD_TOKEN_PEPPER` to enable managed-token authentication. A token issued by `engram cloud bootstrap admin --issue-token` (or by the dashboard/`/admin/*` token-create routes) then authenticates directly against `/sync/*` and `/admin/*`, and can log into the dashboard as its resolved principal/role.
-- If `ENGRAM_CLOUD_TOKEN_PEPPER` is not set, managed-token authentication is simply disabled: the server still starts normally, and `ENGRAM_CLOUD_TOKEN` / `ENGRAM_CLOUD_ADMIN` continue to authenticate exactly as before (legacy-only mode).
-- Managed principals are deny-by-default for project sync: a managed token only reaches projects explicitly granted via `--grant-project` (or the dashboard/`/admin/*` grant routes). Legacy `ENGRAM_CLOUD_TOKEN` keeps its existing `ENGRAM_CLOUD_ALLOWED_PROJECTS` allowlist behavior, unaffected by managed grants.
-- Managed dashboard inventory, details, statistics, browser views, and project sync controls use the principal's grants, not `ENGRAM_CLOUD_ALLOWED_PROJECTS`. Zero grants expose no projects; wildcard access must be explicitly granted. Legacy dashboard credentials remain env-allowlist restricted.
+- Set `QBIT_JAY_CLOUD_TOKEN_PEPPER` to enable managed-token authentication. A token issued by `qbit-jay cloud bootstrap admin --issue-token` (or by the dashboard/`/admin/*` token-create routes) then authenticates directly against `/sync/*` and `/admin/*`, and can log into the dashboard as its resolved principal/role.
+- If `QBIT_JAY_CLOUD_TOKEN_PEPPER` is not set, managed-token authentication is simply disabled: the server still starts normally, and `QBIT_JAY_CLOUD_TOKEN` / `QBIT_JAY_CLOUD_ADMIN` continue to authenticate exactly as before (legacy-only mode).
+- Managed principals are deny-by-default for project sync: a managed token only reaches projects explicitly granted via `--grant-project` (or the dashboard/`/admin/*` grant routes). Legacy `QBIT_JAY_CLOUD_TOKEN` keeps its existing `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` allowlist behavior, unaffected by managed grants.
+- Managed dashboard inventory, details, statistics, browser views, and project sync controls use the principal's grants, not `QBIT_JAY_CLOUD_ALLOWED_PROJECTS`. Zero grants expose no projects; wildcard access must be explicitly granted. Legacy dashboard credentials remain env-allowlist restricted.
 - Explicit `cloud_project_controls` rows register projects, including empty projects shown with zero counts. Existing projects with synced content remain visible for compatibility, subject to the same credential scope. Updating project sync controls refreshes dashboard inventory.
 - After a warm dashboard load, sync writes refold only the changed projects when the complete cached history is project-local; unchanged project snapshots are reused. Reads still wait for fresh data. Cold loads, policy/registry changes, mixed-project payloads, or noncanonical historical project envelopes use a full rebuild. Global statistics and current credential filtering are recomputed over the combined inventory. This reduces unrelated history decoding; a single large project can still need a costly refold.
 - Disabled managed users, revoked managed tokens, and revoked project grants stop authenticating/authorizing on the very next request — no server restart required.
-- No rollback action is required to keep using legacy credentials: legacy `ENGRAM_CLOUD_TOKEN` continues to use its existing sync allowlist, and `ENGRAM_CLOUD_ADMIN` continues to provide dashboard read access, project sync controls, audit logs, and the first-admin dashboard bootstrap entry point whether or not `ENGRAM_CLOUD_TOKEN_PEPPER` is configured. The CLI recovery command remains limited to its documented stranded-admin state. Use a managed admin token for managed-user administration.
+- No rollback action is required to keep using legacy credentials: legacy `QBIT_JAY_CLOUD_TOKEN` continues to use its existing sync allowlist, and `QBIT_JAY_CLOUD_ADMIN` continues to provide dashboard read access, project sync controls, audit logs, and the first-admin dashboard bootstrap entry point whether or not `QBIT_JAY_CLOUD_TOKEN_PEPPER` is configured. The CLI recovery command remains limited to its documented stranded-admin state. Use a managed admin token for managed-user administration.
 
 #### Managed admin API response JSON
 
@@ -1190,78 +1192,78 @@ Cloud sync is still local-first and explicit:
 
 ```bash
 # Explicit cloud sync call
-engram sync --cloud --project my-project
+qbit-jay sync --cloud --project my-project
 
 # Optional env toggle for cloud mode in sync command
-ENGRAM_CLOUD_SYNC=1 engram sync --status --project my-project
+QBIT_JAY_CLOUD_SYNC=1 qbit-jay sync --status --project my-project
 ```
 
-When `engram sync --cloud --project <project>` or autosync hits a known repairable cloud sync/upsert/canonicalization failure, Engram preserves the original error and appends guidance to run:
+When `qbit-jay sync --cloud --project <project>` or autosync hits a known repairable cloud sync/upsert/canonicalization failure, qbit-jay preserves the original error and appends guidance to run:
 
 ### Cloud Upgrade Flow
 
 ```bash
-engram cloud upgrade doctor --project <project>
-engram cloud upgrade repair --project <project> --dry-run
-engram cloud upgrade repair --project <project> --apply
-engram sync --cloud --project <project>
+qbit-jay cloud upgrade doctor --project <project>
+qbit-jay cloud upgrade repair --project <project> --dry-run
+qbit-jay cloud upgrade repair --project <project> --apply
+qbit-jay sync --cloud --project <project>
 ```
 
 Sync/autosync never auto-applies repairs; only the explicit `repair --apply` command mutates local repairable upgrade state.
 
-For pending observation upserts missing only a title, preview with `engram doctor repair --project <project> --check sync_mutation_required_fields --plan`, then use `--apply` instead of `--plan`. Eligible local mutations copy the matching live observation's validated current title verbatim without updating that observation. This repairs the current projection, not historical title truth. The existing blank-local-title path still derives a title from observation content and updates the source. Both paths patch only the queued payload title, preserving sequence and delivery state; neither pushes mutations. Conflicting identity, ownership, or project references are not eligible for current-title copying.
+For pending observation upserts missing only a title, preview with `qbit-jay doctor repair --project <project> --check sync_mutation_required_fields --plan`, then use `--apply` instead of `--plan`. Eligible local mutations copy the matching live observation's validated current title verbatim without updating that observation. This repairs the current projection, not historical title truth. The existing blank-local-title path still derives a title from observation content and updates the source. Both paths patch only the queued payload title, preserving sequence and delivery state; neither pushes mutations. Conflicting identity, ownership, or project references are not eligible for current-title copying.
 
-When cloud sync receives `policy_forbidden`, Engram preserves the server's denied project message and advises the server administrator to check `ENGRAM_CLOUD_ALLOWED_PROJECTS`. A managed principal's project grant may also need checking; the client does not expose allowlist contents.
+When cloud sync receives `policy_forbidden`, qbit-jay preserves the server's denied project message and advises the server administrator to check `QBIT_JAY_CLOUD_ALLOWED_PROJECTS`. A managed principal's project grant may also need checking; the client does not expose allowlist contents.
 
-For cloud servers that already accepted mutation pushes before mutation payloads were materialized into chunk history, run the server-side backfill against the Postgres DSN used by `engram cloud serve`:
+For cloud servers that already accepted mutation pushes before mutation payloads were materialized into chunk history, run the server-side backfill against the Postgres DSN used by `qbit-jay cloud serve`:
 
 ```bash
-ENGRAM_DATABASE_URL='postgres://...' engram cloud repair materialize-mutations --project <project> --dry-run
-ENGRAM_DATABASE_URL='postgres://...' engram cloud repair materialize-mutations --project <project> --apply
+QBIT_JAY_DATABASE_URL='postgres://...' qbit-jay cloud repair materialize-mutations --project <project> --dry-run
+QBIT_JAY_DATABASE_URL='postgres://...' qbit-jay cloud repair materialize-mutations --project <project> --apply
 ```
 
 The backfill is project-scoped, non-destructive, and idempotent: it inserts missing compatible chunks and leaves existing `cloud_mutations` and chunks in place.
 
-`engram cloud serve` also runs this materialization repair automatically for every configured `ENGRAM_CLOUD_ALLOWED_PROJECTS` entry at startup. The command reports PostgreSQL initialization, session indexing, and per-project repair progress on stderr. Once the listener is bound, HTTP routes return `503 Service Unavailable` until startup finishes and Cloud routes become available. Use [the Cloud health endpoint](#health) to check readiness. The explicit repair command remains available for operator verification, dry-runs, and re-running a project after an upgrade.
+`qbit-jay cloud serve` also runs this materialization repair automatically for every configured `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` entry at startup. The command reports PostgreSQL initialization, session indexing, and per-project repair progress on stderr. Once the listener is bound, HTTP routes return `503 Service Unavailable` until startup finishes and Cloud routes become available. Use [the Cloud health endpoint](#health) to check readiness. The explicit repair command remains available for operator verification, dry-runs, and re-running a project after an upgrade.
 
 ### Local Cloud Bring-Up (Docker + Postgres)
 
 ```bash
 # 1) SERVER-SIDE startup requirements (configure before startup)
 # docker-compose.cloud.yml includes defaults for browser-demo smoke usage:
-# ENGRAM_CLOUD_INSECURE_NO_AUTH=1
-# ENGRAM_CLOUD_ALLOWED_PROJECTS=smoke-project
+# QBIT_JAY_CLOUD_INSECURE_NO_AUTH=1
+# QBIT_JAY_CLOUD_ALLOWED_PROJECTS=smoke-project
 docker compose -f docker-compose.cloud.yml up -d
 
 # source-run flow (without compose): set BOTH token + allowlist before startup
-# ENGRAM_DATABASE_URL="postgres://engram:engram_dev@127.0.0.1:5433/engram_cloud?sslmode=disable" \
-# ENGRAM_JWT_SECRET="replace-with-32+-byte-random-secret" \
-# ENGRAM_CLOUD_TOKEN="your-token" \
-# ENGRAM_CLOUD_ALLOWED_PROJECTS="my-project" \
-# engram cloud serve
+# QBIT_JAY_DATABASE_URL="postgres://engram:engram_dev@127.0.0.1:5433/engram_cloud?sslmode=disable" \
+# QBIT_JAY_JWT_SECRET="replace-with-32+-byte-random-secret" \
+# QBIT_JAY_CLOUD_TOKEN="your-token" \
+# QBIT_JAY_CLOUD_ALLOWED_PROJECTS="my-project" \
+# qbit-jay cloud serve
 
 # 2) CLIENT-SIDE CLI setup
 # compose runtime flow: published :18080
-engram cloud config --server http://127.0.0.1:18080
+qbit-jay cloud config --server http://127.0.0.1:18080
 # compose runtime default is insecure local-dev mode; keep token unset
 # client sync preflight only requires the configured cloud server URL; no
-# client-side ENGRAM_CLOUD_INSECURE_NO_AUTH flag is required for compose flow
-unset ENGRAM_CLOUD_TOKEN
+# client-side QBIT_JAY_CLOUD_INSECURE_NO_AUTH flag is required for compose flow
+unset QBIT_JAY_CLOUD_TOKEN
 
 # 3) Enroll project + run explicit cloud sync
-engram cloud enroll smoke-project
-engram cloud upgrade doctor --project smoke-project
-engram cloud upgrade repair --project smoke-project --dry-run
-engram cloud upgrade repair --project smoke-project --apply
-engram cloud upgrade bootstrap --project smoke-project --resume
-engram cloud upgrade status --project smoke-project
-engram sync --cloud --status --project smoke-project
+qbit-jay cloud enroll smoke-project
+qbit-jay cloud upgrade doctor --project smoke-project
+qbit-jay cloud upgrade repair --project smoke-project --dry-run
+qbit-jay cloud upgrade repair --project smoke-project --apply
+qbit-jay cloud upgrade bootstrap --project smoke-project --resume
+qbit-jay cloud upgrade status --project smoke-project
+qbit-jay sync --cloud --status --project smoke-project
 
 # source-run client endpoint (without compose): default :8080
-# engram cloud config --server http://127.0.0.1:8080
+# qbit-jay cloud config --server http://127.0.0.1:8080
 
 # cloud mode enforces a single explicit project scope
-# engram sync --cloud --all  # blocked by design
+# qbit-jay sync --cloud --all  # blocked by design
 ```
 
 Deterministic reason codes shared across store/CLI/server:
@@ -1269,7 +1271,7 @@ Deterministic reason codes shared across store/CLI/server:
 - `blocked_unenrolled`
 - `auth_required`
 - `cloud_config_error`
-- `policy_forbidden` — check the server-side `ENGRAM_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents.
+- `policy_forbidden` — check the server-side `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents.
 - `paused`
 - `transport_failed`
 
@@ -1287,7 +1289,7 @@ Cloud failure visibility must stay deterministic across supported surfaces:
 | Explicit paused state                                                                                  | `paused`                             | `/sync/status`              |
 | Remote/network failure                                                                                 | `transport_failed`                   | CLI stderr + `/sync/status` |
 
-`engram sync --cloud --status --project <name>` is read-only: it does **not** mutate `/sync/status` lifecycle fields.
+`qbit-jay sync --cloud --status --project <name>` is read-only: it does **not** mutate `/sync/status` lifecycle fields.
 
 Machine-actionable validation/policy failures from cloud sync routes include:
 
@@ -1301,13 +1303,13 @@ This envelope is used consistently by `/sync/push` validation/control failures a
 
 ## MCP Project Resolution
 
-Engram resolves the project at MCP tool call time. The default source is the **server process working directory** (cwd), not MCP startup state, but some write tools have stronger context: `mem_session_start(directory=...)` resolves from the provided directory, and `mem_save` may use a validated explicit `project` or an existing `session_id` project before falling back to cwd detection. The explicit field is treated as a **validated selection**, not a free-form creation hint. This eliminates project drift caused by agents supplying different names for the same repo.
+qbit-jay resolves the project at MCP tool call time. The default source is the **server process working directory** (cwd), not MCP startup state, but some write tools have stronger context: `mem_session_start(directory=...)` resolves from the provided directory, and `mem_save` may use a validated explicit `project` or an existing `session_id` project before falling back to cwd detection. The explicit field is treated as a **validated selection**, not a free-form creation hint. This eliminates project drift caused by agents supplying different names for the same repo.
 
 ### Detection algorithm
 
 | Case | Condition                                                                                 | Source            | Project                            |
 | ---- | ----------------------------------------------------------------------------------------- | ----------------- | ---------------------------------- |
-| 1    | nearest `.engram/config.json` exists within the enclosing git root, or at cwd outside git | `config`          | `project_name` from config         |
+| 1    | nearest `.qbit-jay/config.json` exists within the enclosing git root, or at cwd outside git | `config`          | `project_name` from config         |
 | 2    | cwd is inside a git repo that currently has an `origin` remote                              | `git_remote`      | if the binding is absent, initialize it from the remote repo name; otherwise reuse the stored binding label |
 | 3    | cwd is inside a git repo that currently has no `origin` remote                               | `git_root`        | if the binding is absent, initialize it from the git-root basename; otherwise reuse the stored binding label |
 | 4    | cwd has exactly one git-repo child                                                        | `git_child`       | child's canonical name: its config first, then existing Git binding or origin remote, then repository-root basename (warning included) |
@@ -1322,25 +1324,25 @@ The Git binding is private to each clone and shared by that clone's linked workt
 
 ### Initialize an explicit project identity
 
-Use `engram init [project_name] [--force]` to write `.engram/config.json` in the current directory. When `project_name` is omitted, Engram uses the current directory basename. `--force` replaces an existing config; without it, init stops and tells you that the config already exists.
+Use `qbit-jay init [project_name] [--force]` to write `.qbit-jay/config.json` in the current directory. When `project_name` is omitted, qbit-jay uses the current directory basename. `--force` replaces an existing config; without it, init stops and tells you that the config already exists.
 
-Different Git remotes can end in the same repository name. For example, `client-a/customer-solution.git` and `client-b/customer-solution.git` can both resolve to `customer-solution`. Before capturing memories, run `engram init client-a` from the first repository's root and `engram init client-b` from the second repository's root to give them distinct project names.
+Different Git remotes can end in the same repository name. For example, `client-a/customer-solution.git` and `client-b/customer-solution.git` can both resolve to `customer-solution`. Before capturing memories, run `qbit-jay init client-a` from the first repository's root and `qbit-jay init client-b` from the second repository's root to give them distinct project names.
 
 When CLI or MCP capture first observes independent Git checkouts selecting the same project implicitly in one local store, the later checkout receives a warning once. The capture completes under the current name. MCP can also return the warning when a new session selects its project implicitly. Linked worktrees share the checkout identity. Explicit project names and operations on an existing session keep their current behavior.
 
-If the repositories already share a project, the new names apply when Engram resolves the project from those repositories in the future. Existing sessions and observations stay under the shared name. Selective recovery requires evidence tying each record to its original repository.
+If the repositories already share a project, the new names apply when qbit-jay resolves the project from those repositories in the future. Existing sessions and observations stay under the shared name. Selective recovery requires evidence tying each record to its original repository.
 
-An active session keeps its original project after `engram init`. To save under the new name, start a fresh agent session from the repository root. If you manage session IDs directly through MCP, call `mem_session_start` with a fresh `id` and set `directory` to the repository root, then use that same ID as `session_id` for later saves.
+An active session keeps its original project after `qbit-jay init`. To save under the new name, start a fresh agent session from the repository root. If you manage session IDs directly through MCP, call `mem_session_start` with a fresh `id` and set `directory` to the repository root, then use that same ID as `session_id` for later saves.
 
-For ordinary `mem_save` calls that omit `project` and `session_id` and leave `project_choice_reason` blank, `ENGRAM_PROJECT` and `engram mcp --project` take precedence over repository detection. To use the repository's new name for those calls, remove the override or set it to the intended name in your MCP launch configuration, then restart the MCP server. A nonblank `project_choice_reason` skips these overrides. Supply that field only when recovering from an `ambiguous_project` error after the user selects a project.
+For ordinary `mem_save` calls that omit `project` and `session_id` and leave `project_choice_reason` blank, `QBIT_JAY_PROJECT` and `qbit-jay mcp --project` take precedence over repository detection. To use the repository's new name for those calls, remove the override or set it to the intended name in your MCP launch configuration, then restart the MCP server. A nonblank `project_choice_reason` skips these overrides. Supply that field only when recovering from an `ambiguous_project` error after the user selects a project.
 
-If the resolving process cannot read `.engram/config.json`, the diagnostic starts
-with `cannot read .engram/config.json` and includes the filesystem error. Invalid
-JSON or project names retain `invalid .engram/config.json`. Both failures stop
+If the resolving process cannot read `.qbit-jay/config.json`, the diagnostic starts
+with `cannot read .qbit-jay/config.json` and includes the filesystem error. Invalid
+JSON or project names retain `invalid .qbit-jay/config.json`. Both failures stop
 config-based resolution; a missing file continues through the existing detection
 fallbacks. A read error alone does not identify a macOS privacy restriction.
 
-This is the explicit resolution path for a non-Git aggregator workspace that contains multiple child repositories. Run `engram init aggregator-name` at the aggregator root so its config resolves the workspace identity before child-repository scanning reports ambiguity.
+This is the explicit resolution path for a non-Git aggregator workspace that contains multiple child repositories. Run `qbit-jay init aggregator-name` at the aggregator root so its config resolves the workspace identity before child-repository scanning reports ambiguity.
 
 ### Response envelope
 
@@ -1348,21 +1350,21 @@ Most successful MCP tool responses use this envelope:
 
 ```json
 {
-  "project": "engram",
+  "project": "qbit-jay",
   "project_source": "git_remote",
-  "project_path": "/home/user/engram",
+  "project_path": "/home/user/qbit-jay",
   "result": "...(tool output)..."
 }
 ```
 
 Error responses include `available_projects` when the error is `ambiguous_project` or `unknown_project`.
 
-When a Git repository binding cannot be read or created, MCP returns `repository_binding_unavailable` with guidance to configure the repository's `.engram/config.json` with the intended canonical project. This is not an ambiguity and does not include ambiguity recovery tokens.
+When a Git repository binding cannot be read or created, MCP returns `repository_binding_unavailable` with guidance to configure the repository's `.qbit-jay/config.json` with the intended canonical project. This is not an ambiguity and does not include ambiguity recovery tokens.
 
 Exceptions:
 
 - `mem_current_project` returns detection fields directly (`project`, `project_source`, `project_path`, `cwd`, `available_projects`, optional `warning` / `error_hint`) and does not wrap them in `result`.
-- `mem_doctor` returns the same JSON report shape as `engram doctor --json`; it uses read-project resolution before running diagnostics but does not wrap the report in the common MCP envelope.
+- `mem_doctor` returns the same JSON report shape as `qbit-jay doctor --json`; it uses read-project resolution before running diagnostics but does not wrap the report in the common MCP envelope.
 
 ### Write tools (explicit/session/cwd project resolution)
 
@@ -1370,22 +1372,22 @@ Exceptions:
 
 `mem_update` requires `id` and caller-supplied `expected_project`. Like REST PATCH and `mem_delete`, it checks normalized stored ownership atomically with the mutation, independently of server cwd, process overrides, or cwd ambiguity. Its success envelope identifies the matched owner with `project_source: "explicit_override"` and `project_path: ""`; it does not claim a verified repository path. The assertion is not authentication or a permission grant. Save/session project resolution remains unchanged. `mem_get_observation` retains its read-only stored-owner fallback.
 
-`mem_save` resolves writes by precedence: validated explicit `project`, project already associated with `session_id`, repo/cwd detection (nearest `.engram/config.json` within the enclosing git root, git remote/root/child), then directory-basename fallback.
+`mem_save` resolves writes by precedence: validated explicit `project`, project already associated with `session_id`, repo/cwd detection (nearest `.qbit-jay/config.json` within the enclosing git root, git remote/root/child), then directory-basename fallback.
 
 Guardrails:
 
 - Invalid explicit `project` names fail loudly instead of silently falling back.
-- Valid-looking explicit `project` names are accepted only when backed by known context: an existing local project in the store, a matching existing session project, the nearest resolvable `.engram/config.json`, or exact ambiguous-project recovery after the user selected one available project.
+- Valid-looking explicit `project` names are accepted only when backed by known context: an existing local project in the store, a matching existing session project, the nearest resolvable `.qbit-jay/config.json`, or exact ambiguous-project recovery after the user selected one available project.
 - An unbacked explicit `project` fails loudly and does not create a new bucket.
 - An unknown non-empty `session_id` normally fails with `unknown_session`. Only genuine cwd ambiguity offers a short-lived MCP-local `recovery_token` bound to that session ID, canonical context, and exact unique candidate paths. After explicit user selection, `mem_save`, `mem_save_prompt`, or `mem_session_summary` may register that ID as project-owned before writing, using `project`, `project_choice_reason=user_selected_after_ambiguous_project`, and the token. A bare explicit project cannot register an unknown session, even when the project already exists. Recovery never resumes an ended session or changes an unrelated owner.
 - If both explicit `project` and `session_id` are supplied, they must resolve to the same normalized project or `mem_save` fails with a structured error and does not write.
-- An explicit `session_id` is authoritative. When a write omits it, Engram uses the current process directory only to narrow active non-manual runtime sessions for the resolved project. A valid, unexpired local lease takes precedence over legacy unleased rows in the same directory; every live leased owner remains a candidate, so multiple live leases fail closed. Expired, malformed, and nonblank invalid leases are excluded. Only when a directory has no live lease do unleased rows use the legacy seven-day effective-activity fallback (latest observation, then `started_at`). This precedence is applied independently for every requested directory. Engram attaches to a session only when exactly one candidate remains, uses the project manual-save session when none remain, and fails closed when multiple candidates remain rather than selecting by recency. Selection is read-only and never changes `ended_at`. Directory is not session identity; callers with concurrent sessions must supply `session_id`, end other active matching sessions, or save independently with `engram save "TITLE" "CONTENT" --project PROJECT --type TYPE --topic TOPIC_KEY`. The CLI fallback writes to an independent project manual-save session and does not bind it to the current MCP session. Claude Code currently may require ending other active matching sessions because its MCP transport does not expose runtime identity to each tool call.
+- An explicit `session_id` is authoritative. When a write omits it, qbit-jay uses the current process directory only to narrow active non-manual runtime sessions for the resolved project. A valid, unexpired local lease takes precedence over legacy unleased rows in the same directory; every live leased owner remains a candidate, so multiple live leases fail closed. Expired, malformed, and nonblank invalid leases are excluded. Only when a directory has no live lease do unleased rows use the legacy seven-day effective-activity fallback (latest observation, then `started_at`). This precedence is applied independently for every requested directory. qbit-jay attaches to a session only when exactly one candidate remains, uses the project manual-save session when none remain, and fails closed when multiple candidates remain rather than selecting by recency. Selection is read-only and never changes `ended_at`. Directory is not session identity; callers with concurrent sessions must supply `session_id`, end other active matching sessions, or save independently with `qbit-jay save "TITLE" "CONTENT" --project PROJECT --type TYPE --topic TOPIC_KEY`. The CLI fallback writes to an independent project manual-save session and does not bind it to the current MCP session. Claude Code currently may require ending other active matching sessions because its MCP transport does not expose runtime identity to each tool call.
 - `project_choice_reason=user_selected_after_ambiguous_project` is only honored when cwd resolution is actually ambiguous. On a non-ambiguous cwd, stale recovery flags do not override explicit-project precedence or session mismatch validation.
 - If ambiguous-project recovery is active, `project` must exactly match one of the previously returned `available_projects`; invented or normalized guesses are rejected. Tokens expire after five minutes and are valid only in the issuing MCP process. Same-choice retries are allowed; changed-choice, wrong-session, changed-context/candidate, and duplicate case-normalized candidate-path requests fail closed. Tokens are recovery capabilities, not OpenCode authentication.
 - Exact ambiguous-project choices can still fail with `project_name_collision` when multiple available names collapse to the same stored project bucket after normalization. Rename or disambiguate the colliding projects before retrying.
 - Ordinary explicit `mem_save(project=...)` calls can also fail with `project_name_collision` when the raw explicit name collapses into an existing config-backed, session-backed, or store-backed project bucket, such as `foo--bar` colliding with `foo-bar`.
 
-For monorepos, detection now honors the **nearest** `.engram/config.json` at or below the enclosing git root. That lets `repo/backend/.engram/config.json` and `repo/frontend/.engram/config.json` behave as independent projects without letting `~/.engram/config.json` leak into nested workspaces.
+For monorepos, detection now honors the **nearest** `.qbit-jay/config.json` at or below the enclosing git root. That lets `repo/backend/.qbit-jay/config.json` and `repo/frontend/.qbit-jay/config.json` behave as independent projects without letting `~/.qbit-jay/config.json` leak into nested workspaces.
 
 `mem_save_prompt` keeps the older cwd/default behavior by default and only uses `project` for the narrow ambiguous-project recovery override: after a previous `ambiguous_project` error, the agent may retry with `project=<one of available_projects>` and `project_choice_reason=user_selected_after_ambiguous_project`, with the returned `recovery_token`. A supplied session normally remains authoritative; the same narrow token-validated unknown-session bootstrap applies.
 
@@ -1405,10 +1407,10 @@ Use `mem_current_project` as the first call in a session to inspect the detectio
 
 ```json
 {
-  "project": "engram",
+  "project": "qbit-jay",
   "project_source": "git_remote",
-  "project_path": "/home/user/engram",
-  "cwd": "/home/user/engram",
+  "project_path": "/home/user/qbit-jay",
+  "cwd": "/home/user/qbit-jay",
   "available_projects": [],
   "warning": ""
 }
@@ -1484,13 +1486,13 @@ MCP `mem_save` runs conflict candidate detection after saving the observation. I
 
 ### mem_update
 
-Update an observation by ID, with mandatory `expected_project` supplied by the caller (for example, `{ "id": 42, "expected_project": "engram", "title": "Corrected" }`). Public schema supports partial updates for `title`, `content`, `find`, `replace`, `type`, `scope`, and `topic_key`. `find` and `replace` are paired literal, case-sensitive global replacement inputs and cannot be combined with `content`; empty finds and replacements with no effective normalized change preserve content.
+Update an observation by ID, with mandatory `expected_project` supplied by the caller (for example, `{ "id": 42, "expected_project": "qbit-jay", "title": "Corrected" }`). Public schema supports partial updates for `title`, `content`, `find`, `replace`, `type`, `scope`, and `topic_key`. `find` and `replace` are paired literal, case-sensitive global replacement inputs and cannot be combined with `content`; empty finds and replacements with no effective normalized change preserve content.
 
 This intentionally breaks mutation clients that omit the owner assertion. Native MCP and the in-repository Pi adapter require it; an external gentle-engram relay must be adapted separately and is not fixed by this repository change. Never read the target observation to manufacture a missing expectation. CLI/internal maintenance store APIs retain their unguarded entry points.
 
 ### mem_review
 
-Review observation lifecycle state. Available in the `agent` profile (`engram mcp --tools=agent`).
+Review observation lifecycle state. Available in the `agent` profile (`qbit-jay mcp --tools=agent`).
 
 Actions:
 
@@ -1501,7 +1503,7 @@ Actions:
 
 ### mem_pin
 
-Pin a local observation so it appears before recent observations in memory context. Pinned state is **local to this device and is not synced**. Available in the `agent` profile (`engram mcp --tools=agent`).
+Pin a local observation so it appears before recent observations in memory context. Pinned state is **local to this device and is not synced**. Available in the `agent` profile (`qbit-jay mcp --tools=agent`).
 
 Parameters:
 
@@ -1511,7 +1513,7 @@ Returns `{ "result": "Memory #N pinned", "id": N, "sync_id": ..., "pinned": true
 
 ### mem_unpin
 
-Unpin a local observation so it only appears in normal recency order in memory context. Pinned state is **local to this device and is not synced**. Available in the `agent` profile (`engram mcp --tools=agent`).
+Unpin a local observation so it only appears in normal recency order in memory context. Pinned state is **local to this device and is not synced**. Available in the `agent` profile (`qbit-jay mcp --tools=agent`).
 
 Parameters:
 
@@ -1525,7 +1527,7 @@ Suggest a stable `topic_key` from `type + title` (or content fallback). Uses fam
 
 ### mem_delete
 
-Delete an observation by ID with mandatory caller-supplied `expected_project`, for example `{ "id": 42, "expected_project": "engram", "hard_delete": true }`. Uses soft-delete by default (`deleted_at`); optional hard-delete for permanent removal. Both modes reject invalid or mismatched assertions before changing data.
+Delete an observation by ID with mandatory caller-supplied `expected_project`, for example `{ "id": 42, "expected_project": "qbit-jay", "hard_delete": true }`. Uses soft-delete by default (`deleted_at`); optional hard-delete for permanent removal. Both modes reject invalid or mismatched assertions before changing data.
 
 ### mem_save_prompt
 
@@ -1548,7 +1550,7 @@ MCP `mem_context` uses a 16 KiB default budget for the complete tool result and 
 
 The `mem_context` statistics footer uses the same effective project filter as its context. Cross-project personal context (no explicit project argument) retains global totals. Project-scoped calls do not enumerate unrelated projects for their footer.
 
-Use MCP `mem_context` with `older_history: true`, HTTP `GET /context?project=X&older_history=true`, or `engram context --project X --older-history` to opt into `### Older History`. Omitted or false options preserve existing output. This is a calendar overview of observations outside the SQL recent window, excluding pinned and deleted observations and respecting project/scope filters—not a summary of byte-truncated recent output.
+Use MCP `mem_context` with `older_history: true`, HTTP `GET /context?project=X&older_history=true`, or `qbit-jay context --project X --older-history` to opt into `### Older History`. Omitted or false options preserve existing output. This is a calendar overview of observations outside the SQL recent window, excluding pinned and deleted observations and respecting project/scope filters—not a summary of byte-truncated recent output.
 
 The overview uses UTC: weeks within the current month (Monday starts, explicit partial-week ranges), earlier months in the current quarter, earlier quarters in the current year, and previous years. Weekly titles are explicitly labeled samples and include observation IDs (up to three for the current week and one per earlier week); older periods show counts, with type counts for monthly groups. Retrieve an ID with `mem_get_observation` to read its full content.
 
@@ -1648,9 +1650,9 @@ Detect the current project from the working directory (or optional `directory` /
 
 ### mem_list_projects
 
-List every project known to Engram with per-project `observation_count`, `session_count`, `prompt_count`, and known `directories`, ordered by observation count descending — the same view as `engram projects list`. Returns `{ "projects": [...], "count": N }`.
+List every project known to qbit-jay with per-project `observation_count`, `session_count`, `prompt_count`, and known `directories`, ordered by observation count descending — the same view as `qbit-jay projects list`. Returns `{ "projects": [...], "count": N }`.
 
-Included in the `agent` profile; `engram mcp` registers all tools by default, so `--tools=agent` is not required to use it.
+Included in the `agent` profile; `qbit-jay mcp` registers all tools by default, so `--tools=agent` is not required to use it.
 
 Result semantics:
 
@@ -1661,7 +1663,7 @@ Use it for cross-project discovery when the working directory matches no known p
 
 ### mem_doctor
 
-Run read-only operational diagnostics. Returns the same JSON report shape as `engram doctor --json`, with optional `project` and `check` filters. The optional `project` override is validated with read-project resolution before diagnostics run.
+Run read-only operational diagnostics. Returns the same JSON report shape as `qbit-jay doctor --json`, with optional `project` and `check` filters. The optional `project` override is validated with read-project resolution before diagnostics run.
 
 ### mem_judge
 
@@ -1706,7 +1708,7 @@ After deciding the candidate relationships, an MCP client can use `mem_judge_man
 
 Records a verdict on a semantic comparison between two memories. The agent reads both memories, judges the relationship using its LLM reasoning, and calls `mem_compare` to persist the verdict. Unlike `mem_judge` (which resolves a pre-existing `pending` candidate surfaced by `mem_save`), `mem_compare` creates a new relation row directly — useful for proactive semantic analysis that goes beyond FTS5 lexical matching.
 
-Available in the `agent` profile (`engram mcp --tools=agent`).
+Available in the `agent` profile (`qbit-jay mcp --tools=agent`).
 
 Parameters:
 
@@ -1736,18 +1738,18 @@ OpenCode's source-to-embedded copy. Review these consumers together for semantic
 not identical formatting. External harness policies are independent and are not changed by
 editing this repository; a host may supply additional obligations.
 
-The protocol teaches agents **when** and **how** to use Engram's tools. Add the appropriate
+The protocol teaches agents **when** and **how** to use qbit-jay's tools. Add the appropriate
 host instructions to your prompt file (see [Agent Setup](docs/AGENT-SETUP.md)).
 
 The agent MUST follow this protocol without waiting for activation.
 
 ### AVAILABLE TOOLS
 
-Use the Engram tools actually exposed by the host, with their registered names.
+Use the qbit-jay tools actually exposed by the host, with their registered names.
 Names such as `mem_save` below are logical names; OpenCode uses qualified names
-such as `engram_mem_save`. Claude Code's core/deferred tools and ToolSearch
+such as `qbit-jay_mem_save`. Claude Code's core/deferred tools and ToolSearch
 conventions are Claude-specific, not a bootstrap requirement for other hosts.
-If tools are unavailable, use `engram setup <agent>` with the supported host name
+If tools are unavailable, use `qbit-jay setup <agent>` with the supported host name
 and restart that host. Setup repairs host-specific registration; do not assume
 Claude MCP names or permission allowlists on every host.
 
@@ -1810,9 +1812,9 @@ contract: Claude/Codex SessionEnd hooks and the OpenCode adapter own closure;
 Pi uses its explicit closure contract; Gemini additionally requires
 `mem_session_end` after `mem_session_summary` succeeds, only at actual session closure.
 
-Codex registers the native PreToolUse command `engram hook codex-pre-tool-use`
-for `mcp__engram__mem_*` and `mcp__plugin_engram_engram__mem_*`. It resolves the
-authoritative Codex host session to the server-confirmed Engram identity before
+Codex registers the native PreToolUse command `qbit-jay hook codex-pre-tool-use`
+for `mcp__qbit-jay__mem_*` and `mcp__plugin_qbit-jay_qbit-jay__mem_*`. It resolves the
+authoritative Codex host session to the server-confirmed qbit-jay identity before
 binding supported write/session arguments: `session_id` for writes and `id` for
 session start/end. `mem_session_end` uses `id`, not `session_id`. Read-only tools
 are unchanged; malformed inputs or unconfirmed host resolution deny mutating calls.
@@ -1871,7 +1873,7 @@ Do not skip step 1. Without it, everything done before compaction is lost from m
 
 ## Project Name Normalization
 
-Engram automatically prevents project name drift — the same project saved under different names (`"engram"` vs `"Engram"` vs `"  ENGRAM  "`) by different clients or users.
+qbit-jay automatically prevents project name drift — the same project saved under different names (`"qbit-jay"` vs `"Qbit-Jay"` vs `"  QBIT-JAY  "`) by different clients or users.
 
 ### Automatic normalization
 
@@ -1881,16 +1883,16 @@ All project names are normalized on write and read: **Unicode NFC**, **lowercase
 
 MCP tools resolve project names at call time using the shared detection chain:
 
-1. Nearest `.engram/config.json` `project_name` within the enclosing git root, or at cwd outside git
+1. Nearest `.qbit-jay/config.json` `project_name` within the enclosing git root, or at cwd outside git
 2. Git repository with an `origin` remote: initialize an absent private binding from the normalized repo name, otherwise reuse the stored binding label
 3. Git repository without an `origin` remote: initialize an absent private binding from the normalized root directory name, otherwise reuse the stored binding label
 4. Single git-repo child of cwd
 5. Multiple git-repo children of cwd returns `ambiguous_project` with `available_projects`
 6. Current working directory basename
 
-`engram mcp` accepts a process-level default project via `--project <name>` / `--project=<name>` or `ENGRAM_PROJECT=<name>`. For current-project tools, this override takes precedence over cwd detection throughout the MCP process. It must be a project name, not a path; operations that cannot establish project context reject unknown overrides. Deliberately global tools retain their own omission contract, including `mem_review` list without a project filter.
+`qbit-jay mcp` accepts a process-level default project via `--project <name>` / `--project=<name>` or `QBIT_JAY_PROJECT=<name>`. For current-project tools, this override takes precedence over cwd detection throughout the MCP process. It must be a project name, not a path; operations that cannot establish project context reject unknown overrides. Deliberately global tools retain their own omission contract, including `mem_review` list without a project filter.
 
-The same precedence rule is applied by every entry point, so identity never depends on which binary wrote the record: an **explicit request project** (`engram save --project`, an MCP tool `project` argument) wins first, then the **process override** (`engram mcp --project`, then `ENGRAM_PROJECT`), then **cwd detection**.
+The same precedence rule is applied by every entry point, so identity never depends on which binary wrote the record: an **explicit request project** (`qbit-jay save --project`, an MCP tool `project` argument) wins first, then the **process override** (`qbit-jay mcp --project`, then `QBIT_JAY_PROJECT`), then **cwd detection**.
 
 ### Ownership on legacy sessions
 
@@ -1900,21 +1902,21 @@ A database upgraded from the schema where `sessions.project` was nullable still 
 - Adoption is refused in one case: an unowned session that already parents a record owned by a *different* project. Claiming it there would split that record from its session, so the write fails with `project_ownership_ambiguous` (HTTP `409`) and the operator resolves it explicitly.
 - A write that resolves no project at all against an unowned session fails with `project_ownership_required` (HTTP `409`).
 
-Both errors carry a `remedy` field naming the exact command to run: `engram projects rescue-ownership --project <name> --session <id>`. That command reaches the local store directly and needs no server token, so recovery stays available in a zero-config install. Bulk repair remains available over HTTP through `POST /projects/rescue-ownership` when `ENGRAM_HTTP_TOKEN` is configured.
+Both errors carry a `remedy` field naming the exact command to run: `qbit-jay projects rescue-ownership --project <name> --session <id>`. That command reaches the local store directly and needs no server token, so recovery stays available in a zero-config install. Bulk repair remains available over HTTP through `POST /projects/rescue-ownership` when `QBIT_JAY_HTTP_TOKEN` is configured.
 
 ### Similar-project warnings
 
-When saving to a project without live observations, Engram checks for similar existing project names (Levenshtein distance, substring, case-insensitive matching) and warns the agent if a likely variant already exists. MCP saves first check the target project's live observations; established projects skip the full name listing. Sessions, prompts or enrollment alone do not suppress this warning, and soft-deleted observations do not count. The warning is advisory: if its point lookup fails, the existing best-effort name check is still attempted.
+When saving to a project without live observations, qbit-jay checks for similar existing project names (Levenshtein distance, substring, case-insensitive matching) and warns the agent if a likely variant already exists. MCP saves first check the target project's live observations; established projects skip the full name listing. Sessions, prompts or enrollment alone do not suppress this warning, and soft-deleted observations do not count. The warning is advisory: if its point lookup fails, the existing best-effort name check is still attempted.
 
 ### Retroactive cleanup
 
 For local future-only key/cwd mappings, use [project aliases](docs/PROJECT-ALIASES.md). Alias resolution is a read-only preview; it does not enable inbox routing, enroll projects, or rewrite history.
 
-Use `engram projects merge --from acmeapi --to acme-api --dry-run` to preview one explicitly named separator variant without mutation, then `--apply` to merge it. ASCII spaces are also admitted by this explicit path: `engram projects merge --from "plugin obsidian" --to plugin-obsidian --dry-run`, followed by `--apply`. Only the exact named source spelling moves; other case or separator variants are not included implicitly. Internal tabs and nonbreaking spaces are not admitted as separators. This does not change project-name normalization or automatic consolidation. Exactly one mode and both names are required; unrelated names and already-canonical sources (including surrounding whitespace) are rejected. A distinct legacy case or NFD spelling is accepted when it normalizes to the canonical target; surrounding whitespace in `--from` is trimmed before lookup, and the remaining spelling must match the stored source exactly. For example, `--from ' Acme-api '` selects the stored `Acme-api`, not another case-equivalent spelling. Use `engram projects merge --from Acme-api --to acme-api --dry-run`, then replace `--dry-run` with `--apply` to canonicalize a single legacy name locally, without cloud configuration or enrollment. Preview reports observation, session, and prompt counts plus sync identity changes, even with zero rows. It is point-in-time: apply revalidates and reports actual moved row counts, which may differ. Apply's sync identity message is qualitative, not an actual-change count or a claim that the preview's sync state still holds. Sync-only merges can succeed with zero record moves. The reserved `inbox` project cannot be a merge destination, including for an explicitly named separator variant such as `in-box`; preview and apply both reject it.
+Use `qbit-jay projects merge --from acmeapi --to acme-api --dry-run` to preview one explicitly named separator variant without mutation, then `--apply` to merge it. ASCII spaces are also admitted by this explicit path: `qbit-jay projects merge --from "plugin obsidian" --to plugin-obsidian --dry-run`, followed by `--apply`. Only the exact named source spelling moves; other case or separator variants are not included implicitly. Internal tabs and nonbreaking spaces are not admitted as separators. This does not change project-name normalization or automatic consolidation. Exactly one mode and both names are required; unrelated names and already-canonical sources (including surrounding whitespace) are rejected. A distinct legacy case or NFD spelling is accepted when it normalizes to the canonical target; surrounding whitespace in `--from` is trimmed before lookup, and the remaining spelling must match the stored source exactly. For example, `--from ' Acme-api '` selects the stored `Acme-api`, not another case-equivalent spelling. Use `qbit-jay projects merge --from Acme-api --to acme-api --dry-run`, then replace `--dry-run` with `--apply` to canonicalize a single legacy name locally, without cloud configuration or enrollment. Preview reports observation, session, and prompt counts plus sync identity changes, even with zero rows. It is point-in-time: apply revalidates and reports actual moved row counts, which may differ. Apply's sync identity message is qualitative, not an actual-change count or a claim that the preview's sync state still holds. Sync-only merges can succeed with zero record moves. The reserved `inbox` project cannot be a merge destination, including for an explicitly named separator variant such as `in-box`; preview and apply both reject it.
 
-Use `engram projects consolidate` to interactively merge legacy project names that are equivalent after normalization, or `mem_merge_projects` for agent-driven consolidation. `engram projects consolidate --all --dry-run` groups existing NFC/NFD pairs and suggests the NFC canonical name; rerun without `--dry-run` to select the groups to merge. Existing rows are not automatically migrated. Explicit merge and consolidation move observations, sessions, prompts, pending sync mutations and enrollment through the existing transactional repair path; acknowledged sync history remains unchanged.
+Use `qbit-jay projects consolidate` to interactively merge legacy project names that are equivalent after normalization, or `mem_merge_projects` for agent-driven consolidation. `qbit-jay projects consolidate --all --dry-run` groups existing NFC/NFD pairs and suggests the NFC canonical name; rerun without `--dry-run` to select the groups to merge. Existing rows are not automatically migrated. Explicit merge and consolidation move observations, sessions, prompts, pending sync mutations and enrollment through the existing transactional repair path; acknowledged sync history remains unchanged.
 
-Use `engram projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]` to assign ownership to legacy rows that carry none. It prints how many sessions, observations, and prompts moved, and — when anything was left behind — exactly which items and why. It works against the local store, so it needs no running server and no `ENGRAM_HTTP_TOKEN`.
+Use `qbit-jay projects rescue-ownership --project <name> [--session <id>] [--observation <id>] [--prompt <id>]` to assign ownership to legacy rows that carry none. It prints how many sessions, observations, and prompts moved, and — when anything was left behind — exactly which items and why. It works against the local store, so it needs no running server and no `QBIT_JAY_HTTP_TOKEN`.
 
 ---
 
@@ -1953,21 +1955,21 @@ Separate table captures what the USER asked (not just tool calls). Gives future 
 
 Share memories across machines, backup, or migrate:
 
-- `engram export` — Versioned JSON backup of sessions, observations, prompts, local pin state, and memory-relation metadata
-- `engram import <file>` — Load an atomic backup transaction. Version `0.2.0` preserves pins and relations; legacy `0.1.0` backups without those fields remain compatible, while unsupported versions fail before mutation. Orphaned relation audit rows may retain missing endpoint observations; other dangling relations or missing superseding relations fail the complete transaction.
-- `engram export --help` and `engram import --help` — Show command-specific usage and options without an update check, configuration lookup, database migration, or store access. Export accepts an optional output filename and `--project NAME` or `--all`; import requires a backup filename for normal operation.
+- `qbit-jay export` — Versioned JSON backup of sessions, observations, prompts, local pin state, and memory-relation metadata
+- `qbit-jay import <file>` — Load an atomic backup transaction. Version `0.2.0` preserves pins and relations; legacy `0.1.0` backups without those fields remain compatible, while unsupported versions fail before mutation. Orphaned relation audit rows may retain missing endpoint observations; other dangling relations or missing superseding relations fail the complete transaction.
+- `qbit-jay export --help` and `qbit-jay import --help` — Show command-specific usage and options without an update check, configuration lookup, database migration, or store access. Export accepts an optional output filename and `--project NAME` or `--all`; import requires a backup filename for normal operation.
 
 ### Git Sync (Chunked)
 
 Share memories through git repositories using compressed chunks with a manifest index.
 
-- `engram sync` — Exports new memories as a gzipped JSONL chunk to `.engram/chunks/`
-- `engram sync --all` — Exports memories from every project, excluding prompts by default
-- `engram sync --include-prompts` — Intentionally includes prompts in local Git export (also usable with `--all` or `--project NAME`)
-- `engram sync --import` — Imports chunks listed in the manifest that haven't been imported yet
-- `engram sync --status` — Shows how many chunks exist locally vs remotely (filesystem mode)
-- `engram sync --cloud --status --project <name>` — Shows local, remote, and pending chunk counts for the specified cloud project
-- `engram sync --project NAME` — Filters export to a specific project
+- `qbit-jay sync` — Exports new memories as a gzipped JSONL chunk to `.qbit-jay/chunks/`
+- `qbit-jay sync --all` — Exports memories from every project, excluding prompts by default
+- `qbit-jay sync --include-prompts` — Intentionally includes prompts in local Git export (also usable with `--all` or `--project NAME`)
+- `qbit-jay sync --import` — Imports chunks listed in the manifest that haven't been imported yet
+- `qbit-jay sync --status` — Shows how many chunks exist locally vs remotely (filesystem mode)
+- `qbit-jay sync --cloud --status --project <name>` — Shows local, remote, and pending chunk counts for the specified cloud project
+- `qbit-jay sync --project NAME` — Filters export to a specific project
 - Local sync projects hard deletes as canonical observation, prompt, and session delete mutations; child deletes precede their session and remain replay-safe through manifest history.
 - Within one imported mutation chunk, a session delete superseded by a validated, admissible later actual upsert of the same session (local recreation must pass the existing tombstone timestamp policy) records delete intent without physically removing the session or its associated observations, prompts, or local finalization marker. Explicit child deletes still apply, and recreation uses normal session upsert rules. Final session deletes and per-mutation pulls retain ordinary deletion behavior, including foreign-key errors when observations still reference the session.
 
@@ -1976,29 +1978,29 @@ Git export excludes prompt records and content-bearing prompt upserts by default
 Keep private prompts local; opt in only when intentionally sharing reviewed prompts with your team:
 
 ```bash
-engram sync --project my-project                 # prompts stay local
-engram sync --project my-project --include-prompts # intentionally share prompts
+qbit-jay sync --project my-project                 # prompts stay local
+qbit-jay sync --project my-project --include-prompts # intentionally share prompts
 ```
 
-A later opt-in includes older omitted prompts and their required parent sessions, even after intervening default exports. Repeated exports retain the existing identity/deduplication and deletion rules. `--include-prompts` is invalid with `--import`, `--status`, or cloud sync, including cloud selected by `ENGRAM_CLOUD_SYNC=true`; rejection occurs before opening the store or creating sync artifacts.
+A later opt-in includes older omitted prompts and their required parent sessions, even after intervening default exports. Repeated exports retain the existing identity/deduplication and deletion rules. `--include-prompts` is invalid with `--import`, `--status`, or cloud sync, including cloud selected by `QBIT_JAY_CLOUD_SYNC=true`; rejection occurs before opening the store or creating sync artifacts.
 
-**Review before committing:** sessions and observations can also contain secrets or other sensitive content; prompt exclusion is not automatic redaction or a guarantee that a chunk is safe to publish. Inspect `.engram/` before adding it to Git. Committed content can remain permanently in Git history and other clones. Default exclusion does not rewrite old chunks or erase previously shared prompts from history. There is no interactive confirmation.
+**Review before committing:** sessions and observations can also contain secrets or other sensitive content; prompt exclusion is not automatic redaction or a guarantee that a chunk is safe to publish. Inspect `.qbit-jay/` before adding it to Git. Committed content can remain permanently in Git history and other clones. Default exclusion does not rewrite old chunks or erase previously shared prompts from history. There is no interactive confirmation.
 
-Cloud sync and standalone `engram export` are unchanged: they do not adopt this Git-only prompt exclusion. Import remains compatible with historical prompt-bearing chunks.
+Cloud sync and standalone `qbit-jay export` are unchanged: they do not adopt this Git-only prompt exclusion. Import remains compatible with historical prompt-bearing chunks.
 
 ```
-.engram/
+.qbit-jay/
 ├── manifest.json          <- index of all chunks (small, git-mergeable)
 ├── chunks/
 │   ├── a3f8c1d2.jsonl.gz <- chunk 1 (gzipped JSONL)
 │   ├── b7d2e4f1.jsonl.gz <- chunk 2
 │   └── ...
-└── engram.db              <- local working DB (gitignored)
+└── qbit-jay.db              <- local working DB (gitignored)
 ```
 
 **Why chunks?**
 
-- Each `engram sync` creates a NEW chunk — old chunks are never modified
+- Each `qbit-jay sync` creates a NEW chunk — old chunks are never modified
 - No merge conflicts: each dev creates independent chunks, git just adds files
 - Chunks are content-hashed (SHA-256 prefix) — each chunk is imported only once
 - The manifest is the only file git diffs — it's small and append-only
@@ -2015,7 +2017,7 @@ Instead of a separate LLM service, the agent itself compresses observations. The
 
 ### No Raw Tool-Call Auto-Capture
 
-Engram does not record a firehose of raw tool calls. Raw tool calls (`edit: {file: "foo.go"}`, `bash: {command: "go build"}`) are noisy and pollute FTS5 search. The agent's curated summaries are higher signal, more searchable, and don't bloat the database. Shell history and git provide the raw audit trail.
+qbit-jay does not record a firehose of raw tool calls. Raw tool calls (`edit: {file: "foo.go"}`, `bash: {command: "go build"}`) are noisy and pollute FTS5 search. The agent's curated summaries are higher signal, more searchable, and don't bloat the database. Shell history and git provide the raw audit trail.
 
 `mem_save` can also best-effort store the current user prompt when its runtime supplies context for the same project/session and `capture_prompt` is not disabled. MCP uses process-local context (typically fed by `mem_save_prompt`); native Pi supplies its eligible current turn's redacted/truncated content. Go dedupes independent prompt rows by session/project/content; there is no explicit observation-ID link. The save still succeeds if context is missing or capture fails, and opting out does not disable Pi's independent lifecycle capture.
 
@@ -2023,7 +2025,7 @@ Engram does not record a firehose of raw tool calls. Raw tool calls (`edit: {fil
 
 ## Terminal UI (TUI)
 
-Interactive Bubbletea-based terminal UI. Launch with `engram tui`.
+Interactive Bubbletea-based terminal UI. Launch with `qbit-jay tui`.
 
 ### Screens
 
@@ -2050,7 +2052,7 @@ Interactive Bubbletea-based terminal UI. Launch with `engram tui`.
 
 ### Visual Features
 
-- **Engram Elephant** color palette
+- **qbit-jay Elephant** color palette
 - **`(active)` badge** — shown next to sessions and observations from active sessions, sorted to top
 - **Scroll indicators** — position in long lists (e.g. "showing 1-20 of 50")
 - **2-line items** — each observation shows title + content preview
@@ -2059,68 +2061,68 @@ Interactive Bubbletea-based terminal UI. Launch with `engram tui`.
 
 ## Running as a Service
 
-Use a service supervisor to start `engram serve` after reboot and restart it after failures. Replacing the binary alone does not guarantee that an existing process exits. In this version, permanent database generation invalidation observed by an HTTP request triggers autosync cancellation, up to five seconds of HTTP draining, listener release, and a nonzero exit after cleanup. Restart belongs to the supervisor or operator, not Engram itself; already-running older binaries do not gain this behavior. Use `engram cloud status` afterwards to confirm — the `Local daemon:` line should report `running on port 7437`.
+Use a service supervisor to start `qbit-jay serve` after reboot and restart it after failures. Replacing the binary alone does not guarantee that an existing process exits. In this version, permanent database generation invalidation observed by an HTTP request triggers autosync cancellation, up to five seconds of HTTP draining, listener release, and a nonzero exit after cleanup. Restart belongs to the supervisor or operator, not qbit-jay itself; already-running older binaries do not gain this behavior. Use `qbit-jay cloud status` afterwards to confirm — the `Local daemon:` line should report `running on port 7437`.
 
 ### CLI daemon verbs (docker-style)
 
-Engram ships docker-style verbs for the common daemon lifecycle. They manage only the daemon started by `engram run -d` — the one tracked by the pidfile — and never touch session-owned serves that MCP clients spawn per session.
+qbit-jay ships docker-style verbs for the common daemon lifecycle. They manage only the daemon started by `qbit-jay run -d` — the one tracked by the pidfile — and never touch session-owned serves that MCP clients spawn per session.
 
-| Concern | Docker equivalent | Engram command |
+| Concern | Docker equivalent | qbit-jay command |
 | --- | --- | --- |
-| Run in background | `docker run -d` | `engram run -d` — detaches, prints PID and port |
-| Custom port | `docker run -d -p 1234` | `engram run -d -p 1234` — fails loudly if the port is taken |
-| Status | `docker ps` | `engram ps` — managed running (pid N) on port P / not running / unreachable / unmanaged or unknown listener |
-| Stop | `docker stop` | `engram stop` — graceful stop, then force if needed |
-| Logs | `docker logs` | `engram logs` — `engram logs -f` follows |
-| Restart | `docker restart` | `engram restart [-p PORT]` — stop, then start detached again |
+| Run in background | `docker run -d` | `qbit-jay run -d` — detaches, prints PID and port |
+| Custom port | `docker run -d -p 1234` | `qbit-jay run -d -p 1234` — fails loudly if the port is taken |
+| Status | `docker ps` | `qbit-jay ps` — managed running (pid N) on port P / not running / unreachable / unmanaged or unknown listener |
+| Stop | `docker stop` | `qbit-jay stop` — graceful stop, then force if needed |
+| Logs | `docker logs` | `qbit-jay logs` — `qbit-jay logs -f` follows |
+| Restart | `docker restart` | `qbit-jay restart [-p PORT]` — stop, then start detached again |
 
-- The daemon records `<dataDir>/serve.pid` (JSON `{"pid": N, "port": P, "token": T}` — the token identifies one daemon start) and writes its stdout/stderr to `<dataDir>/serve.log` (default data dir `~/.engram`). Concurrent starts on one data directory are serialized through `<dataDir>/serve.lock`, so two parents can never overwrite each other's records.
-- An identity-confirmed `engram ps` also prints server and installed CLI semantic release versions. A known difference reports `Restart pending`; unknown versions do not. Status never restarts or signals the process, and a version match cannot replace the start-token identity check.
-- When `engram ps` reports an unmanaged Engram listener, a valid self-reported release adds the server and installed CLI versions to the diagnostic. The unmanaged listener produces a nonzero exit status. Verify which process owns the listener before restarting it through its supervisor or launch method.
-- A second `engram run -d` against a live daemon reports `already running (pid N)` and exits non-zero.
-- With a missing or dead pidfile, `ps` and `stop` also inspect the recorded port (otherwise `ENGRAM_PORT`, then 7437). A healthy Engram listener is reported as unmanaged; other occupied or unconfirmed listeners are reported as unknown. `run -d` checks its requested port before spawning. These diagnostics exit non-zero and never adopt or signal the listener. Windows reports a unique OS-observed IPv4 loopback/wildcard owning PID when available; other platforms, lookup failures, and ambiguous owners explicitly report PID unavailable. An observed PID is a diagnostic snapshot, never stop authorization.
+- The daemon records `<dataDir>/serve.pid` (JSON `{"pid": N, "port": P, "token": T}` — the token identifies one daemon start) and writes its stdout/stderr to `<dataDir>/serve.log` (default data dir `~/.qbit-jay`). Concurrent starts on one data directory are serialized through `<dataDir>/serve.lock`, so two parents can never overwrite each other's records.
+- An identity-confirmed `qbit-jay ps` also prints server and installed CLI semantic release versions. A known difference reports `Restart pending`; unknown versions do not. Status never restarts or signals the process, and a version match cannot replace the start-token identity check.
+- When `qbit-jay ps` reports an unmanaged qbit-jay listener, a valid self-reported release adds the server and installed CLI versions to the diagnostic. The unmanaged listener produces a nonzero exit status. Verify which process owns the listener before restarting it through its supervisor or launch method.
+- A second `qbit-jay run -d` against a live daemon reports `already running (pid N)` and exits non-zero.
+- With a missing or dead pidfile, `ps` and `stop` also inspect the recorded port (otherwise `QBIT_JAY_PORT`, then 7437). A healthy qbit-jay listener is reported as unmanaged; other occupied or unconfirmed listeners are reported as unknown. `run -d` checks its requested port before spawning. These diagnostics exit non-zero and never adopt or signal the listener. Windows reports a unique OS-observed IPv4 loopback/wildcard owning PID when available; other platforms, lookup failures, and ambiguous owners explicitly report PID unavailable. An observed PID is a diagnostic snapshot, never stop authorization.
 - A pidfile pid is only signaled after `/health` returns the same nonempty start token recorded in the pidfile. A live pid with a missing or mismatched identity is never signaled. `run -d` can clear a token-bearing record when the recorded port is not running or answers with a different identity; an unreachable probe preserves the record. A live legacy record without a token remains readable, but `ps` reports it as unmanaged and `run -d`, `stop`, and `restart` preserve it and require manual verification. Verify the process locally and stop it manually only if it is the daemon; remove the pidfile only if the record is stale. A healthy HTTP port alone never establishes ownership of a PID.
 - A port conflict is a startup error with a non-zero exit code, so `KeepAlive`/`Restart` supervisors never hot-loop on a silent exit-0 bind failure.
-- `engram stop` escalates from graceful to forced termination; on Windows, detached children cannot receive console events, so stop terminates the process directly.
+- `qbit-jay stop` escalates from graceful to forced termination; on Windows, detached children cannot receive console events, so stop terminates the process directly.
 - The verbs complement the supervisor templates below: use a unit for boot persistence and the verbs for day-to-day control.
 
 ### Using systemd (Linux)
 
 1. Move binary to `~/.local/bin` (ensure it's in your `$PATH`)
-2. Create directories: `mkdir -p ~/.engram ~/.config/systemd/user`
-3. Create `~/.config/systemd/user/engram.service` (see below)
+2. Create directories: `mkdir -p ~/.qbit-jay ~/.config/systemd/user`
+3. Create `~/.config/systemd/user/qbit-jay.service` (see below)
 4. `systemctl --user daemon-reload`
-5. `systemctl --user enable engram`
-6. `systemctl --user start engram`
-7. `journalctl --user -u engram -f`
+5. `systemctl --user enable qbit-jay`
+6. `systemctl --user start qbit-jay`
+7. `journalctl --user -u qbit-jay -f`
 
 ```ini
 [Unit]
-Description=Engram Memory Server
+Description=qbit-jay Memory Server
 After=network.target
 
 [Service]
 WorkingDirectory=%h
-ExecStart=%h/.local/bin/engram serve
+ExecStart=%h/.local/bin/qbit-jay serve
 Restart=on-failure
 RestartSec=3
-Environment=ENGRAM_DATA_DIR=%h/.engram
+Environment=QBIT_JAY_DATA_DIR=%h/.qbit-jay
 
 [Install]
 WantedBy=default.target
 ```
 
-`Restart=on-failure` restarts the service after any non-zero exit. Both port-ownership conflicts are startup errors: the same Engram instance already owning the port and a different or legacy owner, so the unit retries at `RestartSec` pace instead of silently looping on a clean exit. Existing installed units are not changed by this example: manually update `~/.config/systemd/user/engram.service` and run `systemctl --user daemon-reload` to apply the policy.
+`Restart=on-failure` restarts the service after any non-zero exit. Both port-ownership conflicts are startup errors: the same qbit-jay instance already owning the port and a different or legacy owner, so the unit retries at `RestartSec` pace instead of silently looping on a clean exit. Existing installed units are not changed by this example: manually update `~/.config/systemd/user/qbit-jay.service` and run `systemctl --user daemon-reload` to apply the policy.
 
 ### Using launchd (macOS)
 
-This is the recommended setup for Homebrew users on macOS. With `KeepAlive=true`, launchd relaunches `engram serve` when it exits. A binary upgrade alone is not an exit trigger; request-observed permanent database generation invalidation is.
+This is the recommended setup on macOS. With `KeepAlive=true`, launchd relaunches `qbit-jay serve` when it exits. A binary upgrade alone is not an exit trigger; request-observed permanent database generation invalidation is.
 
-1. Find your binary path: `which engram` (typically `/opt/homebrew/bin/engram` on Apple Silicon or `/usr/local/bin/engram` on Intel)
-2. Create the data dir if missing: `mkdir -p ~/.engram`
-3. Create `~/Library/LaunchAgents/com.gentleman-programming.engram.plist` with the contents below — replace `<HOME>` with the absolute path of your home directory (`echo $HOME`) and adjust the binary path if `which engram` returned something different
-4. Load it: `launchctl load ~/Library/LaunchAgents/com.gentleman-programming.engram.plist`
-5. Verify: `launchctl list | grep engram` and `engram cloud status` (the `Local daemon:` line should report `running on port 7437`)
+1. Find your binary path: `which qbit-jay` (for example `~/go/bin/qbit-jay` after `go install`; use the absolute path)
+2. Create the data dir if missing: `mkdir -p ~/.qbit-jay`
+3. Create `~/Library/LaunchAgents/dev.qbitdev.qbit-jay.plist` with the contents below — replace `<HOME>` with the absolute path of your home directory (`echo $HOME`) and adjust the binary path if `which qbit-jay` returned something different
+4. Load it: `launchctl load ~/Library/LaunchAgents/dev.qbitdev.qbit-jay.plist`
+5. Verify: `launchctl list | grep qbit-jay` and `qbit-jay cloud status` (the `Local daemon:` line should report `running on port 7437`)
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -2128,24 +2130,24 @@ This is the recommended setup for Homebrew users on macOS. With `KeepAlive=true`
 <plist version="1.0">
 <dict>
     <key>Label</key>
-    <string>com.gentleman-programming.engram</string>
+    <string>dev.qbitdev.qbit-jay</string>
     <key>ProgramArguments</key>
     <array>
-        <string>/opt/homebrew/bin/engram</string>
+        <string>/Users/you/go/bin/qbit-jay</string>
         <string>serve</string>
     </array>
     <key>WorkingDirectory</key>
     <string><HOME></string>
     <key>EnvironmentVariables</key>
     <dict>
-        <key>ENGRAM_DATA_DIR</key>
-        <string><HOME>/.engram</string>
+        <key>QBIT_JAY_DATA_DIR</key>
+        <string><HOME>/.qbit-jay</string>
         <!-- Uncomment and fill these to enable cloud autosync:
-        <key>ENGRAM_CLOUD_AUTOSYNC</key>
+        <key>QBIT_JAY_CLOUD_AUTOSYNC</key>
         <string>1</string>
-        <key>ENGRAM_CLOUD_SERVER</key>
+        <key>QBIT_JAY_CLOUD_SERVER</key>
         <string>https://your-cloud-host</string>
-        <key>ENGRAM_CLOUD_TOKEN</key>
+        <key>QBIT_JAY_CLOUD_TOKEN</key>
         <string>your-cloud-token</string>
         -->
     </dict>
@@ -2154,32 +2156,32 @@ This is the recommended setup for Homebrew users on macOS. With `KeepAlive=true`
     <key>KeepAlive</key>
     <true/>
     <key>StandardOutPath</key>
-    <string><HOME>/.engram/serve.out.log</string>
+    <string><HOME>/.qbit-jay/serve.out.log</string>
     <key>StandardErrorPath</key>
-    <string><HOME>/.engram/serve.err.log</string>
+    <string><HOME>/.qbit-jay/serve.err.log</string>
 </dict>
 </plist>
 ```
 
-To unload (stop and disable): `launchctl unload ~/Library/LaunchAgents/com.gentleman-programming.engram.plist`. To reload after editing the plist: unload, then load again.
+To unload (stop and disable): `launchctl unload ~/Library/LaunchAgents/dev.qbitdev.qbit-jay.plist`. To reload after editing the plist: unload, then load again.
 
-> **Note on `brew upgrade`:** launchd does not expand `$HOME` or `~` inside plist values, which is why the template uses literal absolute paths.
+> **Note on upgrades:** launchd does not expand `$HOME` or `~` inside plist values, which is why the template uses literal absolute paths.
 
 ### Using Windows Task Scheduler
 
-Windows Task Scheduler is the native service equivalent on Windows. It restarts `engram serve` on login and after reboots, keeping autosync alive without a third-party service manager.
+Windows Task Scheduler is the native service equivalent on Windows. It restarts `qbit-jay serve` on login and after reboots, keeping autosync alive without a third-party service manager.
 
 **Setup steps:**
 
-1. Confirm `engram.exe` is in your `PATH`: open PowerShell and run `Get-Command engram`.
-2. Set `ENGRAM_CLOUD_TOKEN` (and any other cloud vars) as a **user or system environment variable** in System Properties → Advanced → Environment Variables. Task Scheduler does not inherit session environment variables, so tokens set in your shell profile or in `$env:...` within a PowerShell session will not be visible to the scheduled task.
+1. Confirm `qbit-jay.exe` is in your `PATH`: open PowerShell and run `Get-Command qbit-jay`.
+2. Set `QBIT_JAY_CLOUD_TOKEN` (and any other cloud vars) as a **user or system environment variable** in System Properties → Advanced → Environment Variables. Task Scheduler does not inherit session environment variables, so tokens set in your shell profile or in `$env:...` within a PowerShell session will not be visible to the scheduled task.
 3. Create the scheduled task by running the PowerShell snippet below in an elevated terminal (Run as Administrator), or import it manually through the Task Scheduler GUI.
-4. Verify: after the next login (or trigger manually), run `engram cloud status` — the `Local daemon:` line should report `running on port 7437`.
+4. Verify: after the next login (or trigger manually), run `qbit-jay cloud status` — the `Local daemon:` line should report `running on port 7437`.
 
 ```powershell
 $action  = New-ScheduledTaskAction `
     -Execute  "powershell.exe" `
-    -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -Command `"Start-Process engram -ArgumentList 'serve' -NoNewWindow`""
+    -Argument "-ExecutionPolicy Bypass -WindowStyle Hidden -Command `"Start-Process qbit-jay -ArgumentList 'serve' -NoNewWindow`""
 
 $trigger = New-ScheduledTaskTrigger -AtLogOn
 
@@ -2190,19 +2192,19 @@ $settings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable
 
 Register-ScheduledTask `
-    -TaskName    "EngramMemoryServer" `
+    -TaskName    "QbitJayMemoryServer" `
     -Action      $action `
     -Trigger     $trigger `
     -Settings    $settings `
     -RunLevel    Limited `
-    -Description "Engram persistent memory server (engram serve)"
+    -Description "qbit-jay persistent memory server (qbit-jay serve)"
 ```
 
-> **Environment variables:** `ENGRAM_CLOUD_TOKEN`, `ENGRAM_CLOUD_SERVER`, `ENGRAM_CLOUD_AUTOSYNC`, and `ENGRAM_DATA_DIR` must be set as persistent user or system environment variables (Control Panel → System → Advanced → Environment Variables) so Task Scheduler can read them. Variables you `export` or set with `$env:` in a terminal session are not visible to scheduled tasks.
+> **Environment variables:** `QBIT_JAY_CLOUD_TOKEN`, `QBIT_JAY_CLOUD_SERVER`, `QBIT_JAY_CLOUD_AUTOSYNC`, and `QBIT_JAY_DATA_DIR` must be set as persistent user or system environment variables (Control Panel → System → Advanced → Environment Variables) so Task Scheduler can read them. Variables you `export` or set with `$env:` in a terminal session are not visible to scheduled tasks.
 
-> **Logs:** To capture stdout/stderr, redirect output in the PowerShell command string, for example: `... -Command "Start-Process engram -ArgumentList 'serve' -NoNewWindow -RedirectStandardOutput '$env:USERPROFILE\.engram\serve.out.log' -RedirectStandardError '$env:USERPROFILE\.engram\serve.err.log'"`. Ensure the log files are opened with UTF-8 encoding (`-Encoding UTF8`) if you post-process them.
+> **Logs:** To capture stdout/stderr, redirect output in the PowerShell command string, for example: `... -Command "Start-Process qbit-jay -ArgumentList 'serve' -NoNewWindow -RedirectStandardOutput '$env:USERPROFILE\.qbit-jay\serve.out.log' -RedirectStandardError '$env:USERPROFILE\.qbit-jay\serve.err.log'"`. Ensure the log files are opened with UTF-8 encoding (`-Encoding UTF8`) if you post-process them.
 
-> **Stopping the task:** `Stop-ScheduledTask -TaskName "EngramMemoryServer"` or `Unregister-ScheduledTask -TaskName "EngramMemoryServer" -Confirm:$false` to remove it entirely.
+> **Stopping the task:** `Stop-ScheduledTask -TaskName "QbitJayMemoryServer"` or `Unregister-ScheduledTask -TaskName "QbitJayMemoryServer" -Confirm:$false` to remove it entirely.
 
 ---
 
@@ -2214,7 +2216,7 @@ Register-ScheduledTask `
 4. **Agent-driven compression** — The agent already has an LLM. No separate compression service.
 5. **Privacy at two layers** — Strip in plugin AND store. Defense in depth.
 6. **Pure Go SQLite (modernc.org/sqlite)** — No CGO means true cross-platform binary distribution.
-7. **No raw tool-call auto-capture** — The agent saves curated summaries; `mem_save` may best-effort capture process-local prompt context tied to that save, but Engram does not ingest raw tool-call firehoses. Shell history and git provide the raw audit trail.
+7. **No raw tool-call auto-capture** — The agent saves curated summaries; `mem_save` may best-effort capture process-local prompt context tied to that save, but qbit-jay does not ingest raw tool-call firehoses. Shell history and git provide the raw audit trail.
 8. **TUI with Bubbletea** — Interactive terminal UI following Gentleman Bubbletea patterns.
 
 ---
@@ -2270,34 +2272,34 @@ The regenerated `components_templ.go`, `layout_templ.go`, and `login_templ.go` m
 
 ## Cloud Autosync
 
-Autosync is a background push/pull replication service that keeps your local Engram store in sync with the Engram Cloud server without blocking local writes.
+Autosync is a background push/pull replication service that keeps your local qbit-jay store in sync with the qbit-jay Cloud server without blocking local writes.
 
 ### Enabling Autosync
 
-Autosync is **opt-in**. Set all three environment variables before starting `engram serve` or `engram mcp`:
+Autosync is **opt-in**. Set all three environment variables before starting `qbit-jay serve` or `qbit-jay mcp`:
 
 | Variable                | Required          | Description                                                             |
 | ----------------------- | ----------------- | ----------------------------------------------------------------------- |
-| `ENGRAM_CLOUD_AUTOSYNC` | Yes (exact `"1"`) | Enables autosync. Any other value disables it.                          |
-| `ENGRAM_CLOUD_TOKEN`    | Yes               | Bearer token for the cloud server.                                      |
-| `ENGRAM_CLOUD_SERVER`   | Yes               | Base URL of the cloud server (e.g. `https://cloud.engram.example.com`). |
+| `QBIT_JAY_CLOUD_AUTOSYNC` | Yes (exact `"1"`) | Enables autosync. Any other value disables it.                          |
+| `QBIT_JAY_CLOUD_TOKEN`    | Yes               | Bearer token for the cloud server.                                      |
+| `QBIT_JAY_CLOUD_SERVER`   | Yes               | Base URL of the cloud server (e.g. `https://cloud.example.com`). |
 
 Example:
 
 ```sh
-ENGRAM_CLOUD_AUTOSYNC=1 \
-ENGRAM_CLOUD_TOKEN=your-token \
-ENGRAM_CLOUD_SERVER=https://cloud.engram.example.com \
-engram serve
+QBIT_JAY_CLOUD_AUTOSYNC=1 \
+QBIT_JAY_CLOUD_TOKEN=your-token \
+QBIT_JAY_CLOUD_SERVER=https://cloud.example.com \
+qbit-jay serve
 
 # Or, for stdio MCP agents:
-ENGRAM_CLOUD_AUTOSYNC=1 \
-ENGRAM_CLOUD_TOKEN=your-token \
-ENGRAM_CLOUD_SERVER=https://cloud.engram.example.com \
-engram mcp
+QBIT_JAY_CLOUD_AUTOSYNC=1 \
+QBIT_JAY_CLOUD_TOKEN=your-token \
+QBIT_JAY_CLOUD_SERVER=https://cloud.example.com \
+qbit-jay mcp
 ```
 
-Missing `ENGRAM_CLOUD_TOKEN` or `ENGRAM_CLOUD_SERVER` logs an `ERROR` and disables autosync gracefully — `engram serve` or `engram mcp` still starts.
+Missing `QBIT_JAY_CLOUD_TOKEN` or `QBIT_JAY_CLOUD_SERVER` logs an `ERROR` and disables autosync gracefully — `qbit-jay serve` or `qbit-jay mcp` still starts.
 
 ### Autosync Phase Table
 
@@ -2319,8 +2321,8 @@ Missing `ENGRAM_CLOUD_TOKEN` or `ENGRAM_CLOUD_SERVER` logs an `ERROR` and disabl
 | `reason_code`      | Cause                                                   | Resolution                                                                   |
 | ------------------ | ------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | `transport_failed` | Network error, server 5xx, or 404 on mutation endpoints | Check server health and network; if 404, see `server_unsupported` note below |
-| `auth_required`    | Bearer token rejected (401)                             | Rotate `ENGRAM_CLOUD_TOKEN`                                                  |
-| `policy_forbidden` | Project access denied (403)                             | Check the server-side `ENGRAM_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents. |
+| `auth_required`    | Bearer token rejected (401)                             | Rotate `QBIT_JAY_CLOUD_TOKEN`                                                  |
+| `policy_forbidden` | Project access denied (403)                             | Check the server-side `QBIT_JAY_CLOUD_ALLOWED_PROJECTS` policy for the denied project; a managed principal's project grant may also need checking. The client does not expose allowlist contents. |
 | `internal_error`   | Panic inside the sync cycle                             | Check logs for stack trace                                                   |
 | `upgrade_paused`   | Autosync paused during cloud upgrade (`PhaseDisabled`)  | Call `ResumeAfterUpgrade` or restart                                         |
 
@@ -2328,11 +2330,11 @@ Note: when the cloud server returns 404 on mutation endpoints, the transport log
 
 ### Troubleshooting
 
-For a step-by-step recovery guide covering `chunk_id does not match payload content hash`, `session payload directory is required`, and the temporary missing-directory repair helper, see [Engram Cloud Troubleshooting](docs/engram-cloud/troubleshooting.md).
+For a step-by-step recovery guide covering `chunk_id does not match payload content hash`, `session payload directory is required`, and the temporary missing-directory repair helper, see [qbit-jay Cloud Troubleshooting](docs/engram-cloud/troubleshooting.md).
 
-**`transport_failed` with `server_unsupported` in logs**: Older pre-mutation cloud server deployments may not implement `POST /sync/mutations/push` or `GET /sync/mutations/pull`, causing 404 responses from those endpoints. Deploy a server version that includes these routes before enabling `ENGRAM_CLOUD_AUTOSYNC=1`. Check logs for the line containing `server_unsupported`.
+**`transport_failed` with `server_unsupported` in logs**: Older pre-mutation cloud server deployments may not implement `POST /sync/mutations/push` or `GET /sync/mutations/pull`, causing 404 responses from those endpoints. Deploy a server version that includes these routes before enabling `QBIT_JAY_CLOUD_AUTOSYNC=1`. Check logs for the line containing `server_unsupported`.
 
-**Autosync not starting**: Check that `ENGRAM_CLOUD_AUTOSYNC` is exactly `"1"` (not `"true"` or `"yes"`), and that both `ENGRAM_CLOUD_TOKEN` and `ENGRAM_CLOUD_SERVER` are non-empty. The process logs an `[autosync] ERROR` line explaining which variable is missing.
+**Autosync not starting**: Check that `QBIT_JAY_CLOUD_AUTOSYNC` is exactly `"1"` (not `"true"` or `"yes"`), and that both `QBIT_JAY_CLOUD_TOKEN` and `QBIT_JAY_CLOUD_SERVER` are non-empty. The process logs an `[autosync] ERROR` line explaining which variable is missing.
 
 **Local writes still blocked**: Autosync shares the SQLite store and its write transactions with local requests. Automatic legacy-mutation quarantine examines at most 100 pending rows per push cycle, continuing from an in-memory sequence cursor on later cycles. A completed sweep restarts on a later cycle; restarting the process resets the cursor. Valid unenrolled mutations remain pending, and the explicit doctor/manual quarantine operation still examines its complete selected scope. The page bound limits automatic validation work per transaction; individual payloads, other store work, and database contention can still delay local requests.
 
@@ -2340,7 +2342,7 @@ For a step-by-step recovery guide covering `chunk_id does not match payload cont
 
 ## Scheduled Explicit Cloud Sync Wrappers
 
-The wrappers under `tools/` are an **alternative** to native autosync for hosts where you cannot keep `engram serve` running. For each explicitly named project, they run the native autosync order: export/push (`engram sync --cloud --project <project>`), then import/pull (`engram sync --cloud --import --project <project>`). **Choose ONE mode** -- native autosync (recommended) when a daemon is feasible, OR these wrappers for the no-daemon case. Do **not** run both at once. Cloud `--all` is intentionally unsupported; projects are never inferred from cwd or an env var.
+The wrappers under `tools/` are an **alternative** to native autosync for hosts where you cannot keep `qbit-jay serve` running. For each explicitly named project, they run the native autosync order: export/push (`qbit-jay sync --cloud --project <project>`), then import/pull (`qbit-jay sync --cloud --import --project <project>`). **Choose ONE mode** -- native autosync (recommended) when a daemon is feasible, OR these wrappers for the no-daemon case. Do **not** run both at once. Cloud `--all` is intentionally unsupported; projects are never inferred from cwd or an env var.
 
 ### Bash: `tools/cloud-sync-projects.sh`
 
@@ -2349,7 +2351,7 @@ The wrappers under `tools/` are an **alternative** to native autosync for hosts 
 ./tools/cloud-sync-projects.sh --log /var/log/engram-cloud-sync.log my-project
 ```
 
-Exit `0` if every attempted export, import, and log operation succeeded; `1` if any attempted phase or logging operation failed; `2` on usage error. If export fails, that project's import is skipped, matching native autosync; the wrapper records the export failure and continues with later projects. If import fails, it is recorded and makes the aggregate result nonzero. Default durable log `$ENGRAM_DATA_DIR/cloud-sync-projects.log` (`~/.engram` fallback); override `--log` > `ENGRAM_CLOUD_SYNC_LOG` > default. Per-project, per-phase status lines go to both timestamped console and log; command stdout+stderr stays live on the console and is appended to the log. Nothing retried or silenced.
+Exit `0` if every attempted export, import, and log operation succeeded; `1` if any attempted phase or logging operation failed; `2` on usage error. If export fails, that project's import is skipped, matching native autosync; the wrapper records the export failure and continues with later projects. If import fails, it is recorded and makes the aggregate result nonzero. Default durable log `$QBIT_JAY_DATA_DIR/cloud-sync-projects.log` (`~/.qbit-jay` fallback); override `--log` > `QBIT_JAY_CLOUD_SYNC_LOG` > default. Per-project, per-phase status lines go to both timestamped console and log; command stdout+stderr stays live on the console and is appended to the log. Nothing retried or silenced.
 
 ### PowerShell: `tools/cloud-sync-projects.ps1`
 
@@ -2358,7 +2360,7 @@ pwsh ./tools/cloud-sync-projects.ps1 my-project my-other-project
 pwsh ./tools/cloud-sync-projects.ps1 -LogPath C:\logs\engram-cloud-sync.log my-project
 ```
 
-Requires PowerShell 7 (`pwsh`); 5.1 is not supported. Same export-then-import order, skipped-import behavior after an export failure, exit codes, and log defaults as Bash; override `-LogPath` > `ENGRAM_CLOUD_SYNC_LOG` > default.
+Requires PowerShell 7 (`pwsh`); 5.1 is not supported. Same export-then-import order, skipped-import behavior after an export failure, exit codes, and log defaults as Bash; override `-LogPath` > `QBIT_JAY_CLOUD_SYNC_LOG` > default.
 
 Both wrapper files are included in every GoReleaser release archive under `tools/`; copy the one for your scheduler host from the extracted archive.
 
@@ -2367,20 +2369,20 @@ Both wrapper files are included in every GoReleaser release archive under `tools
 `phase=<export|import> FAILURE project=<name> exit=<n>` records the exact exit code from the failing CLI phase:
 
 ```sh
-grep 'phase=.* FAILURE' "${ENGRAM_DATA_DIR:-$HOME/.engram}/cloud-sync-projects.log" | tail -n 5
+grep 'phase=.* FAILURE' "${QBIT_JAY_DATA_DIR:-$HOME/.qbit-jay}/cloud-sync-projects.log" | tail -n 5
 ```
 
 ```powershell
-# PowerShell 7 ($env:ENGRAM_DATA_DIR or $HOME/.engram fallback)
-$d = if ($env:ENGRAM_DATA_DIR) { $env:ENGRAM_DATA_DIR } else { Join-Path $HOME '.engram' }
+# PowerShell 7 ($env:QBIT_JAY_DATA_DIR or $HOME/.qbit-jay fallback)
+$d = if ($env:QBIT_JAY_DATA_DIR) { $env:QBIT_JAY_DATA_DIR } else { Join-Path $HOME '.qbit-jay' }
 Select-String 'phase=.* FAILURE' (Join-Path $d 'cloud-sync-projects.log') | Select-Object -Last 5
 ```
 
-Pass the failing project to [Engram Cloud Troubleshooting](docs/engram-cloud/troubleshooting.md) -- the wrappers record and propagate, not interpret or retry.
+Pass the failing project to [qbit-jay Cloud Troubleshooting](docs/engram-cloud/troubleshooting.md) -- the wrappers record and propagate, not interpret or retry.
 
 ## Cloud Sync Audit Log
 
-When project sync is paused and a push is rejected, Engram records an audit entry in `cloud_sync_audit_log`. This gives operators a persistent trail of every rejection event, visible in the admin dashboard under **Admin > Audit Log**.
+When project sync is paused and a push is rejected, qbit-jay records an audit entry in `cloud_sync_audit_log`. This gives operators a persistent trail of every rejection event, visible in the admin dashboard under **Admin > Audit Log**.
 
 ### Schema
 
@@ -2437,7 +2439,7 @@ COMMIT;
 
 ## Next Steps
 
-- [Agent Setup](docs/AGENT-SETUP.md) — connect your agent to Engram
+- [Agent Setup](docs/AGENT-SETUP.md) — connect your agent to qbit-jay
 - [Plugins](docs/PLUGINS.md) — what the OpenCode and Claude Code plugins add beyond bare MCP
 - [Obsidian Brain](docs/beta/obsidian-brain.md) — visualize memories as a knowledge graph (beta)
 - [Contributing](CONTRIBUTING.md) — how to contribute

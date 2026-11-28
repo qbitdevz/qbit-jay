@@ -1,13 +1,16 @@
 [← Back to README](../../README.md)
 
-# Engram Cloud
+# qbit-jay Cloud
 
-**Use Engram Cloud when you want shared, project-scoped memory across machines without giving up local-first ownership.**
+**Use qbit-jay Cloud when you want shared, project-scoped memory across machines without giving up local-first ownership.**
 
-Local SQLite remains authoritative. Engram Cloud is optional replication + browser visibility for teams and operators.
+Local SQLite remains authoritative. qbit-jay Cloud is optional replication + browser visibility for teams and operators.
 
 <p align="center">
-  <img src="../../assets/branding/engram-cloud-logo.png" alt="Engram Cloud" width="960" />
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="../../assets/branding/qbit-jay-logo-horizontal-dark.svg" />
+    <img src="../../assets/branding/qbit-jay-logo-horizontal-light.svg" alt="qbit-jay Cloud" width="480" />
+  </picture>
 </p>
 
 ---
@@ -23,9 +26,9 @@ If you want a working cloud setup fast, use the local smoke path first:
 
 ```bash
 docker compose -f docker-compose.cloud.yml up -d
-engram cloud config --server http://127.0.0.1:18080
-engram cloud enroll smoke-project
-engram sync --cloud --project smoke-project
+qbit-jay cloud config --server http://127.0.0.1:18080
+qbit-jay cloud enroll smoke-project
+qbit-jay sync --cloud --project smoke-project
 ```
 
 Continue with full verification and expected outputs in [Quickstart](./quickstart.md).
@@ -34,7 +37,7 @@ Continue with full verification and expected outputs in [Quickstart](./quickstar
 
 ## Public Container Image (GHCR)
 
-Engram Cloud publishes an official production image at:
+qbit-jay Cloud publishes an official production image at:
 
 - `ghcr.io/gentleman-programming/engram:v2.0.0`
 
@@ -51,14 +54,14 @@ For a direct registry-based deploy example, use:
 
 ---
 
-## What Engram Cloud Is
+## What qbit-jay Cloud Is
 
 - **Project-scoped replication**: each sync call is tied to one explicit `--project`
-- **Self-hosted cloud runtime**: `engram cloud serve` on infrastructure you control
+- **Self-hosted cloud runtime**: `qbit-jay cloud serve` on infrastructure you control
 - **Browser dashboard**: `/dashboard/*` visibility for humans/operators
 - **Deterministic status/failure signals**: clear reason codes instead of silent drift
 
-## What Engram Cloud Is Not
+## What qbit-jay Cloud Is Not
 
 - Not cloud-only
 - Not implicit “sync everything” mode
@@ -68,11 +71,11 @@ For a direct registry-based deploy example, use:
 
 ## Runtime Split (important)
 
-### Local runtime: `engram serve`
+### Local runtime: `qbit-jay serve`
 - Local memory API
 - Local sync status endpoint: `GET /sync/status`
 
-### Cloud runtime: `engram cloud serve`
+### Cloud runtime: `qbit-jay cloud serve`
 - `GET /health`
 - `GET /sync/pull`, `POST /sync/push`
 - `GET /dashboard/*` (browser surfaces)
@@ -100,7 +103,7 @@ HTTPS and appropriate deployment controls for transport security.
 | [Quickstart](./quickstart.md) | One recommended path first, then authenticated mode |
 | [Production Checklist](./production-checklist.md) | Self-hosted production boundaries, recovery, and operator responsibilities |
 | [GHCR Compose Example](./docker-compose.ghcr.yml) | Pull-and-run deployment sample for Dokploy/Coolify/Portainer/VPS |
-| [Branding](./branding.md) | Engram Cloud visual identity, asset usage, previews |
+| [Branding](./branding.md) | qbit-jay Cloud visual identity, asset usage, previews |
 | [Technical Cloud Reference](../../DOCS.md#cloud-cli-opt-in) | Full CLI + env/runtime details |
 | [Cloud Autosync](../../DOCS.md#cloud-autosync) | Background replication behavior + phase table |
 

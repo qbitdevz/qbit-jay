@@ -5,7 +5,7 @@ Pi's native inventory matches Go's `ProfileAgent`; input and output envelopes ar
 ## Authority and scope
 
 - Go's MCP definitions in `internal/mcp/mcp.go` and HTTP handlers in `internal/server` own the contracts and agent/admin boundary. Pi schemas and dispatch are projections; the registration regression compares the public native inventory against the current Go profile rather than freezing a second list.
-- `mem_delete`, `mem_stats`, `mem_timeline`, and `mem_merge_projects` require deliberate administrative access, such as a separate `engram mcp --tools=admin` client. Pi does not offer an administrative opt-in profile. Retained internal dispatchers and chrome entries do not register tools or authorize access.
+- `mem_delete`, `mem_stats`, `mem_timeline`, and `mem_merge_projects` require deliberate administrative access, such as a separate `qbit-jay mcp --tools=admin` client. Pi does not offer an administrative opt-in profile. Retained internal dispatchers and chrome entries do not register tools or authorize access.
 - Schemas describe model inputs, not all HTTP fields. Pi supplies project/session context and applies its existing redaction, cancellation, timeout, and error policy. Go still validates the received request.
 - Optional fields preserve omission except documented Pi defaults; `false` and zero are not omission. Pi's `mem_context.max_bytes` and consolidation IDs use bounded integer schemas; batch confidence uses [0,1]. These schemas do not replace Go's validation.
 - Pi renders HTTP data through a text result and `details.data`; MCP uses its tool-result text/project envelopes. Labels, status summaries, MCP annotations, descriptions, and defer-loading metadata are transport/presentation information, not authorization.
@@ -71,7 +71,7 @@ Errors are `pi input: invalid capture`, `pi input: duplicate registration`,
 or `pi input: unsupported source for NAME`; authority-generation errors propagate.
 
 Run from the repository root with Node.js 24 and existing TypeBox 1.3.34:
-`ENGRAM_PI_SCHEMA_REQUIRE_REAL=1 GOPROXY=off GOSUMDB=off go test ./internal/mcp -run '^TestPiInput' -count=1 -v`.
+`QBIT_JAY_PI_SCHEMA_REQUIRE_REAL=1 GOPROXY=off GOSUMDB=off go test ./internal/mcp -run '^TestPiInput' -count=1 -v`.
 Tests capture actual registrations twice through the existing disposable sandbox,
 then independently mutate fields/constraints/inventory and check immutability.
 Default Go-only runs skip integration only for missing Node or the fixed local

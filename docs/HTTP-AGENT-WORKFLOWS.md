@@ -1,6 +1,6 @@
 # Compound agent workflows over HTTP
 
-These local Go HTTP bridges use the existing store operations. They do not invoke MCP or implement memory algorithms in clients. All three routes use the existing optional Bearer-token mutation policy: when `ENGRAM_HTTP_TOKEN` is configured, supply `Authorization: Bearer <token>`. Session-owned servers also retain their whole-handler authentication.
+These local Go HTTP bridges use the existing store operations. They do not invoke MCP or implement memory algorithms in clients. All three routes use the existing optional Bearer-token mutation policy: when `QBIT_JAY_HTTP_TOKEN` is configured, supply `Authorization: Bearer <token>`. Session-owned servers also retain their whole-handler authentication.
 
 Send exactly one JSON object. Each workflow request is limited to **1 MiB (1,048,576 bytes)**, including trailing JSON or whitespace. The decoder enforces this limit before workflow writes, after the existing authentication checks. Overflow detected while reading either the object or its trailing data returns HTTP 413 `{ "error": "body exceeds 1048576-byte limit", "code": "request_too_large" }`; malformed, empty, null, array or additional JSON values within the limit return HTTP 400 `invalid_arguments`. This is a transport resource limit, not a change to Store content rules.
 

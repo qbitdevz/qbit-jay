@@ -1,5 +1,7 @@
 [← Back to README](../README.md)
 
+> **Historical upstream guide.** This is Engram's community-testing guide for its beta branch `feat/memory-conflict-surfacing-cloud-sync`. It is kept as a record and is not rewritten for qbit-jay: its clone URL, `engram` commands and `~/.engram` paths are upstream's.
+
 # Engram Beta — Phases 2 + 3 + 4
 
 Community-testing guide for the new memory-conflict-surfacing features.
